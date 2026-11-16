@@ -2,12 +2,12 @@
 
 Roles are **temporary**. When you onboard, confirm or change your row. The only fixed role is Neil's (EE / flex).
 
-| Name | Background | Role preference | Location | Status |
-| --- | --- | --- | --- | --- |
-| Neil | Electrical engineering (EE) | **Flex (fixed)**: hardware, integration, fills gaps | _fill in: local or remote_ | confirmed |
-| AJ | _fill in_ | Flex | _fill in_ | temporary |
-| Anish | Competitive programming | Backend, algorithms | _fill in_ | temporary |
-| Adarsh | Electrical engineering (EE) | Flex | _fill in_ | temporary |
+| Name | GitHub | Background | Role preference | Location | Status |
+| --- | --- | --- | --- | --- | --- |
+| Neil | Codexee | Electrical engineering (EE) | **Flex (fixed)**: hardware, integration, fills gaps | _fill in: local or remote_ | confirmed |
+| AJ | unpug | _fill in_ | Flex | _fill in_ | temporary |
+| Anish | sseance | Competitive programming | Backend, algorithms | _fill in_ | temporary |
+| Adarsh | _pending_ | Electrical engineering (EE) | Flex | _fill in_ | temporary |
 
 Constraint: **2 of the 4 members are remote.** See `constraints.md`.
 

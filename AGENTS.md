@@ -22,7 +22,7 @@ We are a 4-person team competing in **Patriot HackFest Fall 2026** (George Mason
 - **Phase:** Mon Nov 16, ideation (calendar: "review the challenge, set goals, choose a project direction").
 - **Done:** repo, shared context, skills, and the round-1 idea shortlist (`ideation/shortlist.md`).
 - **Next:** team vote, then `/interview <idea>`, then lock the spec tonight, then `/parallelize` on Tuesday morning.
-- **Blockers:** none.
+- **Blockers:** ⏸ **Ideation is ON HOLD** (Neil, Nov 16). The team is first settling how the tools split roles (see `docs/tooling.md` → "Who does what"). Do not run `/ideate` or `/interview`, and do not vote on ideas, until Neil lifts the hold.
 
 ## How we work
 
