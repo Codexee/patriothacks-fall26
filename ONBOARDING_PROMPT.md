@@ -16,7 +16,8 @@ the same context. Do the following in order, and do not skip steps:
 
 2. Check my toolchain and tell me exactly what is missing. Do not install anything without asking me:
    - Claude Code signed in; Codex CLI (`codex --version`, then `codex login`)
-   - The jmo-workflow plugin (`claude plugin list`)
+   - The plugins jmo-workflow and codex@openai-codex (`claude plugin list`). For the Codex plugin, run `/codex:setup` once.
+   - The agent-browser CLI (`agent-browser --version`), used for browser QA
    - Paradev, formerly Superset (parallel agents in git worktrees). It is a macOS Homebrew cask.
      On other systems, suggest the alternatives listed in scripts/setup.sh
    - Offer to run `bash scripts/setup.sh` for me.

@@ -21,10 +21,16 @@ Based on the video's Opticon workflow. Johnathan split his master plan into inde
 
 ## 3. Launch
 
-Each workstream runs in its own git worktree, created with `git worktree add ../wt-<slug> -b ws/<slug>`, or as a Superset workspace. Run them in one of these ways:
+Each workstream runs in its own git worktree or Paradev (formerly Superset) workspace. Choose the first option that is available:
 
-- **One machine:** start one sub-agent per workstream (use the Agent tool with `isolation: "worktree"` where available). Give each sub-agent its row of the table, the spec path, the contracts, and its "done when" check.
-- **Across teammates:** each person opens their own workstream as a Superset workspace (or a worktree) and runs their AI on that row. Remote teammates take workstreams that need no hardware.
+- **Paradev (preferred: this is the video's setup).** If the `superset:orchestrate` skill is available and `superset auth whoami` succeeds, call `superset:orchestrate` and hand it the Workstreams table as its coordinator table:
+  - one Paradev workspace (branch) per workstream
+  - a Claude Code agent for the frontend rows and a Codex agent for the backend rows
+  - the dependencies, the "done when" checks, and the worker prompt below
+
+  Follow its worker protocol to dispatch the agents, read their progress, and collect structured results.
+- **One machine, without Paradev.** Start one sub-agent per workstream, using the Agent tool with `isolation: "worktree"` where that is available, or create a worktree with `git worktree add ../wt-<slug> -b ws/<slug>`. Give each sub-agent its row of the table, the spec path, the contracts, and its "done when" check.
+- **Across teammates.** Each person opens their own workstream as a Paradev workspace or a worktree, and runs their AI on that row. Remote teammates take the workstreams that need no hardware. When a workstream changes hands, use `/handoff`.
 
 Every sub-agent prompt must say:
 
@@ -38,4 +44,5 @@ Every sub-agent prompt must say:
 - Merge the branches into `main` one at a time. After each merge, run the app and the checks.
 - Run `/codex review` on the combined diff.
 - Update the **Status** section in `CLAUDE.md`: what works, what is broken, what comes next.
-- Then polish by hand: use `/agentation` for visual feedback, `/better-interface` for a full UI audit, and `/animate` for motion.
+- Run the app in a real browser with `/agent-browser` or `/webapp-testing`. When something breaks, use `/systematic-debugging` before changing any code.
+- Then polish by hand: use `/agentation` for visual feedback (or `/agentation-self-driving` to let the agent annotate the page itself), `/better-interface` for a full UI audit, and `/animate` for motion.

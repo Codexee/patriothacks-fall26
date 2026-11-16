@@ -33,11 +33,12 @@ Source: https://www.youtube.com/watch?v=AoxK3JpxbRc. This file summarizes the wo
 
 | Video skill | Here | Use it to |
 | --- | --- | --- |
-| `/interview` | `/interview` (upgraded) | Turn an idea into a locked master spec in `.plans/` |
+| `/interview` | `/interview` (JMO's version plus Matt Pocock's `grilling` loop) | Turn an idea into a locked master spec in `.plans/` |
 | `/ste` | `/ste` (upgraded) | Get clear explanations with no "levers / knobs / counterfactual" filler |
-| `/better-ui` | `/better-ui` and the full `better-*` suite, including `/better-interface` | Run a whole-app UI audit and polish |
-| `/animate` | `/animate`, `/review-animations`, `/improve-animations` | Add motion design |
-| `/agentation` | `/agentation` | Click an element in the app and send the comment to the agent |
-| `/codex` | `/codex` (review / challenge / consult / implement) | Get backend work done or a second-opinion review |
-| (workflow) | `/ideate`, `/parallelize`, `/pitch` | Run steps 1, 2, and 4 of the playbook |
+| `/better-ui` | `/better-interface` (whole-app audit), the `better-*` suite, `/frontend-design` (new screens), `/impeccable` | Avoid AI-slop design; audit and polish |
+| `/animate` | `/animate`, `/choreograph`, `/review-animations`, `/improve-animations`, `/find-animation-opportunities` | Add motion design |
+| `/agentation` | `/agentation`, `/agentation-self-driving` | Click an element in the app and send the comment to the agent |
+| `/codex` | `/codex` (routes to OpenAI's official plugin: review / challenge / consult / implement) | Get backend work done or a second-opinion review |
+| (workflow) | `/ideate`, `/parallelize` (→ Paradev `superset:orchestrate`), `/pitch`, `/handoff`, `/prototype`, `/systematic-debugging` | Run steps 1, 2, and 4 of the playbook |
+| (QA, writing, video) | `/agent-browser`, `/webapp-testing`, `/humanizer`, `/hyperframes` | Test in a real browser, clean up the prose, make the demo video |
 | MCPs | Supabase, Neon, Stripe (optional) | Create databases and payments from the agent |

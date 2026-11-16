@@ -22,6 +22,21 @@ if command -v claude >/dev/null; then
   claude plugin install jmo-workflow@jmo-skills >/dev/null 2>&1 && ok "jmo-workflow installed (user scope)" || warn "plugin install failed. Run it by hand: claude plugin install jmo-workflow@jmo-skills"
 fi
 
+say "Official OpenAI Codex plugin (the engine behind /codex)"
+if command -v claude >/dev/null; then
+  claude plugin marketplace add openai/codex-plugin-cc >/dev/null 2>&1 || true
+  claude plugin install codex@openai-codex >/dev/null 2>&1 && ok "codex@openai-codex installed. In Claude Code run: /codex:setup" || warn "Run by hand: claude plugin install codex@openai-codex"
+fi
+
+say "agent-browser (browser QA for agents; also needed by /agentation-self-driving)"
+if command -v agent-browser >/dev/null; then ok "$(agent-browser --version)"; else
+  if command -v npm >/dev/null; then npm install -g agent-browser && agent-browser install && ok "agent-browser installed"; else warn "Install Node.js, then: npm i -g agent-browser && agent-browser install"; fi; fi
+
+say "Optional runtimes (installed the first time a skill needs them)"
+echo "  /webapp-testing : pip install playwright && playwright install chromium"
+echo "  /hyperframes    : runs through npx (Node 22+). It sends a usage beacon; opt out per its docs"
+echo "  /impeccable     : downloads its own binary on first run"
+
 if [[ "$(uname)" == "Darwin" ]] && command -v brew >/dev/null; then
   say "Desktop apps (Homebrew casks)"
   for cask in superset; do

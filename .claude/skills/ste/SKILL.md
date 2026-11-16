@@ -21,6 +21,10 @@ The reader must understand the text on the first read, and it must stay technica
 8. Keep three things separate: what is confirmed, what is assumed, and what you recommend.
 9. When an idea is abstract, give a short, concrete example.
 10. Use exact numbers and names. Write "takes 2–3 s on a 1,000-row table", not "is a bit slow".
+11. Use lists for steps or parallel items. Use prose when the ideas depend on one another. (From JMO.)
+12. Remove filler, vague intensifiers, and decorative jargon. (From JMO. The table below lists the usual offenders.)
+
+For finished prose that readers will see (the Devpost write-up, pitch script, README), run `/humanizer` after `/ste`. `/ste` makes explanations precise. `/humanizer` removes the structural AI tells, such as "not X but Y", forced triads, and one-line closers.
 
 ## Banned words and phrases
 

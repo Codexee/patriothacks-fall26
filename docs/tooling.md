@@ -17,6 +17,34 @@ The plugin was checked against what the video describes. Five gaps made it weake
 
 The plugin stays installed at user scope, as the guide says. `.claude/settings.json` turns it **off inside this repo**, so that each skill shows up once. This also follows the video's advice to turn off skills you do not need.
 
+**Round 2 (Nov 16):** every JMO skill was compared against the most popular alternatives. See `docs/skills-review.md`. The changes:
+- `/interview` now uses Matt Pocock's `grilling` loop.
+- `/codex` now runs on OpenAI's official plugin.
+- `/ste` gained JMO's two missing rules.
+- The newer upstream `better-ui` and `animate` were diffed against JMO's pinned copies. They contain only fixes by their authors, and nothing was removed.
+- New skills: frontend-design, impeccable, humanizer, choreograph, find-animation-opportunities, agentation-self-driving, agent-browser, webapp-testing, systematic-debugging, handoff, prototype, and hyperframes.
+
+## Which skill when
+
+Some design skills overlap. Use this table so that agents do not run three of them on the same screen.
+
+| Situation | Use | Not |
+| --- | --- | --- |
+| Building a **new** screen or picking the visual direction | `/frontend-design` (plans the design tokens first and avoids AI-default looks) | the `better-*` skills (they polish; they don't set a direction) |
+| Exploring several layouts, or shaping UX before code | `/impeccable shape`, `/impeccable live`, `/prototype` (throwaway variants) | |
+| Full UI audit of the app (Thu) | `/better-interface` | `/impeccable audit` (use one auditor, not both) |
+| Reviewing a branch's UI changes | `/interface-review` | |
+| Exact polish: radius, shadows, icons | `/better-ui` | |
+| Adding motion | `/animate`; `/choreograph` for group entrances | `/impeccable animate` |
+| Finding where motion would help, or auditing motion | `/find-animation-opportunities`, `/improve-animations`, `/review-animations` | |
+| Pointing at an element and saying "fix this" | `/agentation` (you annotate) · `/agentation-self-driving` (the agent annotates) | |
+| Checking that the app works in a browser | `/agent-browser` (explore and dogfood) · `/webapp-testing` (repeatable Playwright scripts) | |
+| A bug or failing test | `/systematic-debugging` before you change code | |
+| Explanations, specs, docs | `/ste` | |
+| Devpost text, pitch script, README | `/ste`, then `/humanizer` | |
+| A teammate takes over a workstream | `/handoff` (saved to `docs/handoffs/`) | |
+| Demo video (Fri) | `/hyperframes` | |
+
 ## Who does what
 
 **You talk to Claude Code. Paradev does not think; it is a window manager for agents.**
@@ -38,6 +66,8 @@ Paradev's desktop app is macOS-only (Linux is experimental, Windows is not suppo
 | --- | --- | --- |
 | Claude Code | https://code.claude.com/docs/en/setup | The main agent harness |
 | Codex CLI | `npm i -g @openai/codex`, then `codex login` | Backend work and second-opinion reviews (`/codex`) |
+| Codex plugin (official) | `claude plugin install codex@openai-codex`, then `/codex:setup` | `/codex:review`, `/codex:adversarial-review`, `/codex:rescue` (our `/codex` routes to these) |
+| agent-browser | `npm i -g agent-browser && agent-browser install` | Browser QA; needed by `/agentation-self-driving` |
 | Paradev (Superset) | `brew install --cask superset` | Parallel agents in git worktrees, with a built-in browser and diffs |
 | Cosmos | https://www.cosmos.so (web) | The inspiration board |
 
