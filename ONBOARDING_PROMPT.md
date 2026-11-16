@@ -1,6 +1,6 @@
 # Onboarding prompt for a teammate's AI
 
-Clone the repo, then paste everything in the box below into Claude Code (or Codex or Cursor), opened **inside the repo folder**.
+Clone https://github.com/Codexee/patriothacks-fall26 (ask Neil for a collaborator invite), then paste everything in the box below into Claude Code (or Codex or Cursor), opened **inside the repo folder**.
 
 ```text
 You are joining my team's AI setup for Patriot HackFest Fall 2026 (GMU, virtual, Nov 14–20, 2026).

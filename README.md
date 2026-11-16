@@ -8,7 +8,7 @@ The repo holds both the project and the **shared AI context**. Every teammate's 
 ## Quick start (teammates)
 
 ```bash
-git clone <this repo> && cd patriothacks-fall26
+git clone https://github.com/Codexee/patriothacks-fall26 && cd patriothacks-fall26
 bash scripts/setup.sh        # Codex CLI, JMO plugin, Wispr Flow, Superset
 claude                       # then paste ONBOARDING_PROMPT.md
 ```
