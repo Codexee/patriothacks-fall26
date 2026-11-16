@@ -17,8 +17,8 @@ the same context. Do the following in order, and do not skip steps:
 2. Check my toolchain and tell me exactly what is missing. Do not install anything without asking me:
    - Claude Code signed in; Codex CLI (`codex --version`, then `codex login`)
    - The jmo-workflow plugin (`claude plugin list`)
-   - Wispr Flow (voice prompting) and Superset (parallel agents in git worktrees). Both are macOS
-     Homebrew casks. On other systems, suggest the alternatives listed in scripts/setup.sh
+   - Paradev, formerly Superset (parallel agents in git worktrees). It is a macOS Homebrew cask.
+     On other systems, suggest the alternatives listed in scripts/setup.sh
    - Offer to run `bash scripts/setup.sh` for me.
 
 3. Confirm that the project skills in .claude/skills/ are available to you (/ideate, /interview,

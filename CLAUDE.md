@@ -7,4 +7,3 @@
 - These are upgraded versions of the `jmo-workflow` plugin's skills. `.claude/settings.json` disables that plugin inside this repo, so each skill appears only once.
 - `/codex` needs the Codex CLI (`npm i -g @openai/codex`, then `codex login`).
 - Use `/interview` with AskUserQuestion. Do not hold a long interview in prose.
-- When the user dictates with Wispr Flow, the prompt can be long and loose. Pull out the real request, and confirm only the parts that are truly unclear.

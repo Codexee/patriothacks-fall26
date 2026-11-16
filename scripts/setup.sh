@@ -24,14 +24,13 @@ fi
 
 if [[ "$(uname)" == "Darwin" ]] && command -v brew >/dev/null; then
   say "Desktop apps (Homebrew casks)"
-  for cask in wispr-flow superset; do
+  for cask in superset; do
     if brew list --cask "$cask" >/dev/null 2>&1; then ok "$cask already installed"; else brew install --cask "$cask" && ok "$cask installed"; fi
   done
 else
   say "Desktop apps"
   warn "Not on macOS with Homebrew. Install by hand:"
-  warn "  Wispr Flow (voice-to-text prompting): https://wisprflow.ai  (Windows, iOS, and Android apps exist)"
-  warn "  Superset (parallel agents and worktrees, macOS): https://superset.sh. Alternative: plain 'git worktree' or Cursor"
+  warn "  Paradev, formerly Superset (parallel agents and worktrees, macOS): https://superset.sh. Alternative: plain 'git worktree' or Cursor"
 fi
 
 say "Optional MCP plugins (install only if the locked spec needs them)"

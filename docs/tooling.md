@@ -27,7 +27,6 @@ Paradev (the Superset app's new name, made by Paradev) runs CLI agents such as C
 | **Claude Code** | The main agent. Every prompt, skill, and plan goes through it. It also does the frontend work. | All week |
 | **Codex CLI** | The second agent: backend work and reviews (`/codex`) | Tue–Thu |
 | **Paradev (Superset)** | Runs several Claude Code or Codex sessions in parallel, one worktree per workstream, and reviews their diffs | Tue–Wed builds (`/parallelize`). Not needed Mon. |
-| **Wispr Flow** | Voice input into any of the above | All week |
 | **Cosmos** | The inspiration board. The agents copy from it. | Mon–Tue design |
 | **GitHub repo** | Shared memory and sync between the 4 setups | All week |
 
@@ -39,7 +38,6 @@ Paradev's desktop app is macOS-only (Linux is experimental, Windows is not suppo
 | --- | --- | --- |
 | Claude Code | https://code.claude.com/docs/en/setup | The main agent harness |
 | Codex CLI | `npm i -g @openai/codex`, then `codex login` | Backend work and second-opinion reviews (`/codex`) |
-| Wispr Flow | `brew install --cask wispr-flow` | Voice prompting, about 4× faster than typing |
 | Paradev (Superset) | `brew install --cask superset` | Parallel agents in git worktrees, with a built-in browser and diffs |
 | Cosmos | https://www.cosmos.so (web) | The inspiration board |
 

@@ -11,7 +11,7 @@ Source: https://www.youtube.com/watch?v=AoxK3JpxbRc. This file summarizes the wo
 - Skill: `/ideate`, then `/interview`.
 
 ### 2. Build fast with AI agents
-- Use agents. Typing by hand is too slow, and so is typing prompts. Dictate them with **Wispr Flow**, which is about 4× faster and leads you to give more context.
+- Use agents. Typing code by hand is too slow. Give the agent a lot of context in each prompt.
 - **Harness** (Claude Code, Codex, Cursor) = the wrapper around the model that handles memory, context, and routing.
 - **Agent IDE** (Superset) = runs many agents in parallel, each in its own **git worktree**, with a built-in browser and a diff view.
 - **Write the plan first.** For Opticon, the team spent 2–3 hours being interviewed by Claude about the plan. They then split the plan into independent tasks and ran one sub-agent per task for 5–6 hours, refined by hand with `/agentation` for 1 hour, and slept. The project won.
