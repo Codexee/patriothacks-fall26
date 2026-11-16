@@ -1,0 +1,21 @@
+{
+  "_about": "Skill reminders. When a prompt matches a pattern (case-insensitive regex) and does not already name a skill, the AI asks the user whether to use that skill, at most once per skill per session. Read by scripts/hooks/skill_nudge.py (Claude Code) and by AGENTS.md (other AIs). Keep docs/skills.md in sync when you edit this file.",
+  "triggers": [
+    { "skill": "systematic-debugging", "why": "find the root cause before changing code", "patterns": ["\\bbug\\b", "\\berror\\b", "\\bbroken\\b", "not working", "doesn'?t work", "\\bfail(s|ed|ing)?\\b", "\\bcrash", "stack ?trace", "exception", "\\bfix (it|this|the)\\b"] },
+    { "skill": "ideate", "why": "score ideas with the think-backward framework", "patterns": ["\\bideas?\\b", "brainstorm", "what should we build", "project direction"] },
+    { "skill": "interview", "why": "turn this into a locked master spec in .plans/", "patterns": ["\\bspec\\b", "requirements", "plan (out|the) (project|feature|app)", "grill me", "scope (it|this|the)"] },
+    { "skill": "prototype", "why": "answer the question with a throwaway prototype first", "patterns": ["prototype", "mock ?up", "try (a few|some|different) (versions|layouts|designs)", "quick test of"] },
+    { "skill": "parallelize", "why": "split the locked spec into workstreams with one agent each", "patterns": ["split (up )?the work", "in parallel", "divide (the )?tasks", "start (the )?build", "worktrees?", "assign (tasks|work)"] },
+    { "skill": "handoff", "why": "write a handoff doc to docs/handoffs/ so the next person or agent can continue", "patterns": ["hand ?off", "take over", "pass (this|it) to", "going to (bed|sleep)", "end of (my )?shift", "pick (this|it) up (later|tomorrow)"] },
+    { "skill": "codex", "why": "get Codex's review, challenge, or backend implementation", "patterns": ["review (my|the|this) (code|diff|pr|changes)", "second opinion", "before (we )?merge", "\\bbackend\\b", "\\bapi endpoint", "\\bdatabase\\b"] },
+    { "skill": "frontend-design", "why": "set a deliberate visual direction and avoid generic AI-looking UI", "patterns": ["new (page|screen|view|component)", "landing page", "design the", "build (the|a) (ui|page|screen|dashboard)", "\\blook and feel\\b"] },
+    { "skill": "better-interface", "why": "run a full UI audit", "patterns": ["audit (the )?ui", "\\bpolish\\b", "looks (bad|off|ugly|cheap)", "\\bugly\\b", "make it look (better|good)"] },
+    { "skill": "animate", "why": "build the motion with exact curves and durations", "patterns": ["animat", "transition", "\\bmotion\\b", "\\bhover effect", "fade in"] },
+    { "skill": "agentation", "why": "annotate the exact element in the running app", "patterns": ["this (button|element|card|section)", "that (button|element|card|section)", "(move|resize) the .* (button|element|card)"] },
+    { "skill": "agent-browser", "why": "check it in a real browser: click through, take screenshots, read the console", "patterns": ["test (it|this) in (the )?browser", "check the (page|site|app)", "does (it|this) (work|load)", "\\bconsole\\b", "screenshot", "\\be2e\\b", "click through"] },
+    { "skill": "pitch", "why": "follow the judging playbook for the pitch and demo script", "patterns": ["\\bpitch\\b", "\\bjudg", "demo script", "\\bsubmission\\b", "\\bpresent(ation)?\\b"] },
+    { "skill": "humanizer", "why": "remove AI writing tells from prose people will read", "patterns": ["devpost", "write-?up", "\\breadme\\b", "\\bcopy ?writ", "\\bblurb\\b"] },
+    { "skill": "ste", "why": "explain it in Standard Technical English", "patterns": ["explain", "what does .* mean", "confus", "\\bjargon\\b", "simpler terms"] },
+    { "skill": "hyperframes", "why": "render the demo video from HTML", "patterns": ["demo video", "record (a|the) video", "render (a|the) video", "title card", "\\btrailer\\b"] }
+  ]
+}

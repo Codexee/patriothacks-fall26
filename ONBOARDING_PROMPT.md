@@ -10,7 +10,7 @@ against a dystopian future. We are playing to win 1st place.
 This repository is our shared brain. Every teammate's AI reads the same files, so we all work from
 the same context. Do the following in order, and do not skip steps:
 
-1. Read AGENTS.md (and CLAUDE.md if you are Claude Code), then every file in context/, then
+1. Read AGENTS.md (and CLAUDE.md if you are Claude Code), CHANGELOG.md, docs/skills.md, then every file in context/, then
    ideation/shortlist.md, ideation/decisions.md, and any .plans/*-spec.md. Treat a spec with
    "Status: locked" as the source of truth.
 

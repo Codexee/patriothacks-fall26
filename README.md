@@ -38,4 +38,6 @@ docs/                     tooling notes, then pitch, Devpost, and demo-video dra
 
 ## Skills
 
+**Start here: [docs/skills.md](docs/skills.md)**, which lists every project skill and when to use it. Your AI reminds you when a prompt fits a skill you didn't call. See [CHANGELOG.md](CHANGELOG.md) for what changed recently.
+
 See `context/video-playbook.md` for the full map. The skills are based on [jmo-skills](https://github.com/23jmo/jmo-skills), with upgrades. See `docs/tooling.md` for what changed and why.

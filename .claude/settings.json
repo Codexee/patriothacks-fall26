@@ -8,6 +8,22 @@
       "source": { "source": "github", "repo": "23jmo/jmo-skills" }
     }
   },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          { "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/hooks/sync_check.sh\"", "timeout": 20 }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          { "type": "command", "command": "python3 \"$CLAUDE_PROJECT_DIR/scripts/hooks/skill_nudge.py\"", "timeout": 5 }
+        ]
+      }
+    ]
+  },
   "enabledPlugins": {
     "jmo-workflow@jmo-skills": false,
     "codex@openai-codex": true

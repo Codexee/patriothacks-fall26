@@ -20,9 +20,22 @@ We are a 4-person team competing in **Patriot HackFest Fall 2026** (George Mason
 ## Where we are (update this section after every milestone)
 
 - **Phase:** Mon Nov 16, ideation (calendar: "review the challenge, set goals, choose a project direction").
-- **Done:** repo, shared context, skills, and the round-1 idea shortlist (`ideation/shortlist.md`).
+- **Done:** repo, shared context, the round-1 idea shortlist (`ideation/shortlist.md`), the skill upgrade (`docs/skills-review.md`), skill reminders, and the sync check. **Read the top entry of `CHANGELOG.md`.**
 - **Next:** team vote, then `/interview <idea>`, then lock the spec tonight, then `/parallelize` on Tuesday morning.
 - **Blockers:** ⏸ **Ideation is ON HOLD** (Neil, Nov 16). The team is first settling how the tools split roles (see `docs/tooling.md` → "Who does what"). Do not run `/ideate` or `/interview`, and do not vote on ideas, until Neil lifts the hold.
+
+## Start of every session (all AIs)
+
+1. Run `git fetch`. If this copy is behind `origin/main`, tell the user and offer to run `git pull` (ask first if there are uncommitted changes). Then show the top entry of `CHANGELOG.md`. In Claude Code, `scripts/hooks/sync_check.sh` does this automatically.
+2. Pick skills from `docs/skills.md`.
+
+## Skill reminders (all AIs)
+
+When a request looks like a job for a project skill (see the patterns in `.claude/skill-triggers.json`) and the user did not name that skill, **ask the user in one short line whether to use it** ("Want me to use /systematic-debugging for this?") before you start. Ask at most once per skill per session. Never run the skill without a yes. In Claude Code, `scripts/hooks/skill_nudge.py` sends this reminder automatically. Codex, Cursor, and other AIs must follow this rule themselves.
+
+## Keeping the team in sync
+
+When you change shared context, skills, hooks, or the workflow: add an entry at the top of `CHANGELOG.md` (what changed, and what each teammate must do), then commit and push.
 
 ## How we work
 
