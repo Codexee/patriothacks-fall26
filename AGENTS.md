@@ -1,14 +1,15 @@
 # Team brief for every AI agent (Claude, Codex, Cursor, …)
 
-We are a 4-person team competing in **Patriot HackFest Fall 2026** (George Mason University, virtual, **Nov 14–20, 2026**). The goal is to **win 1st place ($2,000)**.
+We are a 4-person team competing in **Patriot HackFest Fall 2026** (George Mason University, virtual, **Nov 14–20, 2026; deadline Fri Nov 20, 11:00 pm**). The goal is to **win 1st place ($2,000)**.
 
-**Track:** *Best Solution for a Dystopian World*. Build a tool to **navigate, survive, or rebel** against a dystopian future ("they're watching").
+**Track:** *Life underground* (the Hollow). In 2087, 2 billion people live underground under a government called the Directorate, and their systems are failing. The brief lists **15 problems** (power, heat, water, tunnels, crowding, communication, health, food, the return to the surface) and rewards **one connected solution that covers several of them**. See `context/track.md`. This replaces the pre-event teaser ("navigate, survive, or rebel").
 
 ## Read before doing anything
 
 | File | What it holds |
 | --- | --- |
-| `context/event.md` | Track text, prizes, the **calendar**, check-in times, the judging stand-in |
+| `context/event.md` | Schedule, **deadline**, official rules, submission and judging, prizes |
+| `context/track.md` | **The track brief: the Hollow world and its 15 problems** |
 | `context/constraints.md` | **Hard rules**: remote-first, the hybrid hardware gate, ethics |
 | `context/team.md` | Who is on the team, their skills, local or remote, and who owns which workstream |
 | `context/video-playbook.md` | The 4-step winning workflow we follow, and the skill map |
@@ -19,10 +20,10 @@ We are a 4-person team competing in **Patriot HackFest Fall 2026** (George Mason
 
 ## Where we are (update this section after every milestone)
 
-- **Phase:** Tue Nov 17, spec drafted; build starts after the team sync.
+- **Phase:** Tue Nov 17. Track changed to the Hollow; software only. **Hollow Twin spec drafted** (`.plans/hollow-twin-spec.md`). Off the Record is on hold.
 - **Done:** repo, shared context, skills, hooks, and **ideation rounds 1–13** (`ideation/ideas.md`, `ideation/shortlist.md`). **Read the top entry of `CHANGELOG.md`.**
-- **Next:** the team reads `.plans/off-the-record-spec.md` and `.plans/off-the-record-schedule.md`, assigns workstreams at the sync, sets `Status: locked`, then `/parallelize`. Tue-night gate: agent reads only the rewritten DOM: **passed** with the Claude in Chrome tools (branch `prototype/agent-view-gate`); one by-hand side-panel test is left. GLiNER in the browser: **passed** (83 ms against a 500–1000 ms budget; branch `prototype/gliner-bench`).
-- **Blockers:** the spec is a draft (not locked); the judging format is unknown (ask the directors).
+- **Next:** the team reads `.plans/hollow-twin-spec.md`, picks workstreams at the sync, agrees on the day-1 interfaces in `packages/sim/src/types.ts`, sets `Status: locked`, then `/parallelize`.
+- **Blockers:** the spec is a draft; confirm the raw data for the 4 scenario packs Wed morning; the judging criteria are not published.
 
 ## Start of every session (all AIs)
 

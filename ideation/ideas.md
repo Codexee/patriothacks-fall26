@@ -4,7 +4,7 @@ Method: `/ideate` (think backward from the winning demo). Track: **Best Solution
 
 Scores run from 1 to 5. W = Wow, T = Track fit, F = Feasible in Tue–Wed, R = Remote-OK, Tm = Team fit (EE plus backend/CP), L = Live-demo-able.
 
-**On hold: A (Shadow Route) and H (Hush)** (Neil, Nov 16). **Next phase (Nov 17): Off the Record + Unsign. See `ideation/off-the-record.md`.** Round 13 (Option A) ranked it first at 22/25. Round 11 (Flock): AG. Unmarked and AH. Watch the Watchers. Ground Truth (Round 10) was rejected: people do not trust an AI to judge whether a photo is real. Round 8 — AD. Pinpoint v2 is kept for reference. Round 7: Tripwire set aside (few people use AI browsers), Veil dropped (protective noise can be removed; topic avoided for publicity), AC folded into AD. Rounds 4–6 are kept below for reference. Neil said rounds 4–5 lack wow. Round 3 (K–P) and Flagged (R) were rejected. The other ideas are under "Scrapped".
+**Track changed (Nov 17): the Hollow brief. See Round 14 (Earshot, Canary with a grid sense) and `ideation/hollow-pivot.md`.** Earlier rounds were scored against the old teaser. **On hold: A (Shadow Route) and H (Hush)** (Neil, Nov 16). **Next phase (Nov 17): Off the Record + Unsign. See `ideation/off-the-record.md`.** Round 13 (Option A) ranked it first at 22/25. Round 11 (Flock): AG. Unmarked and AH. Watch the Watchers. Ground Truth (Round 10) was rejected: people do not trust an AI to judge whether a photo is real. Round 8 — AD. Pinpoint v2 is kept for reference. Round 7: Tripwire set aside (few people use AI browsers), Veil dropped (protective noise can be removed; topic avoided for publicity), AC folded into AD. Rounds 4–6 are kept below for reference. Neil said rounds 4–5 lack wow. Round 3 (K–P) and Flagged (R) were rejected. The other ideas are under "Scrapped".
 
 ---
 
@@ -621,6 +621,140 @@ It is already new (no consumer defense against LLM authorship attribution), but 
 **Recommendation:**
 1. **Off the Record.** Every judge uses an AI chatbot daily. The "what your chat history says about you" dossier is a strong moment. Users can check the protection themselves. It beats the existing maskers on two visible points: context clues and the audit of past chats.
 2. **Receipt**, but only if its free 1-hour test finds a real price gap. If it does, it saves real money and makes the brand-new NYC law enforceable.
+
+---
+
+# Round 14 (Tue Nov 17): the Hollow brief, in depth
+
+Rules for this round (Neil): compare with Canary (`ideation/hollow-pivot.md`, 23/25), and go deep on 2–3 ideas that combine with recent research for a big wow factor, rather than going for breadth. Scores are /25, the same as in the pivot doc: W = Wow, C = Cover (Hollow problems addressed directly, `context/track.md`), F = Feasible by Fri 6 pm, R = Real-world impact, V = shows well on Video.
+
+---
+
+## AI. Earshot: your phone becomes the Hollow's ears (machines, lungs and the grid)  ·  software only  ·  **23/25**
+
+**Crazy version:** every phone in the Hollow listens for the sound of a fan about to die, a lung getting worse, and the grid about to fail. The Directorate can't hide any of the three.
+
+**Buildable version:** a web app. It runs in the phone's browser and does one thing: it turns sound into a measurement. It has 3 modes, and all of them use the same signal-processing pipeline (spectrogram, a baseline learned on the spot, and an anomaly score):
+
+1. **Machines (problems 1, 3, 4, 5).**
+   - The user holds the phone near a fan, pump or recycler for 20 seconds, and Earshot learns how that machine sounds when it is healthy.
+   - When the sound drifts, Earshot flags it and names the likely fault from the spectrum. For example, a strong peak at the rotation frequency means the rotor is out of balance, and wide-band noise that rises over time suggests bearing wear.
+   - This is the DCASE "first-shot" anomalous-sound-detection problem (DCASE 2025 Task 2). Its datasets (MIMII) include fans and pumps, the exact machines the brief says are failing.
+2. **Lungs (problems 9, 10, 11).**
+   - **Blow test:** the user blows hard at the phone, and Earshot estimates peak expiratory flow (PEF), a standard lung-function number, from the sound. Research: SpiroSmart (UW, UbiComp 2012) reached a 5.1% mean error against a clinical spirometer on 52 subjects. MMLung (Interspeech 2023) reports under 3% error on 40 participants.
+   - **Night mode:** Earshot counts coughs on the device, using cough detection like YAMNet's cough class, or Google's HeAR model if we get API access.
+   - **Cough index:** FluSense (UMass, 2020) showed that cough counts in a hospital waiting room tracked the local flu numbers. Earshot sends only anonymous counts per level, with no audio, to build a "cough index" map. That is the real outbreak curve, next to the Directorate's numbers.
+3. **Grid (problem 1). Stretch, needs a test.**
+   - Mains power makes chargers and lights hum at 60 Hz and its harmonics (120 Hz, 180 Hz). Earshot reads the exact grid frequency from that hum. Forensic researchers already use this method, called electric network frequency (ENF).
+   - A grid under stress shows it in its frequency. Earshot plots the live frequency and flags swings.
+
+**Winning demo (30 s):**
+1. A $15 desk fan is on camera. Earshot listens for 20 seconds, and the score line is flat: "Fan 3: healthy."
+2. Neil sticks a small piece of tape on one blade. The score jumps, a peak lights up on the spectrogram, and the result reads "Imbalance. Report to Level 47 maintenance." The alert goes onto the shared maintenance map.
+3. Neil blows into the laptop. Earshot shows 470 L/min. A $15 plastic peak-flow meter on camera reads 480. Two independent measurements agree, so the viewer doesn't have to trust an AI.
+4. The map of the Hollow shows the cough index rising on Levels 44–47, and the "Directorate feed" says "No outbreak."
+5. **Judges can try it themselves:** the demo site works on their own laptop, with their own fan, fridge and lungs. No hardware is needed.
+
+**How it works:**
+- **Web Audio API:** the browser captures raw audio. Earshot turns off echo cancellation, noise suppression and auto gain, so the browser doesn't filter the signal.
+- **Features:** log-mel spectrograms, plus fine FFT peaks for rotation and grid frequencies.
+- **Machine model:** the 20-second baseline gives a set of feature vectors. The anomaly score is the distance from a new sound to its nearest neighbours in that baseline (k-NN, the DCASE first-shot baseline approach), with a 3-window confirmation so a single noise doesn't trigger an alert. A pretrained audio embedding (YAMNet or BEATs in ONNX) can replace the hand-made features if it scores better.
+- **Fault hints:** rules on the spectrum (1× rotation peak = imbalance, rising high-frequency energy = bearing wear). These are fixed rules a judge can read.
+- **Phone accelerometer as a second sensor (DeviceMotion API):** the phone is laid on the machine to feel its vibration. The browser reports motion at only about 60–100 times a second, which is enough for a fan's rotation rate.
+- **Blow test:** a regression from the sound's spectral envelope over time to flow. We calibrate it per phone against the plastic peak-flow meter: 10 blows from each team member, which gives about 40 points. This is the part with the most risk.
+- **Privacy:** audio never leaves the device. Only numbers do: scores, PEF values and cough counts. The anonymous symptom text reuses the GLiNER-in-the-browser work (gate G1).
+
+**Hardware (gate):** no hardware is required for the product. Two demo props: a desk fan (any store, $15) and a plastic peak-flow meter (CVS or Amazon, about $15, ordered tonight).
+
+**Prior art (honest):**
+- **Augury's Auguscope** is a phone app that records machine sounds for cloud diagnosis. It is industrial and paid.
+- **"Machine Sound Monitor"** (a lablab.ai hackathon project) already showed baseline-and-alert on a desk fan. That beat on its own is not new.
+- SpiroSmart and MMLung are research, not public apps.
+- ResApp, a cough-diagnosis app, was bought by Pfizer in 2022.
+- Google's HeAR is a research model.
+
+Nobody combines machines, lungs and the grid in one free browser tool. The two parts that make the claim credible are the independent check (the plastic meter on camera) and the shared official-vs-measured map.
+
+**Overlap with past winners:** health tools have won at GMU before (CarePilot, OxiFlow), but none of them measured anything from sound.
+
+**Risks / Ethics:**
+- **The blow test may not be accurate enough.** If 40 blows can't get within ±15% of the meter, cut it and keep night-mode cough counting.
+- **Phone microphones filter low frequencies,** so the grid mode may fail. It is a stretch goal.
+- **Medical claims:** label it "screening, not diagnosis."
+- **An always-on microphone is a privacy risk.** Process everything on the device, never store speech, and send only counts.
+
+**Scores:** W4 C5 F4 R5 V5 = **23/25** (problems 1, 3, 4, 5, 9, 10, 11: 7 of 15, with no hardware).
+
+---
+
+## AJ. Canary with a grid sense: it would have warned Spain 30 minutes early  ·  hybrid  ·  **23/25**
+
+**The hook (real news):** on Apr 28, 2025, the Iberian grid collapsed, and Spain and Portugal lost power. ENTSO-E's expert panel found 2 periods of power and frequency oscillations in the half hour before the collapse. Its final report (Mar 2026) lists the oscillations among the root causes. *(Confirm the exact times and the number of people affected before quoting.)*
+
+**The idea:** this is Canary (`ideation/hollow-pivot.md`) with one upgrade that fixes its "it's just sensors and a display" weakness. Each node also measures the **grid itself**:
+- a safe 9 V AC wall adapter feeds an ESP32 input (the standard OpenEnergyMonitor method)
+- the ESP32 times the zero crossings to get the grid frequency to about 1 mHz, and also measures the voltage
+
+The mesh compares the nodes:
+- **Same swing at every node:** the whole grid is under stress. That is the blackout warning (problem 1).
+- **One level's voltage sags while the others don't:** that level is being cut. That is evidence for fair sharing (problem 2), and it shows exactly who loses power first.
+
+**Winning demo (30 s):**
+1. Neil's node and Adarsh's node are in two homes about 20 km apart. On screen their frequency lines wiggle **identically**. That is the grid's own signal, seen live.
+2. Then a backtest: we feed the **real recorded frequency data from Apr 28, 2025** into the same detector. The detector raises "Grid oscillation, collapse risk" at the time of the first oscillation, about 30 minutes before the blackout.
+3. Then the Canary beats: salt water on the TDS probe sends alerts to every phone, the router gets unplugged, and the messages keep arriving.
+
+**How it works:**
+- **The detector:** a band-pass filter for inter-area oscillation frequencies (about 0.1–1 Hz) on the frequency trace, the oscillation amplitude over a sliding window, and a threshold. It is a fixed rule a judge can read, not an AI verdict.
+- **Everything else** is the same as Canary: the mesh (Meshtastic, or ESP32 with ESP-NOW), signed readings, the official-vs-measured view, and anonymous reports.
+
+**Hardware (gate):**
+
+| Part | Source | Cost |
+| --- | --- | --- |
+| 3 ESP32 boards | Micro Center, today | ~$10 each |
+| 2 × 9 V AC adapters | Amazon 1-day | ~$10 each |
+| Resistors and capacitors | parts bin | — |
+| SCD40 CO₂ sensor | Micro Center or Amazon | ~$45 |
+| TDS probe | Amazon | ~$10 |
+| Meshtastic LoRa boards (optional) | Amazon 1-day | $20–35 each |
+
+**Fallback:** simulated nodes plus the backtest. The backtest needs no hardware at all.
+
+**Open question:** is the frequency data for Apr 28, 2025 public at a fine time resolution? Gridradar and the ENTSO-E reports show plots of it. If no raw data exists, digitize the published plot and say so on screen.
+
+**Prior art:** grid-frequency monitors exist (FNET/GridEye, Gridradar), but they are for professionals. Nobody puts grid warnings, water and air alerts, and a mesh that survives shutdowns in one community system.
+
+**Risks:**
+- **The US grid will not oscillate during our test week,** so the live trace will only show normal wiggles. The wow comes from the backtest.
+- **The parts must be bought tonight.**
+- **The scope is larger than Earshot's.**
+
+**Scores:** W5 C5 F3 R5 V5 = **23/25** (problems 1, 2, 3, 4, 7, 8, 9, 13: 8 of 15).
+
+---
+
+## AK. Grid Pulse, phone only: read the grid from a lamp's flicker  ·  software only  ·  **15/25** (folded into AI and AJ)
+
+**The idea:** LED lights flicker at twice the grid frequency. A phone camera's rolling shutter samples that flicker row by row, so a video of a lamp holds the grid frequency (Su et al., ICIP 2014; Frijters and Geradts; Scientific Reports 2025).
+**Why it is folded:** browsers can't lock a phone camera's exposure reliably, the signal is weak, and the papers call this "challenging" even on native apps. The useful parts moved: the hum-based grid mode went to Earshot (AI), and the hardware grid sense went to Canary (AJ).
+**Scores:** W4 C2 F2 R4 V3 = 15/25
+
+---
+
+## Round 14 verdict
+
+| Idea | W | C | F | R | V | **/25** | Problems | Hardware |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| **Earshot** (AI) | 4 | 5 | 4 | 5 | 5 | **23** | 1, 3, 4, 5, 9, 10, 11 | none (two $15 props) |
+| **Canary + grid sense** (AJ) | 5 | 5 | 3 | 5 | 5 | **23** | 1, 2, 3, 4, 7, 8, 9, 13 | buy tonight |
+| Canary, as in the pivot doc | 4 | 5 | 4 | 5 | 5 | 23 | 1, 3, 4, 7, 8, 9, 13 | buy tonight |
+| Grid Pulse, phone only (AK) | 4 | 2 | 2 | 4 | 3 | 15 | 1, 2 | none |
+
+**The tie is broken by which risk we prefer:**
+- **Earshot** has no hardware risk. Judges can try it on their own devices, which Neil wanted from the start, and its "trust" beat (the plastic meter agreeing on camera) is physical. Its risk is the accuracy of the blow test.
+- **Canary with the grid sense** has the bigger headline ("it would have warned Spain"), but it depends on parts bought tonight and on finding the Iberian data.
+- **Do not build both.** If the team wants Canary's mesh, Earshot can be the phone app that joins it later, as a stretch goal only.
 
 ---
 

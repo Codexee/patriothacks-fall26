@@ -1,7 +1,7 @@
 # PatriotHacks Fall '26 (Patriot HackFest)
 
 Team repository for **Patriot HackFest Fall 2026** (GMU · virtual · Nov 14–20, 2026).
-Track: **Best Solution for a Dystopian World**. Prizes: $2,000 / $1,000 / $500.
+Track: **Life underground** (the Hollow; 15 problems, see `context/track.md`). Deadline: Fri Nov 20, 11:00 pm. Prizes: $2,000 / $1,000 / $500.
 
 The repo holds both the project and the **shared AI context**. Every teammate's agent reads the same brief, calendar, constraints, ideas, and spec, so all four setups work from the same information.
 

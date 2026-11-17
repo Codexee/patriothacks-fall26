@@ -15,7 +15,7 @@ This repo adds the hackathon context, the demo-first opening, and a spec format 
 ## 0. Load context before you ask anything
 
 Read these files if they exist:
-- `CLAUDE.md`, `context/event.md`, `context/team.md`, `context/constraints.md`
+- `CLAUDE.md`, `context/event.md`, `context/track.md`, `context/team.md`, `context/constraints.md`
 - `ideation/shortlist.md`, `ideation/decisions.md`
 - every file in `.plans/`
 
@@ -81,7 +81,7 @@ Status: draft | locked   ·   Last updated: <date>   ·   Owner: <name>
 ## One-liner
 ## The winning demo (30-second scene)
 ## Problem, user, and why now
-## Track fit (Best Solution for a Dystopian World: navigate / survive / rebel)
+## Track fit (Life underground: which of the 15 Hollow problems it covers, by number)
 ## Scope
 ### Must ship (demo path)
 ### Nice to have (only after must-ship is green)

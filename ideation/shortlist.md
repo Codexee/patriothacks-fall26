@@ -1,6 +1,22 @@
-# Shortlist (round 13, Tue Nov 17)
+# Shortlist (round 15, Tue Nov 17): the Hollow brief
 
-> **Next phase (Nov 17): Off the Record, with Unsign included, is the idea under consideration.** The full exploration (architecture, every entry point, the local model, 5 demo concepts, the recommended 3-act demo, risks, first tests, and open questions) is in **`ideation/off-the-record.md`**. **Adarsh: workshop that file.**
+> **Chosen (Neil, Nov 17): Hollow Twin.** Software only. Spec: `.plans/hollow-twin-spec.md`. Earshot and Canary are dropped (unknowns and hardware).
+
+Scores are /25: Wow, Cover (Hollow problems), Feasible, Real-world, Video. Details: `ideation/ideas.md` → Round 14 and `ideation/hollow-pivot.md`.
+
+| Rank | Idea | Problems covered | **/25** | Hardware | Next step |
+| --- | --- | --- | --- | --- | --- |
+| 1= | **Earshot**: the phone listens to machines, lungs and the grid | 1, 3, 4, 5, 9, 10, 11 | **23** | none | 1-hour test: fan baseline and blow test against a peak-flow meter |
+| 1= | **Canary + grid sense**: sensor mesh, with an Iberian-blackout backtest | 1, 2, 3, 4, 7, 8, 9, 13 | **23** | buy tonight | Find the Apr 28, 2025 frequency data; buy parts |
+| 3 | Canary, as in the pivot doc | 1, 3, 4, 7, 8, 9, 13 | 23 | buy tonight | superseded by the grid-sense version |
+| 4 | Off the Record (on hold) | 0 directly | 19 | none | ask a judge whether it is in scope |
+| 5 | Fair Share (rationing) | 2, 6, 12 | 17 | none | module only |
+
+**Update (Neil, Nov 17): software only, because no parts can arrive in time.** Both Canary versions are out. **Recommendation: Earshot**, with household props only. It drops the plastic peak-flow meter; the trust beat becomes two phones agreeing on the same blow, plus the straw test.
+
+---
+
+## Round 13 (old teaser track, out of date)
 
 > **Option A chosen (Neil, Nov 17):** an idea qualifies if it clearly beats what already exists, in a way a judge can see. Scores are /25 (Wow, Track, Feasible, Live, Beats existing).
 

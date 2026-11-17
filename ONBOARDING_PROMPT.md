@@ -4,8 +4,8 @@ Clone https://github.com/Codexee/patriothacks-fall26 (ask Neil for a collaborato
 
 ```text
 You are joining my team's AI setup for Patriot HackFest Fall 2026 (GMU, virtual, Nov 14–20, 2026).
-The track is "Best Solution for a Dystopian World": build a tool to navigate, survive, or rebel
-against a dystopian future. We are playing to win 1st place.
+The track is "Life underground": in the Hollow, 2 billion people live underground in 2087 and
+their systems are failing. The brief lists 15 problems (see context/track.md). We are playing to win 1st place.
 
 This repository is our shared brain. Every teammate's AI reads the same files, so we all work from
 the same context. Do the following in order, and do not skip steps:

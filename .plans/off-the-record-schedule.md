@@ -1,8 +1,8 @@
 # Off the Record: build plan and schedule
 
-Status: draft · Last updated: Tue 2026-11-17 · Source of scope: `.plans/off-the-record-spec.md`
+Status: **on hold** (the Hollow track brief arrived; see `ideation/hollow-pivot.md`) · was draft · Last updated: Tue 2026-11-17 · Source of scope: `.plans/off-the-record-spec.md`
 
-All times are US Eastern. Submission is **Fri Nov 20**. Confirm the exact deadline time with the directors. Until then, assume **Fri 5:00 pm** and finish everything by Fri 2:00 pm.
+All times are US Eastern. Submission is **Fri Nov 20**. The official deadline is **Fri 11:00 pm** (`context/event.md`).
 
 ## Gates (a gate stops the plan if it fails)
 

@@ -10,6 +10,7 @@ This is step 1 of the workflow in `context/video-playbook.md`. Picture the team 
 
 ## Inputs (read first)
 
+- `context/track.md`: the Hollow world and its 15 problems (the track brief)
 - `context/event.md`: the track, prizes, calendar, and rules
 - `context/past-winners.md`: what has already won at GMU, and what is overdone
 - `context/team.md` and `context/constraints.md`: skills, who is remote, and the hardware rules
@@ -23,7 +24,7 @@ This is step 1 of the workflow in `context/video-playbook.md`. Picture the team 
 3. **Check for overlap.** Compare with `context/past-winners.md`. GMU has seen many "AI assistant for X" winners. An idea that looks like a past winner needs a sharper angle.
 4. **Score each idea from 1 to 5 on each criterion:**
    - **Wow:** does the demo make a judge react right away?
-   - **Track fit:** does it clearly help people navigate, survive, or rebel in a dystopia?
+   - **Track fit:** how many of the 15 Hollow problems (`context/track.md`) does it address directly, and does the demo show them?
    - **Feasible:** can it be built in the Tue–Wed build window, with Thu for testing?
    - **Remote-OK:** can the two remote members do half of the work? Does any hardware arrive in time, with a software fallback?
    - **Team fit:** does it use the EE strengths and the backend/competitive-programming (CP) strength?

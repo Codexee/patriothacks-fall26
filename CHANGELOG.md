@@ -2,6 +2,29 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-17 (16): New direction: Hollow Twin (software only)
+
+- **The track is the Hollow** (`context/track.md`). Off the Record is on hold. Hardware is out (no parts in time). Earshot is dropped (too many unknowns).
+- **New spec: `.plans/hollow-twin-spec.md`** (draft). A pixel-art cutaway of the Hollow (50 levels × 8 sections) that runs real-world data as the Hollow: Texas 2021 power, Chicago 1995 heat, Wuhan 2020 delays, Flint water.
+  - The Directorate's lies delay the residents' response and cost trust.
+  - Players use 4 tools (Early Warning, Fair Share, Ledger, Layout) and play one day per turn, trying to keep the Hollow alive.
+  - A Shapley panel shows what each tool changed.
+  - A rival algorithm, a leaderboard and a Claude-written summary come with each run.
+- **Action for everyone:** read the spec before the sync, pick a workstream, and agree on the day-1 interfaces.
+
+## 2026-11-17 (15): The official track brief changes the direction
+
+- **The organizers published the real track: "Life underground" (the Hollow).** In 2087, 2 billion people live underground under a government called the Directorate. The brief lists **15 numbered problems** (power, heat, water, tunnels, crowding, communication, health, food, and the return to the surface). It says one connected solution that covers several problems can score higher. **New file: `context/track.md`.**
+- **New facts in `context/event.md`:**
+  - The deadline is **Fri Nov 20, 11:00 pm**, with no extensions.
+  - Judging runs Nov 21–24 on an internal platform, so the video is almost certainly the demo.
+  - No coding during judging. AI tools are allowed.
+  - HackOverflow (GMU's hardware hackathon organization) co-runs the event.
+- **Off the Record is on hold.** It covers 0 of the 15 problems directly. The spec and schedule are kept, not deleted.
+- **New file: `ideation/hollow-pivot.md`.** It holds the fit analysis and 5 options. The recommendation is **Canary**: sensor nodes on every level, linked by a mesh, that warn before air or power fails, flag bad water, carry family check-ins through a network shutdown, and map the real outbreak next to the Directorate's numbers. It covers problems 1, 3, 4, 7, 8, 9 and 13. The GLiNER gate work is reused for anonymous symptom reports.
+- Updated for the new track: `AGENTS.md`, `README.md`, `ONBOARDING_PROMPT.md`, `context/constraints.md`, `ideation/shortlist.md`, and the `/ideate` and `/interview` skills.
+- **Action for everyone:** read `context/track.md` and `ideation/hollow-pivot.md`, and vote on the pivot today. If we pivot, the hardware must be bought tonight.
+
 ## 2026-11-17 (14): Schedule, gate G2 passed, tool reminders
 
 - **New file: `.plans/off-the-record-schedule.md`.** It holds the gates, the critical path, the interfaces to agree on at the sync, an hour-by-hour plan for Tue–Fri, which tool to use for each step, and the 5 steps where we switch to Fable.

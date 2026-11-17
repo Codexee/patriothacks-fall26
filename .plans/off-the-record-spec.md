@@ -1,5 +1,5 @@
 # Off the Record — Master Spec
-Status: draft   ·   Last updated: 2026-11-17   ·   Owner: Neil (workstreams assigned at the team sync)
+Status: **on hold** (the Hollow track brief covers 0 of its 15 problems directly; see `ideation/hollow-pivot.md`) · was draft   ·   Last updated: 2026-11-17   ·   Owner: Neil (workstreams assigned at the team sync)
 
 ## One-liner
 A privacy layer that runs on your own machine and sits between you and ChatGPT, Claude, and AI agents. It gives the AI only the data the task needs and replaces the rest with realistic stand-ins. It lets an agent *use* your bank details without ever *seeing* them. Even a hijacked agent can only leak fake values.

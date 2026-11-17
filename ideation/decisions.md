@@ -40,3 +40,9 @@ Add one line per decision: date · decision · why · who. Newest last.
 - 2026-11-17 · GLiNER gate passed; per-prompt budget raised from 300 ms to 500–1000 ms. Recommend gliner-pii-edge-v1.0 quint8, WASM in a Web Worker, threshold 0.3 (83 ms p95, 18/18 on a small key); own wrapper on onnxruntime-web instead of gliner.js (3 bugs). Evidence: branch `prototype/gliner-bench` · Neil and Claude
 - 2026-11-17 · G2 passed: the page rewrite hides real values from every agent read channel, and the `formdata` submit swap sends real values without showing them; the extension must inject at document_start in the MAIN world in all frames · Neil and Claude
 - 2026-11-17 · Schedule written (.plans/off-the-record-schedule.md). Default model Opus; switch to Fable only for the 5 steps listed there · Neil
+- 2026-11-17 · The official track brief arrived (the Hollow, 15 problems); deadline Fri Nov 20, 11:00 pm; judging Nov 21–24 on an internal platform · organizers' document · Claude
+- 2026-11-17 · Off the Record spec and schedule put on hold: they cover 0 of the 15 problems directly · Claude recommends a pivot to Canary (sensor and mesh network, 7 problems) · pending Neil
+- 2026-11-17 · Software only: parts cannot arrive in time; Canary (both versions) dropped; household props allowed · Neil
+- 2026-11-17 · A software project can win this event (both 2025 PatriotHacks winners were software, and judging is by video) · Claude; Earshot recommended, pending Neil
+- 2026-11-17 · Earshot dropped (too many unknowns: accuracy, data, props); pure-code projects only · Neil
+- 2026-11-17 · Hollow Twin chosen and interviewed; draft spec at .plans/hollow-twin-spec.md (pixel cutaway, 50×8 sections, real-data scenario packs, lies as delay + trust, 4 tools with Shapley attribution, rival/helper, leaderboard, Claude summary) · Neil

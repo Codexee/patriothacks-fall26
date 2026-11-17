@@ -1,28 +1,57 @@
 # Patriot HackFest Fall 2026: event facts
 
-Sources: patriothackfest.com, the app.patriothackfest.com dashboard, and the @patriothackfest Instagram posts from Nov 6 and Nov 15, 2026. All checked on Mon Nov 16, 2026. Update this file when organizers post something new.
+Sources:
+- **The organizers' participant document** (primary, read on Tue Nov 17, 2026): https://docs.google.com/document/d/1sz_UdwRzvyL1dVbcbqLnUdJwVHvOUWARg4B79VmKgaE/edit?tab=t.g3ixdrcdfya4
+- patriothackfest.com, the app.patriothackfest.com dashboard, and the @patriothackfest Instagram posts from Nov 6 and Nov 15, 2026.
+
+Update this file when the organizers post something new.
 
 ## Basics
 
 | Item | Value |
 | --- | --- |
-| Organizers | PatriotHacks, GMU CS Club, HackOverflow |
+| Organizers | PatriotHacks, the GMU CS Club (runs HackFax, a cybersecurity hackathon and CTF), and HackOverflow (GMU's **hardware** hackathon organization) |
+| Sponsors | Microsoft, MetroStar Systems, Caelon, Drums (drums.run), Runtime (withruntime.com). No sponsor challenges announced. |
 | Format | 100% virtual. Optional in-person sessions in the Johnson Center (JC) |
-| Dates | **Sat Nov 14 → Fri Nov 20, 2026**. Note: the applicant dashboard shows "Nov 14–25", which may be a judging or results window. Confirm with directors@patriothackfest.com or on Discord. |
-| Team size | 1–4 |
+| Team size | 1–4. Only team members may contribute. Teams can change until submission; the team must be entered in the system when you submit, and it cannot be edited after. |
 | Cost | Free |
-| Submission | app.patriothackfest.com → Projects. The form is not open yet ("check that the event has enabled submissions"). |
 | Contact | directors@patriothackfest.com |
 
-## The track (the only one)
+## Schedule (official)
 
-**Best Solution for a Dystopian World**
+| Event | When |
+| --- | --- |
+| Opening ceremony and building starts | Sat Nov 14, 9:00 am |
+| Submission opens | Sun Nov 15 (on the internal judging platform) |
+| **Building ends, submission deadline** | **Fri Nov 20, 11:00 pm. No extensions, no late submissions.** |
+| Judging period | Nov 21–24 (the document says "Sunday, Nov 21 – Tuesday, Nov 24"; Nov 21, 2026 is a Saturday) |
+| Winners announced | Wed Nov 25 |
 
-> "The system has collapsed, and survival is no longer guaranteed. For this track, your mission is to build the ultimate tool to **navigate, survive, or rebel** against a dystopian future. Whether it's a secure communication network for the resistance, a resource-rationing algorithm, or an anti-surveillance interface: show us how your tech can save humanity. What will you build for the underground?"
+The document also says "Saturday, Nov 20" for the deadline. Nov 20, 2026 is a **Friday**. We plan for **Fri Nov 20, 11:00 pm Eastern**, and we finish by 6:00 pm to leave room for upload problems. Confirm with the directors.
 
-The theme taglines are "they're watching." and "The system is broken. Welcome to the resistance." The theme post also says "bypass surveillance, build survival tools, and design tomorrow's underground tech."
+## Rules (official)
 
-Every project must fit this track.
+1. Teams of 1–4. Only team members contribute.
+2. **No pre-coding, and no coding during the judging period.** Work after judging is allowed.
+3. No late submissions, no extensions.
+4. **Any tool is allowed, including AI tools.**
+5. Be respectful.
+
+## Submission and judging
+
+- Judging happens on the organizers' **internal judging platform**. Details will be posted when it is released. The document says there **will be specific submission expectations that must be followed**. Watch for them.
+- Judging runs for 4 days after the deadline. That points to **asynchronous judging of a submitted video, write-up and links**, not a live call. This is our assumption, not confirmed.
+- **Judging criteria: not published.** Until they are, use the PatriotHacks 2025 Devpost rubric as a stand-in:
+  1. **Innovation:** how new or ambitious, technical depth, use of APIs and models.
+  2. **People impact:** a clear problem, a real benefit, potential as a product.
+  3. **Presentation:** clarity, structure, storytelling.
+  4. **Final project quality:** it works, it is realistic, it adds value beyond existing tools.
+  5. **Teamwork:** shared contributions and clear roles.
+- The track brief adds one signal of its own: **one solution that addresses several of the 15 problems can score higher.**
+
+## The track
+
+**"Life underground" (the Hollow).** See `context/track.md` for the world and the 15 problems. The old general text ("Best Solution for a Dystopian World: navigate, survive, or rebel", "they're watching") was the pre-event teaser. The Hollow brief replaces it.
 
 ## Prizes ($3,500 total)
 
@@ -32,31 +61,16 @@ Every project must fit this track.
 | 2nd | $1,000 |
 | 3rd | $500 |
 
-## Sponsors
-
-Microsoft, MetroStar, Caelon, Drums (drums.run), Runtime (withruntime.com). No sponsor-specific challenges have been announced. If Microsoft adds one, Azure or PatriotAI use has scored well at past PatriotHacks events.
-
-## Calendar: "Suggested Week Schedule" (official)
+## Calendar ("Suggested Week Schedule", official, from the dashboard)
 
 | Day | Date | Official guidance | Our plan |
 | --- | --- | --- | --- |
 | Sat–Sun | Nov 14–15 | Event starts | Setup and research |
-| **Mon** | **Nov 16 (today)** | Review the challenge, set goals, choose a project direction | **Ideation**: `/ideate`, then `/interview`, then lock the spec |
-| Tue–Wed | Nov 17–18 | Build the core features and divide tasks across the team | `/parallelize`, with one agent per workstream |
-| Thu | Nov 19 | Test the project, fix issues, prepare a clean demo | Test, `/codex review`, `/better-interface`, rehearse |
-| Fri | Nov 20 | Polish the presentation, rehearse, submit the finished work | `/pitch`, record the demo video, submit |
+| Mon | Nov 16 | Review the challenge, set goals, choose a direction | Ideation |
+| **Tue–Wed** | **Nov 17–18** | Build the core features, divide tasks | **Tue: re-check the idea against the Hollow brief, decide, lock the spec.** Then build. |
+| Thu | Nov 19 | Test, fix, prepare a clean demo | Test, review, rehearse |
+| Fri | Nov 20 | Polish, rehearse, submit | Record the video, submit by 6:00 pm (deadline 11:00 pm) |
 
 ## In-person events (optional)
 
-- **Mon Nov 16, 10:00am–3:00pm, JC Room E:** team building and info session (get questions answered).
-- **Thu Nov 19, final check-in / Q&A:** 10:00am–1:30pm in JC Room C, **and** 2:00–4:00pm in JC Room G. Show the organizers your work.
-
-## Judging criteria
-
-Not published yet. Until they are, use the PatriotHacks 2025 Devpost rubric as a stand-in:
-
-1. **Innovation of solution:** how new or ambitious it is, its technical depth, and how well it integrates APIs and models.
-2. **People impact:** a clear problem, a real benefit to users, and the potential to become a real product.
-3. **Quality of presentation:** clarity, structure, and storytelling.
-4. **Quality of final project:** it works, it is realistic, and it adds value beyond existing tools.
-5. **Teamwork:** shared contributions and a clear role for each member.
+- **Thu Nov 19, final check-in / Q&A:** 10:00 am–1:30 pm in JC Room C, and 2:00–4:00 pm in JC Room G.
