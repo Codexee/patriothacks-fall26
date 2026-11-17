@@ -278,7 +278,7 @@ def crop_away(img, clues, min_area=0.6):
     return best
 
 
-def protect_vlm(img, truth, radius_km, attack_fn, final_fn=None, rounds=3, max_box_frac=0.15):
+def protect_vlm(img, truth, radius_km, attack_fn, final_fn=None, rounds=2, max_box_frac=0.15):
     img = img.convert("RGB")
     if max(img.size) > 1400:
         img.thumbnail((1400, 1400))

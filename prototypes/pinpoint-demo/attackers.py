@@ -18,6 +18,13 @@ except ImportError:
     pass
 
 MODEL = "claude-opus-5-5"
+EFFORT = os.environ.get("PINPOINT_EFFORT", "medium")  # keep cost low; "high" is stronger
+# Running cost tracker (Claude Opus 5.5: $4 / $20 per MTok; web search $10 per 1,000 searches)
+USAGE = {"calls": 0, "input": 0, "output": 0, "cache_read": 0, "searches": 0}
+
+
+def cost_usd():
+    return (USAGE["input"] * 4 + USAGE["cache_read"] * 0.2 + USAGE["output"] * 20) / 1e6 + USAGE["searches"] * 0.01
 
 
 class Clue(BaseModel):
@@ -48,7 +55,7 @@ def available():
     return bool(os.environ.get("ANTHROPIC_API_KEY"))
 
 
-def _b64(img, max_side=1568):
+def _b64(img, max_side=1024):
     im = img.convert("RGB").copy()
     im.thumbnail((max_side, max_side))
     buf = io.BytesIO()
@@ -60,15 +67,16 @@ def claude_attack(img, web_search=False):
     """Return a Geolocation, or None if the model declined."""
     import anthropic
 
-    client = anthropic.Anthropic()
+    # Pin the official endpoint and the key from .env.local, so a stray ANTHROPIC_BASE_URL in the shell never gets the key.
+    client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"], base_url="https://api.anthropic.com")
     kwargs = {}
     if web_search:  # slower and costlier; the strongest attacker (like ChatGPT with search)
-        kwargs["tools"] = [{"type": "web_search_20260209", "name": "web_search", "max_uses": 5}]
+        kwargs["tools"] = [{"type": "web_search_20260209", "name": "web_search", "max_uses": 3}]
     resp = client.beta.messages.parse(
         model=MODEL,
         max_tokens=16000,
         thinking={"type": "adaptive"},
-        output_config={"effort": "high"},
+        output_config={"effort": EFFORT},
         betas=["server-side-fallback-2026-07-01"],
         fallbacks="default",
         output_format=Geolocation,
@@ -83,6 +91,13 @@ def claude_attack(img, web_search=False):
         ],
         **kwargs,
     )
+    u = resp.usage
+    USAGE["calls"] += 1
+    USAGE["input"] += (u.input_tokens or 0) + (getattr(u, "cache_creation_input_tokens", 0) or 0)
+    USAGE["cache_read"] += getattr(u, "cache_read_input_tokens", 0) or 0
+    USAGE["output"] += u.output_tokens or 0
+    stu = getattr(u, "server_tool_use", None)
+    USAGE["searches"] += (getattr(stu, "web_search_requests", 0) or 0) if stu else 0
     if resp.stop_reason == "refusal":
         return None
     return resp.parsed_output
