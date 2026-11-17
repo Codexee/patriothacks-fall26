@@ -4,7 +4,7 @@ Method: `/ideate` (think backward from the winning demo). Track: **Best Solution
 
 Scores run from 1 to 5. W = Wow, T = Track fit, F = Feasible in Tue–Wed, R = Remote-OK, Tm = Team fit (EE plus backend/CP), L = Live-demo-able.
 
-**On hold: A (Shadow Route) and H (Hush)** (Neil, Nov 16). **Active: round 8 — AD. Pinpoint v2** (the lead idea). Round 7: Tripwire set aside (few people use AI browsers), Veil dropped (protective noise can be removed; topic avoided for publicity), AC folded into AD. Rounds 4–6 are kept below for reference. Neil said rounds 4–5 lack wow. Round 3 (K–P) and Flagged (R) were rejected. The other ideas are under "Scrapped".
+**On hold: A (Shadow Route) and H (Hush)** (Neil, Nov 16). **Round 9 (Nov 17): Pinpoint failed its test (3 of 3 fixes failed). Recommendation: pivot, or run the one decisive test in Round 9.** Round 8 — AD. Pinpoint v2 is kept for reference. Round 7: Tripwire set aside (few people use AI browsers), Veil dropped (protective noise can be removed; topic avoided for publicity), AC folded into AD. Rounds 4–6 are kept below for reference. Neil said rounds 4–5 lack wow. Round 3 (K–P) and Flagged (R) were rejected. The other ideas are under "Scrapped".
 
 ---
 
@@ -307,6 +307,69 @@ Protective noise is a cat-and-mouse game that defenders lose (Hönig et al.). Th
 - Misuse: the same attacker could locate *other people's* photos. Ideas for `/interview`: show the attacker's guesses only *after* the edit, as distances ("4 km away"), or show exact pins only for photos taken by the user's own camera.
 **First test (Tuesday morning, 2 hours):** 10 photos (Neil's Zürich photo plus 9 campus photos). Hand-run the loop: SAM 2 + LaMa + crops, against 2 VLMs and GeoCLIP. **Pass:** ≥ 7 of 10 photos pass a street-level radius with ≥ 90% of pixels unchanged.
 **Scores:** W5 T5 F4 R5 Tm4 L5
+
+---
+
+# Round 9 (Tue Nov 17): honest verdict on Pinpoint after the Claude test
+
+## What the test showed (Nov 17, branch `prototype/pinpoint-demo`, cost $0.50)
+
+The test used 5 photos, a radius of 1 km, and Claude Opus 5.5 at medium effort as the attacker, with one web-search check at the end.
+
+| Photo | First guess | Final guess | Pixels unchanged |
+| --- | --- | --- | --- |
+| Zürich Street View | 97 km off (Bern) | no edit needed | 100% |
+| Fenwick Library, inside | 842 km off | no edit needed | 100% |
+| Mason statue | 0.09 km | 0.11 km ❌ | 60% |
+| 1900 K St, DC | 0.02 km | 2.9 km after the edits, then **0.14 km** after the web-search check ❌ | 83% |
+| E St NW, DC | 0.04 km | 0.17 km ❌ | 100% (crop only) |
+
+**Confirmed:**
+- When the attacker could find the photo, Pinpoint **failed 3 of 3 times**.
+- In every failure, the main clue was the place itself: a statue, a building, or a whole street of buildings.
+- Small clues such as signs, banners, and logos were easy to remove, and removing them did not hurt the photo.
+- Claude's clue boxes are imprecise. Real masks need a grounding model plus SAM 2.
+
+## Prior-art check (Nov 17)
+
+"Check a photo for privacy risks before you post it" is **already a crowded app category**:
+- Lookr: faces, plates, signs, tickets
+- BlurPass: GPS, EXIF, faces
+- Privacy Guard: Photos & Docs
+- Censorify
+- PixelGuard
+- a Devpost project called "Redacted"
+- an academic study of an LLM location-awareness app (arXiv 2503.20226, 19 users)
+
+Hotel identification is also an active research area. Hotels-50K reaches about 8% top-1 for the exact hotel and about 40% top-1 for the hotel chain, using retrieval alone.
+
+## Brutal verdict
+
+**Pinpoint does not meet the "it can't fail" bar. We recommend a pivot.** The reasons:
+
+1. **It fixes what is easy and fails what matters.** Pinpoint can hide small, incidental clues (a sign, a plate, a label), and existing apps already do that. It cannot hide a photo whose subject *is* the place: the building, the statue, the street, the hotel pool. Those are the photos that people most need to protect.
+2. **A wider radius makes it harder, not easier.** To move a guess from "this campus" to "somewhere in the state", the attacker must be wrong by 50–300 km. That means removing the architecture, vegetation, road style, and light, which is almost the whole background.
+3. **The vacation case has a simpler, complete fix: post after you leave.** No image edit beats that. A tool that schedules the post for later is useful, but it is not a hackathon-winning technical demo.
+4. **A live demo is a risk.** If a judge uploads their own travel photo, the most likely result is "cannot hide this without cropping 40%". The demo would then show Pinpoint failing.
+5. **The novel part was never the attack.** GeoSpy and the 2025–2026 papers already do the attack. Our only new part was the verified fix loop, and the fix loop is the part that failed.
+
+**What still holds (keep for any pivot):**
+- A strong VLM attacker that explains its clues is a reliable and impressive demo moment (3 of 3 found within 100 m).
+- A red-team loop that rechecks a defense is a good engineering pattern. It caught a false "safe" on K Street.
+
+## If the team still wants Pinpoint: the best blend of methods
+
+Use the methods in this order, and stop at the first one that works:
+
+1. **Ask what must stay.** The subject (people, food, the pet) is locked and never edited.
+2. **Remove small clues** (text, logos, plates, room numbers) with a mask and inpainting. This is cheap and invisible, and it is the only step that worked reliably in our test.
+3. **Crop to an Instagram ratio:** 4:5 or 1:1 for the feed, 1.91:1 for landscape, 9:16 for stories. If a crop breaks the ratio, extend the edge with generative fill (outpainting).
+4. **Use a "portrait mode" background blur.** Depth Anything V2 estimates depth, and the app blurs only the background. Blur that looks intentional is not ugly, because phones already do it. **Unverified:** whether strong background blur defeats a VLM that sees the silhouette of a building.
+5. **Replace the sky or a landmark with generative fill**, only if the user accepts that the photo is no longer fully true.
+6. **Delay the post** until after the user leaves. This is the only defense that always works.
+7. **Report honestly** when nothing works: "this photo shows the place itself".
+
+**One decisive test before you commit (maximum 1 hour, about $0.50):** 6 vacation-style photos where people are the subject (from team members' own phones). Apply steps 2–4, then attack again. **Continue only if** ≥ 5 of 6 photos move more than 5 km **and** the team would still post the edited photo. Otherwise, pivot.
 
 ---
 

@@ -2,6 +2,12 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-17 (6): Pinpoint failed its test, pivot recommended
+
+- The Claude attacker test of the Pinpoint prototype (branch `prototype/pinpoint-demo`) failed 3 of 3 photos it could locate. The building, statue, or street itself was the clue. Small clues (signs, logos) were easy to remove.
+- "Check before you post" apps already exist (Lookr, BlurPass, Privacy Guard, Censorify, PixelGuard).
+- **Action for everyone:** read `ideation/ideas.md` → Round 9 and decide **today**: pivot, or run the 1-hour decisive test described there.
+
 ## 2026-11-16 (5): Pinpoint v2 is the lead idea
 
 - Neil tested Pinpoint by hand with ChatGPT on a Zürich Street View photo. A blurred photo was ugly and was **still located**. Round 8 (`ideation/ideas.md`) redesigns Pinpoint to answer that: a privacy radius, crop first, small masked edits that copy every other pixel from the original, and a loop of 3–4 independent attackers that runs until all of them miss.

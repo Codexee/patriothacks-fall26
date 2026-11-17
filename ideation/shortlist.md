@@ -1,4 +1,6 @@
-# Shortlist (round 8, Mon Nov 16)
+# Shortlist (round 9, Tue Nov 17)
+
+> **⚠ Status (Nov 17):** the Claude test ran on `prototype/pinpoint-demo`. When the attacker found the photo, Pinpoint failed 3 of 3 times, because the place itself was the clue. "Check before you post" apps already exist (Lookr, BlurPass, and others). **Recommendation: pivot**, unless the one decisive test in `ideation/ideas.md` → Round 9 passes. The build window has started, so decide today.
 
 > **Handoff:** Neil ran rounds 1–7 on Nov 16. **Adarsh continues ideation from here.** Read "Neil's criteria" first, then "Open questions".
 
