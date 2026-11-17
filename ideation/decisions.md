@@ -28,3 +28,5 @@ Add one line per decision: date · decision · why · who. Newest last.
 - 2026-11-17 · Team fit no longer scored (every member has a coding agent) · Neil
 - 2026-11-17 · Round 11 (Flock): Unmarked (21/25), Watch the Watchers (19/25); neither a clear winner · `/ideate` round 11 · Claude, pending Neil
 - 2026-11-17 · Round 12: scoped out; nothing passes all 8 rules (AI-chat masking, ZK age checks, and camera AR/alerts already exist) · team must choose which rule bends · Claude, pending Neil
+- 2026-11-17 · Option A chosen: "never done" becomes "clearly better than what exists, in a way a judge can see" · Neil
+- 2026-11-17 · Round 13: Off the Record (22/25) leads, then Receipt (20/25, pending a price-gap test) and Mirror (19/25) · `/ideate` round 13 · Claude, pending a team vote

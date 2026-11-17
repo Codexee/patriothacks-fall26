@@ -4,7 +4,7 @@ Method: `/ideate` (think backward from the winning demo). Track: **Best Solution
 
 Scores run from 1 to 5. W = Wow, T = Track fit, F = Feasible in Tue–Wed, R = Remote-OK, Tm = Team fit (EE plus backend/CP), L = Live-demo-able.
 
-**On hold: A (Shadow Route) and H (Hush)** (Neil, Nov 16). **Round 12 (Nov 17): scoped out to the whole track. Nothing passes all 8 rules; the team must choose which rule bends (see Round 12).** Round 11 (Flock): AG. Unmarked and AH. Watch the Watchers. Ground Truth (Round 10) was rejected: people do not trust an AI to judge whether a photo is real. Round 8 — AD. Pinpoint v2 is kept for reference. Round 7: Tripwire set aside (few people use AI browsers), Veil dropped (protective noise can be removed; topic avoided for publicity), AC folded into AD. Rounds 4–6 are kept below for reference. Neil said rounds 4–5 lack wow. Round 3 (K–P) and Flagged (R) were rejected. The other ideas are under "Scrapped".
+**On hold: A (Shadow Route) and H (Hush)** (Neil, Nov 16). **Round 13 (Nov 17), Option A ("beat what exists, visibly"): lead Off the Record (22/25), then Receipt (20/25, if its price-gap test passes).** Round 11 (Flock): AG. Unmarked and AH. Watch the Watchers. Ground Truth (Round 10) was rejected: people do not trust an AI to judge whether a photo is real. Round 8 — AD. Pinpoint v2 is kept for reference. Round 7: Tripwire set aside (few people use AI browsers), Veil dropped (protective noise can be removed; topic avoided for publicity), AC folded into AD. Rounds 4–6 are kept below for reference. Neil said rounds 4–5 lack wow. Round 3 (K–P) and Flagged (R) were rejected. The other ideas are under "Scrapped".
 
 ---
 
@@ -523,6 +523,104 @@ The output is an oversight report for a city council or a student assembly (for 
 - **Option A, relax rule 3** to "clearly better than what exists, in a way a judge can see". Most hackathon winners are new in their *mechanism or demo*, not in their *problem*.
 - **Option B, leave consumer privacy.** Look at the "survive" side of the track (for example, logistics after a collapse, or community coordination). It is less crowded, but the demos are harder to make exciting.
 - **Option C, pick the best idea so far** (for example, Unmarked) and accept its known flaw. This saves the most build time.
+
+---
+
+# Round 13 (Tue Nov 17): Option A, beat what exists in a way a judge can see
+
+**New rule 3 (Neil, Nov 17):** an idea qualifies if it is **clearly better than what already exists**, and a judge can see the difference in the demo. New scoring: **Wow, Track fit, Feasible, Live-demo-able, and "Beats existing" (B)**, each scored 1–5, for a total of /25.
+
+---
+
+## Old ideas reconsidered
+
+### 1. Off the Record (from the round-12 AI-chat masking idea)  ·  **22/25**
+**Hook:** *"A court ordered OpenAI to hand over 20 million ChatGPT conversations"* (S.D.N.Y., Jan 5, 2026). A separate order from May 2025 requires OpenAI to keep logs that users had deleted.
+**What exists:** Caviard (about 300 users, no reviews), PII Shield, PiiBlocker, ChatWall, and Saklam. They mask obvious fields (names, emails, phone numbers) with patterns. Caviard restores the originals only when the user presses a key.
+**How we beat it, visibly:**
+1. **Audit of the past:** the user uploads their own ChatGPT data export (Settings → Data controls → Export). A local model reads every chat and builds the profile that anyone holding the logs could build: "You are a GMU junior in ECE, you live in Fairfax, your sister Priya works at Inova, you asked about an ADHD diagnosis in March". This is the "gasp" moment.
+2. **Protection for the future:** a browser extension that also hides *context* clues (school, employer, relatives, health conditions, small towns), not only the obvious fields. It swaps them for consistent placeholders before sending, then restores them in the reply automatically.
+3. **Proof:** a side-by-side view of what you typed and what the chatbot's company received, for every message.
+
+**Why users can trust it:** the masking runs on the user's own machine, and the user can see every word that leaves it. No AI judgment is needed to trust the result.
+**Demo (30 s):** drop a real export (a teammate's) into the app. A dossier card fills in from 400 chats. Then type a personal question in ChatGPT with the extension on. The side panel shows that OpenAI received "[SCHOOL_1] … [RELATIVE_1] … [CONDITION_1]", and the reply comes back with the real words restored.
+**Risks:**
+- A placeholder can break the meaning of the question, so test 30 real prompts.
+- The chat sites change their page structure (DOM) often, so support ChatGPT and Claude first.
+
+**Scores:** W5 T5 F4 L5 B3
+
+### 2. Receipt (from Ghost Price, round 6)  ·  **20/25**
+**Hook:** *"New York City bans surveillance pricing"* (Nov 2026; it is the second US city to do so, after Maryland's sector bans). In the Consumer Reports study, some shoppers paid $124 for the same 20-item Instacart basket that others got for $114.
+**What exists:** Priceglass (v0.3) and BiasRadar. Both only *detect* a price difference.
+**How we beat it, visibly:** before you pay, Receipt (1) loads the same item at the same moment in clean "ghost" sessions, (2) hands you the cheapest clean session for checkout, and (3) saves timestamped, signed evidence and drafts a complaint under the law that applies where you live (the NYC ban, the New York disclosure law, Maryland).
+**Demo:** "You see $124. A fresh shopper sees $114. Buy at $114. The evidence and a complaint are ready to send."
+**Biggest risk:** a price gap may not appear live. **First test (1 hour, free):** compare 20 products on Instacart, Uber, and 2 airlines from a logged-in session and from fresh sessions. If no site shows a gap, drop the idea.
+**Scores:** W5 T4 F3 L3 B5
+
+### 3. Mirror (from What They Know, round 1)  ·  **19/25**
+**Hook:** *"Chatbots can now dox you from data-broker records"* (EPIC, Jan 2026). A full people-search profile costs $2.99, or nothing.
+**What exists:** DeleteMe, Optery, and Incogni. They cost $100–$200 a year and send a static report every few months.
+**How we beat it, visibly:** a live AI agent shows, in 60 seconds, what a stranger with an AI chatbot can find from only your name and school (home address, relatives, phone, schedule clues). Then free opt-out requests are filed one by one, while you watch.
+**Risks:**
+- Opt-out forms often have CAPTCHAs, which we must not bypass. The user completes those steps.
+- It must work only on the verified user.
+- It is close to existing paid services, so the "live" view must carry the demo.
+
+**Scores:** W4 T5 F3 L3 B4
+
+### 4. Shadow Route (round 1)  ·  **16/25**
+**What exists:** FlockHopper (two driving routes, and it counts cameras) and DeFlock.
+**How we would beat it:** walking and biking routes on campus, the direction each camera faces, and "minutes visible" instead of a camera count.
+**Problem:** the difference is small, and a judge would see it as FlockHopper with extra features.
+**Scores:** W3 T5 F4 L3 B1
+
+### 5. Unsign (round 5)  ·  **18/25**
+It is already new (no consumer defense against LLM authorship attribution), but Neil judged its wow low. It can fold into Off the Record as a "writing-style clues" check.
+**Scores:** W3 T5 F4 L4 B2
+
+**Dropped under the new rule:**
+- **Tailgate:** Apple and Google now give cross-platform tracker alerts.
+- **Duress:** GrapheneOS already has a duress PIN.
+- **Tripwire:** few people use AI browsers.
+- **Pinpoint:** anonymizing photos is close to impossible.
+- **Ground Truth:** people do not trust it.
+- **Unmarked:** its fix is compliance.
+
+---
+
+## New ideas that the new rule makes possible
+
+### 6. Spyware Check for everyone  ·  **15/25**
+**Hook:** *"Apple warns iPhone users in 99 countries of mercenary spyware"* (latest round, Nov 2026).
+**What exists:** Amnesty's MVT (a command-line tool for experts) and iVerify.
+**Our version:** one-click MVT checks for non-experts.
+**Problem:** a clean result shows nothing, so the wow is low.
+**Scores:** W2 T5 F3 L3 B2
+
+### 7. Who Read My Records  ·  **13/25**
+**Hook:** *"UK regulator gets 300+ reports of staff snooping in medical records"* (Nov 2026).
+**Our version:** generate and track requests to see who opened your health and school records.
+**Problem:** the answer comes back in weeks, so there is nothing to show live.
+**Scores:** W2 T4 F3 L1 B3
+
+---
+
+## Ranking under Option A
+
+| Rank | Idea | Hook | W | T | F | L | B | **/25** |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | **Off the Record** | Court orders 20M ChatGPT logs | 5 | 5 | 4 | 5 | 3 | **22** |
+| 2 | **Receipt** | NYC bans surveillance pricing | 5 | 4 | 3 | 3 | 5 | **20** |
+| 3 | Mirror | Chatbots now dox from broker data | 4 | 5 | 3 | 3 | 4 | 19 |
+| 4 | Unsign (fold into #1) | LLMs unmask anonymous authors | 3 | 5 | 4 | 4 | 2 | 18 |
+| 5 | Shadow Route | Campuses vote against Flock | 3 | 5 | 4 | 3 | 1 | 16 |
+| 6 | Spyware Check | Apple spyware alerts in 99 countries | 2 | 5 | 3 | 3 | 2 | 15 |
+| 7 | Who Read My Records | 300+ medical-record snooping reports | 2 | 4 | 3 | 1 | 3 | 13 |
+
+**Recommendation:**
+1. **Off the Record.** Every judge uses an AI chatbot daily. The "what your chat history says about you" dossier is a strong moment. Users can check the protection themselves. It beats the existing maskers on two visible points: context clues and the audit of past chats.
+2. **Receipt**, but only if its free 1-hour test finds a real price gap. If it does, it saves real money and makes the brand-new NYC law enforceable.
 
 ---
 

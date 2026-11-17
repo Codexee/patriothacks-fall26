@@ -1,6 +1,14 @@
-# Shortlist (round 12, Tue Nov 17)
+# Shortlist (round 13, Tue Nov 17)
 
-> **Round 12 (Nov 17):** after scoping out to the whole track, nothing passes all 8 rules (`ideation/ideas.md` → Round 12). AI-chat masking, zero-knowledge age checks, and camera-alert apps all exist already. **Decision needed today:** relax "never done" (Option A), leave consumer privacy (Option B), or take the best idea so far (Option C).
+> **Option A chosen (Neil, Nov 17):** an idea qualifies if it clearly beats what already exists, in a way a judge can see. Scores are /25 (Wow, Track, Feasible, Live, Beats existing).
+
+| Rank | Idea | Hook | **/25** | Next step |
+| --- | --- | --- | --- | --- |
+| 1 | **Off the Record** (audit your ChatGPT history, then mask context clues in new chats) | Court orders 20M ChatGPT logs | **22** | `/interview Off the Record` |
+| 2 | **Receipt** (buy at the clean price, with evidence and a complaint) | NYC bans surveillance pricing | **20** | Free 1-hour price-gap test first |
+| 3 | Mirror (live AI dox drill, then free opt-outs) | Chatbots dox from broker data | 19 | |
+
+Full list and reasons: `ideation/ideas.md` → Round 13.
 
 ## Round 11 table
 

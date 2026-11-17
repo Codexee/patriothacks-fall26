@@ -2,6 +2,13 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-17 (10): Option A, lead idea Off the Record
+
+- Neil chose Option A: an idea qualifies if it clearly beats what already exists, in a way a judge can see.
+- **Lead: Off the Record.** Audit your own ChatGPT export to see what anyone holding the logs could learn about you, then use a browser extension that hides context clues in new chats and restores them in the replies. Hook: a court ordered OpenAI to hand over 20M ChatGPT logs.
+- **Runner-up: Receipt** (surveillance pricing; NYC banned it in Nov 2026), if a free 1-hour price-gap test passes.
+- **Action for everyone:** read `ideation/ideas.md` → Round 13 and vote.
+
 ## 2026-11-17 (9): Round 12, scoped out; a decision is needed
 
 - Ideation scoped out to the whole track. Fresh 2026 problems (ChatGPT logs handed to a court, ID leaks from age checks, Flock cameras) all already have tools.
