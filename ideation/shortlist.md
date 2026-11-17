@@ -1,5 +1,7 @@
 # Shortlist (round 13, Tue Nov 17)
 
+> **Next phase (Nov 17): Off the Record, with Unsign included, is the idea under consideration.** The full exploration (architecture, every entry point, the local model, 5 demo concepts, the recommended 3-act demo, risks, first tests, and open questions) is in **`ideation/off-the-record.md`**. **Adarsh: workshop that file.**
+
 > **Option A chosen (Neil, Nov 17):** an idea qualifies if it clearly beats what already exists, in a way a judge can see. Scores are /25 (Wow, Track, Feasible, Live, Beats existing).
 
 | Rank | Idea | Hook | **/25** | Next step |

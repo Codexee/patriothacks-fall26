@@ -2,6 +2,13 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-17 (11): Off the Record enters the next phase
+
+- **New file: `ideation/off-the-record.md`.** A small model on your own machine sits between you and every AI (chatbots, AI browsers, computer-use agents, coding agents, MCP tools, and file uploads). It replaces anything that identifies you, including context clues and writing style (Unsign), and restores the real values in the replies. It also lets an agent type your real data without ever seeing it.
+- The file has the prior art and the gap, the architecture, every entry point, 5 demo concepts, a recommended 3-act demo, risks, 4 cheap first tests, and open questions.
+- **Action for Adarsh:** `git pull`, then workshop `ideation/off-the-record.md`, starting with the open questions.
+- **Action for everyone:** read it. Anyone willing to share their own ChatGPT export for the demo, say so.
+
 ## 2026-11-17 (10): Option A, lead idea Off the Record
 
 - Neil chose Option A: an idea qualifies if it clearly beats what already exists, in a way a judge can see.
