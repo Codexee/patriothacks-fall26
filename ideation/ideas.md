@@ -4,7 +4,7 @@ Method: `/ideate` (think backward from the winning demo). Track: **Best Solution
 
 Scores run from 1 to 5. W = Wow, T = Track fit, F = Feasible in Tue–Wed, R = Remote-OK, Tm = Team fit (EE plus backend/CP), L = Live-demo-able.
 
-**On hold: A (Shadow Route) and H (Hush)** (Neil, Nov 16). **Round 10 (Nov 17): lead idea AE. Ground Truth** (check whether a viral photo is what people say it is). Pinpoint (anonymizing) is dropped: Neil, Nov 17. Round 8 — AD. Pinpoint v2 is kept for reference. Round 7: Tripwire set aside (few people use AI browsers), Veil dropped (protective noise can be removed; topic avoided for publicity), AC folded into AD. Rounds 4–6 are kept below for reference. Neil said rounds 4–5 lack wow. Round 3 (K–P) and Flagged (R) were rejected. The other ideas are under "Scrapped".
+**On hold: A (Shadow Route) and H (Hush)** (Neil, Nov 16). **Round 11 (Nov 17): Flock ideas AG. Unmarked and AH. Watch the Watchers. Neither is a clear winner.** Ground Truth (Round 10) was rejected: people do not trust an AI to judge whether a photo is real. Round 8 — AD. Pinpoint v2 is kept for reference. Round 7: Tripwire set aside (few people use AI browsers), Veil dropped (protective noise can be removed; topic avoided for publicity), AC folded into AD. Rounds 4–6 are kept below for reference. Neil said rounds 4–5 lack wow. Round 3 (K–P) and Flagged (R) were rejected. The other ideas are under "Scrapped".
 
 ---
 
@@ -423,6 +423,77 @@ Use the methods in this order, and stop at the first one that works:
 
 A person who is lost, or a 911 caller who cannot say where they are, sends a photo. With their consent, the agent places them on a map, with the clues it used. **Problems:** the agent is weak on forests and generic places (the exact places people get lost), it is not used day to day, and RapidSOS and phone location already cover most cases.
 **Scores:** W4 T4 F3 R5 Tm3 L3
+
+---
+
+# Round 11 (Tue Nov 17): Flock and license-plate cameras, beyond routing
+
+**Neil (Nov 17):** Ground Truth does not fit its problem, because people rightly do not trust an AI to say whether a photo is real. Revisit the Shadow Route problem space (Flock cameras, including on campuses). Check prior art before exploring an idea. Lead with the headline. Ignore team strengths and the final API cost. Do not limit ideas to GMU.
+
+**What already exists (do not rebuild):**
+- **DeFlock:** a crowdsourced camera map
+- **FlockHopper and FlockDetour:** routing around cameras
+- **Have I Been Flocked:** search 242M released audit records by plate, plus maps of sharing networks
+- **EyesOnFlock:** scrapes 1,517 public transparency portals; Pew used it in Nov 2026
+- **whoapprovedthis.org:** finds Flock contracts
+- **Outflock:** a small YOLO model (about 189 images) that detects Flock hardware
+- **Flock-You:** detects Flock devices by their wireless signals, on an ESP32
+- **Flock's own "Audit Assistance"** (announced Aug 2026)
+
+**Campus status (2026):**
+- **Pilots:** Penn State; University at Buffalo (20 cameras, then paused after criticism).
+- **Already in use:** USF shares data with regional agencies; UNC Charlotte shares with agencies in contiguous states; Norfolk State is ringed by 17 cameras and is in a federal lawsuit.
+- **Student opposition:** William & Mary students voted **1,480 to 116** to end the college's Flock contract (Mar 2026).
+
+---
+
+## AG. Unmarked: how findable your car is to Flock's AI search, even with the plate hidden  ·  software only  ·  **21/25**
+
+**The hook:** *"Police can type 'blue car with a bumper sticker' and search every Flock camera at once."* Flock's FreeForm search runs on its "Vehicle Fingerprint" index, which records color, make, model, roof racks, **bumper stickers**, and **dents**. Audit logs reported by 404 Media show officers searching by clothing, race, and political belief. Separately, officers in Kentucky and Indiana are each accused of searching an ex-partner's plate **more than 2,000 times**.
+**The idea:** the user takes one photo of their own car. Unmarked:
+1. **Lists what the camera index sees,** in the plain-language form that FreeForm uses: "silver 2016 Honda Civic, rainbow sticker on rear window, university decal, dent on rear left bumper, bike rack".
+2. **Estimates how many cars match that description** in the user's state. It starts from public vehicle-registration counts (make, model, year, and color where a state publishes them) and multiplies by how rare each visible feature is.
+3. **Flags features that reveal beliefs or affiliations:** political, religious, Pride, union, school, and employer stickers. These make the driver searchable by *who they are*, not only by what they drive.
+4. **Ranks the changes** by how much each one makes the car blend in: "Remove the campus decal: 1 in 40 cars becomes 1 in 2,100."
+
+**Winning demo (30 s):** a photo of a teammate's car. The plate is covered. A card shows: **"Searchable as: 'gray Subaru Outback, rainbow sticker, 'Mason' decal, kayak rack'. About 14 cars in Virginia match."** The card flags the rainbow sticker as a belief signal. Then show the ranked list of changes: without the decal and the rack, about 9,800 cars match.
+**Why it is different from the rest:** every existing tool is about the *plate* (maps, routes, audit lookups). Unmarked is about the *car's appearance*, which plate covers and route planners do not help with. We found no consumer tool that does this (searched Nov 17: only Privacy4Cars' VIN data report, and enterprise tools such as UVeye).
+**Reliability:** the AI only describes things the user can see in their own photo, so the user can check every claim. The match count is an estimate, and the card shows how it was calculated.
+**Brutally honest weaknesses:**
+- **The fix is self-censorship.** "Remove your Pride sticker so police can't find you" is a dystopian outcome in itself. Neil rejected Flagged for encouraging compliance, and this has the same risk. A possible answer: present it as a right to know, and let the user decide.
+- **Wow is moderate.** The number ("14 cars match") is interesting, but people run it once, not daily.
+- **The data is thin.** Few states publish registrations by color, and sticker rarity needs a sampled estimate (for example, VLM counts on a public set of parking-lot photos).
+**Scores (team fit ignored):** W4 T5 F4 R4 L4
+
+---
+
+## AH. Watch the Watchers: find stalking-like searches in released Flock audit logs  ·  software only  ·  **19/25**
+
+**The hook:** *"A police officer used Flock to track his ex-girlfriend more than 2,000 times."* At least 18 officers have been arrested, fired, or investigated for misusing Flock. Each case was caught *after the fact*, often by chance.
+**The idea:** take audit logs released through public-records requests, starting with the data behind Have I Been Flocked, and flag patterns that look like misuse:
+- the same user searching the same plate again and again
+- searches with no case number
+- meaningless reasons ("LMAO", "idk")
+- searches outside the agency's area
+- bursts of searches right after a protest
+
+The output is an oversight report for a city council or a student assembly (for example, William & Mary's Senate).
+**Prior art:** Have I Been Flocked lets a person look up a plate, but it does not flag patterns, as far as we found. Flock now sells "Audit Assistance" to agencies, but only the agency sees the results.
+**Weaknesses:**
+- It depends on which logs are released, and the logs often lag by months.
+- Judges do not use it day to day.
+- Naming officers needs legal care. Report by agency instead.
+- The demo is a dashboard.
+
+**Scores:** W3 T5 F3 R4 L4
+
+---
+
+## Verdict for round 11
+
+- **Unmarked** is the only Flock idea we found that is new, reliable, and useful to ordinary drivers. Its main risk is that the fix looks like compliance.
+- **Watch the Watchers** fits "rebel" best, but it is a dashboard that depends on data, and nobody uses it day to day.
+- **Neither idea is a clear winner.** If Neil does not accept Unmarked's "right to know" framing, scope out and start a new round of ideation.
 
 ---
 

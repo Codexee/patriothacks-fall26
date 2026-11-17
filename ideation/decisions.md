@@ -24,3 +24,6 @@ Add one line per decision: date · decision · why · who. Newest last.
 - 2026-11-17 · Pinpoint test: 3 of 3 locatable photos stayed located (the place itself was the clue); "pre-post privacy check" apps already exist · Claude recommends a pivot unless the 1-hour decisive test passes · pending Neil
 - 2026-11-17 · Photo anonymizing (Pinpoint) dropped: close to impossible, and the Claude test agreed · Neil
 - 2026-11-17 · New lead: Ground Truth (check whether a viral photo matches its claim; campus rumors and rental listings) · `/ideate` round 10 · Claude, pending a team vote
+- 2026-11-17 · Ground Truth rejected: people do not trust an AI to judge whether a photo is real · Neil
+- 2026-11-17 · Team fit no longer scored (every member has a coding agent) · Neil
+- 2026-11-17 · Round 11 (Flock): Unmarked (21/25), Watch the Watchers (19/25); neither a clear winner · `/ideate` round 11 · Claude, pending Neil

@@ -1,13 +1,13 @@
-# Shortlist (round 10, Tue Nov 17)
+# Shortlist (round 11, Tue Nov 17)
 
-> **Status (Nov 17):** Pinpoint (hiding where a photo was taken) is **dropped**. Neil: anonymizing is close to impossible, and the Claude test agreed. **New lead: AE. Ground Truth.** It uses the same photo-reading engine to *check claims* about viral photos (campus rumors, rental listings). Checking a claim is easier than locating a photo from scratch, and "cannot confirm" is an honest answer. See `ideation/ideas.md` → Round 10.
+> **Status (Nov 17):** Ground Truth is rejected, because people do not trust an AI to judge whether a photo is real. Round 11 looked again at Flock cameras. **No clear winner.** If the Unmarked "right to know" framing does not work for the team, scope out and run ideation again.
 
-| Rank | Idea | Wow | Track | Feasible | Remote | Team | Live | **Total** |
+| Rank | Idea | Hook | Wow | Track | Feasible | Remote | Live | **Total /25** |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | **AE. Ground Truth** | 5 | 5 | 4 | 5 | 4 | 4 | **27** |
-| 2 | AF. Lost Signal | 4 | 4 | 3 | 5 | 3 | 3 | 22 |
+| 1 | AG. Unmarked | "Police can search every Flock camera for 'a blue car with a bumper sticker'" | 4 | 5 | 4 | 4 | 4 | **21** |
+| 2 | AH. Watch the Watchers | "An officer used Flock to track his ex more than 2,000 times" | 3 | 5 | 3 | 4 | 4 | 19 |
 
-**Next:** run the 2-hour first test in Round 10 (10 debunked + 5 genuine campus-rumor photos, about $1). If it passes, run `/interview Ground Truth` and lock the spec today.
+Team fit is no longer scored (Neil, Nov 17: every member has a coding agent).
 
 ## Earlier rounds (kept for reference)
 

@@ -20,9 +20,9 @@ We are a 4-person team competing in **Patriot HackFest Fall 2026** (George Mason
 ## Where we are (update this section after every milestone)
 
 - **Phase:** Mon Nov 16, ideation (calendar: "review the challenge, set goals, choose a project direction").
-- **Done:** repo, shared context, skills, hooks, and **ideation rounds 1–10** (`ideation/ideas.md`, `ideation/shortlist.md`). **Read the top entry of `CHANGELOG.md`.**
+- **Done:** repo, shared context, skills, hooks, and **ideation rounds 1–11** (`ideation/ideas.md`, `ideation/shortlist.md`). **Read the top entry of `CHANGELOG.md`.**
 - **Next:** **Adarsh continues ideation** from `ideation/shortlist.md` (Neil's criteria and open questions are at the top). Then team vote, `/interview <idea>`, lock the spec, and `/parallelize`.
-- **Blockers:** **No locked idea, and the build window has started (Tue Nov 17).** Lead idea: **Ground Truth** (`ideation/ideas.md` → Round 10). Run its 2-hour first test, then `/interview`.
+- **Blockers:** **No locked idea, and the build window has started (Tue Nov 17).** Round 11 (Flock): Unmarked and Watch the Watchers, neither a clear winner. Next: accept one, or scope out and ideate again.
 
 ## Start of every session (all AIs)
 

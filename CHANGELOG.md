@@ -2,6 +2,13 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-17 (8): Round 11, Flock cameras revisited
+
+- Ground Truth is rejected (people do not trust an AI to judge whether a photo is real).
+- Round 11 looked again at Flock. Many tools already exist (DeFlock, FlockHopper, Have I Been Flocked, EyesOnFlock). The two new candidates are **Unmarked** (how findable your car is to Flock's AI search by its stickers and dents, even with the plate hidden) and **Watch the Watchers** (find stalking-like searches in released audit logs). Neither is a clear winner.
+- Team fit is no longer scored.
+- **Action for everyone:** read `ideation/ideas.md` → Round 11 and give a yes or no on Unmarked.
+
 ## 2026-11-17 (7): Pinpoint dropped; new lead Ground Truth
 
 - Neil dropped photo anonymizing (Pinpoint). New lead, **Ground Truth**: use the same photo-reading AI to check whether a viral photo matches its claim (place, time, earlier copies, uniforms and vehicles, AI-generated signs). Use cases: false campus rumors (for example, false ICE sightings), and fake rental listings.
