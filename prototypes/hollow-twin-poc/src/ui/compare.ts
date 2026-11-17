@@ -92,5 +92,5 @@ export async function attribution(
     onProgress(mask + 1, total);
     await tick(); // let the browser paint the progress bar
   }
-  return { runs, phi: shapley(runs.map((r) => r.days)) };
+  return { runs, phi: shapley(runs.map((r) => -r.deaths)) /* lives saved: days survived misleads, because a stable run ends early */ };
 }

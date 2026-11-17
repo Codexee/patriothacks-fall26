@@ -38,8 +38,8 @@ function Section({ title, children, extra }: { title: string; children: ReactNod
   );
 }
 
-const fmt = (n: number) => n.toLocaleString();
-const signed = (n: number) => `${n >= 0 ? '+' : '−'}${Math.abs(n).toFixed(1)}`;
+const fmt = (n: number) => Math.round(n).toLocaleString();
+const signed = (n: number) => `${n >= 0 ? '+' : '−'}${Math.round(Math.abs(n)).toLocaleString()}`;
 
 function RunCol({ title, r }: { title: string; r: RunResult }) {
   return (
@@ -182,12 +182,12 @@ export function Panel(p: PanelProps) {
           )}
           {p.attr && (
             <div className="attr">
-              <p className="muted small">Shapley share of days survived, over 16 runs.</p>
+              <p className="muted small">Shapley share of lives saved, over 16 runs.</p>
               {[...TOOL_KEYS].sort((a, b) => p.attr!.phi[b] - p.attr!.phi[a]).map((k) => (
                 <div key={k} className="attr-row">
                   <span className="name">{TOOL_LABELS[k]}</span>
                   <div className="abar"><div className={p.attr!.phi[k] < 0 ? 'neg' : ''} style={{ width: `${(Math.abs(p.attr!.phi[k]) / maxPhi) * 100}%` }} /></div>
-                  <span className="v">{signed(p.attr!.phi[k])} days</span>
+                  <span className="v">{signed(p.attr!.phi[k])} lives</span>
                 </div>
               ))}
             </div>
