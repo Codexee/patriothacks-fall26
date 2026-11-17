@@ -2,6 +2,14 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-17 (13): GLiNER browser gate passed
+
+- **The GLiNER half of the Tue-night gate passed.** `knowledgator/gliner-pii-edge-v1.0` (quint8, 46 MB) on WASM takes 83 ms p95 on a 147-word prompt, and 172 ms on one thread. It found 18 of 18 names, organizations, places, the address and the SSN at threshold 0.3.
+- **The per-prompt budget is now 500–1000 ms** (was 300 ms). The spec and `AGENTS.md` are updated.
+- **`gliner` npm (0.0.19) does not work with these models as it is.** It returns zero entities because of 3 bugs (tokenizer format, start token, output layout). `packages/core` must use its own small wrapper on `onnxruntime-web`.
+- Full table, bug details and run steps: branch `prototype/gliner-bench`, file `prototypes/gliner-bench/README.md`. The prototype is not on main.
+- **Action for the core-engine owner:** read that README before you start `packages/core`. Check recall again on the bank page and the activist chat log before you lock the threshold.
+
 ## 2026-11-17 (12): Off the Record spec drafted
 
 - **New file: `.plans/off-the-record-spec.md`** (Status: draft). The hero moment is a hijacked bank agent that leaks only stand-ins. The activist half is a fact re-attack on a seeded persona. The video shows Claude for Chrome and our extension. The demo site is a playground where the model runs in the judge's browser.

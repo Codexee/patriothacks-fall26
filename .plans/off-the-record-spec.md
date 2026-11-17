@@ -115,7 +115,7 @@ Owners are chosen at the team sync tonight. Neil and Adarsh carry Tue–Wed day;
 
 | # | Workstream | Owner | Files/dirs owned | Depends on | Done when |
 | --- | --- | --- | --- | --- | --- |
-| 1 | Core engine | tbd | `packages/core` | — | Unit fixtures pass; GLiNER in browser < 300 ms per prompt; stand-ins consistent and checksum-valid |
+| 1 | Core engine | tbd | `packages/core` | — | Unit fixtures pass; GLiNER in browser < 1000 ms per prompt (target 500 ms; edge quint8 measured 83 ms); stand-ins consistent and checksum-valid |
 | 2 | Page rewrite + submit swap | tbd | `packages/rewrite` | 1 (interface only) | Fake bank's AI view contains 0 real values in text, inputs, attributes; submit gets the real value |
 | 3 | Extension | tbd | `apps/extension` | 1, 2 | Chat mode works on chatgpt.com and claude.ai; agent mode works with Claude for Chrome on the fake bank |
 | 4 | Fake bank | tbd | `apps/bank` | — | 3 screens, seeded data, injection memo, deployed |
@@ -172,7 +172,7 @@ Owners are chosen at the team sync tonight. Neil and Adarsh carry Tue–Wed day;
 | Owners | Chosen at the team sync | User |
 | Data policy | Changes with the prompt: the model classifies what the task needs, warns before sensitive data is sent, sends stand-ins for the rest, then shows a summary of what was sent | User |
 | Attack score | Facts recovered vs a 12-fact truth sheet | User |
-| Gates and cut order | Tue night: the Claude for Chrome test and GLiNER under 300 ms. Wed night: a full bank run. Cut order: Unsign, the companion app, then the context LLM in the Chat tab | User |
+| Gates and cut order | Tue night: the Claude for Chrome test and GLiNER under 500–1000 ms (budget raised from 300 ms by Neil; GLiNER part passed, see branch `prototype/gliner-bench`). Wed night: a full bank run. Cut order: Unsign, the companion app, then the context LLM in the Chat tab | User |
 | Video length | Assume 3 minutes | User |
 | Account anonymity | Stated as a non-goal | User |
 
