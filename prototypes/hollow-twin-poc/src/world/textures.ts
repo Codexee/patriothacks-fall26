@@ -365,7 +365,7 @@ export function structTextures(): StructTextures {
 }
 
 export function dripTexture(): Texture {
-  const p = new Px(1, 2); p.set(0, 0, C.drip, 200); p.set(0, 1, C.drip); return p.texture();
+  const p = new Px(1, 3); p.set(0, 0, C.drip, 140); p.set(0, 1, C.drip, 220); p.set(0, 2, C.drip); return p.texture();
 }
 export function puddleTexture(w: number): Texture {
   const p = new Px(w, 1);

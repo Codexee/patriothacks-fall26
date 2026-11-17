@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 // PROTOTYPE: the PixiJS cutaway of the Hollow. The canvas renders at art resolution and CSS scales it
 // by SCALE with image-rendering: pixelated, so pixels stay crisp and the fill cost stays low.
 import { useEffect, useRef } from 'react';
@@ -33,6 +34,7 @@ export function World(props: WorldProps) {
       sceneRef.current?.destroy();
       const scene = new HollowScene(app, artW);
       sceneRef.current = scene;
+      if (import.meta.env.DEV) (window as unknown as { __hollowScene?: HollowScene }).__hollowScene = scene; // debug handle
       sizeCanvas(scene);
       scene.setFrame(propsRef.current.frame);
       scene.setSelected(propsRef.current.selected);

@@ -18,7 +18,7 @@ const lerpColor = (a: number, b: number, t: number) => {
   return (Math.round(r) << 16) | (Math.round(g) << 8) | Math.round(bl);
 };
 
-const DRIPS = 3;
+const DRIPS = 4;
 const FLOOR_ORDER: StructureKind[] = ['plant', 'recycler', 'clinic', 'farm'];
 
 interface StructNode { root: Container; blade?: Sprite; core?: Sprite; halo?: Sprite; lamp?: Sprite }
@@ -70,7 +70,8 @@ export class HollowScene {
     const L = this.layout;
     const w = L.roomW, h = ROOM_H;
     this.root.addChild(new Sprite(this.keep(backgroundTexture(L))));
-    const names = ['glow', 'struct', 'crowd', 'sick', 'heat', 'fog', 'drip', 'dark', 'rubble'];
+    // Darkness sits under the data overlays so heat, fog, sickness and drips stay readable in a dark room.
+    const names = ['glow', 'struct', 'crowd', 'dark', 'sick', 'heat', 'fog', 'drip', 'rubble'];
     for (const n of names) { const c = new Container(); this.layers[n] = c; this.root.addChild(c); }
     this.layers.glow.blendMode = 'add';
 
@@ -216,7 +217,7 @@ export class HollowScene {
       const wt = (cur.wet[i] += (tgt.wet[i] - cur.wet[i]) * k);
       const lost = this.lost[i] === 1;
       const flicker = p > 0.02 && p < 0.7 ? 0.85 + 0.15 * Math.sin(t * 23 + i * 1.7) : 1;
-      sec.glow.alpha = p * 0.9 * flicker;
+      sec.glow.alpha = p * 0.72 * flicker;
       sec.bulb.tint = lerpColor(BULB_OFF, BULB_ON, p * flicker);
       sec.dark.alpha = Math.max(lost ? 0.55 : 0, (1 - p) * 0.8);
       sec.heat.alpha = ht * (0.75 + 0.2 * Math.sin(t * 3 + i));
@@ -231,7 +232,7 @@ export class HollowScene {
         s.visible = d < active;
         if (!s.visible) continue;
         const ph = (t * 0.7 + sec.dripPhase[d]) % 1;
-        s.position.set(sec.dripX[d], sec.ry + 3 + Math.floor(ph * (ROOM_H - 5)));
+        s.position.set(sec.dripX[d], sec.ry + 3 + Math.floor(ph * (ROOM_H - 6)));
       }
       sec.puddle.visible = wt > 0.05 && !lost;
       sec.puddle.alpha = Math.min(1, wt * 2);

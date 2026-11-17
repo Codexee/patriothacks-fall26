@@ -12,7 +12,7 @@ export const SURFACE_H = 76;
 export const GROUND_H = 9; // dirt band at the bottom of the surface
 export const CRUST_H = 6;
 export const BOTTOM_H = 12;
-export const MIN_ROOM_W = 24;
+export const MIN_ROOM_W = 16; // 180 art px = 360 CSS px minimum width, so a 375 px phone still fits
 
 export type RGB = [number, number, number];
 export const hex = (n: number): RGB => [(n >> 16) & 255, (n >> 8) & 255, n & 255];
