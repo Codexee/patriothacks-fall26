@@ -4,7 +4,7 @@ Method: `/ideate` (think backward from the winning demo). Track: **Best Solution
 
 Scores run from 1 to 5. W = Wow, T = Track fit, F = Feasible in Tue–Wed, R = Remote-OK, Tm = Team fit (EE plus backend/CP), L = Live-demo-able.
 
-**On hold: A (Shadow Route) and H (Hush)** (Neil, Nov 16). **Round 9 (Nov 17): Pinpoint failed its test (3 of 3 fixes failed). Recommendation: pivot, or run the one decisive test in Round 9.** Round 8 — AD. Pinpoint v2 is kept for reference. Round 7: Tripwire set aside (few people use AI browsers), Veil dropped (protective noise can be removed; topic avoided for publicity), AC folded into AD. Rounds 4–6 are kept below for reference. Neil said rounds 4–5 lack wow. Round 3 (K–P) and Flagged (R) were rejected. The other ideas are under "Scrapped".
+**On hold: A (Shadow Route) and H (Hush)** (Neil, Nov 16). **Round 10 (Nov 17): lead idea AE. Ground Truth** (check whether a viral photo is what people say it is). Pinpoint (anonymizing) is dropped: Neil, Nov 17. Round 8 — AD. Pinpoint v2 is kept for reference. Round 7: Tripwire set aside (few people use AI browsers), Veil dropped (protective noise can be removed; topic avoided for publicity), AC folded into AD. Rounds 4–6 are kept below for reference. Neil said rounds 4–5 lack wow. Round 3 (K–P) and Flagged (R) were rejected. The other ideas are under "Scrapped".
 
 ---
 
@@ -370,6 +370,59 @@ Use the methods in this order, and stop at the first one that works:
 7. **Report honestly** when nothing works: "this photo shows the place itself".
 
 **One decisive test before you commit (maximum 1 hour, about $0.50):** 6 vacation-style photos where people are the subject (from team members' own phones). Apply steps 2–4, then attack again. **Continue only if** ≥ 5 of 6 photos move more than 5 km **and** the team would still post the edited photo. Otherwise, pivot.
+
+---
+
+# Round 10 (Tue Nov 17): use the photo-reading engine for verification, not hiding
+
+**Neil (Nov 17):** anonymizing photos is close to impossible, so drop it. Keep the strong part we found: a VLM agent that reads a photo and explains which details show where and when it was taken. Use it on dystopian problems.
+
+**Key reversal:** *finding* where an unknown photo was taken is hard. *Checking a claim* about a photo ("this is GMU, today") is much easier. The claim tells us where to look, so we can compare against known reference images of that place. "Cannot confirm" is also an honest, valid answer. An anonymizer that fails looks broken; a checker that says "unknown, and here is why" still works.
+
+**Research for this round:**
+- **Campus panic from false rumors is real and recent.** In 2025–2026, false ICE-sighting reports spread at Seattle schools (4 schools locked down in Jan 2026), Syracuse (YikYak, Feb 2026), Rutgers (a GroupMe screenshot), Fresno State, Cal State LA, Stanford, and Michigan State. At William & Mary, a photo of two campus police officers on patrol was shared as "ICE".
+- **AI alone is bad at photo verification.** In the Columbia Journalism Review / Tow Center test, only 14 of 280 AI answers got the location, date, and photographer right. AI did better on location than on date. A product must therefore combine signals and show evidence, never one AI verdict.
+- **Newsrooms have tools** (AP Verify, InVID/WeVerify, GeoSpy's "confirm or deny"), but they are for professionals. We found no free tool for students that checks a campus rumor photo against its claim.
+- **Rental scams:** reverse image search catches most stolen listing photos, but AI-generated property photos now defeat it. Guides tell renters to compare the photos with Google Maps at the address by hand. We found no tool that does this automatically.
+
+---
+
+## AE. Ground Truth: check whether a viral photo is what people say it is  ·  software only  ·  **27/30**
+
+**Crazy version:** a "truth button" on every viral image, so panic and propaganda die in 30 seconds.
+**Buildable version:** a student pastes a viral photo or screenshot plus its claim (for example, "ICE agents at the Johnson Center right now"). Ground Truth runs independent checks in parallel, shows the evidence for each, and gives one of three verdicts: **consistent**, **inconsistent**, or **cannot confirm**.
+1. **Place check:** is the scene consistent with the claimed place? It compares the photo with reference images of the claimed place (our GMU campus set plus Mapillary/Street View near the claimed spot). Feature matching (SuperPoint + LightGlue) gives a hard match score, and the VLM explains the visible clues. This is the step our prototype already does well (3 of 3 landmark photos placed within 100 m).
+2. **Time check:** is it consistent with "today"? It compares the season, foliage, and snow with today's weather at that place (from a free weather history API), and the sun direction and shadow length with the claimed time (sun-position math, as in SunCalc).
+3. **Earlier-copy check:** has this photo appeared online before? This uses reverse image search (for example, the SerpApi Google Lens API).
+4. **Who-is-it check (no faces):** which uniforms, vehicles, and markings are visible, for example "vehicle markings match Mason Police, not ICE". It never identifies a person, and it blurs faces before any step.
+5. **AI-image check:** does it show signs of an AI-generated image, plus a C2PA content-credential check if the file has one?
+**Winning demo (30 s):** a screenshot from a group chat: "ICE AT THE JC RIGHT NOW 🚨 share". Ground Truth runs, and four cards fill in: **Place: consistent with Johnson Center (match 0.91).** **Time: inconsistent: leaves are green and shadows point northeast in the morning; today is Nov 19 and bare.** **Earlier copy: found, posted Apr 2025 at another campus.** **Vehicle: markings match a university police department.** Verdict: **Inconsistent, an old photo reused.** One tap copies a short, sourced reply to paste into the group chat.
+**Second use case (same engine), rental listings:** "Is this apartment really at 10340 Main St?" The tool compares the listing's exterior photo with street-level images at that address, and runs the earlier-copy check. Result: "The photo does not match the building at this address. The same photo is listed in Tucson."
+**How it works:**
+- A Python backend runs the checks in parallel, with one adapter for each check.
+- Claude vision gives the clue explanation, and the evidence cards cite their sources.
+- Feature matching and reference images give the hard place score. The local members photograph the GMU locations that appear most often in rumors (the JC, the Hub, Fenwick, the dorms) on Tuesday.
+- Sun and weather math gives the time score.
+- A web app (paste or upload), plus a "share the result" card.
+**Who does what:**
+- **Anish:** the verdict logic that combines the scores (how to weigh independent signals and when to say "cannot confirm"), plus the sun math.
+- **EE members:** feature matching and the reference image set.
+- **Remote members:** the web app, the result cards, and the reverse-search and weather adapters.
+**Hardware (gate):** none.
+**Overlap with past winners:** CupidSecure and Sketchy (scam and threat checks) won in Feb 2026, so judges reward "check before you trust". Ours is the visual, campus version. It is close to newsroom tools (AP Verify), but for students and with a 30-second answer.
+**Risks / Ethics:**
+- **A false "consistent" verdict could spread a rumor.** Mitigation: the tool never says "true". It shows the evidence for each check, and "cannot confirm" is the default when the signals disagree.
+- **The topic is politically sensitive** (ICE). Frame it as "campus rumor check" for any alert (fake active-shooter alerts, fights, fires), with the ICE case as one example. It never helps locate or identify any person.
+- **Dependencies:** reverse image search (paid API, about 100 free searches a month) and the Claude API. Cache the demo runs.
+**First test (Tuesday, 2 hours, about $1):** collect 10 real debunked campus-rumor photos from news reports and 5 genuine ones. **Pass:** ≥ 8 of 10 debunked photos get "inconsistent" or "cannot confirm" with correct evidence, and 0 genuine photos get "inconsistent".
+**Scores:** W5 T5 F4 R5 Tm4 L4
+
+---
+
+## AF. Lost Signal: send one photo, get found (when GPS or 911 location fails)  ·  software only  ·  **22/30**
+
+A person who is lost, or a 911 caller who cannot say where they are, sends a photo. With their consent, the agent places them on a map, with the clues it used. **Problems:** the agent is weak on forests and generic places (the exact places people get lost), it is not used day to day, and RapidSOS and phone location already cover most cases.
+**Scores:** W4 T4 F3 R5 Tm3 L3
 
 ---
 

@@ -1,6 +1,15 @@
-# Shortlist (round 9, Tue Nov 17)
+# Shortlist (round 10, Tue Nov 17)
 
-> **⚠ Status (Nov 17):** the Claude test ran on `prototype/pinpoint-demo`. When the attacker found the photo, Pinpoint failed 3 of 3 times, because the place itself was the clue. "Check before you post" apps already exist (Lookr, BlurPass, and others). **Recommendation: pivot**, unless the one decisive test in `ideation/ideas.md` → Round 9 passes. The build window has started, so decide today.
+> **Status (Nov 17):** Pinpoint (hiding where a photo was taken) is **dropped**. Neil: anonymizing is close to impossible, and the Claude test agreed. **New lead: AE. Ground Truth.** It uses the same photo-reading engine to *check claims* about viral photos (campus rumors, rental listings). Checking a claim is easier than locating a photo from scratch, and "cannot confirm" is an honest answer. See `ideation/ideas.md` → Round 10.
+
+| Rank | Idea | Wow | Track | Feasible | Remote | Team | Live | **Total** |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | **AE. Ground Truth** | 5 | 5 | 4 | 5 | 4 | 4 | **27** |
+| 2 | AF. Lost Signal | 4 | 4 | 3 | 5 | 3 | 3 | 22 |
+
+**Next:** run the 2-hour first test in Round 10 (10 debunked + 5 genuine campus-rumor photos, about $1). If it passes, run `/interview Ground Truth` and lock the spec today.
+
+## Earlier rounds (kept for reference)
 
 > **Handoff:** Neil ran rounds 1–7 on Nov 16. **Adarsh continues ideation from here.** Read "Neil's criteria" first, then "Open questions".
 

@@ -2,6 +2,11 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-17 (7): Pinpoint dropped; new lead Ground Truth
+
+- Neil dropped photo anonymizing (Pinpoint). New lead, **Ground Truth**: use the same photo-reading AI to check whether a viral photo matches its claim (place, time, earlier copies, uniforms and vehicles, AI-generated signs). Use cases: false campus rumors (for example, false ICE sightings), and fake rental listings.
+- **Action for everyone:** read `ideation/ideas.md` → Round 10 and vote. The first test needs 10 debunked and 5 genuine campus-rumor photos from news reports.
+
 ## 2026-11-17 (6): Pinpoint failed its test, pivot recommended
 
 - The Claude attacker test of the Pinpoint prototype (branch `prototype/pinpoint-demo`) failed 3 of 3 photos it could locate. The building, statue, or street itself was the clue. Small clues (signs, logos) were easy to remove.

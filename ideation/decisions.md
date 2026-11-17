@@ -22,3 +22,5 @@ Add one line per decision: date · decision · why · who. Newest last.
 - 2026-11-16 · Tripwire set aside (few people use AI browsers); Veil dropped (protective noise can be removed, Hönig et al. ICLR 2025; avoid the nudify topic for publicity) · Neil
 - 2026-11-16 · Pinpoint v2 is the lead idea: privacy radius, crop first, masked edits only, and a loop of 3–4 independent attackers until all miss · `/ideate` round 8 after Neil's ChatGPT test · Neil and Claude
 - 2026-11-17 · Pinpoint test: 3 of 3 locatable photos stayed located (the place itself was the clue); "pre-post privacy check" apps already exist · Claude recommends a pivot unless the 1-hour decisive test passes · pending Neil
+- 2026-11-17 · Photo anonymizing (Pinpoint) dropped: close to impossible, and the Claude test agreed · Neil
+- 2026-11-17 · New lead: Ground Truth (check whether a viral photo matches its claim; campus rumors and rental listings) · `/ideate` round 10 · Claude, pending a team vote
