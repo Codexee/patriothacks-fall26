@@ -19,3 +19,5 @@ Add one line per decision: date · decision · why · who. Newest last.
 - 2026-11-16 · Prior art found: Shadow Route already exists (FlockHopper, FlockDetour). Personalized-price detectors exist (Priceglass, BiasRadar) · round-6 research · Claude
 - 2026-11-16 · Round 7 from recent research: Tripwire (27), Pinpoint with the grid upgrade (27), Veil (26). Location-SDK and FaceTell problems dropped · `/ideate` round 7 · Claude, pending a team vote
 - 2026-11-16 · Adarsh (air842) takes over ideation from Neil · Neil
+- 2026-11-16 · Tripwire set aside (few people use AI browsers); Veil dropped (protective noise can be removed, Hönig et al. ICLR 2025; avoid the nudify topic for publicity) · Neil
+- 2026-11-16 · Pinpoint v2 is the lead idea: privacy radius, crop first, masked edits only, and a loop of 3–4 independent attackers until all miss · `/ideate` round 8 after Neil's ChatGPT test · Neil and Claude

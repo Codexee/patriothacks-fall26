@@ -20,9 +20,9 @@ We are a 4-person team competing in **Patriot HackFest Fall 2026** (George Mason
 ## Where we are (update this section after every milestone)
 
 - **Phase:** Mon Nov 16, ideation (calendar: "review the challenge, set goals, choose a project direction").
-- **Done:** repo, shared context, skills, hooks, and **ideation rounds 1–7** (`ideation/ideas.md`, `ideation/shortlist.md`). **Read the top entry of `CHANGELOG.md`.**
+- **Done:** repo, shared context, skills, hooks, and **ideation rounds 1–8** (`ideation/ideas.md`, `ideation/shortlist.md`). **Read the top entry of `CHANGELOG.md`.**
 - **Next:** **Adarsh continues ideation** from `ideation/shortlist.md` (Neil's criteria and open questions are at the top). Then team vote, `/interview <idea>`, lock the spec, and `/parallelize`.
-- **Blockers:** no idea meets all of Neil's criteria yet. Shadow Route already exists (FlockHopper). Top candidates: Tripwire, Pinpoint, Veil.
+- **Blockers:** none. **Lead idea: Pinpoint v2** (`ideation/ideas.md` → Round 8). Open questions are in `ideation/shortlist.md`.
 
 ## Start of every session (all AIs)
 

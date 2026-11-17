@@ -4,7 +4,7 @@ Method: `/ideate` (think backward from the winning demo). Track: **Best Solution
 
 Scores run from 1 to 5. W = Wow, T = Track fit, F = Feasible in Tue–Wed, R = Remote-OK, Tm = Team fit (EE plus backend/CP), L = Live-demo-able.
 
-**On hold: A (Shadow Route) and H (Hush)** (Neil, Nov 16). **Active: round 7** (AA Tripwire, AB Veil, AC Pinpoint upgrade) is the latest. Rounds 4–6 are kept below for reference. Neil said rounds 4–5 lack wow. Round 3 (K–P) and Flagged (R) were rejected. The other ideas are under "Scrapped".
+**On hold: A (Shadow Route) and H (Hush)** (Neil, Nov 16). **Active: round 8 — AD. Pinpoint v2** (the lead idea). Round 7: Tripwire set aside (few people use AI browsers), Veil dropped (protective noise can be removed; topic avoided for publicity), AC folded into AD. Rounds 4–6 are kept below for reference. Neil said rounds 4–5 lack wow. Round 3 (K–P) and Flagged (R) were rejected. The other ideas are under "Scrapped".
 
 ---
 
@@ -239,6 +239,74 @@ Method (Neil): find recent research (2025–2026) that shows a pressing problem,
 ## AC. Pinpoint, upgraded by the 2026 research  ·  software only  ·  **27/30** (no change to the score)
 
 New research shows that the risk is not one photo but the *grid*: models link small clues across many photos into one profile (MultiPriv). Upgrade the Pinpoint demo: drop in your last 9 Instagram posts. Pinpoint places them on the campus map, links them ("same window in posts 2 and 7, same parking lot in post 5"), and builds the profile a stranger could build ("lives in Liberty Square, east side, parks in Lot K, at the RAC on weekday mornings"). Then "Make safe" fixes the 3 posts that leak the most, and the profile falls apart.
+
+---
+
+# Round 8 (Mon Nov 16): Pinpoint v2, answers to Neil's critique
+
+**Neil's test (Nov 16):** he gave ChatGPT a Street View photo from Zürich. It found the place (Baslerstrasse, next to Letzigrund Stadium) from the stadium roof, the inclined floodlight masts, and the green cycle-lane stripe. It then blurred the photo heavily, and the result was **unusable**. A second, partly blurred version was located again by a *fresh* ChatGPT, from the masts that stuck out above the blur, the rust-colored wall, and the road markings. Only a third edit brought the guess down to "Switzerland, maybe Zürich".
+
+**Neil's critique:**
+1. A photo blurred enough to be safe is ugly, so nobody would post it.
+2. Blurring is not foolproof. One clue that survives is enough.
+3. Editing images by program is hard, and running the whole photo through diffusion changes it too much.
+4. (Veil) Protective noise can be trained around or removed, so why has nobody shipped it?
+
+**What recent research says:**
+
+| Paper | Finding | What it means for us |
+| --- | --- | --- |
+| Hönig, Rando, Carlini, Tramèr, *Adversarial Perturbations Cannot Reliably Protect Artists From Generative AI* (ICLR 2025) | Glaze, Mist, and Anti-DreamBooth are bypassed by cheap methods such as noisy upscaling | **Neil is right about Veil.** Protection based on invisible noise breaks easily. That is why it is not a product. Do not build on adversarial noise (this also rules out GeoShield-style defenses, arXiv 2508.03209). |
+| GEO-Detective (arXiv 2511.22441, 2025) | An LLM agent with reverse image search beats plain VLMs (+11.1% at country level) and **stays robust against the defenses that were tested** | The real attacker is an *agent with tools*, not one model. The defense must be tested against agents, more than once, the way Neil did by hand. |
+| *Hiding in Plain Sight* (arXiv 2609.21363, Sep 2026) | Refusal safeguards fail (jailbreaks reach 100%). Pixel-noise defenses transfer badly. Their fix changes the *semantics* during diffusion sampling. | It confirms the direction (change the meaning, not the pixels), but it regenerates the whole image. That is Neil's problem 3. |
+| *Beyond Pixels: Semantic-aware typographic attack for geoprivacy* (arXiv 2511.12575, 2025) | Deceptive text **added outside the image** greatly reduced the geolocation accuracy of 5 commercial models, and the photo stayed untouched | A zero-damage tool exists: a caption or border can mislead the AI. It is model-dependent, so it is a supporting layer only. |
+| Mendes et al., *Granular Privacy Control for Geolocation* (EMNLP 2024) | Location leakage is measured at 5 levels: country, city, neighborhood, exact place, GPS | Privacy is a **radius**, not yes or no. Users choose how much to reveal. |
+
+---
+
+## AD. Pinpoint v2: remove only the clues that matter, check with several attackers, and keep the photo beautiful  ·  software only  ·  **28/30**
+
+**The key idea: removal, not noise.** Invisible noise (Veil, GeoShield) can be washed out, because the information is still in the picture. A floodlight mast that has been *removed* cannot be "upscaled back". Pinpoint v2 removes the information and leaves everything else exactly as it was.
+
+### Answer to problem 1 (blurred photos are ugly)
+- **The user sets a privacy radius first**, like Apple's "approximate location": "OK to show *Zürich*, hide the *street*", or "OK to show *Fairfax*, hide *which dorm*". Most real risk is at the street and building level, not the city. A coarse radius needs far fewer edits.
+- **Edits are ranked by how much they cost the photo, and the cheapest that works is used:**
+  1. **Reframe (no edit at all):** search all crops at Instagram ratios (4:5, 1:1, 9:16) that keep the people in the photo and drop the clues. Often the answer is "crop out the left 18%". The photo is still a real photo.
+  2. **Remove a small object:** a mask on that one object (a sign, a parking permit, a mast), filled by a fast inpainting model (LaMa), with **every pixel outside the mask copied back from the original**.
+  3. **Recolor** a clue that is a color (a green cycle stripe becomes grey asphalt, a rust wall becomes beige).
+  4. **Decoy caption (optional):** a misleading text line for the caption or border, based on the typographic-attack research. It never touches the photo.
+- **People in the photo are protected:** the person mask is locked, so the subject never changes.
+- The result screen shows a **pixel-change map: "96.8% of pixels unchanged."**
+
+### Answer to problem 2 (blur is not foolproof)
+- **Find the clues the way the attacker finds them, not by guessing.** Each attacker returns the clues it used, with boxes on the image (VLM grounding). An open geolocation model (GeoCLIP) adds an occlusion-sensitivity map: hide each patch and measure how far the location guess moves. This catches clues that a person forgets, such as the masts above the blur in Neil's test.
+- **A red-team loop that automates Neil's manual test:** 3–4 *independent* attackers, each with a fresh context that knows nothing about the original (two VLMs from different vendors, GeoCLIP, and one agent with web and reverse image search for the final check). They attack the edited photo. If any attacker's best guess is inside the privacy radius, its clues go back into the edit step, and the loop runs again. The photo passes only when **every** attacker misses by more than the radius.
+- **An honest result, not "100% safe":** "Checked by 4 attackers. Closest guess: 6.2 km away (radius: 2 km). Remaining clues: none found." We also report a candidate count: "This photo now matches 3,400 streets in the canton of Zürich equally well."
+
+### Answer to problem 3 (editing by program is hard, and diffusion changes too much)
+- **No full-image diffusion.** Segment Anything 2 (SAM 2) turns each attacker's clue box into an exact mask. Only pixels inside the masks change, and the rest are copied bit for bit from the original. LaMa inpaints a sky or a wall in under a second on a GPU and does not "redraw" the scene.
+- When an object is too large to remove (a whole stadium), the optimizer prefers **reframing** over inpainting, because a crop never looks fake.
+- **A quality check on every edit:** a perceptual score (LPIPS) on the changed region, and a check that faces and people did not change. An edit that looks bad is rejected, and the next-cheapest option is tried.
+
+### Answer to problem 4 (Veil)
+Protective noise is a cat-and-mouse game that defenders lose (Hönig et al.). That is why nobody ships it as a real product, and we drop Veil. Pinpoint v2 does not depend on fooling a model: it removes what a model *or a person* would use. A future model cannot recover a sign that is no longer in the photo.
+
+**Winning demo (30 s):** "Neil asked ChatGPT to make this photo safe. This is what it gave him." Show the grey smear. "And it *still* found the place on the next try." Drop the original photo into Pinpoint and set the radius to "city OK, hide street". Four attacker cards run at the same time, and three pins land on Baslerstrasse. Clues light up: the masts, the stadium roof, the green stripe. Pinpoint crops 15% off the left, removes two masts, and turns the stripe grey. The attackers run again: every pin is now more than 3 km away, and the pixel map reads "95% unchanged". Show the two photos side by side: you would still post it.
+**GMU version of the same demo:** a dorm-window photo, radius "Fairfax OK, hide building".
+**How it works (stack):** a web app (upload or camera). A Python worker on one GPU with SAM 2, LaMa, GeoCLIP, and LPIPS. Attacker adapters for 2–3 VLM APIs plus an agent with web search. A crop optimizer (an exhaustive grid over crop windows is fast). A loop controller, with a budget of about 3 rounds and about 60–90 s in total. Fast attackers run in the loop, and the slow web agent runs once at the end.
+**Who does what:**
+- **Anish:** the loop controller and the crop and edit optimizer (cheapest set of edits that pushes every attacker outside the radius, which is a set-cover problem).
+- **EE members:** attribution (occlusion sensitivity, GeoCLIP) and the quality metrics.
+- **Remote members:** the attacker adapters, the web app, and the before/after result screen.
+- Everyone needs only a laptop.
+**Hardware (gate):** none. One cloud GPU (Modal, RunPod, or Azure credits).
+**Overlap / prior art:** research only (GeoShield, Hiding in Plain Sight, the typographic attack). No consumer tool. Every published defense is *one* technique. Ours is the loop: attack, attribute, cheapest edit, attack again.
+**Risks / Ethics:**
+- The demo depends on paid VLM APIs, so cache the full runs for the pitch and keep a live run too.
+- Some photos cannot pass at a small radius without heavy edits. Pinpoint must say so ("we can hide the street only by cropping 40%; post anyway, choose a different photo, or widen the radius"). That honesty is part of the product.
+- Misuse: the same attacker could locate *other people's* photos. Ideas for `/interview`: show the attacker's guesses only *after* the edit, as distances ("4 km away"), or show exact pins only for photos taken by the user's own camera.
+**First test (Tuesday morning, 2 hours):** 10 photos (Neil's Zürich photo plus 9 campus photos). Hand-run the loop: SAM 2 + LaMa + crops, against 2 VLMs and GeoCLIP. **Pass:** ≥ 7 of 10 photos pass a street-level radius with ≥ 90% of pixels unchanged.
+**Scores:** W5 T5 F4 R5 Tm4 L5
 
 ---
 

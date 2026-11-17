@@ -2,6 +2,12 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-16 (5): Pinpoint v2 is the lead idea
+
+- Neil tested Pinpoint by hand with ChatGPT on a Zürich Street View photo. A blurred photo was ugly and was **still located**. Round 8 (`ideation/ideas.md`) redesigns Pinpoint to answer that: a privacy radius, crop first, small masked edits that copy every other pixel from the original, and a loop of 3–4 independent attackers that runs until all of them miss.
+- Veil is dropped (protective noise can be removed, Hönig et al., ICLR 2025). Tripwire is set aside (few people use AI browsers).
+- **Action for Adarsh:** `git pull`, read `ideation/shortlist.md` (open questions) and Round 8, then `/interview Pinpoint v2` or continue `/ideate`.
+
 ## 2026-11-16 (4): Ideation rounds 2–7, handoff to Adarsh
 
 - **Ideation hold lifted** (Neil). `/ideate` ran 6 more rounds today. Every idea, its scores, and the reason for each rejection are in `ideation/ideas.md`. The decisions are in `ideation/decisions.md`.
