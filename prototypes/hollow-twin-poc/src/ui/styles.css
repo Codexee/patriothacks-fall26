@@ -92,14 +92,16 @@ button.primary { background: var(--accent); color: #1a1406; border-color: var(--
 .hc-row dt { color: var(--muted); }
 .hc-row dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
 
-.src { position: relative; display: inline-flex; flex-direction: column; }
+.src { position: relative; display: inline-block; }
 .info { background: none; border: none; padding: 0 3px; color: var(--measured); font-size: 16px; line-height: 1; }
 .src-pop {
   position: absolute; left: 0; top: 100%; z-index: 20; width: 260px; display: flex; flex-direction: column; gap: 3px;
   background: #0f0f16; border: 1px solid var(--measured); padding: 6px 8px; color: var(--text);
   text-transform: none; letter-spacing: 0; font-size: 17px;
 }
-.hc-row .src-pop { position: static; width: auto; margin: 2px 0; }
+.hc-row { position: relative; }
+.hc-row .src { position: static; }
+.hc-row .src-pop { left: 0; right: 0; width: auto; }
 .src-pop a { color: var(--measured); word-break: break-all; }
 
 .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
