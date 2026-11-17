@@ -5,7 +5,7 @@ Roles are **temporary**. When you onboard, confirm or change your row. The only 
 | Name | GitHub | Background | Role preference | Location | Status |
 | --- | --- | --- | --- | --- | --- |
 | Neil | Codexee | Electrical engineering (EE) | **Flex (fixed)**: hardware, integration, fills gaps | _fill in: local or remote_ | confirmed |
-| AJ | unpug | _fill in_ | Flex | _fill in_ | temporary |
+| Darryl | _fill in_ | _fill in_ | Flex | _fill in_ | temporary (replaces AJ) |
 | Anish | sseance | Competitive programming | Backend, algorithms | _fill in_ | temporary |
 | Adarsh | air842 | Electrical engineering (EE) | Flex | _fill in_ | temporary |
 

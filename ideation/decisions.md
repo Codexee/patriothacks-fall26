@@ -31,3 +31,9 @@ Add one line per decision: date · decision · why · who. Newest last.
 - 2026-11-17 · Option A chosen: "never done" becomes "clearly better than what exists, in a way a judge can see" · Neil
 - 2026-11-17 · Round 13: Off the Record (22/25) leads, then Receipt (20/25, pending a price-gap test) and Mirror (19/25) · `/ideate` round 13 · Claude, pending a team vote
 - 2026-11-17 · Off the Record (with Unsign) moves to the next phase of consideration; exploration in ideation/off-the-record.md; Adarsh workshops it · Neil
+- 2026-11-17 · AJ (unpug) left the team; Darryl joins · Neil
+- 2026-11-17 · Off the Record /interview done; draft spec at .plans/off-the-record-spec.md · hero: hijacked bank agent leaks only stand-ins; activist half: fact re-attack on a seeded persona · Neil and Claude
+- 2026-11-17 · Real product first (Claude for Chrome + extension on chatgpt.com/claude.ai); own harness if the Tue gate fails · Neil
+- 2026-11-17 · Fake bank uses common patterns, not a 1:1 copy of a real bank (Safe Browsing and impersonation risk) · Neil after Claude's pushback
+- 2026-11-17 · Data policy is task-aware: the local model classifies what the task needs, warns before sensitive data is sent, sends stand-ins for the rest, and shows a receipt · Neil
+- 2026-11-17 · All TypeScript; the model runs in the browser; Unsign is low priority; account anonymity is a non-goal · Neil

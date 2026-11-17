@@ -2,6 +2,14 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-17 (12): Off the Record spec drafted
+
+- **New file: `.plans/off-the-record-spec.md`** (Status: draft). The hero moment is a hijacked bank agent that leaks only stand-ins. The activist half is a fact re-attack on a seeded persona. The video shows Claude for Chrome and our extension. The demo site is a playground where the model runs in the judge's browser.
+- Darryl replaces AJ in `context/team.md`.
+- **Action for everyone:** read the spec before the sync. Choose workstreams at the sync, then set `Status: locked`.
+- **Action for Darryl:** fill in your row in `context/team.md`.
+- **Action for anyone:** ask the directors about the judging format (video length, demo links).
+
 ## 2026-11-17 (11): Off the Record enters the next phase
 
 - **New file: `ideation/off-the-record.md`.** A small model on your own machine sits between you and every AI (chatbots, AI browsers, computer-use agents, coding agents, MCP tools, and file uploads). It replaces anything that identifies you, including context clues and writing style (Unsign), and restores the real values in the replies. It also lets an agent type your real data without ever seeing it.

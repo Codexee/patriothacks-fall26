@@ -19,10 +19,10 @@ We are a 4-person team competing in **Patriot HackFest Fall 2026** (George Mason
 
 ## Where we are (update this section after every milestone)
 
-- **Phase:** Mon Nov 16, ideation (calendar: "review the challenge, set goals, choose a project direction").
+- **Phase:** Tue Nov 17, spec drafted; build starts after the team sync.
 - **Done:** repo, shared context, skills, hooks, and **ideation rounds 1–13** (`ideation/ideas.md`, `ideation/shortlist.md`). **Read the top entry of `CHANGELOG.md`.**
-- **Next:** **Adarsh workshops `ideation/off-the-record.md`** (open questions at the bottom). Then the first tests, `/interview`, lock the spec, and `/parallelize`.
-- **Blockers:** **Not locked yet; the build window has started (Tue Nov 17).** **Off the Record (+ Unsign) is in the next phase of consideration:** `ideation/off-the-record.md`. Next: Adarsh workshops it, the team runs its 4 first tests, then `/interview Off the Record` and locks the spec.
+- **Next:** the team reads `.plans/off-the-record-spec.md`, assigns workstreams at the sync, sets `Status: locked`, then `/parallelize`. Tue-night gate: Claude for Chrome reads our rewritten DOM, and GLiNER runs in the browser in under 300 ms.
+- **Blockers:** the spec is a draft (not locked); the judging format is unknown (ask the directors).
 
 ## Start of every session (all AIs)
 
