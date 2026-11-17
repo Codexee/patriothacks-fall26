@@ -27,3 +27,4 @@ Add one line per decision: date · decision · why · who. Newest last.
 - 2026-11-17 · Ground Truth rejected: people do not trust an AI to judge whether a photo is real · Neil
 - 2026-11-17 · Team fit no longer scored (every member has a coding agent) · Neil
 - 2026-11-17 · Round 11 (Flock): Unmarked (21/25), Watch the Watchers (19/25); neither a clear winner · `/ideate` round 11 · Claude, pending Neil
+- 2026-11-17 · Round 12: scoped out; nothing passes all 8 rules (AI-chat masking, ZK age checks, and camera AR/alerts already exist) · team must choose which rule bends · Claude, pending Neil

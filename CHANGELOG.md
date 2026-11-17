@@ -2,6 +2,11 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-17 (9): Round 12, scoped out; a decision is needed
+
+- Ideation scoped out to the whole track. Fresh 2026 problems (ChatGPT logs handed to a court, ID leaks from age checks, Flock cameras) all already have tools.
+- **Action for everyone:** read `ideation/ideas.md` → Round 12, and vote on which rule bends: A (relax "never done"), B (leave consumer privacy), or C (take the best idea so far).
+
 ## 2026-11-17 (8): Round 11, Flock cameras revisited
 
 - Ground Truth is rejected (people do not trust an AI to judge whether a photo is real).

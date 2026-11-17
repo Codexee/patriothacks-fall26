@@ -1,4 +1,8 @@
-# Shortlist (round 11, Tue Nov 17)
+# Shortlist (round 12, Tue Nov 17)
+
+> **Round 12 (Nov 17):** after scoping out to the whole track, nothing passes all 8 rules (`ideation/ideas.md` → Round 12). AI-chat masking, zero-knowledge age checks, and camera-alert apps all exist already. **Decision needed today:** relax "never done" (Option A), leave consumer privacy (Option B), or take the best idea so far (Option C).
+
+## Round 11 table
 
 > **Status (Nov 17):** Ground Truth is rejected, because people do not trust an AI to judge whether a photo is real. Round 11 looked again at Flock cameras. **No clear winner.** If the Unmarked "right to know" framing does not work for the team, scope out and run ideation again.
 

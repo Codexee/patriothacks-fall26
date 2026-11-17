@@ -4,7 +4,7 @@ Method: `/ideate` (think backward from the winning demo). Track: **Best Solution
 
 Scores run from 1 to 5. W = Wow, T = Track fit, F = Feasible in Tue–Wed, R = Remote-OK, Tm = Team fit (EE plus backend/CP), L = Live-demo-able.
 
-**On hold: A (Shadow Route) and H (Hush)** (Neil, Nov 16). **Round 11 (Nov 17): Flock ideas AG. Unmarked and AH. Watch the Watchers. Neither is a clear winner.** Ground Truth (Round 10) was rejected: people do not trust an AI to judge whether a photo is real. Round 8 — AD. Pinpoint v2 is kept for reference. Round 7: Tripwire set aside (few people use AI browsers), Veil dropped (protective noise can be removed; topic avoided for publicity), AC folded into AD. Rounds 4–6 are kept below for reference. Neil said rounds 4–5 lack wow. Round 3 (K–P) and Flagged (R) were rejected. The other ideas are under "Scrapped".
+**On hold: A (Shadow Route) and H (Hush)** (Neil, Nov 16). **Round 12 (Nov 17): scoped out to the whole track. Nothing passes all 8 rules; the team must choose which rule bends (see Round 12).** Round 11 (Flock): AG. Unmarked and AH. Watch the Watchers. Ground Truth (Round 10) was rejected: people do not trust an AI to judge whether a photo is real. Round 8 — AD. Pinpoint v2 is kept for reference. Round 7: Tripwire set aside (few people use AI browsers), Veil dropped (protective noise can be removed; topic avoided for publicity), AC folded into AD. Rounds 4–6 are kept below for reference. Neil said rounds 4–5 lack wow. Round 3 (K–P) and Flagged (R) were rejected. The other ideas are under "Scrapped".
 
 ---
 
@@ -494,6 +494,35 @@ The output is an oversight report for a city council or a student assembly (for 
 - **Unmarked** is the only Flock idea we found that is new, reliable, and useful to ordinary drivers. Its main risk is that the fix looks like compliance.
 - **Watch the Watchers** fits "rebel" best, but it is a dashboard that depends on data, and nobody uses it day to day.
 - **Neither idea is a clear winner.** If Neil does not accept Unmarked's "right to know" framing, scope out and start a new round of ideation.
+
+---
+
+# Round 12 (Tue Nov 17): scoped out to the whole track
+
+**Rules from rounds 1–11:**
+1. Big wow.
+2. Daily use, or a clear real-world impact.
+3. Never done before.
+4. Mainly digital.
+5. On the theme.
+6. Defeats the system instead of complying with it.
+7. Fast to build and demo.
+8. The fix must work reliably, and users must be able to check it without trusting an AI's judgment.
+
+**Fresh 2025–2026 problems checked (each with its prior art):**
+
+| Hook | Possible tool | Already exists? |
+| --- | --- | --- |
+| "A court ordered OpenAI to hand over 20 million ChatGPT conversations" (S.D.N.Y., Jan 5, 2026) | Mask personal data before it reaches the chatbot, then restore it in the reply | **Yes.** Caviard, PII Shield, PiiBlocker, ChatWall, Saklam |
+| "Hackers stole 70,000 government ID photos from Discord's age-check vendor" (Oct 2025); the Tea app leaked 72,000 selfies and IDs (Jul 2025) | Prove "over 18" without showing an ID (a zero-knowledge proof) | **Yes.** The EU age-verification app (Apr 2026), Concordium, zkPassport |
+| Flock cameras on every campus road | A live AR view of every camera that can see you | **Mostly.** DeFlock (also on visionOS), Flock Alert (alerts when you get close), Flock Finder (uses WiGLE Wi-Fi data) |
+
+**Finding:** across 12 rounds, almost every single consumer privacy problem with a recent headline already has a tool, often several. Rule 3 ("never done") together with rule 8 (a reliable fix) leaves close to nothing in this category.
+
+**The decision the team must make:** which rule bends.
+- **Option A, relax rule 3** to "clearly better than what exists, in a way a judge can see". Most hackathon winners are new in their *mechanism or demo*, not in their *problem*.
+- **Option B, leave consumer privacy.** Look at the "survive" side of the track (for example, logistics after a collapse, or community coordination). It is less crowded, but the demos are harder to make exciting.
+- **Option C, pick the best idea so far** (for example, Unmarked) and accept its known flaw. This saves the most build time.
 
 ---
 
