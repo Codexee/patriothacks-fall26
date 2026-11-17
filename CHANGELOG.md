@@ -8,7 +8,7 @@ Newest first. Add an entry whenever you change shared context, skills, or the wo
 - **Gate G2 passed.** With the Claude in Chrome tools, the agent saw only stand-ins in text, attributes, inputs, hidden elements, shadow DOM, iframes, late content and masked last-4 digits. A stand-in typed at submit reached the bank as the real value. Details: branch `prototype/agent-view-gate`. One by-hand test in the real side panel is left.
 - **The skill-reminder hook now also gives a tool reminder** on the first prompt of each session: Paradev `superset:orchestrate` and `superset:computer`, `/codex`, `/agent-browser`, `/webapp-testing`, `/agentation`, `/hyperframes`. New triggers: `superset:computer`, `superset:orchestrate`, `webapp-testing`, plus planning words for `/interview`. Run `git pull` to get it.
 - **Setup (everyone with a Mac):** put the Paradev CLI on your PATH and sign in:
-  - `ln -s /Applications/Superset.app/Contents/Resources/resources/bin/superset /usr/local/bin/superset`
+  - `ln -s /Applications/Superset.app/Contents/Resources/resources/bin/superset ~/.local/bin/superset` (needs `~/.local/bin` on PATH; `/usr/local/bin` needs sudo)
   - `superset auth login`
   - For computer control, install Cua Driver (https://cua.ai/docs/cua-driver) or `brew install steipete/tap/peekaboo`.
 - **Action for everyone:** read the schedule before the sync.
