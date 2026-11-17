@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "pinpoint-prototype",
+      "runtimeExecutable": "prototypes/pinpoint-demo/.venv/bin/python",
+      "runtimeArgs": ["prototypes/pinpoint-demo/app.py"],
+      "port": 7860
+    }
+  ]
+}
