@@ -1,0 +1,497 @@
+[
+  {
+    "model": "edge",
+    "dtype": "quint8",
+    "ep": "wasm",
+    "threads": 15,
+    "th": 0.5,
+    "loadMs": 391.0049999952316,
+    "prompts": {
+      "short": {
+        "words": 14,
+        "firstMs": 40.325000047683716,
+        "p50": 17.774999976158142,
+        "p95": 20.240000009536743,
+        "ents": [
+          "person:\"Dana Whitfield\"(0.66)",
+          "organization:\"Fairfax clinic\"(0.67)"
+        ]
+      },
+      "medium": {
+        "words": 66,
+        "firstMs": 41.22999995946884,
+        "p50": 41.219999969005585,
+        "p95": 43.66499996185303,
+        "ents": [
+          "organization:\"Northgate Federal Credit Union\"(0.61)",
+          "person:\"Marcus Ellery\"(0.68)",
+          "address:\"4127 Lindell Road, Annandale VA 22003\"(0.75)",
+          "organization:\"Inova\"(0.62)"
+        ]
+      },
+      "long": {
+        "words": 147,
+        "firstMs": 89.38499999046326,
+        "p50": 78.31499999761581,
+        "p95": 83.24500000476837,
+        "ents": [
+          "organization:\"Colfax Commons\"(0.57)",
+          "person:\"Ruth Okafor\"(0.82)",
+          "person:\"Daniel\"(0.69)",
+          "person:\"Glen Hartley\"(0.66)",
+          "organization:\"Brightline Residential\"(0.62)",
+          "person:\"Elena\"(0.68)",
+          "organization:\"Mount Vernon Hospital\"(0.56)",
+          "location:\"Alexandria\"(0.58)",
+          "social security number:\"123-45-6789\"(0.70)"
+        ]
+      }
+    }
+  },
+  {
+    "model": "edge",
+    "dtype": "fp32",
+    "ep": "wasm",
+    "threads": 15,
+    "th": 0.5,
+    "loadMs": 533.6999999880791,
+    "prompts": {
+      "short": {
+        "words": 14,
+        "firstMs": 41.72999995946884,
+        "p50": 17.014999985694885,
+        "p95": 19.7849999666214,
+        "ents": [
+          "person:\"Dana Whitfield\"(0.75)",
+          "email:\"dana.w@example.org\"(0.77)",
+          "organization:\"Fairfax clinic\"(0.75)"
+        ]
+      },
+      "medium": {
+        "words": 66,
+        "firstMs": 45.29000002145767,
+        "p50": 42.2399999499321,
+        "p95": 48.535000026226044,
+        "ents": [
+          "organization:\"Northgate Federal Credit Union\"(0.74)",
+          "person:\"Marcus Ellery\"(0.69)",
+          "address:\"4127 Lindell Road, Annandale VA 22003\"(0.90)",
+          "organization:\"Harbor Fitness\"(0.60)",
+          "person:\"Priya\"(0.70)",
+          "location:\"Inova\"(0.71)",
+          "phone number:\"(703) 555-0148\"(0.93)"
+        ]
+      },
+      "long": {
+        "words": 147,
+        "firstMs": 84.44999998807907,
+        "p50": 74.54000002145767,
+        "p95": 83.0799999833107,
+        "ents": [
+          "location:\"Colfax Commons\"(0.62)",
+          "person:\"Ruth Okafor\"(0.81)",
+          "person:\"Daniel\"(0.74)",
+          "person:\"Glen Hartley\"(0.82)",
+          "organization:\"Brightline Residential\"(0.80)",
+          "person:\"Elena\"(0.74)",
+          "location:\"Mount Vernon Hospital\"(0.63)",
+          "location:\"Alexandria\"(0.66)",
+          "email:\"glen.hartley@brightline-res.example\"(0.92)",
+          "social security number:\"123-45-6789\"(0.96)",
+          "bank account number:\"1042\"(0.55)"
+        ]
+      }
+    }
+  },
+  {
+    "model": "edge",
+    "dtype": "fp32",
+    "ep": "webgpu",
+    "threads": 15,
+    "th": 0.5,
+    "loadMs": 576.8249999880791,
+    "prompts": {
+      "short": {
+        "words": 14,
+        "firstMs": 934.25,
+        "p50": 43.610000014305115,
+        "p95": 47.44000005722046,
+        "ents": [
+          "person:\"Dana Whitfield\"(0.75)",
+          "email:\"dana.w@example.org\"(0.77)",
+          "organization:\"Fairfax clinic\"(0.75)"
+        ]
+      },
+      "medium": {
+        "words": 66,
+        "firstMs": 164.75999999046326,
+        "p50": 44.355000019073486,
+        "p95": 46.38499999046326,
+        "ents": [
+          "organization:\"Northgate Federal Credit Union\"(0.74)",
+          "person:\"Marcus Ellery\"(0.69)",
+          "address:\"4127 Lindell Road, Annandale VA 22003\"(0.90)",
+          "organization:\"Harbor Fitness\"(0.60)",
+          "person:\"Priya\"(0.70)",
+          "location:\"Inova\"(0.71)",
+          "phone number:\"(703) 555-0148\"(0.93)"
+        ]
+      },
+      "long": {
+        "words": 147,
+        "firstMs": 67.51999998092651,
+        "p50": 61.82499998807907,
+        "p95": 66.44999998807907,
+        "ents": [
+          "location:\"Colfax Commons\"(0.62)",
+          "person:\"Ruth Okafor\"(0.81)",
+          "person:\"Daniel\"(0.74)",
+          "person:\"Glen Hartley\"(0.82)",
+          "organization:\"Brightline Residential\"(0.80)",
+          "person:\"Elena\"(0.74)",
+          "location:\"Mount Vernon Hospital\"(0.63)",
+          "location:\"Alexandria\"(0.66)",
+          "email:\"glen.hartley@brightline-res.example\"(0.92)",
+          "social security number:\"123-45-6789\"(0.96)",
+          "bank account number:\"1042\"(0.55)"
+        ]
+      }
+    }
+  },
+  {
+    "model": "edge",
+    "dtype": "fp16",
+    "ep": "webgpu",
+    "threads": "all",
+    "th": 0.5,
+    "error": "Can't create a session. ERROR_CODE: 1, ERROR_MESSAGE: Type Error: Type (tensor(float16)) of output arg (/core/token_rep_layer/bert_layer/model/layers.0/attn/rotary_emb/Cast_1_output_0) of node (/core/token_rep_layer/bert_layer/model/layers.0/attn/rotary_emb/Cast_1) does not match expected type (tensor(float))."
+  },
+  {
+    "model": "small",
+    "dtype": "quint8",
+    "ep": "wasm",
+    "threads": 15,
+    "th": 0.5,
+    "loadMs": 508.80000001192093,
+    "prompts": {
+      "short": {
+        "words": 14,
+        "firstMs": 55.22999995946884,
+        "p50": 30.240000009536743,
+        "p95": 34.22999995946884,
+        "ents": [
+          "person:\"Dana Whitfield\"(0.63)",
+          "organization:\"Fairfax clinic\"(0.80)"
+        ]
+      },
+      "medium": {
+        "words": 66,
+        "firstMs": 66.62999999523163,
+        "p50": 65.09500002861023,
+        "p95": 69.13999998569489,
+        "ents": [
+          "organization:\"Northgate Federal Credit Union\"(0.73)",
+          "person:\"Marcus Ellery\"(0.80)",
+          "address:\"4127 Lindell Road, Annandale VA 22003\"(0.90)",
+          "bank account number:\"004417829915\"(0.88)",
+          "organization:\"Harbor Fitness\"(0.73)",
+          "person:\"Priya\"(0.67)"
+        ]
+      },
+      "long": {
+        "words": 147,
+        "firstMs": 119.43999999761581,
+        "p50": 117.375,
+        "p95": 118.89999997615814,
+        "ents": [
+          "location:\"Colfax Commons\"(0.79)",
+          "person:\"Ruth Okafor\"(0.84)",
+          "person:\"Daniel\"(0.70)",
+          "person:\"Glen Hartley\"(0.76)",
+          "organization:\"Brightline Residential\"(0.77)",
+          "person:\"Elena\"(0.66)",
+          "organization:\"Mount Vernon Hospital\"(0.77)",
+          "location:\"Alexandria\"(0.56)",
+          "email:\"glen.hartley@brightline-res.example\"(0.74)",
+          "social security number:\"123-45-6789\"(0.94)",
+          "credit card number:\"1042\"(0.68)"
+        ]
+      }
+    }
+  },
+  {
+    "model": "small",
+    "dtype": "fp32",
+    "ep": "wasm",
+    "threads": 15,
+    "th": 0.5,
+    "loadMs": 777.3100000023842,
+    "prompts": {
+      "short": {
+        "words": 14,
+        "firstMs": 49.25,
+        "p50": 28.849999964237213,
+        "p95": 31.160000026226044,
+        "ents": [
+          "person:\"Dana Whitfield\"(0.70)",
+          "organization:\"Fairfax clinic\"(0.89)"
+        ]
+      },
+      "medium": {
+        "words": 66,
+        "firstMs": 64.81000000238419,
+        "p50": 63.92500001192093,
+        "p95": 65.55000001192093,
+        "ents": [
+          "organization:\"Northgate Federal Credit Union\"(0.81)",
+          "person:\"Marcus Ellery\"(0.72)",
+          "address:\"4127 Lindell Road, Annandale VA 22003\"(0.94)",
+          "credit card number:\"004417829915\"(0.81)",
+          "organization:\"Harbor Fitness\"(0.79)",
+          "person:\"Priya\"(0.64)",
+          "location:\"Inova\"(0.62)",
+          "phone number:\"(703) 555-0148\"(0.92)"
+        ]
+      },
+      "long": {
+        "words": 147,
+        "firstMs": 108.32000005245209,
+        "p50": 114.84999996423721,
+        "p95": 123.31499999761581,
+        "ents": [
+          "organization:\"tenants union\"(0.57)",
+          "location:\"Colfax Commons\"(0.83)",
+          "person:\"Ruth Okafor\"(0.80)",
+          "person:\"Daniel\"(0.70)",
+          "person:\"Glen Hartley\"(0.74)",
+          "organization:\"Brightline Residential\"(0.80)",
+          "person:\"Elena\"(0.65)",
+          "organization:\"Mount Vernon Hospital\"(0.78)",
+          "email:\"glen.hartley@brightline-res.example\"(0.83)",
+          "social security number:\"123-45-6789\"(0.97)",
+          "credit card number:\"1042\"(0.70)"
+        ]
+      }
+    }
+  },
+  {
+    "model": "small",
+    "dtype": "fp32",
+    "ep": "webgpu",
+    "threads": 15,
+    "th": 0.5,
+    "loadMs": 852.7799999713898,
+    "prompts": {
+      "short": {
+        "words": 14,
+        "firstMs": 407.7450000047684,
+        "p50": 63.53999996185303,
+        "p95": 78.21000003814697,
+        "ents": [
+          "person:\"Dana Whitfield\"(0.70)",
+          "organization:\"Fairfax clinic\"(0.89)"
+        ]
+      },
+      "medium": {
+        "words": 66,
+        "firstMs": 82.37999999523163,
+        "p50": 76.41000002622604,
+        "p95": 78.68500000238419,
+        "ents": [
+          "organization:\"Northgate Federal Credit Union\"(0.81)",
+          "person:\"Marcus Ellery\"(0.72)",
+          "address:\"4127 Lindell Road, Annandale VA 22003\"(0.94)",
+          "credit card number:\"004417829915\"(0.81)",
+          "organization:\"Harbor Fitness\"(0.79)",
+          "person:\"Priya\"(0.64)",
+          "location:\"Inova\"(0.62)",
+          "phone number:\"(703) 555-0148\"(0.92)"
+        ]
+      },
+      "long": {
+        "words": 147,
+        "firstMs": 104.85499995946884,
+        "p50": 98.625,
+        "p95": 102.25999999046326,
+        "ents": [
+          "organization:\"tenants union\"(0.57)",
+          "location:\"Colfax Commons\"(0.83)",
+          "person:\"Ruth Okafor\"(0.80)",
+          "person:\"Daniel\"(0.70)",
+          "person:\"Glen Hartley\"(0.74)",
+          "organization:\"Brightline Residential\"(0.80)",
+          "person:\"Elena\"(0.65)",
+          "organization:\"Mount Vernon Hospital\"(0.78)",
+          "email:\"glen.hartley@brightline-res.example\"(0.83)",
+          "social security number:\"123-45-6789\"(0.97)",
+          "credit card number:\"1042\"(0.70)"
+        ]
+      }
+    }
+  },
+  {
+    "model": "edge",
+    "dtype": "quint8",
+    "ep": "wasm",
+    "threads": 1,
+    "th": 0.5,
+    "loadMs": 322.9350000023842,
+    "prompts": {
+      "short": {
+        "words": 14,
+        "firstMs": 51.90499997138977,
+        "p50": 27.080000042915344,
+        "p95": 27.73499995470047,
+        "ents": [
+          "person:\"Dana Whitfield\"(0.66)",
+          "organization:\"Fairfax clinic\"(0.67)"
+        ]
+      },
+      "medium": {
+        "words": 66,
+        "firstMs": 80.26499998569489,
+        "p50": 79.39000004529953,
+        "p95": 82.43000000715256,
+        "ents": [
+          "organization:\"Northgate Federal Credit Union\"(0.61)",
+          "person:\"Marcus Ellery\"(0.68)",
+          "address:\"4127 Lindell Road, Annandale VA 22003\"(0.75)",
+          "organization:\"Inova\"(0.62)"
+        ]
+      },
+      "long": {
+        "words": 147,
+        "firstMs": 166.5199999809265,
+        "p50": 167.53500002622604,
+        "p95": 171.5199999809265,
+        "ents": [
+          "organization:\"Colfax Commons\"(0.57)",
+          "person:\"Ruth Okafor\"(0.82)",
+          "person:\"Daniel\"(0.69)",
+          "person:\"Glen Hartley\"(0.66)",
+          "organization:\"Brightline Residential\"(0.62)",
+          "person:\"Elena\"(0.68)",
+          "organization:\"Mount Vernon Hospital\"(0.56)",
+          "location:\"Alexandria\"(0.58)",
+          "social security number:\"123-45-6789\"(0.70)"
+        ]
+      }
+    }
+  },
+  {
+    "model": "edge",
+    "dtype": "quint8",
+    "ep": "wasm",
+    "threads": 15,
+    "th": 0.3,
+    "loadMs": 347.7150000333786,
+    "prompts": {
+      "short": {
+        "words": 14,
+        "firstMs": 39.24500000476837,
+        "p50": 18.44999998807907,
+        "p95": 20.30000001192093,
+        "ents": [
+          "person:\"Dana Whitfield\"(0.66)",
+          "email:\"dana.w@example.org\"(0.49)",
+          "organization:\"Fairfax clinic\"(0.67)"
+        ]
+      },
+      "medium": {
+        "words": 66,
+        "firstMs": 43.314999997615814,
+        "p50": 41.144999980926514,
+        "p95": 42.30000001192093,
+        "ents": [
+          "organization:\"Northgate Federal Credit Union\"(0.61)",
+          "person:\"Marcus Ellery\"(0.68)",
+          "address:\"4127 Lindell Road, Annandale VA\"(0.77)",
+          "bank account number:\"004417829915\"(0.44)",
+          "organization:\"Harbor Fitness\"(0.44)",
+          "person:\"Priya\"(0.70)",
+          "organization:\"Inova\"(0.62)",
+          "phone number:\"555-0148\"(0.60)"
+        ]
+      },
+      "long": {
+        "words": 147,
+        "firstMs": 79.72000002861023,
+        "p50": 79.26499998569489,
+        "p95": 82.85500001907349,
+        "ents": [
+          "organization:\"Colfax Commons\"(0.57)",
+          "person:\"Ruth Okafor\"(0.82)",
+          "person:\"Daniel\"(0.69)",
+          "person:\"Glen Hartley\"(0.66)",
+          "organization:\"Brightline Residential\"(0.62)",
+          "person:\"Elena\"(0.68)",
+          "organization:\"Mount Vernon Hospital\"(0.56)",
+          "location:\"Alexandria\"(0.58)",
+          "email:\"hartley@brightline-res\"(0.65)",
+          "organization:\"county housing office\"(0.34)",
+          "social security number:\"123-45-6789\"(0.70)",
+          "organization:\"Capital Ridge\"(0.44)",
+          "bank account number:\"7731\"(0.39)",
+          "bank account number:\"1042\"(0.39)"
+        ]
+      }
+    }
+  },
+  {
+    "model": "small",
+    "dtype": "quint8",
+    "ep": "wasm",
+    "threads": 15,
+    "th": 0.3,
+    "loadMs": 512.2200000286102,
+    "prompts": {
+      "short": {
+        "words": 14,
+        "firstMs": 54.87000000476837,
+        "p50": 31.865000009536743,
+        "p95": 69.87000000476837,
+        "ents": [
+          "person:\"Dana\"(0.65)",
+          "organization:\"Fairfax clinic\"(0.80)"
+        ]
+      },
+      "medium": {
+        "words": 66,
+        "firstMs": 65.30000001192093,
+        "p50": 67.87999999523163,
+        "p95": 73.76499998569489,
+        "ents": [
+          "organization:\"Northgate Federal Credit Union\"(0.73)",
+          "person:\"Marcus Ellery\"(0.80)",
+          "address:\"4127 Lindell Road, Annandale VA\"(0.92)",
+          "bank account number:\"004417829915\"(0.88)",
+          "organization:\"Harbor Fitness\"(0.73)",
+          "person:\"Priya\"(0.67)",
+          "location:\"Inova\"(0.53)",
+          "phone number:\"703) 555-0148\"(0.81)"
+        ]
+      },
+      "long": {
+        "words": 147,
+        "firstMs": 129.3299999833107,
+        "p50": 123.50499999523163,
+        "p95": 136.00999999046326,
+        "ents": [
+          "organization:\"tenants union\"(0.51)",
+          "location:\"Colfax Commons\"(0.79)",
+          "person:\"Ruth Okafor\"(0.84)",
+          "person:\"Daniel\"(0.70)",
+          "person:\"Glen Hartley\"(0.76)",
+          "organization:\"Brightline Residential\"(0.77)",
+          "person:\"Elena\"(0.66)",
+          "organization:\"Mount Vernon Hospital\"(0.77)",
+          "location:\"Alexandria\"(0.56)",
+          "email:\"glen.hartley@brightline-res.example\"(0.74)",
+          "social security number:\"123-45-6789\"(0.94)",
+          "credit card number:\"7731\"(0.55)",
+          "credit card number:\"1042\"(0.68)"
+        ]
+      }
+    }
+  }
+]

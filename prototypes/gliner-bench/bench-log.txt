@@ -1,0 +1,259 @@
+→ edge quint8 wasm all threads th=0.5
+  model=edge dtype=quint8 ep=wasm threads=15 isolated=true cores=15 webgpu=true
+  cls_token_id=50281 sep_token_id=50282 sample=[50281,24336,50282]
+  load+init: 391 ms
+  logits dims=[1,21,10,3] max=0.92 inputs={"input_ids":[1,56],"attention_mask":[1,56],"words_mask":[1,56],"text_lengths":[1,1]} outputs=logits
+  [short] 14 words  first=40ms  p50=18ms  p95=20ms  PASS
+    person:"Dana Whitfield"(0.66)
+    organization:"Fairfax clinic"(0.67)
+  [medium] 66 words  first=41ms  p50=41ms  p95=44ms  PASS
+    organization:"Northgate Federal Credit Union"(0.61)
+    person:"Marcus Ellery"(0.68)
+    address:"4127 Lindell Road, Annandale VA 22003"(0.75)
+    organization:"Inova"(0.62)
+  [long] 147 words  first=89ms  p50=78ms  p95=83ms  PASS
+    organization:"Colfax Commons"(0.57)
+    person:"Ruth Okafor"(0.82)
+    person:"Daniel"(0.69)
+    person:"Glen Hartley"(0.66)
+    organization:"Brightline Residential"(0.62)
+    person:"Elena"(0.68)
+    organization:"Mount Vernon Hospital"(0.56)
+    location:"Alexandria"(0.58)
+    social security number:"123-45-6789"(0.70)
+→ edge fp32 wasm all threads th=0.5
+  model=edge dtype=fp32 ep=wasm threads=15 isolated=true cores=15 webgpu=true
+  cls_token_id=50281 sep_token_id=50282 sample=[50281,24336,50282]
+  load+init: 534 ms
+  logits dims=[1,21,10,3] max=1.97 inputs={"input_ids":[1,56],"attention_mask":[1,56],"words_mask":[1,56],"text_lengths":[1,1]} outputs=logits
+  [short] 14 words  first=42ms  p50=17ms  p95=20ms  PASS
+    person:"Dana Whitfield"(0.75)
+    email:"dana.w@example.org"(0.77)
+    organization:"Fairfax clinic"(0.75)
+  [medium] 66 words  first=45ms  p50=42ms  p95=49ms  PASS
+    organization:"Northgate Federal Credit Union"(0.74)
+    person:"Marcus Ellery"(0.69)
+    address:"4127 Lindell Road, Annandale VA 22003"(0.90)
+    organization:"Harbor Fitness"(0.60)
+    person:"Priya"(0.70)
+    location:"Inova"(0.71)
+    phone number:"(703) 555-0148"(0.93)
+  [long] 147 words  first=84ms  p50=75ms  p95=83ms  PASS
+    location:"Colfax Commons"(0.62)
+    person:"Ruth Okafor"(0.81)
+    person:"Daniel"(0.74)
+    person:"Glen Hartley"(0.82)
+    organization:"Brightline Residential"(0.80)
+    person:"Elena"(0.74)
+    location:"Mount Vernon Hospital"(0.63)
+    location:"Alexandria"(0.66)
+    email:"glen.hartley@brightline-res.example"(0.92)
+    social security number:"123-45-6789"(0.96)
+    bank account number:"1042"(0.55)
+→ edge fp32 webgpu all threads th=0.5
+  model=edge dtype=fp32 ep=webgpu threads=15 isolated=true cores=15 webgpu=true
+  cls_token_id=50281 sep_token_id=50282 sample=[50281,24336,50282]
+  load+init: 577 ms
+  logits dims=[1,21,10,3] max=1.97 inputs={"input_ids":[1,56],"attention_mask":[1,56],"words_mask":[1,56],"text_lengths":[1,1]} outputs=logits
+  [short] 14 words  first=934ms  p50=44ms  p95=47ms  PASS
+    person:"Dana Whitfield"(0.75)
+    email:"dana.w@example.org"(0.77)
+    organization:"Fairfax clinic"(0.75)
+  [medium] 66 words  first=165ms  p50=44ms  p95=46ms  PASS
+    organization:"Northgate Federal Credit Union"(0.74)
+    person:"Marcus Ellery"(0.69)
+    address:"4127 Lindell Road, Annandale VA 22003"(0.90)
+    organization:"Harbor Fitness"(0.60)
+    person:"Priya"(0.70)
+    location:"Inova"(0.71)
+    phone number:"(703) 555-0148"(0.93)
+  [long] 147 words  first=68ms  p50=62ms  p95=66ms  PASS
+    location:"Colfax Commons"(0.62)
+    person:"Ruth Okafor"(0.81)
+    person:"Daniel"(0.74)
+    person:"Glen Hartley"(0.82)
+    organization:"Brightline Residential"(0.80)
+    person:"Elena"(0.74)
+    location:"Mount Vernon Hospital"(0.63)
+    location:"Alexandria"(0.66)
+    email:"glen.hartley@brightline-res.example"(0.92)
+    social security number:"123-45-6789"(0.96)
+    bank account number:"1042"(0.55)
+→ edge fp16 webgpu all threads th=0.5
+  model=edge dtype=fp16 ep=webgpu threads=15 isolated=true cores=15 webgpu=true
+  ERROR Error: Can't create a session. ERROR_CODE: 1, ERROR_MESSAGE: Type Error: Type (tensor(float16)) of output arg (/core/token_rep_layer/bert_layer/model/layers.0/attn/rotary_emb/Cast_1_output_0) of node (/core/token_rep_layer/bert_layer/model/layers.0/attn/rotary_emb/Cast_1) does not match expected type (tensor(float)).
+      at _e (http://localhost:5199/node_modules/onnxruntime-web/dist/ort.webgpu.bundle.min.mjs?v=bdcad228:15:8846)
+      at Pr (http://localhost:5199/node_modules/onnxruntime-web/dist/ort.webgpu.bundle.min.mjs?v=bdcad228:2537:20025)
+→ small quint8 wasm all threads th=0.5
+  model=small dtype=quint8 ep=wasm threads=15 isolated=true cores=15 webgpu=true
+  cls_token_id=50281 sep_token_id=50282 sample=[50281,24336,50282]
+  load+init: 509 ms
+  logits dims=[1,21,10,3] max=1.46 inputs={"input_ids":[1,56],"attention_mask":[1,56],"words_mask":[1,56],"text_lengths":[1,1]} outputs=logits
+  [short] 14 words  first=55ms  p50=30ms  p95=34ms  PASS
+    person:"Dana Whitfield"(0.63)
+    organization:"Fairfax clinic"(0.80)
+  [medium] 66 words  first=67ms  p50=65ms  p95=69ms  PASS
+    organization:"Northgate Federal Credit Union"(0.73)
+    person:"Marcus Ellery"(0.80)
+    address:"4127 Lindell Road, Annandale VA 22003"(0.90)
+    bank account number:"004417829915"(0.88)
+    organization:"Harbor Fitness"(0.73)
+    person:"Priya"(0.67)
+  [long] 147 words  first=119ms  p50=117ms  p95=119ms  PASS
+    location:"Colfax Commons"(0.79)
+    person:"Ruth Okafor"(0.84)
+    person:"Daniel"(0.70)
+    person:"Glen Hartley"(0.76)
+    organization:"Brightline Residential"(0.77)
+    person:"Elena"(0.66)
+    organization:"Mount Vernon Hospital"(0.77)
+    location:"Alexandria"(0.56)
+    email:"glen.hartley@brightline-res.example"(0.74)
+    social security number:"123-45-6789"(0.94)
+    credit card number:"1042"(0.68)
+→ small fp32 wasm all threads th=0.5
+  model=small dtype=fp32 ep=wasm threads=15 isolated=true cores=15 webgpu=true
+  cls_token_id=50281 sep_token_id=50282 sample=[50281,24336,50282]
+  load+init: 777 ms
+  logits dims=[1,21,10,3] max=2.19 inputs={"input_ids":[1,56],"attention_mask":[1,56],"words_mask":[1,56],"text_lengths":[1,1]} outputs=logits
+  [short] 14 words  first=49ms  p50=29ms  p95=31ms  PASS
+    person:"Dana Whitfield"(0.70)
+    organization:"Fairfax clinic"(0.89)
+  [medium] 66 words  first=65ms  p50=64ms  p95=66ms  PASS
+    organization:"Northgate Federal Credit Union"(0.81)
+    person:"Marcus Ellery"(0.72)
+    address:"4127 Lindell Road, Annandale VA 22003"(0.94)
+    credit card number:"004417829915"(0.81)
+    organization:"Harbor Fitness"(0.79)
+    person:"Priya"(0.64)
+    location:"Inova"(0.62)
+    phone number:"(703) 555-0148"(0.92)
+  [long] 147 words  first=108ms  p50=115ms  p95=123ms  PASS
+    organization:"tenants union"(0.57)
+    location:"Colfax Commons"(0.83)
+    person:"Ruth Okafor"(0.80)
+    person:"Daniel"(0.70)
+    person:"Glen Hartley"(0.74)
+    organization:"Brightline Residential"(0.80)
+    person:"Elena"(0.65)
+    organization:"Mount Vernon Hospital"(0.78)
+    email:"glen.hartley@brightline-res.example"(0.83)
+    social security number:"123-45-6789"(0.97)
+    credit card number:"1042"(0.70)
+→ small fp32 webgpu all threads th=0.5
+  model=small dtype=fp32 ep=webgpu threads=15 isolated=true cores=15 webgpu=true
+  cls_token_id=50281 sep_token_id=50282 sample=[50281,24336,50282]
+  load+init: 853 ms
+  logits dims=[1,21,10,3] max=2.19 inputs={"input_ids":[1,56],"attention_mask":[1,56],"words_mask":[1,56],"text_lengths":[1,1]} outputs=logits
+  [short] 14 words  first=408ms  p50=64ms  p95=78ms  PASS
+    person:"Dana Whitfield"(0.70)
+    organization:"Fairfax clinic"(0.89)
+  [medium] 66 words  first=82ms  p50=76ms  p95=79ms  PASS
+    organization:"Northgate Federal Credit Union"(0.81)
+    person:"Marcus Ellery"(0.72)
+    address:"4127 Lindell Road, Annandale VA 22003"(0.94)
+    credit card number:"004417829915"(0.81)
+    organization:"Harbor Fitness"(0.79)
+    person:"Priya"(0.64)
+    location:"Inova"(0.62)
+    phone number:"(703) 555-0148"(0.92)
+  [long] 147 words  first=105ms  p50=99ms  p95=102ms  PASS
+    organization:"tenants union"(0.57)
+    location:"Colfax Commons"(0.83)
+    person:"Ruth Okafor"(0.80)
+    person:"Daniel"(0.70)
+    person:"Glen Hartley"(0.74)
+    organization:"Brightline Residential"(0.80)
+    person:"Elena"(0.65)
+    organization:"Mount Vernon Hospital"(0.78)
+    email:"glen.hartley@brightline-res.example"(0.83)
+    social security number:"123-45-6789"(0.97)
+    credit card number:"1042"(0.70)
+→ edge quint8 wasm 1 th=0.5
+  model=edge dtype=quint8 ep=wasm threads=1 isolated=true cores=15 webgpu=true
+  cls_token_id=50281 sep_token_id=50282 sample=[50281,24336,50282]
+  load+init: 323 ms
+  logits dims=[1,21,10,3] max=0.92 inputs={"input_ids":[1,56],"attention_mask":[1,56],"words_mask":[1,56],"text_lengths":[1,1]} outputs=logits
+  [short] 14 words  first=52ms  p50=27ms  p95=28ms  PASS
+    person:"Dana Whitfield"(0.66)
+    organization:"Fairfax clinic"(0.67)
+  [medium] 66 words  first=80ms  p50=79ms  p95=82ms  PASS
+    organization:"Northgate Federal Credit Union"(0.61)
+    person:"Marcus Ellery"(0.68)
+    address:"4127 Lindell Road, Annandale VA 22003"(0.75)
+    organization:"Inova"(0.62)
+  [long] 147 words  first=167ms  p50=168ms  p95=172ms  PASS
+    organization:"Colfax Commons"(0.57)
+    person:"Ruth Okafor"(0.82)
+    person:"Daniel"(0.69)
+    person:"Glen Hartley"(0.66)
+    organization:"Brightline Residential"(0.62)
+    person:"Elena"(0.68)
+    organization:"Mount Vernon Hospital"(0.56)
+    location:"Alexandria"(0.58)
+    social security number:"123-45-6789"(0.70)
+→ edge quint8 wasm all threads th=0.3
+  model=edge dtype=quint8 ep=wasm threads=15 isolated=true cores=15 webgpu=true
+  cls_token_id=50281 sep_token_id=50282 sample=[50281,24336,50282]
+  load+init: 348 ms
+  logits dims=[1,21,10,3] max=0.92 inputs={"input_ids":[1,56],"attention_mask":[1,56],"words_mask":[1,56],"text_lengths":[1,1]} outputs=logits
+  [short] 14 words  first=39ms  p50=18ms  p95=20ms  PASS
+    person:"Dana Whitfield"(0.66)
+    email:"dana.w@example.org"(0.49)
+    organization:"Fairfax clinic"(0.67)
+  [medium] 66 words  first=43ms  p50=41ms  p95=42ms  PASS
+    organization:"Northgate Federal Credit Union"(0.61)
+    person:"Marcus Ellery"(0.68)
+    address:"4127 Lindell Road, Annandale VA"(0.77)
+    bank account number:"004417829915"(0.44)
+    organization:"Harbor Fitness"(0.44)
+    person:"Priya"(0.70)
+    organization:"Inova"(0.62)
+    phone number:"555-0148"(0.60)
+  [long] 147 words  first=80ms  p50=79ms  p95=83ms  PASS
+    organization:"Colfax Commons"(0.57)
+    person:"Ruth Okafor"(0.82)
+    person:"Daniel"(0.69)
+    person:"Glen Hartley"(0.66)
+    organization:"Brightline Residential"(0.62)
+    person:"Elena"(0.68)
+    organization:"Mount Vernon Hospital"(0.56)
+    location:"Alexandria"(0.58)
+    email:"hartley@brightline-res"(0.65)
+    organization:"county housing office"(0.34)
+    social security number:"123-45-6789"(0.70)
+    organization:"Capital Ridge"(0.44)
+    bank account number:"7731"(0.39)
+    bank account number:"1042"(0.39)
+→ small quint8 wasm all threads th=0.3
+  model=small dtype=quint8 ep=wasm threads=15 isolated=true cores=15 webgpu=true
+  cls_token_id=50281 sep_token_id=50282 sample=[50281,24336,50282]
+  load+init: 512 ms
+  logits dims=[1,21,10,3] max=1.46 inputs={"input_ids":[1,56],"attention_mask":[1,56],"words_mask":[1,56],"text_lengths":[1,1]} outputs=logits
+  [short] 14 words  first=55ms  p50=32ms  p95=70ms  PASS
+    person:"Dana"(0.65)
+    organization:"Fairfax clinic"(0.80)
+  [medium] 66 words  first=65ms  p50=68ms  p95=74ms  PASS
+    organization:"Northgate Federal Credit Union"(0.73)
+    person:"Marcus Ellery"(0.80)
+    address:"4127 Lindell Road, Annandale VA"(0.92)
+    bank account number:"004417829915"(0.88)
+    organization:"Harbor Fitness"(0.73)
+    person:"Priya"(0.67)
+    location:"Inova"(0.53)
+    phone number:"703) 555-0148"(0.81)
+  [long] 147 words  first=129ms  p50=124ms  p95=136ms  PASS
+    organization:"tenants union"(0.51)
+    location:"Colfax Commons"(0.79)
+    person:"Ruth Okafor"(0.84)
+    person:"Daniel"(0.70)
+    person:"Glen Hartley"(0.76)
+    organization:"Brightline Residential"(0.77)
+    person:"Elena"(0.66)
+    organization:"Mount Vernon Hospital"(0.77)
+    location:"Alexandria"(0.56)
+    email:"glen.hartley@brightline-res.example"(0.74)
+    social security number:"123-45-6789"(0.94)
+    credit card number:"7731"(0.55)
+    credit card number:"1042"(0.68)
+saved results.json
