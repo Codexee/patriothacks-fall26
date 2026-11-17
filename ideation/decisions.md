@@ -38,3 +38,5 @@ Add one line per decision: date · decision · why · who. Newest last.
 - 2026-11-17 · Data policy is task-aware: the local model classifies what the task needs, warns before sensitive data is sent, sends stand-ins for the rest, and shows a receipt · Neil
 - 2026-11-17 · All TypeScript; the model runs in the browser; Unsign is low priority; account anonymity is a non-goal · Neil
 - 2026-11-17 · GLiNER gate passed; per-prompt budget raised from 300 ms to 500–1000 ms. Recommend gliner-pii-edge-v1.0 quint8, WASM in a Web Worker, threshold 0.3 (83 ms p95, 18/18 on a small key); own wrapper on onnxruntime-web instead of gliner.js (3 bugs). Evidence: branch `prototype/gliner-bench` · Neil and Claude
+- 2026-11-17 · G2 passed: the page rewrite hides real values from every agent read channel, and the `formdata` submit swap sends real values without showing them; the extension must inject at document_start in the MAIN world in all frames · Neil and Claude
+- 2026-11-17 · Schedule written (.plans/off-the-record-schedule.md). Default model Opus; switch to Fable only for the 5 steps listed there · Neil

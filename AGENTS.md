@@ -21,7 +21,7 @@ We are a 4-person team competing in **Patriot HackFest Fall 2026** (George Mason
 
 - **Phase:** Tue Nov 17, spec drafted; build starts after the team sync.
 - **Done:** repo, shared context, skills, hooks, and **ideation rounds 1–13** (`ideation/ideas.md`, `ideation/shortlist.md`). **Read the top entry of `CHANGELOG.md`.**
-- **Next:** the team reads `.plans/off-the-record-spec.md`, assigns workstreams at the sync, sets `Status: locked`, then `/parallelize`. Tue-night gate: Claude for Chrome reads our rewritten DOM (still open). GLiNER in the browser: **passed** (83 ms against a 500–1000 ms budget; branch `prototype/gliner-bench`).
+- **Next:** the team reads `.plans/off-the-record-spec.md` and `.plans/off-the-record-schedule.md`, assigns workstreams at the sync, sets `Status: locked`, then `/parallelize`. Tue-night gate: agent reads only the rewritten DOM: **passed** with the Claude in Chrome tools (branch `prototype/agent-view-gate`); one by-hand side-panel test is left. GLiNER in the browser: **passed** (83 ms against a 500–1000 ms budget; branch `prototype/gliner-bench`).
 - **Blockers:** the spec is a draft (not locked); the judging format is unknown (ask the directors).
 
 ## Start of every session (all AIs)

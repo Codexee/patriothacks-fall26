@@ -2,6 +2,17 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-17 (14): Schedule, gate G2 passed, tool reminders
+
+- **New file: `.plans/off-the-record-schedule.md`.** It holds the gates, the critical path, the interfaces to agree on at the sync, an hour-by-hour plan for Tue–Fri, which tool to use for each step, and the 5 steps where we switch to Fable.
+- **Gate G2 passed.** With the Claude in Chrome tools, the agent saw only stand-ins in text, attributes, inputs, hidden elements, shadow DOM, iframes, late content and masked last-4 digits. A stand-in typed at submit reached the bank as the real value. Details: branch `prototype/agent-view-gate`. One by-hand test in the real side panel is left.
+- **The skill-reminder hook now also gives a tool reminder** on the first prompt of each session: Paradev `superset:orchestrate` and `superset:computer`, `/codex`, `/agent-browser`, `/webapp-testing`, `/agentation`, `/hyperframes`. New triggers: `superset:computer`, `superset:orchestrate`, `webapp-testing`, plus planning words for `/interview`. Run `git pull` to get it.
+- **Setup (everyone with a Mac):** put the Paradev CLI on your PATH and sign in:
+  - `ln -s /Applications/Superset.app/Contents/Resources/resources/bin/superset /usr/local/bin/superset`
+  - `superset auth login`
+  - For computer control, install Cua Driver (https://cua.ai/docs/cua-driver) or `brew install steipete/tap/peekaboo`.
+- **Action for everyone:** read the schedule before the sync.
+
 ## 2026-11-17 (13): GLiNER browser gate passed
 
 - **The GLiNER half of the Tue-night gate passed.** `knowledgator/gliner-pii-edge-v1.0` (quint8, 46 MB) on WASM takes 83 ms p95 on a 147-word prompt, and 172 ms on one thread. It found 18 of 18 names, organizations, places, the address and the SSN at threshold 0.3.

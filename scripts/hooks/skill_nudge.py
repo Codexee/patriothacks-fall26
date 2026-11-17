@@ -44,6 +44,20 @@ def main() -> None:
     except Exception:
         already = set()
 
+    tooling_note = ""
+    if "__tooling__" not in already:
+        already.add("__tooling__")
+        tooling_note = (
+            "Team tooling reminder (PatriotHacks repo, from docs/tooling.md; once per session): "
+            "use the JMO workflow tools where they fit, and say which one you are using. "
+            "Parallel builds: /parallelize, then Paradev superset:orchestrate (one workspace and worktree per workstream). "
+            "Native apps, the Claude for Chrome side panel, or a real browser window: Paradev superset:computer. "
+            "Paradev's in-app browser: superset:browser. Backend code and reviews: /codex. "
+            "Browser QA: /agent-browser (explore) or /webapp-testing (repeatable). UI feedback: /agentation. "
+            "Demo video: /hyperframes. If a tool is not installed or not signed in, tell the user the one command to fix it. "
+            "Also suggest any project skill from docs/skills.md that fits the prompt, even if the reminder below names none.\n\n"
+        )
+
     hits = []
     for t in triggers:
         name = t.get("skill")
@@ -59,7 +73,7 @@ def main() -> None:
         if len(hits) == 2:  # never suggest more than two skills at once
             break
 
-    if not hits:
+    if not hits and not tooling_note:
         return
 
     already.update(t["skill"] for t in hits)
@@ -70,7 +84,10 @@ def main() -> None:
         pass
 
     lines = [f"- /{t['skill']}: {t.get('why', '')}" for t in hits]
-    context = (
+    if not hits:
+        print(json.dumps({"hookSpecificOutput": {"hookEventName": "UserPromptSubmit", "additionalContext": tooling_note.strip()}}))
+        return
+    context = tooling_note + (
         "Skill reminder (PatriotHacks repo): this prompt looks like a job for a project skill "
         "the user did not call:\n" + "\n".join(lines) + "\n"
         "Before doing the work, ask the user in ONE short line whether they want to use it "

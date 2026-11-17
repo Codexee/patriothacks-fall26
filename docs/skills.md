@@ -2,7 +2,7 @@
 
 These skills live in `.claude/skills/` and load automatically when you open this repo in Claude Code. Other AIs (Codex, Cursor) can read the `SKILL.md` files directly.
 
-**Skill reminders:** when your prompt looks like a job for a skill but you didn't call it, your AI asks one line, such as "Want to use `/systematic-debugging` for this?". It asks once per skill per session. Answer yes or no and keep going. The rules live in `.claude/skill-triggers.json`.
+**Skill reminders:** when your prompt looks like a job for a skill but you didn't call it, your AI asks one line, such as "Want to use `/systematic-debugging` for this?". It asks once per skill per session. On the first prompt of each session, the AI also gets a short reminder of which team tool fits which job (`docs/tooling.md`). Answer yes or no and keep going. The rules live in `.claude/skill-triggers.json`.
 
 ## By day
 
@@ -59,6 +59,8 @@ These skills live in `.claude/skills/` and load automatically when you open this
 | `/agentation` | You want to click an element in the running app and say "fix this" | Benji Taylor (JMO) |
 | `/agentation-self-driving` | You want the agent to critique the page and annotate it by itself | Benji Taylor |
 | `/agent-browser` | Checking that the app really works: click through it, take screenshots, read the console | Vercel |
+| `superset:computer` | Driving a native app, the Claude for Chrome side panel, or a real browser window (needs Cua Driver or Peekaboo) | Paradev |
+| `superset:orchestrate` | Running and watching the parallel workstream agents as Paradev workspaces (after `/parallelize`) | Paradev |
 | `/webapp-testing` | You want repeatable Playwright tests for the demo path | Anthropic |
 
 ### Writing
