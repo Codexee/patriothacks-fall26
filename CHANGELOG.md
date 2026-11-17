@@ -2,6 +2,16 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-16 (4): Ideation rounds 2–7, handoff to Adarsh
+
+- **Ideation hold lifted** (Neil). `/ideate` ran 6 more rounds today. Every idea, its scores, and the reason for each rejection are in `ideation/ideas.md`. The decisions are in `ideation/decisions.md`.
+- **Current top 3** (`ideation/shortlist.md`): **Tripwire** (stops web pages from hijacking AI browsers), **Pinpoint** (your photos show where you live), and **Veil** (your photos fail in nudify apps).
+- **Shadow Route already exists** (FlockHopper, FlockDetour), so do not pick it without a new angle.
+- **Neil's criteria** for any new idea are at the top of `ideation/shortlist.md`. Read them before you suggest ideas.
+- Adarsh's GitHub handle (air842) is now in `context/team.md`.
+- **Action for Adarsh:** `git pull`, read `ideation/shortlist.md`, then continue with `/ideate` or `/interview`.
+- **Action for everyone else:** `git pull`, read the shortlist, and vote in the team chat.
+
 ## 2026-11-16 (3): Skill reminders and sync check
 
 - **New: skill reminders.** If your prompt looks like a job for a project skill and you didn't call it, your AI asks once: "Want to use /X for this?". The rules are in `.claude/skill-triggers.json`.

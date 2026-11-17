@@ -1,25 +1,48 @@
-# Shortlist (round 1, Mon Nov 16)
+# Shortlist (round 7, Mon Nov 16)
 
-| Rank | Idea | Type | Wow | Track | Feasible | Remote | Team | Live | **Total** |
+> **Handoff:** Neil ran rounds 1–7 on Nov 16. **Adarsh continues ideation from here.** Read "Neil's criteria" first, then "Open questions".
+
+## Neil's criteria (all rounds so far)
+
+1. **Big wow.** A judge reacts in 5 seconds. Neil rejected rounds 4–5 for low wow.
+2. **Daily use or a clear real-world impact.** Judges want to use it themselves, or they see who it saves.
+3. **Not done before**, or at least not done this way. Check prior art before scoring.
+4. **Mainly digital.** No hardware dependency.
+5. **Relevant to GMU or college students**, and on the track theme ("they're watching").
+6. **Defeat the system, do not comply with it.** Flagged was rejected because it helped students pass AI proctoring.
+7. **Feasible Tue–Wed**, a fast demo (no day of setup), and **more than a thin library or LLM wrapper**.
+
+## Current ranking
+
+| Rank | Idea | Problem source | Wow | Track | Feasible | Remote | Team | Live | **Total** |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | **A. Shadow Route** | software | 4 | 5 | 4 | 5 | 4 | 5 | **27** |
-| 2 | **B. Ghost Protocol** | hybrid (light) | 5 | 5 | 3 | 4 | 5 | 3 | **25** |
-| 3 | C. Tailgate | hybrid | 4 | 5 | 4 | 3 | 5 | 4 | 25 |
-| 4 | G. Ration | software | 2 | 5 | 5 | 5 | 3 | 5 | 25 |
-| 5 | D. Blackout | hybrid | 4 | 5 | 3 | 3 | 5 | 4 | 24 |
-| 6 | E. What They Know | software | 5 | 5 | 3 | 5 | 3 | 3 | 24 |
-| 7 | F. Dead Drop | software | 4 | 5 | 3 | 5 | 3 | 4 | 24 |
+| 1 | **AA. Tripwire** (stops pages from hijacking your AI browser) | UW AI-browser study; LayerX BioShocking (2026) | 5 | 4 | 4 | 5 | 4 | 5 | **27** |
+| 2 | **Q/AC. Pinpoint** (your photos show where you live; upgraded to a whole photo grid) | MultiPriv (2026); GeoSpy stalking (2025) | 5 | 5 | 4 | 4 | 4 | 5 | **27** |
+| 3 | **AB. Veil** (your photos fail in nudify apps, even after upload) | Nudify apps, 705M downloads; SF City Attorney (Jul 2026) | 5 | 5 | 3 | 5 | 4 | 4 | **26** |
+| — | Round 5 (Muffle, Unsign, Crowd, Hum) | | | | | | | | Neil: low wow |
+| — | Round 6 (Ghost Price 24, Watched 25) | | | | | | | | Weak, prior art |
+| — | A. Shadow Route | | | | | | | | **Already exists** (FlockHopper, FlockDetour) |
+| — | H. Hush | | | | | | | | On hold (hardware) |
 
-## Recommendation for `/interview`
+Tripwire and Pinpoint tie, and both have Wow 5. Tripwire is listed first because its demo works the same way every time (we host the attack page).
 
-1. **Shadow Route.** It has the best overall score and no hardware risk. All 4 members can work at full speed from anywhere. The algorithm gives Anish a real challenge, and the camera field-of-view (FOV) modeling and the phone-detection model give the EE members real work. The judge "gets it" in 5 seconds: Google's route has 47 cameras, ours has 6.
-2. **Ghost Protocol.** It has the strongest wow and is the most visual on camera. It is hybrid but cheap, and every part is at Micro Center today. The IR-filter risk must be tested on Tuesday morning. If the test fails, it falls back to software only.
+## The first test for each top idea (Tuesday morning, 2 hours max)
 
-**Possible combination:** Shadow Route can include Ghost's HUD as an "exposure preview" ("this is what the camera on Main St sees"). Decide during the interview. Do not add it by default.
+| Idea | Test | Pass |
+| --- | --- | --- |
+| Tripwire | Hidden-text attack on our own page against browser-use, and against Comet with the extension installed | The attack works without Tripwire, and Tripwire's DOM rewrite reaches the agent in at least the open-source agent |
+| Pinpoint | 20 dorm-window photos against Mapillary images plus 30 min of campus video | ≥ 12 of 20 within 50 m |
+| Veil | Protect 5 photos, run JPEG q=75 plus resizing, then an SD inpainting edit | ≥ 4 of 5 edits visibly broken after compression |
 
-## Next steps (today)
+## Open questions for Adarsh and the team
 
-1. Everyone reads `ideation/ideas.md` and votes in the team chat. Allow 15 minutes.
-2. Run `/interview Shadow Route` (or the winning idea) as a group call. Neil drives, and the others add answers. Plan 1–2 hours.
-3. Set the spec to `Status: locked` tonight, so that `/parallelize` can start on Tuesday morning.
-4. If a hybrid idea wins: buy the parts **tonight** at Micro Center Fairfax.
+1. Does any of AA, AB, or AC meet Neil's bar? If not, which criterion bends? (Almost every daily-use privacy problem already has some tool.)
+2. Tripwire: is the "AI browser" story strong enough on the theme ("they're watching")? A possible framing: "the AI you trust is the one they turn against you."
+3. Veil: can we show the demo with benign edits only and still make the impact clear?
+4. Combination: Pinpoint and Veil both protect photos before posting. They could be one product ("Before you post"), with two checks.
+
+## Next steps
+
+1. Adarsh: read `ideation/ideas.md` → Round 7, then run `/ideate` again or start `/interview <idea>`.
+2. Team vote in the chat.
+3. Lock the spec tonight if possible, so that `/parallelize` can start Tuesday.
