@@ -18,13 +18,22 @@ export type StructureKind = 'plant' | 'fan' | 'farm' | 'recycler' | 'clinic';
  * (src/product/). The sim no longer contains any tool logic. It only produces Observations and applies Outputs.
  * Truthcount is part of the Ledger module.
  */
-export type ToolKey = 'earlyWarning' | 'fairShare' | 'ledger' | 'snow';
+export type ToolKey =
+  | 'earlyWarning' | 'fairShare' | 'ledger' | 'snow' // problems 1, 2, 9, 4
+  | 'lantern' | 'kin' | 'layout' | 'larder' | 'witness'; // problems 7, 8, 3, 12 (+2), 13
 export type ToolSet = Record<ToolKey, boolean>;
-export const NO_TOOLS: ToolSet = { earlyWarning: false, fairShare: false, ledger: false, snow: false };
-export const ALL_TOOLS: ToolSet = { earlyWarning: true, fairShare: true, ledger: true, snow: true };
+export const NO_TOOLS: ToolSet = {
+  earlyWarning: false, fairShare: false, ledger: false, snow: false, lantern: false, kin: false, layout: false, larder: false, witness: false,
+};
+export const ALL_TOOLS: ToolSet = {
+  earlyWarning: true, fairShare: true, ledger: true, snow: true, lantern: true, kin: true, layout: true, larder: true, witness: true,
+};
+
+/** The council's base, where the residents' system runs. Messages start here. */
+export const HUB = { level: 25, col: 4 };
 
 // ---------- Observations: the ONLY data the residents' system may read ----------
-export type ReportTopic = 'cough' | 'water' | 'dark' | 'hot';
+export type ReportTopic = 'cough' | 'water' | 'dark' | 'hot' | 'surface';
 
 export type Observation =
   /** Feeder-line meter on a plant's output, hourly. 0 when the plant is offline. About ±3% noise; ~5% of readings missing. */
@@ -44,8 +53,18 @@ export type Observation =
    * supply = share of normal plant output expected; demand = load multiplier expected. About ±4% error.
    */
   | { kind: 'outlook'; fromHour: number; supply: number[]; demand: number[] }
-  /** Section council census: residents, power asked for (critical part too), and the facilities in the section. */
-  | { kind: 'census'; level: number; col: number; day: number; people: number; demand: number; critical: number; facilities: StructureKind[] };
+  /** Section council census: residents, power asked for (critical part too), facilities, and days of food in store. */
+  | { kind: 'census'; level: number; col: number; day: number; people: number; demand: number; critical: number; facilities: StructureKind[]; food: number }
+  /** Whether the Directorate's network is up, hourly. The system notices when it is cut. */
+  | { kind: 'network'; hour: number; up: boolean }
+  /** Daily family check-ins from one section: how many families were expected to check in, and how many did. */
+  | { kind: 'checkins'; level: number; col: number; day: number; expected: number; received: number }
+  /**
+   * A surface air reading posted by a device, with its signature. Registered council probes sign with their key;
+   * anyone else can post too (rumors). value = toxicity index (≥ 10: deadly in minutes; 1–5: survivable for hours
+   * with a filter mask; < 1: safe).
+   */
+  | { kind: 'probe'; device: string; day: number; value: number; sig: string };
 
 // ---------- Outputs: what the residents' system produces; the sim applies them ----------
 export type AlertAction = 'shed' | 'boilWater' | 'isolateSick';
@@ -61,13 +80,27 @@ export type Output =
   /** A published finding. When `lie` is set, it contradicts a Directorate claim. hash chains it to the previous finding. */
   | { kind: 'finding'; id: string; module: ToolKey; lie?: LieId; text: string; evidence: string[]; hash: string }
   /** Send a residents' repair crew to the recycler on `level`. It takes 2 days. */
-  | { kind: 'repair'; module: ToolKey; level: number; text: string };
+  | { kind: 'repair'; module: ToolKey; level: number; text: string }
+  /** Lantern: sections that get a battery-powered relay, so the phone mesh still crosses dark sections. */
+  | { kind: 'relays'; module: ToolKey; sections: number[]; text: string }
+  /** Kin: send neighbors to check on these sections (families there went silent). */
+  | { kind: 'welfare'; module: ToolKey; sections: number[]; text: string }
+  /** Layout: a crew moves one fan between sections (at most 2 moves a day). */
+  | { kind: 'moveFan'; module: ToolKey; from: number; to: number; text: string }
+  /** Larder: carry `days` of food (per resident of the receiving level) from one level to another. */
+  | { kind: 'foodTransfer'; module: ToolKey; from: number; to: number; days: number; text: string }
+  /** Larder: turn spare space on a level into a grow-lamp farm (at most 1 a day). */
+  | { kind: 'grow'; module: ToolKey; level: number; text: string }
+  /** Witness: the verified surface reading, broadcast to every resident it can reach. */
+  | { kind: 'verdict'; module: ToolKey; value: number; text: string };
 
 /** Events a person can inject into the world (the judge's buttons). */
 export type WorldEvent =
   | { type: 'breakRecycler'; level: number }
   | { type: 'tripPlant'; plant: number }
-  | { type: 'outbreak'; level: number };
+  | { type: 'outbreak'; level: number }
+  | { type: 'cutNetwork'; hours: number }
+  | { type: 'divertFarms'; from: number; to: number };
 
 /** Where a number or model comes from. Shown in the hover card. */
 export interface Source {
@@ -102,7 +135,7 @@ export interface Frame {
   plantsTotal: number;
 }
 
-export type LieId = 'plantFine' | 'noOutbreak' | 'waterSafe';
+export type LieId = 'plantFine' | 'noOutbreak' | 'waterSafe' | 'surfaceDeadly';
 
 export interface Lie {
   id: LieId;
@@ -125,6 +158,12 @@ export interface Totals {
   deaths: number;
   sectionsLost: number;
   hoursDarkDeepest: number; // cumulative dark hours, levels 41–50 average
+  // PRODUCT BRANCH: world facts for problems 7, 8, 12, 13 (shown in the hidden-truth column, never read by modules)
+  networkUp: boolean;
+  familiesNoNews: number; // families split across levels who do not know if their relatives are okay
+  surfaceBelief: number; // 0..1 share of residents who believe the rumor that the surface has healed
+  climbersLost: number; // residents who went up the closed way, believing the rumor, and died
+  hungerDeaths: number;
 }
 
 /** Player choices for one day. */

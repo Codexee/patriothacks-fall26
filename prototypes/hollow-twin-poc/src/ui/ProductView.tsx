@@ -38,6 +38,23 @@ export function ProductView(p: ProductViewProps) {
   const idx = (section.level - 1) * SECTIONS_PER_LEVEL + section.col;
   const log = run.log;
   const ledger = run.memory.ledger;
+  const verdict = run.outputs.find((o): o is Extract<Output, { kind: 'verdict' }> => o.kind === 'verdict');
+  const reachedHere = p.modules.lantern; // with Lantern on, this phone is on the mesh (an estimate shown to the user)
+  const rw = run.memory.runway?.[section.level - 1] ?? [];
+  const runway = rw.length ? rw[rw.length - 1] : null;
+  const trend = rw.length > 1 ? (rw[rw.length - 1] - rw[0]) / (rw.length - 1) : null;
+  const flagged = new Set(log?.kin?.flagged ?? []);
+  // The resident's relatives live on two other levels (fixed per section, for the demo).
+  const family = [
+    { name: 'Mother', level: ((section.level + 8) % 50) + 1, col: (section.col + 3) % 8 },
+    { name: 'Brother', level: ((section.level + 30) % 50) + 1, col: (section.col + 5) % 8 },
+  ].map((f) => {
+    const i = (f.level - 1) * SECTIONS_PER_LEVEL + f.col;
+    const c = run.memory.checkins?.[i];
+    const fresh = c && c.day >= day - 1;
+    const status = !fresh ? 'none' : flagged.has(i) || (c!.expected > 0 && c!.received / c!.expected < 0.75) ? 'quiet' : 'okay';
+    return { ...f, status };
+  });
 
   return (
     <aside className="product" aria-label="Residents' system">
@@ -59,6 +76,14 @@ export function ProductView(p: ProductViewProps) {
         </div>
 
         {!anyOn && <p className="phone-empty">No modules are on. Residents have only the Directorate's bulletin.</p>}
+        {!run.sim.totals.networkUp && (
+          <p className={`net-banner ${reachedHere ? 'ok' : ''}`}>
+            {reachedHere ? 'Network cut by the Directorate. Messages arrive over the Lantern mesh.' : 'Network cut by the Directorate. Nothing reaches this phone.'}
+          </p>
+        )}
+        {verdict && (
+          <p className="verdict"><span className="tag">Witness</span> {verdict.text}</p>
+        )}
 
         <h3>Alerts for your level</h3>
         {alerts.length === 0 ? <p className="muted">No alerts today.</p> : (
@@ -78,6 +103,25 @@ export function ProductView(p: ProductViewProps) {
           <p>Life support <b>{Math.round(plan.crit[idx] * 100)}%</b> · other power <b>{Math.round(plan.non[idx] * 100)}%</b>
             <span className="muted small block">From Fair Share's plan for all 400 sections.</span></p>
         ) : <p className="muted">No residents' plan. The Directorate decides: upper levels first.</p>}
+
+        {p.modules.larder && runway !== null && (
+          <>
+            <h3>Food on your level</h3>
+            <p className={runway < 10 ? 'bad' : runway < 18 ? 'warn-text' : ''}>{runway.toFixed(1)} days in store{trend !== null ? ` (${trend >= 0 ? '+' : ''}${trend.toFixed(2)}/day)` : ''}</p>
+          </>
+        )}
+
+        {p.modules.kin && (
+          <>
+            <h3>Your family</h3>
+            <ul className="family">
+              {family.map((f) => (
+                <li key={f.name}><span>{f.name}, level {f.level}</span>
+                  <span className={f.status === 'okay' ? 'good' : f.status === 'quiet' ? 'warn-text' : 'bad'}>{f.status === 'okay' ? 'checked in' : f.status === 'quiet' ? 'quiet: neighbors asked to check' : 'no news'}</span></li>
+              ))}
+            </ul>
+          </>
+        )}
 
         <h3>Send a report</h3>
         <form className="report" onSubmit={(e) => { e.preventDefault(); if (text.trim()) p.onReport(section.level, section.col, text.trim()); }}>
@@ -123,6 +167,51 @@ export function ProductView(p: ProductViewProps) {
                 <li key={s.level} className="bad">Recycler L{s.level}: {s.reports} complaints ({s.reportsPer1000.toFixed(2)}/1,000 vs {log.snow!.baseline.toFixed(2)}){s.tap !== null ? `, tap ${s.tap.toFixed(2)}` : ''}</li>
               ))}</ul>
             )}
+          </div>
+        )}
+
+        {p.modules.lantern && log?.lantern && (
+          <div className="mod">
+            <h3>Lantern</h3>
+            <p>{log.lantern.relays} battery relays placed. If the network is cut, the mesh should reach {Math.round(log.lantern.predictedReach * 100)}% of sections.</p>
+            {log.lantern.darkLevels.length > 0 && <p className="muted small">Dark levels bridged: {log.lantern.darkLevels.join(', ')}</p>}
+            {log.lantern.networkDownHours > 0 && <p className="bad">Network was cut for {log.lantern.networkDownHours} h yesterday.</p>}
+          </div>
+        )}
+
+        {p.modules.kin && log?.kin && (
+          <div className="mod">
+            <h3>Kin</h3>
+            <p>{fmt(log.kin.received)} of {fmt(log.kin.expected)} family check-ins arrived. {log.kin.unheardSections > 0 ? `${log.kin.unheardSections} sections not heard from.` : ''}</p>
+            {log.kin.flagged.length > 0 && <p className="warn-text">Neighbors sent to {log.kin.flagged.length} quiet sections.</p>}
+          </div>
+        )}
+
+        {p.modules.layout && log?.layout && (
+          <div className="mod">
+            <h3>Layout</h3>
+            {log.layout.hotLevels.length === 0 ? <p className="muted">No level is above 29.5 °C wet-bulb.</p> : <p>Hot levels: {log.layout.hotLevels.join(', ')}</p>}
+            {log.layout.moves.map((mv, i) => <p key={i} className="small">Fan moved: L{mv.from} → L{mv.to}</p>)}
+          </div>
+        )}
+
+        {p.modules.larder && log?.larder && (
+          <div className="mod">
+            <h3>Larder</h3>
+            <p className="small">Lowest food runway: {log.larder.lowest.map((r) => `L${r.level} ${r.runway.toFixed(1)} d`).join(' · ')}</p>
+            {log.larder.transfers.map((tr, i) => <p key={i} className="small">Food carried: L{tr.from} → L{tr.to} ({tr.days} days)</p>)}
+            {log.larder.grow !== null && <p className="small">Grow-lamp farm built on L{log.larder.grow}</p>}
+          </div>
+        )}
+
+        {p.modules.witness && log?.witness && (
+          <div className="mod">
+            <h3>Witness</h3>
+            {log.witness.median !== null ? (
+              <p>Surface toxicity <b>{log.witness.median.toFixed(2)}</b> from {log.witness.valid} signed readings: {log.witness.verdict}.</p>
+            ) : <p className="muted">Not enough signed readings (network cut?).</p>}
+            {log.witness.rejected.length > 0 && <p className="bad small">Rejected unsigned devices: {log.witness.rejected.join(', ')}</p>}
+            <p className="muted small">Rumor reports yesterday: {log.witness.rumorReports}</p>
           </div>
         )}
 

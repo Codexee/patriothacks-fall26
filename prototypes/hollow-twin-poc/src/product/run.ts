@@ -32,6 +32,9 @@ export function stepRun(run: Run, modules: ToolSet, extra: Action[] = []): { run
     else if (o.kind === 'finding') sent.push(`Day ${day} 00:00 · Ledger published #${o.hash}: ${o.text}`);
     else if (o.kind === 'repair') sent.push(`Day ${day} 00:00 · ${label(o.module)}: ${o.text}`);
     else if (o.kind === 'allocation') sent.push(`Day ${day} 00:00 · Fair Share: ${o.text}`);
+    else if (o.kind === 'welfare' || o.kind === 'moveFan' || o.kind === 'foodTransfer' || o.kind === 'grow' || o.kind === 'verdict') {
+      sent.push(`Day ${day} 00:00 · ${label(o.module)}: ${o.text}`);
+    } else if (o.kind === 'relays' && !r_networkUp(run)) sent.push(`Day ${day} 00:00 · Lantern: ${o.text}`);
   }
   return {
     run: { sim: r.state, memory: step.memory, outputs: step.outputs, log: step.log },
@@ -41,5 +44,13 @@ export function stepRun(run: Run, modules: ToolSet, extra: Action[] = []): { run
 }
 
 export function label(module: string): string {
-  return ({ earlyWarning: 'Early Warning', fairShare: 'Fair Share', ledger: 'Ledger', snow: 'Snow' } as Record<string, string>)[module] ?? module;
+  return ({
+    earlyWarning: 'Early Warning', fairShare: 'Fair Share', ledger: 'Ledger', snow: 'Snow',
+    lantern: 'Lantern', kin: 'Kin', layout: 'Layout', larder: 'Larder', witness: 'Witness',
+  } as Record<string, string>)[module] ?? module;
+}
+
+/** Whether the network was up at the end of the last simulated day (as the system saw it). */
+function r_networkUp(run: Run): boolean {
+  return run.memory.networkUpNow;
 }

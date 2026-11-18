@@ -3,7 +3,7 @@ import { useState, type ReactNode } from 'react';
 import { sim } from '../sim/index.ts';
 import type { Action, Frame, Score, SimState, ToolKey, ToolSet, WorldEvent } from '../sim/types.ts';
 import { HoverCard, SourceInfo } from './HoverCard.tsx';
-import { TOOL_HINTS, TOOL_KEYS, TOOL_LABELS, type Attribution, type RunResult } from './compare.ts';
+import { TOOL_HINTS, TOOL_KEYS, TOOL_LABELS, TOOL_PROBLEMS, type Attribution, type RunResult } from './compare.ts';
 
 export interface PanelProps {
   state: SimState;
@@ -58,7 +58,11 @@ function RunCol({ title, r }: { title: string; r: RunResult }) {
 function describe(a: Action): string {
   if (a.type === 'event') {
     const e = a.event;
-    return e.type === 'breakRecycler' ? `Break the recycler near L${e.level}` : e.type === 'tripPlant' ? `Trip Plant ${e.plant + 1}` : `Outbreak on L${e.level}`;
+    if (e.type === 'breakRecycler') return `Break the recycler near L${e.level}`;
+    if (e.type === 'tripPlant') return `Trip Plant ${e.plant + 1}`;
+    if (e.type === 'outbreak') return `Outbreak on L${e.level}`;
+    if (e.type === 'cutNetwork') return `Directorate cuts the network for ${e.hours} h`;
+    return `Directorate diverts the farms of L${e.from}–${e.to}`;
   }
   if (a.type === 'report') return `Report from L${a.level} S${a.col + 1}: “${a.text}”`;
   return a.type;
@@ -68,6 +72,7 @@ function WorldEvents({ onEvent, disabled }: { onEvent: (e: WorldEvent) => void; 
   const [recycler, setRecycler] = useState(18);
   const [plant, setPlant] = useState(0);
   const [outbreak, setOutbreak] = useState(30);
+  const [divert, setDivert] = useState(30);
   return (
     <div className="events">
       <div className="row">
@@ -85,6 +90,14 @@ function WorldEvents({ onEvent, disabled }: { onEvent: (e: WorldEvent) => void; 
       <div className="row">
         <button disabled={disabled} onClick={() => onEvent({ type: 'outbreak', level: outbreak })}>Start outbreak</button>
         <input type="number" min={1} max={50} value={outbreak} onChange={(e) => setOutbreak(+e.target.value || 1)} aria-label="Outbreak level" />
+      </div>
+      <div className="row">
+        <button disabled={disabled} onClick={() => onEvent({ type: 'cutNetwork', hours: 48 })}>Cut network 48 h</button>
+      </div>
+      <div className="row">
+        <button disabled={disabled} onClick={() => onEvent({ type: 'divertFarms', from: Math.max(1, divert - 4), to: Math.min(50, divert + 4) })}>Divert farms</button>
+        <span className="muted">around L</span>
+        <input type="number" min={1} max={50} value={divert} onChange={(e) => setDivert(+e.target.value || 1)} aria-label="Farm diversion level" />
       </div>
     </div>
   );
@@ -147,6 +160,10 @@ export function Panel(p: PanelProps) {
             <div><span className="k">Alive</span><span className="v">{fmt(t.population)}</span></div>
             <div><span className="k">Deaths</span><span className="v bad">{fmt(t.deaths)}</span></div>
             <div><span className="k">Plants</span><span className="v">{frame.plantsOnline}/{frame.plantsTotal}</span></div>
+            <div><span className="k">Network</span><span className={`v ${t.networkUp ? 'good' : 'bad'}`}>{t.networkUp ? 'up' : 'CUT'}</span></div>
+            <div><span className="k" title="Families with relatives on other levels who do not know if they are okay">No news</span><span className="v">{fmt(t.familiesNoNews)}</span></div>
+            <div><span className="k" title="Residents who went up the closed way, believing the surface has healed">Climbers lost</span><span className="v">{fmt(t.climbersLost)}</span></div>
+            <div><span className="k">Hunger deaths</span><span className="v">{fmt(t.hungerDeaths)}</span></div>
           </div>
           <div className="trust">
             <span className="k" title="Residents' trust in the Directorate. Each exposed lie lowers it.">Trust in Directorate</span>
@@ -191,9 +208,14 @@ export function Panel(p: PanelProps) {
             {TOOL_KEYS.map((k) => (
               <label key={k} className={`tool ${p.pendingTools[k] ? 'on' : ''}`} title={TOOL_HINTS[k]}>
                 <input type="checkbox" checked={p.pendingTools[k]} disabled={locked || !!state.end} onChange={() => p.onToggleTool(k)} />
-                {TOOL_LABELS[k]}
+                {TOOL_LABELS[k]} <span className="muted small">#{TOOL_PROBLEMS[k]}</span>
               </label>
             ))}
+          </div>
+          <div className="row">
+            <button disabled={locked || !!state.end} onClick={() => TOOL_KEYS.forEach((k) => { if (!p.pendingTools[k]) p.onToggleTool(k); })}>All on</button>
+            <button disabled={locked || !!state.end} onClick={() => TOOL_KEYS.forEach((k) => { if (p.pendingTools[k]) p.onToggleTool(k); })}>All off</button>
+            <span className="muted small">#n = the track's problem number</span>
           </div>
           {TOOL_KEYS.some((k) => p.pendingTools[k] !== state.tools[k]) && (
             <p className="muted small">Changes apply on the next day.</p>
@@ -236,7 +258,7 @@ export function Panel(p: PanelProps) {
           )}
           {p.attr && (
             <div className="attr">
-              <p className="muted small">Shapley share of lives saved, over 16 runs.</p>
+              <p className="muted small">Shapley share of lives saved, estimated from {p.attr.orderings} random orderings ({p.attr.runs.size} runs).</p>
               {[...TOOL_KEYS].sort((a, b) => p.attr!.phi[b] - p.attr!.phi[a]).map((k) => (
                 <div key={k} className="attr-row">
                   <span className="name">{TOOL_LABELS[k]}</span>

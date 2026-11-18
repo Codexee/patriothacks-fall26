@@ -3,14 +3,28 @@ import { sim } from '../sim/index.ts';
 import { NO_TOOLS, type EndState, type Score, type ToolKey, type ToolSet } from '../sim/types.ts';
 import { createRun, stepRun, type Run } from '../product/run.ts';
 
-export const TOOL_KEYS: ToolKey[] = ['earlyWarning', 'fairShare', 'ledger', 'snow'];
+export const TOOL_KEYS: ToolKey[] = ['earlyWarning', 'fairShare', 'ledger', 'snow', 'lantern', 'kin', 'layout', 'larder', 'witness'];
 export const TOOL_LABELS: Record<ToolKey, string> = {
   earlyWarning: 'Early Warning',
   fairShare: 'Fair Share',
   ledger: 'Ledger',
   snow: 'Snow',
+  lantern: 'Lantern',
+  kin: 'Kin',
+  layout: 'Layout',
+  larder: 'Larder',
+  witness: 'Witness',
+};
+/** The track's problem numbers each module answers. */
+export const TOOL_PROBLEMS: Record<ToolKey, string> = {
+  earlyWarning: '1', fairShare: '2', ledger: '9', snow: '4', lantern: '7', kin: '8', layout: '3', larder: '12, 2', witness: '13',
 };
 export const TOOL_HINTS: Record<ToolKey, string> = {
+  lantern: 'When the Directorate cuts the network, carries every alert and report phone to phone; places battery relays to bridge dark levels.',
+  kin: 'Family check-ins across levels; sends neighbors to check on sections whose families go quiet.',
+  layout: 'Moves fans from cool upper levels to the hottest deep levels, from the sensor boxes.',
+  larder: 'Tracks each level\'s food runway; carries food from surplus levels and builds grow-lamp farms where it runs out.',
+  witness: 'Verifies signed surface probe readings, rejects fakes, and broadcasts whether the surface is safe.',
   earlyWarning: 'Forecasts plant output vs demand from feeder meters and the public outlook; asks residents to cut load before plants trip.',
   fairShare: 'Plans power from the census: life support in every section first, then the same share for all, more for hot levels and farms.',
   ledger: 'Checks Directorate claims against residents\' own data (incl. Truthcount case estimates) and publishes signed findings.',
@@ -61,39 +75,46 @@ function toolsFromMask(mask: number): ToolSet {
   return t;
 }
 
-const fact = (n: number): number => (n <= 1 ? 1 : n * fact(n - 1));
-const popcount = (m: number) => TOOL_KEYS.reduce((c, _, i) => c + ((m >> i) & 1), 0);
-
-/** φ_i = Σ_{S ⊆ N\{i}} |S|!(n−|S|−1)!/n! × (v(S∪{i}) − v(S)) */
-export function shapley(v: number[]): Record<ToolKey, number> {
-  const n = TOOL_KEYS.length;
-  const out = {} as Record<ToolKey, number>;
-  TOOL_KEYS.forEach((k, i) => {
-    let phi = 0;
-    for (let s = 0; s < 1 << n; s++) {
-      if (s & (1 << i)) continue;
-      const size = popcount(s);
-      phi += (fact(size) * fact(n - size - 1)) / fact(n) * (v[s | (1 << i)] - v[s]);
-    }
-    out[k] = phi;
-  });
-  return out;
-}
+/** Orderings sampled for the Shapley estimate. 9 modules have 512 subsets; exact values would need 512 runs. */
+export const ORDERINGS = 6;
 
 export interface Attribution {
-  runs: RunResult[]; // indexed by bitmask over TOOL_KEYS
+  runs: Map<number, RunResult>; // by bitmask over TOOL_KEYS (only the subsets the sampled orderings needed)
   phi: Record<ToolKey, number>;
+  orderings: number;
 }
 
+/**
+ * Shapley values by sampled orderings (Castro et al. 2009): add the modules one by one in a random order and
+ * credit each with the lives saved when it joins; average over the orderings. Each subset runs only once.
+ * Value = lives saved (−deaths): days survived misleads, because a stable run ends early.
+ */
 export async function attribution(
   scenarioId: string, seed: number, onProgress: (done: number, total: number) => void,
 ): Promise<Attribution> {
-  const total = 1 << TOOL_KEYS.length;
-  const runs: RunResult[] = [];
-  for (let mask = 0; mask < total; mask++) {
-    runs.push(runToEnd(scenarioId, seed, toolsFromMask(mask)));
-    onProgress(mask + 1, total);
-    await tick(); // let the browser paint the progress bar
+  const n = TOOL_KEYS.length;
+  const runs = new Map<number, RunResult>();
+  const value = async (mask: number) => {
+    if (!runs.has(mask)) { runs.set(mask, runToEnd(scenarioId, seed, toolsFromMask(mask))); await tick(); }
+    return -runs.get(mask)!.deaths;
+  };
+  let rng = 0x5eed ^ seed;
+  const rand = () => { rng = (Math.imul(rng, 1664525) + 1013904223) >>> 0; return rng / 4294967296; };
+  const phi = Object.fromEntries(TOOL_KEYS.map((k) => [k, 0])) as Record<ToolKey, number>;
+  const total = ORDERINGS * n;
+  let done = 0;
+  for (let o = 0; o < ORDERINGS; o++) {
+    const order = [...Array(n).keys()];
+    for (let i = n - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+    let mask = 0;
+    let prev = await value(0);
+    for (const i of order) {
+      mask |= 1 << i;
+      const v = await value(mask);
+      phi[TOOL_KEYS[i]] += (v - prev) / ORDERINGS;
+      prev = v;
+      onProgress(++done, total);
+    }
   }
-  return { runs, phi: shapley(runs.map((r) => -r.deaths)) /* lives saved: days survived misleads, because a stable run ends early */ };
+  return { runs, phi, orderings: ORDERINGS };
 }

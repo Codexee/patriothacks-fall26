@@ -7,12 +7,13 @@
 //   2. produces Observations: the noisy, partial data residents could really have.
 // The residents' system (src/product/) reads only Observations. It never reads SimState.internal.
 import {
-  HOURS_PER_DAY, LEVELS, SECTIONS_PER_LEVEL, SECTION_COUNT, sectionIndex,
+  HOURS_PER_DAY, HUB, LEVELS, SECTIONS_PER_LEVEL, SECTION_COUNT, sectionIndex,
   type Action, type AlertAction, type Bulletin, type DayResult, type Frame, type Lie, type LieId, type Observation,
   type Output, type ReportTopic, type Scenario, type Score, type SectionView, type SimState, type StructureKind,
   type ToolSet, type WorldEvent,
 } from './types.ts';
 import { mulberry32 } from './rng.ts';
+import { probeSig } from './sign.ts';
 import { heatOffsetFor } from '../data/index.ts';
 
 // ---------- Tunable constants ----------
@@ -42,17 +43,27 @@ const PLANT3_DECAY = 0.1; // health lost per day by Plant 3 from day 4 (hidden b
 const AGING_PER_DAY = 0.002; // all plants
 const LOST_SHARE = 0.25; // a section is lost (cannot function) when fewer than 25% of its residents remain
 const REPAIR_H = 48; // a residents' crew needs 2 days to repair a recycler
+const FAN_COOL = 0.7; // °C of wet-bulb removed by each fan, when it has power
+const DIVERT_H = 11 * 24; // day 12: the Directorate diverts the farms of levels 40–50 to the upper levels
+const DIVERT_SHARE = 0.3; // a diverted farm feeds its neighborhood only 30% as well
+const RETALIATION_H = 48; // after a lie is exposed, the Directorate cuts the network for 48 h, starting next day
+const FAMILY_SIZE = 40; // residents per family with members on other levels
+const WELFARE_CUT = 0.25; // a welfare check cuts heat, air and sickness deaths in a section by 25% for a day
+const SURFACE_TOX = 2.2; // the truth: survivable for about 2 h with a filter mask (the Directorate says ≥ 10)
+const CLIMB_RATE = 0.0004; // daily share of rumor believers who try the closed way up (and die)
+const PROBE_KEYS: Record<string, string> = { 'vent-A': 'k7f2', 'vent-B': 'q91x', 'vent-C': 'z3m8' }; // council probes
+const RUMOR_DEVICES = ['healed-1', 'truth-seeker'];
 
 // Observation noise and reporting rates (what the residents' system can see).
 const SENSOR_COLS = [1, 5]; // 2 sensor boxes per level
-const REPORT_RATE: Record<ReportTopic, number> = { cough: 0.01, water: 0.004, dark: 0.0008, hot: 0.0006 };
+const REPORT_RATE: Record<ReportTopic, number> = { cough: 0.01, water: 0.004, dark: 0.0008, hot: 0.0006, surface: 0.0005 };
 const FALSE_REPORTS = 0.03; // background reports per section, topic and day that are not true
 const CLINIC_SHARE = 0.05; // share of the sick within ±2 levels that a clinic sees each day
 const OFFICIAL_SHARE_LYING = 0.12; // the Directorate's public case count while it denies the outbreak
 
 type Problem = 'power' | 'outbreak' | 'water';
 const LIE_FOR: Record<Problem, LieId> = { power: 'plantFine', outbreak: 'noOutbreak', water: 'waterSafe' };
-const PROBLEM_FOR: Record<LieId, Problem> = { plantFine: 'power', noOutbreak: 'outbreak', waterSafe: 'water' };
+const PROBLEM_FOR: Record<LieId, Problem | 'surface'> = { plantFine: 'power', noOutbreak: 'outbreak', waterSafe: 'water', surfaceDeadly: 'surface' };
 const ONSET_H: Record<Problem, number> = { outbreak: 2 * 24, power: 3 * 24, water: 5 * 24 }; // day 3, 4, 6
 const FAILED_RECYCLER_LEVEL = 38;
 
@@ -61,6 +72,7 @@ const REPORT_TEXT: Record<ReportTopic, string> = {
   water: 'The tap water smells like metal, and people on our corridor are getting sick.',
   dark: 'The power has been off for most of the day.',
   hot: 'It is too hot to sleep, and the fans barely move the air.',
+  surface: 'My cousin says the surface has healed and the Directorate is hiding it. People are going up.',
 };
 
 interface Plant {
@@ -70,7 +82,7 @@ interface Plant {
   offlineUntil: number; // absolute hour; online when hour >= offlineUntil
 }
 
-interface ActiveAlert { action: AlertAction; from: number; to: number; until: number; amount: number }
+interface ActiveAlert { action: AlertAction; from: number; to: number; until: number; amount: number; reach: number[] }
 
 interface Internal {
   rng: number;
@@ -99,15 +111,29 @@ interface Internal {
   levelLost: boolean[];
   // Outputs of the residents' system that are in force.
   alerts: ActiveAlert[];
-  plan: { crit: number[]; non: number[] } | null; // today's power plan (Fair Share), cleared each day
+  plan: { crit: number[]; non: number[]; reach: number[] } | null; // today's power plan (Fair Share), cleared each day
   repairs: { i: number; at: number }[];
   userReports: { level: number; col: number; text: string }[];
+  // Network and mesh (problems 7, 8).
+  netDownFrom: number;
+  netDownUntil: number;
+  pendingFindings: Output[]; // findings that could not reach residents while the network was down
+  relays: number[]; // sections with a Lantern battery relay
+  critPow: number[]; // share of life-support power each section got last hour (phones charge on it)
+  welfareUntil: number[];
+  // Food (problem 12).
+  diversions: { from: number; to: number; start: number; farms: number[] }[]; // farms: the Directorate's farms at that moment
+  // Surface (problem 13).
+  surfaceTox: number;
+  belief: number;
+  verdictReach: number; // share of residents the latest correct verdict reached (today)
 }
 
 const DEFAULT_LIES: Lie[] = [
   { id: 'plantFine', bulletin: 'Plant 3 is operating normally', truth: 'Plant 3 is losing capacity every day', active: true, exposed: false },
   { id: 'noOutbreak', bulletin: 'There is no outbreak', truth: 'A lung sickness is spreading in levels 44–48', active: true, exposed: false },
   { id: 'waterSafe', bulletin: 'The water is safe', truth: `The recycler on level ${FAILED_RECYCLER_LEVEL} is failing`, active: true, exposed: false },
+  { id: 'surfaceDeadly', bulletin: 'The surface air would kill you in minutes', truth: 'Surface air is survivable for about 2 hours with a filter mask (not safe, not deadly in minutes)', active: true, exposed: false },
 ];
 
 // ---------- Small helpers ----------
@@ -229,12 +255,25 @@ export function createState(scenario: Scenario, seed: number, tools: ToolSet): S
     plan: null,
     repairs: [],
     userReports: [],
+    netDownFrom: -1,
+    netDownUntil: -1,
+    pendingFindings: [],
+    relays: [],
+    critPow: new Array(n).fill(1),
+    welfareUntil: new Array(n).fill(-1),
+    diversions: [],
+    surfaceTox: SURFACE_TOX,
+    belief: 0.03,
+    verdictReach: 0,
   };
   const startPopulation = startPeople.reduce((a, b) => a + b, 0);
   const state: SimState = {
     seed, scenario, day: 0, tools: { ...tools }, trust: 0.7, systemTrust: 0.7, observations: [],
     lies: DEFAULT_LIES.map((l) => ({ ...l })),
-    totals: { population: startPopulation, startPopulation, deaths: 0, sectionsLost: 0, hoursDarkDeepest: 0 },
+    totals: {
+      population: startPopulation, startPopulation, deaths: 0, sectionsLost: 0, hoursDarkDeepest: 0,
+      networkUp: true, familiesNoNews: 0, surfaceBelief: 0.03, climbersLost: 0, hungerDeaths: 0,
+    },
     bulletin: { directorate: [], measured: [] },
     end: null,
     lastFrame: makeFrame(internal, 0, 0),
@@ -278,7 +317,8 @@ function warmupObservations(state: SimState, s: Internal): Observation[] {
   }
   let I = 0;
   for (const x of s.infected) I += x;
-  dailyObservations(state, s, 0, obs, { sumPow, sumWet, sumCo2, sumInf }, I, fullC, fullN);
+  const expected = s.people.map((p) => Math.round(p / FAMILY_SIZE));
+  dailyObservations(state, s, 0, obs, { sumPow, sumWet, sumCo2, sumInf }, I, fullC, fullN, null, expected, expected);
   return obs;
 }
 
@@ -326,6 +366,10 @@ function makeBulletin(state: SimState, s: Internal): Bulletin {
   for (let i = 0; i < SECTION_COUNT; i++) if (s.recyclerBroken[i]) broken.push(lvl(i));
   measured.push(broken.length ? `Recyclers failing: L${broken.join(', L')}` : 'All recyclers working');
   measured.push(`Deaths ${Math.round(state.totals.deaths).toLocaleString('en-US')}`);
+  measured.push(networkUp(s, Math.max(0, s.hour - 1)) ? 'Network up' : `Network CUT (until day ${Math.floor(s.netDownUntil / 24) + 1})`);
+  measured.push(`Surface air ${s.surfaceTox.toFixed(1)} (deadly ≥ 10; survivable with a mask 1–5)`);
+  measured.push(`Believe "surface healed": ${(s.belief * 100).toFixed(1)}%; climbers lost ${Math.round(state.totals.climbersLost)}`);
+  if (s.diversions.some((d) => s.hour >= d.start)) measured.push(`Farms diverted: L${s.diversions.map((d) => `${d.from}–${d.to}`).join(', L')}`);
   return { directorate, measured };
 }
 
@@ -361,17 +405,86 @@ function recyclerNear(s: Internal, level: number): number {
   return best;
 }
 
+function farmsIn(s: Internal, from: number, to: number): number[] {
+  const out: number[] = [];
+  for (let i = 0; i < SECTION_COUNT; i++) if (s.structures[i].includes('farm') && lvl(i) >= from && lvl(i) <= to) out.push(i);
+  return out;
+}
+
+// ---------- Network and the Lantern mesh ----------
+function networkUp(s: Internal, hour: number): boolean {
+  return !(hour >= s.netDownFrom && hour < s.netDownUntil);
+}
+
+/**
+ * Which sections a message from the council's base (HUB) reaches: 1 or 0 per section.
+ * Network up: every section. Network down: none, unless Lantern is on. Then phones relay from section to section
+ * (neighbors on a level, and up and down the stairwells) through sections where phones can charge (life-support
+ * power on, even if other power is rationed), or with a Lantern battery relay. A dark section next to the mesh
+ * can still receive.
+ */
+function computeReach(s: Internal, tools: ToolSet, hour: number): number[] {
+  const reach = new Array<number>(SECTION_COUNT).fill(0);
+  if (networkUp(s, hour)) return reach.fill(1);
+  const hub = sectionIndex(HUB.level, HUB.col);
+  reach[hub] = 1;
+  if (!tools.lantern) return reach;
+  const relay = new Array<boolean>(SECTION_COUNT).fill(false);
+  for (const r of s.relays) if (r >= 0 && r < SECTION_COUNT) relay[r] = true;
+  const capable = (i: number) => !s.lost[i] && (s.critPow[i] >= 0.3 || relay[i]);
+  const seen = new Array<boolean>(SECTION_COUNT).fill(false);
+  const queue = [hub];
+  seen[hub] = true;
+  while (queue.length) {
+    const i = queue.shift()!;
+    reach[i] = 1;
+    for (const j of neighbors(i)) {
+      if (!s.lost[j]) reach[j] = 1; // a phone next to the mesh can receive
+      if (!seen[j] && capable(j)) { seen[j] = true; queue.push(j); }
+    }
+  }
+  return reach;
+}
+
+function neighbors(i: number): number[] {
+  const l = lvl(i), c = i % SECTIONS_PER_LEVEL, out: number[] = [];
+  if (c > 0) out.push(i - 1);
+  if (c < SECTIONS_PER_LEVEL - 1) out.push(i + 1);
+  if (l > 1) out.push(i - SECTIONS_PER_LEVEL);
+  if (l < LEVELS) out.push(i + SECTIONS_PER_LEVEL);
+  return out;
+}
+
+const share = (reach: number[]) => reach.reduce((a, b) => a + b, 0) / reach.length;
+
 // ---------- Applying outputs and events ----------
-function applyOutputs(state: SimState, s: Internal, outputs: Output[], events: string[]): void {
+/**
+ * Applies the residents' system's outputs at the start of a day. Every output must REACH residents to work:
+ * with the network up, it reaches everyone; with it cut, only the sections the Lantern mesh reaches.
+ */
+function applyOutputs(state: SimState, s: Internal, outputs: Output[], day: number, events: string[]): void {
   const h = s.hour;
-  for (const o of outputs) {
+  const tools = state.tools;
+  // Relays are placed first, so the mesh can carry today's other outputs.
+  for (const o of outputs) if (o.kind === 'relays') s.relays = o.sections.slice();
+  const reach = computeReach(s, tools, h);
+  const reached = share(reach);
+  if (!networkUp(s, h)) {
+    events.push(`${stamp(h)} · Network is down. ${tools.lantern ? `The Lantern mesh reaches ${Math.round(reached * 100)}% of sections.` : 'Residents\' alerts reach no one.'}`);
+  }
+  // Findings held back during an earlier shutdown go out now if residents can be reached.
+  const all = [...s.pendingFindings, ...outputs];
+  s.pendingFindings = [];
+  let moves = 0, transfers = 0, grows = 0;
+  for (const o of all) {
     if (o.kind === 'alert') {
-      s.alerts.push({ action: o.action, from: o.from, to: o.to, until: h + o.hours, amount: o.amount ?? 1 });
+      s.alerts.push({ action: o.action, from: o.from, to: o.to, until: h + o.hours, amount: o.amount ?? 1, reach: reach.slice() });
     } else if (o.kind === 'allocation') {
-      s.plan = { crit: o.crit.slice(), non: o.non.slice() };
+      s.plan = { crit: o.crit.slice(), non: o.non.slice(), reach: reach.slice() };
     } else if (o.kind === 'repair') {
       const i = recyclerNear(s, o.level);
       if (i >= 0 && Math.abs(lvl(i) - o.level) <= 1) {
+        if (!reach[i]) { events.push(`${stamp(h)} · Repair crew for level ${o.level} could not be reached`); continue; }
         if (!s.repairs.some((r) => r.i === i)) s.repairs.push({ i, at: h + REPAIR_H });
       } else {
         events.push(`${stamp(h)} · Repair crew found no recycler on level ${o.level}`);
@@ -379,20 +492,69 @@ function applyOutputs(state: SimState, s: Internal, outputs: Output[], events: s
     } else if (o.kind === 'finding' && o.lie) {
       const lie = state.lies.find((l) => l.id === o.lie)!;
       if (!lie.active) continue;
+      if (reached < 0.5) { s.pendingFindings.push(o); continue; } // most residents cannot hear it yet
       const p = PROBLEM_FOR[o.lie];
-      if (problemIsReal(s, p)) {
+      const real = p === 'surface' ? s.surfaceTox < 10 : problemIsReal(s, p);
+      if (real) {
         lie.active = false;
         lie.exposed = true;
         state.trust = Math.max(0.1, Math.round((state.trust - 0.15) * 100) / 100);
         state.systemTrust = Math.min(1, Math.round((state.systemTrust + 0.05) * 100) / 100);
-        if (s.respStart[p] < 0) s.respStart[p] = h;
+        if (p !== 'surface' && s.respStart[p] < 0) s.respStart[p] = h;
         events.push(`${stamp(h)} · Published finding exposed a lie: "${lie.bulletin}". ${o.text}`);
+        // The Directorate answers by cutting the network, starting tomorrow.
+        if (s.netDownUntil <= h) {
+          s.netDownFrom = h + 24;
+          s.netDownUntil = h + 24 + RETALIATION_H;
+          events.push(`${stamp(h)} · The Directorate announces a network shutdown for tomorrow ("maintenance")`);
+        }
       } else {
         state.systemTrust = Math.max(0.1, Math.round((state.systemTrust - 0.1) * 100) / 100);
         events.push(`${stamp(h)} · A published finding turned out wrong; residents trust the system less`);
       }
+    } else if (o.kind === 'welfare') {
+      let sent = 0;
+      for (const i of o.sections) if (reach[i] && !s.lost[i]) { s.welfareUntil[i] = h + 24; sent++; }
+      if (sent) events.push(`${stamp(h)} · Neighbors sent to check on ${sent} silent section(s)`);
+    } else if (o.kind === 'moveFan') {
+      if (moves >= 2 || !reach[o.from] || !reach[o.to]) continue;
+      const k = s.structures[o.from].indexOf('fan');
+      if (k < 0 || count(s.structures[o.to], 'fan') >= 3) continue;
+      s.structures[o.from].splice(k, 1);
+      s.structures[o.to].push('fan');
+      moves++;
+      events.push(`${stamp(h)} · Crew moved a fan from level ${lvl(o.from)} to level ${lvl(o.to)}`);
+    } else if (o.kind === 'foodTransfer') {
+      if (transfers >= 3) continue;
+      const days = clamp(o.days, 0, 1.5);
+      const src: number[] = [], dst: number[] = [];
+      for (let c = 0; c < SECTIONS_PER_LEVEL; c++) {
+        const a = sectionIndex(o.from, c), b = sectionIndex(o.to, c);
+        if (!s.lost[a] && reach[a]) src.push(a);
+        if (!s.lost[b] && reach[b]) dst.push(b);
+      }
+      const need = dst.reduce((t, i) => t + days * s.people[i], 0); // resident-days of food
+      const have = src.reduce((t, i) => t + Math.max(0, s.food[i] - 5) * s.people[i], 0); // keep 5 days at the source
+      const moved = Math.min(need, have);
+      if (moved <= 0) continue;
+      for (const i of src) s.food[i] -= (moved * (Math.max(0, s.food[i] - 5) * s.people[i] / have)) / Math.max(1, s.people[i]);
+      const got = moved / Math.max(1, need);
+      for (const i of dst) s.food[i] = Math.min(30, s.food[i] + days * got);
+      transfers++;
+      events.push(`${stamp(h)} · Food carried from level ${o.from} to level ${o.to} (${(days * got).toFixed(1)} days each)`);
+    } else if (o.kind === 'grow') {
+      if (grows >= 1) continue;
+      const i = sectionIndex(clamp(o.level, 1, LEVELS), SECTIONS_PER_LEVEL - 1);
+      if (s.lost[i] || !reach[i] || s.structures[i].includes('farm')) continue;
+      s.structures[i].push('farm');
+      grows++;
+      events.push(`${stamp(h)} · Residents built a grow-lamp farm on level ${lvl(i)}`);
+    } else if (o.kind === 'verdict') {
+      if (Math.abs(o.value - s.surfaceTox) / s.surfaceTox < 0.3) s.verdictReach = reached;
+      else state.systemTrust = Math.max(0.1, Math.round((state.systemTrust - 0.05) * 100) / 100);
     }
   }
+  void day;
 }
 
 function applyEvent(s: Internal, e: WorldEvent, events: string[]): void {
@@ -408,6 +570,14 @@ function applyEvent(s: Internal, e: WorldEvent, events: string[]): void {
     const l = clamp(Math.round(e.level), 1, LEVELS);
     for (let c = 0; c < SECTIONS_PER_LEVEL; c++) { const i = sectionIndex(l, c); s.infected[i] += s.people[i] * 0.015; }
     events.push(`${stamp(h)} · EVENT: an outbreak started on level ${l}`);
+  } else if (e.type === 'cutNetwork') {
+    s.netDownFrom = h;
+    s.netDownUntil = Math.max(s.netDownUntil, h + Math.max(1, e.hours));
+    events.push(`${stamp(h)} · EVENT: the Directorate cut the network for ${e.hours} h`);
+  } else if (e.type === 'divertFarms') {
+    const from = clamp(Math.min(e.from, e.to), 1, LEVELS), to = clamp(Math.max(e.from, e.to), 1, LEVELS);
+    s.diversions.push({ from, to, start: h, farms: farmsIn(s, from, to) });
+    events.push(`${stamp(h)} · EVENT: the Directorate diverted the farms of levels ${from}–${to} to the upper levels`);
   }
 }
 
@@ -427,7 +597,7 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
   let builds = 0;
   for (const a of actions) {
     if (a.type === 'setTools') state.tools = { ...a.tools };
-    else if (a.type === 'outputs') applyOutputs(state, s, a.outputs, events);
+    else if (a.type === 'outputs') applyOutputs(state, s, a.outputs, day, events);
     else if (a.type === 'event') applyEvent(s, a.event, events);
     else if (a.type === 'report') s.userReports.push({ level: a.level, col: a.col, text: a.text });
     else if (a.type === 'build') {
@@ -494,9 +664,10 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
       for (let l = Math.max(1, a.from); l <= Math.min(LEVELS, a.to); l++) {
         for (let c = 0; c < SECTIONS_PER_LEVEL; c++) {
           const i = sectionIndex(l, c);
-          if (a.action === 'shed') shed[i] = Math.max(shed[i], clamp(a.amount, 0, 1) * comply);
-          else if (a.action === 'boilWater') boilA[i] = comply;
-          else isoA[i] = comply;
+          const got = a.reach[i] * comply; // only sections the alert reached
+          if (a.action === 'shed') shed[i] = Math.max(shed[i], clamp(a.amount, 0, 1) * got);
+          else if (a.action === 'boilWater') boilA[i] = Math.max(boilA[i], got);
+          else isoA[i] = Math.max(isoA[i], got);
         }
       }
     }
@@ -516,6 +687,13 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
       s.recyclerBroken[sectionIndex(FAILED_RECYCLER_LEVEL, 4)] = true;
       events.push(`${stamp(h)} · Recycler on level ${FAILED_RECYCLER_LEVEL} started failing`);
     }
+    if (h === DIVERT_H) {
+      s.diversions.push({ from: 40, to: 50, start: h, farms: farmsIn(s, 40, 50) });
+      events.push(`${stamp(h)} · The Directorate diverted the farms of levels 40–50 to the upper levels`);
+    }
+    const netUp = networkUp(s, h);
+    obs.push({ kind: 'network', hour: h, up: netUp });
+    const reachH = netUp ? null : computeReach(s, tools, h);
     for (const p of s.plants) p.health = Math.max(0.2, p.health - AGING_PER_DAY / 24);
     for (const r of s.repairs) {
       if (r.at === h) {
@@ -537,8 +715,10 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
       for (const k of s.structures[i]) { if (k === 'farm') nc += LOAD.farm; else c += LOAD[k]; }
       fullC[i] = c * mult;
       fullN[i] = nc * mult;
-      reqC[i] = fullC[i] * (s.plan ? s.plan.crit[i] : 1);
-      reqN[i] = fullN[i] * (s.plan ? s.plan.non[i] : 1) * (1 - shed[i]);
+      // A section follows the plan only if the plan reached it; otherwise it draws all it needs.
+      const planned = s.plan !== null && s.plan.reach[i] > 0;
+      reqC[i] = fullC[i] * (planned ? s.plan!.crit[i] : 1);
+      reqN[i] = fullN[i] * (planned ? s.plan!.non[i] : 1) * (1 - shed[i]);
       RC += reqC[i]; RN += reqN[i];
     }
     D = RC + RN;
@@ -629,6 +809,7 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
     for (let k = 0; k < s.plants.length; k++) {
       if (urand(s) < 0.05) continue; // missing reading
       const p = s.plants[k];
+      if (reachH && !reachH[sectionIndex(p.level, 0)]) continue; // network down and no mesh path to this plant
       const out = h >= p.offlineUntil ? p.nominal * p.health * supply * costF * (1 + 0.03 * gauss(s)) : 0;
       obs.push({ kind: 'plantMeter', plant: k, level: p.level, hour: h, output: Math.max(0, Math.round(out)) });
     }
@@ -655,7 +836,14 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
     // Farm output per level band.
     const farmPow: number[] = [];
     const farmLevels: number[] = [];
-    for (let i = 0; i < SECTION_COUNT; i++) if (s.structures[i].includes('farm')) { farmLevels.push(lvl(i)); farmPow.push(s.lost[i] ? 0 : nonFrac[i] * count(s.structures[i], 'farm')); }
+    for (let i = 0; i < SECTION_COUNT; i++) {
+      if (!s.structures[i].includes('farm')) continue;
+      // A farm the Directorate diverted feeds its own neighborhood only DIVERT_SHARE as well.
+      // Grow-lamp farms that residents build later are theirs, not diverted.
+      const diverted = s.diversions.some((d) => h >= d.start && d.farms.includes(i));
+      farmLevels.push(lvl(i));
+      farmPow.push(s.lost[i] ? 0 : nonFrac[i] * count(s.structures[i], 'farm') * (diverted ? DIVERT_SHARE : 1));
+    }
     const clinicLevels: number[] = [];
     for (let i = 0; i < SECTION_COUNT; i++) if (s.structures[i].includes('clinic') && !s.lost[i]) clinicLevels.push(lvl(i));
 
@@ -665,6 +853,7 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
       const fd = fullC[i] + fullN[i];
       const p = fd > 0 ? (critFrac[i] * fullC[i] + nonFrac[i] * fullN[i]) / fd : 0;
       s.power[i] = s.lost[i] ? 0 : p;
+      s.critPow[i] = s.lost[i] ? 0 : critFrac[i];
       sumPow[i] += s.power[i];
       if (s.lost[i] || n <= 0) continue;
 
@@ -678,7 +867,8 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
       s.co2[i] = clamp(css + (s.co2[i] - css) * Math.exp((-Q / V) * 3600), CO2_OUT, 10000);
 
       // Heat: cooling needs power; without it the section drifts toward base + 6.
-      const target = baseWet(level) + heatOff + 6 - 12 * Math.sqrt(nonFrac[i]);
+      // Fans also move hot air out (they are life support, so they run on critical power).
+      const target = baseWet(level) + heatOff + 6 - 12 * Math.sqrt(nonFrac[i]) - FAN_COOL * fans * critFrac[i];
       s.wet[i] += (target - s.wet[i]) * 0.1;
 
       // Water: boiling comes from the general response or from a boil-water alert in this section.
@@ -699,7 +889,8 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
       const newInf = S * (1 - Math.exp(-lambda));
       const dist = nearestDistance(level, clinicLevels);
       const mu = (BASE_CFR / RECOVERY_H) * (1 + dist / 4) * (wEff < 0.6 ? 1.5 : 1);
-      const infDeaths = s.infected[i] * mu;
+      const helped = s.welfareUntil[i] > h ? 1 - WELFARE_CUT : 1; // neighbors checked on them (Kin)
+      const infDeaths = s.infected[i] * mu * helped;
       const recovered = s.infected[i] / RECOVERY_H;
 
       // Other deaths: heat above the wet-bulb limit, very high CO₂, bad water, starvation.
@@ -713,7 +904,8 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
       for (let k = 0; k < farmLevels.length; k++) if (Math.abs(farmLevels[k] - level) <= 3) { prod += farmPow[k]; nf++; }
       const grow = nf > 0 ? Math.min(1.2, (1.05 * prod) / nf) : 0.9;
       s.food[i] = clamp(s.food[i] + (grow - 1) / 24, 0, 30);
-      if (s.food[i] <= 0) rate += 0.003;
+      rate *= helped;
+      if (s.food[i] <= 0) { rate += 0.003; state.totals.hungerDeaths += n * 0.003; }
 
       const other = Math.min(n, n * rate);
       const infShare = s.infected[i] / n;
@@ -760,6 +952,42 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
     frames.push(makeFrame(s, day, hod));
   }
 
+  // --- The surface rumor (problem 13): believers try the closed way up, and the machines and air kill them. ---
+  // A correct, signed verdict that reaches residents shrinks the rumor; without one it grows.
+  let alive = 0;
+  for (let i = 0; i < SECTION_COUNT; i++) alive += s.people[i];
+  if (s.verdictReach > 0) s.belief *= 1 - 0.4 * s.verdictReach;
+  else s.belief = Math.min(0.3, s.belief + 0.003);
+  s.verdictReach = 0;
+  s.surfaceTox = Math.max(1.5, s.surfaceTox - 0.002);
+  const climbers = alive * s.belief * CLIMB_RATE;
+  if (climbers > 0 && alive > 0) {
+    for (let i = 0; i < SECTION_COUNT; i++) s.people[i] = Math.max(0, s.people[i] - (climbers * s.people[i]) / alive);
+    state.totals.deaths += climbers;
+    state.totals.climbersLost += climbers;
+  }
+
+  // --- Families split across levels (problem 8): who knows their relatives are okay at the end of the day? ---
+  const hEnd = s.hour - 1;
+  const netUpEnd = networkUp(s, hEnd);
+  const reachEnd = computeReach(s, state.tools, hEnd);
+  const known = new Array<number>(SECTION_COUNT).fill(0);
+  const expected = new Array<number>(SECTION_COUNT).fill(0);
+  let noNews = 0;
+  for (let i = 0; i < SECTION_COUNT; i++) {
+    if (s.lost[i]) continue;
+    expected[i] = Math.round(s.people[i] / FAMILY_SIZE);
+    const sick = s.people[i] > 0 ? s.infected[i] / s.people[i] : 0;
+    const distress = clamp(Math.max(0, s.wet[i] - 30) / 3 + Math.max(0, s.co2[i] - 2000) / 3000 + sick * 3 + (s.power[i] < 0.2 ? 0.3 : 0), 0, 0.9);
+    // Network up: families call each other. Network down: only Kin check-ins over the Lantern mesh get through.
+    const path = netUpEnd ? 1 : state.tools.kin && state.tools.lantern ? reachEnd[i] : 0;
+    known[i] = expected[i] * (1 - distress) * path;
+    noNews += expected[i] - known[i];
+  }
+  state.totals.familiesNoNews = Math.round(noNews);
+  state.totals.networkUp = netUpEnd;
+  state.totals.surfaceBelief = Math.round(s.belief * 1000) / 1000;
+
   // Totals, stability and end states.
   let pop = 0, I = 0, lostSections = 0, lostLevels = 0;
   for (let i = 0; i < SECTION_COUNT; i++) { pop += s.people[i]; I += s.infected[i]; if (s.lost[i]) lostSections++; }
@@ -795,7 +1023,7 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
 
   state.lastFrame = frames[frames.length - 1];
   state.bulletin = makeBulletin(state, s);
-  dailyObservations(state, s, day, obs, { sumPow, sumWet, sumCo2, sumInf }, I, fullC, fullN);
+  dailyObservations(state, s, day, obs, { sumPow, sumWet, sumCo2, sumInf }, I, fullC, fullN, netUpEnd ? null : reachEnd, expected, known);
   state.observations = obs;
   return { state, frames, events };
 }
@@ -805,11 +1033,15 @@ function dailyObservations(
   state: SimState, s: Internal, day: number, obs: Observation[],
   sums: { sumPow: number[]; sumWet: number[]; sumCo2: number[]; sumInf: number[] },
   totalInfected: number, fullC: number[], fullN: number[],
+  reach: number[] | null, expected: number[], known: number[],
 ): void {
   const H = HOURS_PER_DAY;
+  // With the network down, data from a section arrives only if the Lantern mesh reaches it.
+  const heard = (i: number) => reach === null || reach[i] > 0;
   for (let i = 0; i < SECTION_COUNT; i++) {
     const level = lvl(i), col = i % SECTIONS_PER_LEVEL;
     const n = s.people[i];
+    if (!heard(i)) continue;
     if (!s.lost[i]) {
       // Sensor boxes: 2 per level, about 10% of days missing.
       if (SENSOR_COLS.includes(col) && urand(s) > 0.1) {
@@ -828,10 +1060,15 @@ function dailyObservations(
         water: n * REPORT_RATE.water * Math.max(0, 0.8 - water),
         dark: n * REPORT_RATE.dark * Math.max(0, 0.6 - sums.sumPow[i] / H),
         hot: n * REPORT_RATE.hot * Math.max(0, sums.sumWet[i] / H - 29),
+        surface: n * s.belief * 0.0005,
       };
-      for (const t of ['cough', 'water', 'dark', 'hot'] as ReportTopic[]) {
+      for (const t of ['cough', 'water', 'dark', 'hot', 'surface'] as ReportTopic[]) {
         const c = poisson(s, lambda[t] + FALSE_REPORTS);
         if (c > 0) obs.push({ kind: 'reports', level, col, day, topic: t, count: c, text: REPORT_TEXT[t] });
+      }
+      // Kin check-ins from this section (families with relatives on other levels).
+      if (expected[i] > 0) {
+        obs.push({ kind: 'checkins', level, col, day, expected: expected[i], received: Math.max(0, Math.round(known[i] * (1 + 0.03 * gauss(s)))) });
       }
     }
     // Section council census (people rounded; power asked for, with ±3% noise).
@@ -841,7 +1078,19 @@ function dailyObservations(
       demand: Math.round((fullC[i] + fullN[i]) * (1 + 0.03 * gauss(s))),
       critical: Math.round(fullC[i] * (1 + 0.03 * gauss(s))),
       facilities: s.structures[i].slice(),
+      food: Math.round(s.food[i] * (1 + 0.03 * gauss(s)) * 10) / 10,
     });
+  }
+  // Surface probes: the council's 3 registered vents (signed, ±8% error) plus devices spreading the rumor.
+  if (heard(sectionIndex(1, 0))) {
+    for (const [device, key] of Object.entries(PROBE_KEYS)) {
+      const value = Math.round(s.surfaceTox * (1 + 0.08 * gauss(s)) * 100) / 100;
+      obs.push({ kind: 'probe', device, day, value, sig: probeSig(key, device, day, value) });
+    }
+  }
+  for (const device of RUMOR_DEVICES) {
+    const value = Math.round((0.2 + 0.2 * urand(s)) * 100) / 100; // "the surface is healed"
+    obs.push({ kind: 'probe', device, day, value, sig: probeSig('unknown', device, day, value) });
   }
   for (const r of s.userReports) {
     obs.push({ kind: 'reports', level: r.level, col: r.col, day, topic: topicOf(r.text), count: 1, text: r.text, byUser: true });
@@ -849,7 +1098,7 @@ function dailyObservations(
   s.userReports = [];
   // Clinics: each sees a small share of the sick within ±2 levels.
   for (let i = 0; i < SECTION_COUNT; i++) {
-    if (!s.structures[i].includes('clinic') || s.lost[i]) continue;
+    if (!s.structures[i].includes('clinic') || s.lost[i] || !heard(i)) continue;
     const L = lvl(i);
     let sick = 0;
     for (let l = Math.max(1, L - 2); l <= Math.min(LEVELS, L + 2); l++) {

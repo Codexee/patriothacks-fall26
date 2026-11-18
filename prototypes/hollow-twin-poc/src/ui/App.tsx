@@ -97,9 +97,9 @@ export function App() {
   };
 
   const runAttribution = async () => {
-    setBusy('Running all 16 module combinations…');
+    setBusy('Estimating each module\'s share (about 50 runs, up to a minute)…');
     setAttr(null);
-    setAttrProgress({ done: 0, total: 16 });
+    setAttrProgress({ done: 0, total: 1 });
     await sleep(0);
     const a = await attribution(scenarioId, seed, (done, total) => setAttrProgress({ done, total }));
     setAttr(a);

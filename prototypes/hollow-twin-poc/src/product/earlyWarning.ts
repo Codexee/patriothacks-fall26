@@ -50,13 +50,18 @@ export function forecastCapacity(m: ProductMemory): { capAt: (t: number) => numb
       xs.push(i); ys.push(v / Math.max(0.05, sup));
     });
     const meanNorm = ys.length ? ys.reduce((p, q) => p + q, 0) / ys.length : 0;
+    const maxNorm = ys.length ? Math.max(...ys) : 0;
     const supNext = (t: number) => at(m.outlook, 'supply', lastHour + t) ?? at(m.outlookPrev, 'supply', lastHour + t) ?? 1;
     if (lastValid === 0) {
       perPlant.push((t) => (t > OFFLINE_HOURS ? meanNorm * supNext(t) : 0));
       continue;
     }
+    // A plant's own health (output ÷ supply) never improves by itself: rising output comes from supply, which the
+    // outlook already covers. So the health trend may only stay flat or fall, and never exceeds what was measured.
     const { a, b } = fit(xs, ys);
-    perPlant.push((t) => Math.max(0, Math.min(1.1 * meanNorm, a + b * (23 + t))) * supNext(t));
+    const slope = Math.min(0, b);
+    const level = Math.min(maxNorm, a + b * 23); // health now, from the fit
+    perPlant.push((t) => Math.max(0, Math.min(maxNorm, level + slope * t)) * supNext(t));
   }
   return { capAt: (t) => perPlant.reduce((s, f) => s + f(t), 0), capNow, lastHour };
 }

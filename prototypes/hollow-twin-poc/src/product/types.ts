@@ -32,12 +32,23 @@ export interface ProductMemory {
   reports: Record<ReportTopic, number[][]>;
   clinicCases: { level: number; cases: number }[]; // today
   officialCases: number;
-  census: { people: number[]; demand: number[]; critical: number[]; facilities: string[][]; recyclerLevels: number[] };
+  census: { people: number[]; demand: number[]; critical: number[]; facilities: string[][]; food: number[]; recyclerLevels: number[] };
   sensorWater: (number | null)[]; // per level, latest mean tap quality from sensor boxes
   sensorWet: (number | null)[]; // per level, latest mean wet-bulb
+  sensorPower: (number | null)[]; // per level, latest mean share of power served
   ledger: LedgerRecord[];
   repairsSent: Record<string, number>; // recycler level → day sent
   userReports: { day: number; level: number; col: number; text: string }[];
+  // Lantern / Kin (problems 7, 8)
+  networkDownHours: number; // hours of yesterday the network was down
+  networkUpNow: boolean;
+  checkins: ({ expected: number; received: number; day: number } | null)[]; // per section, latest heard
+  // Layout (problem 3)
+  fanReceivers: number[]; // levels that received a fan (never used as donors again)
+  // Larder (problems 12, 2)
+  runway: number[][]; // per level, mean days of food, last 3 days (newest last)
+  // Witness (problem 13)
+  probes: { device: string; day: number; value: number; valid: boolean }[]; // last 3 days
 }
 
 /** What each module worked out today, for the council console. Not used by the sim. */
@@ -48,6 +59,11 @@ export interface ProductLog {
   fairShare?: { available: number; critical: number; nonCriticalShare: number; criticalShare: number; hotLevels: number[] };
   ledger?: { plant3Share: number | null; plant3Baseline: number | null; official: number; estimated: number; byLevel: { level: number; est: number }[] };
   snow?: { suspects: { level: number; reportsPer1000: number; tap: number | null; reports: number }[]; baseline: number };
+  lantern?: { relays: number; predictedReach: number; darkLevels: number[]; networkDownHours: number };
+  kin?: { expected: number; received: number; unheardSections: number; flagged: number[] };
+  layout?: { moves: { from: number; to: number }[]; hotLevels: number[] };
+  larder?: { lowest: { level: number; runway: number; trend: number }[]; transfers: { from: number; to: number; days: number }[]; grow: number | null };
+  witness?: { valid: number; rejected: string[]; median: number | null; verdict: string | null; rumorReports: number };
 }
 
 export interface ProductStep {

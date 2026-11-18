@@ -78,6 +78,13 @@ button, input, select { font: inherit; color: inherit; }
 }
 .panel-body { overflow-y: auto; padding: 12px 14px 24px; flex: 1; }
 .sheet-toggle { display: none; }
+.net-banner { margin: 4px 0; padding: 4px 8px; border: 1px solid var(--bad); color: var(--bad); }
+.net-banner.ok { border-color: var(--warn); color: var(--warn); }
+.verdict { margin: 4px 0; padding: 4px 8px; border-left: 3px solid var(--good); background: var(--panel-2); }
+.verdict .tag { margin: 0 6px 0 0; }
+.warn-text { color: var(--warn); }
+.family { list-style: none; margin: 0; padding: 0; }
+.family li { display: flex; justify-content: space-between; gap: 8px; }
 
 .p-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; }
 h1 { font-size: 30px; margin: 0; letter-spacing: 2px; color: var(--accent); }

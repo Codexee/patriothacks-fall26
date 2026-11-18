@@ -5,7 +5,9 @@
 //  - Truthcount: estimates real cases from cough reports and clinic counts, and compares with the official count.
 import { LEVELS, type LieId, type Output } from '../sim/types.ts';
 import type { LedgerRecord, ProductLog, ProductMemory } from './types.ts';
-import type { Finding } from './snow.ts';
+
+/** A finding another module asks the Ledger to publish. */
+export interface Finding { id: string; module: string; lie?: LieId; text: string; evidence: string[] }
 
 const REPORT_RATE = 0.01; // calibration: about 1 in 100 sick residents reports a cough each day
 const CLINIC_SHARE = 0.05; // calibration: a clinic sees about 5% of the sick within ±2 levels each day

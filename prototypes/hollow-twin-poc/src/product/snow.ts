@@ -9,7 +9,7 @@ const RATE_FACTOR = 3; // a suspect has 3× the typical complaint rate
 const BAD_TAP = 0.6;
 const REPAIR_EVERY_DAYS = 4;
 
-export interface Finding { id: string; module: 'snow'; lie?: 'waterSafe'; text: string; evidence: string[] }
+import type { Finding } from './ledger.ts';
 
 export function snow(m: ProductMemory, day: number):
   { outputs: Output[]; findings: Finding[]; log: NonNullable<ProductLog['snow']> } | null {

@@ -10,7 +10,7 @@ const scenarioId = proc.argv[2] ?? 'texas2021';
 const seed = Number(proc.argv[3] ?? 1);
 const verbose = proc.argv.includes('-v');
 
-interface Run { name: string; end: string; day: number; deaths: number; alive: number; score: number; fairness: number; msPerDay: number; events: string[] }
+interface Run { name: string; end: string; day: number; deaths: number; alive: number; score: number; fairness: number; msPerDay: number; events: string[]; climbers: number; hunger: number; noNews: number }
 
 function run(name: string, tools: ToolSet): Run {
   let r: ProductRun = createRun(scenarioId, seed, tools);
@@ -35,25 +35,33 @@ function run(name: string, tools: ToolSet): Run {
     fairness: sc.fairness,
     msPerDay: ms,
     events,
+    climbers: Math.round(state.totals.climbersLost),
+    hunger: Math.round(state.totals.hungerDeaths),
+    noNews: state.totals.familiesNoNews,
   };
 }
 
 const one = (k: keyof ToolSet): ToolSet => ({ ...NO_TOOLS, [k]: true });
 const only = proc.argv.find((a) => a.startsWith('--only='))?.slice(7);
+const without = (k: keyof ToolSet): ToolSet => ({ ...ALL_TOOLS, [k]: false });
+const FIRST4: ToolSet = { ...NO_TOOLS, earlyWarning: true, fairShare: true, ledger: true, snow: true };
 const all: [string, ToolSet][] = [
   ['NO_MODULES', NO_TOOLS],
-  ['earlyWarning', one('earlyWarning')],
   ['fairShare', one('fairShare')],
-  ['ledger', one('ledger')],
-  ['snow', one('snow')],
   ['EW+fairShare', { ...NO_TOOLS, earlyWarning: true, fairShare: true }],
+  ['FIRST_4', FIRST4],
   ['ALL_MODULES', ALL_TOOLS],
+  ['ALL-lantern', without('lantern')],
+  ['ALL-kin', without('kin')],
+  ['ALL-layout', without('layout')],
+  ['ALL-larder', without('larder')],
+  ['ALL-witness', without('witness')],
 ];
 const runs: Run[] = all.filter(([n]) => !only || only.split(',').includes(n)).map(([n, t]) => run(n, t));
 
 console.log(`Scenario ${scenarioId}, seed ${seed}`);
 console.table(runs.map((r) => ({
-  run: r.name, endDay: r.day, end: r.end, deaths: r.deaths, alivePct: r.alive, fairness: r.fairness, score: r.score, msPerDay: Number(r.msPerDay.toFixed(1)),
+  run: r.name, endDay: r.day, end: r.end.slice(0, 32), deaths: r.deaths, climbers: r.climbers, hunger: r.hunger, score: r.score, ms: Math.round(r.msPerDay),
 })));
 
 if (proc.argv.includes('--checks')) {
