@@ -1,10 +1,560 @@
-# Idea bank (Mon Nov 16)
+# Idea bank (Mon Nov 16; rounds 14-15 on Tue Nov 17)
 
 Method: `/ideate` (think backward from the winning demo). Track: **Best Solution for a Dystopian World**. Constraints: remote-first, and hybrid only with in-hand parts plus a software fallback (`context/constraints.md`).
 
 Scores run from 1 to 5. W = Wow, T = Track fit, F = Feasible in Tue–Wed, R = Remote-OK, Tm = Team fit (EE plus backend/CP), L = Live-demo-able.
 
 **Track changed (Nov 17): the Hollow brief. See Round 14 (Earshot, Canary with a grid sense) and `ideation/hollow-pivot.md`.** Earlier rounds were scored against the old teaser. **On hold: A (Shadow Route) and H (Hush)** (Neil, Nov 16). **Next phase (Nov 17): Off the Record + Unsign. See `ideation/off-the-record.md`.** Round 13 (Option A) ranked it first at 22/25. Round 11 (Flock): AG. Unmarked and AH. Watch the Watchers. Ground Truth (Round 10) was rejected: people do not trust an AI to judge whether a photo is real. Round 8 — AD. Pinpoint v2 is kept for reference. Round 7: Tripwire set aside (few people use AI browsers), Veil dropped (protective noise can be removed; topic avoided for publicity), AC folded into AD. Rounds 4–6 are kept below for reference. Neil said rounds 4–5 lack wow. Round 3 (K–P) and Flagged (R) were rejected. The other ideas are under "Scrapped".
+
+**Chosen (Neil, Nov 17): Hollow Twin** (`.plans/hollow-twin-spec.md`), from Neil's round 14 below. Adarsh ran rounds 14–16 in parallel, before seeing that choice. **Adarsh's round 16 (Nov 17): full build-and-demo sheets for all 15 projects are in `ideation/projects-1-15.md`.** **Adarsh's round 15 (Nov 17, evening): one idea per problem, inputs are reports and a fictional scenario pack.** Round 14 is kept below it. The organizers' doc set a new world (the Hollow, `context/hollow-brief.md`). Rounds 1-13 below do not fit it and are kept for reference only.
+
+---
+
+# Round 15 (Adarsh, Tue Nov 17, evening): one idea per problem
+
+**Why a new round:** Adarsh's feedback on round 14: we cannot pretend that real-world sensor inputs (a pulled charger, a real cough, tap water) are the Hollow. So the inputs must be things that exist *inside* the story. This round gives the best idea for each of the 15 problems on its own. We combine them later.
+
+Problem numbers follow the organizers' doc (`context/hollow-brief.md`): 1 = blackout warning, 15 = plan the move.
+
+## What the product takes as input (honest options)
+
+Yes, **reports are the best main input.** In the Hollow, the people who see the problem are the residents, and the theme says the official numbers lie. A report is something a resident really would send, and in the demo a person really does type or say it. So the input is real, and the world is honestly fictional.
+
+Five input types we can use, from most to least important:
+
+1. **Resident reports (text, voice, or a quick form).** "Lights flickering in C-block", "tap 14 smells like eggs", "water ankle-deep at junction J7". An AI step turns free text into a structured event: place, type, severity, time. Judges can type their own report during the demo, so the outcome is not fixed.
+2. **The sector's own records (a scenario pack).** A fictional but complete data set for one sector, for example "Level 9, Ashvale": the tunnel map, the power feeders, the pipe network, households, clinics, stock, plant load logs. We say openly that it is fictional. It is the "world file", like a map in a game.
+3. **Choices from the user.** Rules, budgets, priorities, sliders ("supply drops to 60%", "hospitals always on"). The product computes a new plan each time.
+4. **A hidden future (replay with a reveal).** The scenario pack can hold what *will* happen (for example, which feeder fails at 14:20). The product sees only the past and the reports. It makes its prediction live, then we press "play" and the hidden future is revealed. Judges see whether the prediction was right. This is the honest way to show a forecast works.
+5. **Real standards and real methods.** Where the world needs a fact, use a real one: WHO and OSHA air limits, WHO water limits, real triage protocols, real heat-stress limits. Where a method needs proof, test it on real public data and label it as a test (for example, the outbreak method on CDC flu data).
+
+One thing in this list is real and is not a sensor: **turning off a network.** When we turn off Wi-Fi in the demo, the network is really off. So the communication ideas (7, 8) can use real phones with no pretending.
+
+**Shared spine (for combining later):** most ideas below use the same three parts: (a) report intake, (b) a sector map with a graph under it (tunnels, pipes, feeders), (c) a way to reach people (alerts, and the offline relay from idea 7). Building those once makes the later combination cheap.
+
+**Scores (round 15, /25):** W = Wow, A = Active loop (input → process → outcome), F = Feasible by Thu night, D = Demo-able live and again, C = Connects to the shared spine.
+
+---
+
+## P1. Flicker: blackout warnings from the first signs residents notice  ·  software only  ·  **20/25**
+
+**Problem:** blackouts last for days and nobody knows when the next one hits. Warn people before the power or air cuts out.
+
+**Crazy version:** the Hollow listens to every resident and knows a feeder will fail an hour before it does, the way an earthquake app warns before shaking.
+
+**How it solves it:** blackouts rarely come with no signs. Lights flicker, fans slow, breakers trip, and the load on a feeder climbs. Flicker collects those signs as resident reports and reads the feeder load log in the scenario pack.
+- **Input:** reports ("lights dim in C-block", "fan in corridor 4 stopped"), the feeder map, and the load log.
+- **Process:** each feeder gets a risk score from (1) load against capacity and its trend, (2) how fast warning reports arrive near it (a burst of reports raises risk, older reports count less), and (3) the cascade rule: when one feeder fails, its load moves to its neighbors, which can then fail. The air system runs on the same power, so a feeder failure also predicts which vents stop.
+- **Outcome:** a countdown warning to the exact sectors at risk, with a short checklist ("charge lamps, fill water, move people on oxygen to Level 7"). People confirm "I did it", so the console can see who is ready.
+
+**Full demo (about 90 s):**
+1. Open the Level 9 map. Feeders are lines, sectors are blocks, all green. Risk is low.
+2. On three phones, type reports: "lights flickering in C-block", "corridor 4 fan slowing", "breaker tripped in C-3". Each one appears as a pin.
+3. C-feeder turns orange, then red: "68% chance of outage in the next 2 hours. Cascade risk to D-feeder."
+4. Press "Send warning". The phones in C and D sectors show the countdown and checklist. Two people tap "Ready".
+5. Press "Play" (the reveal). The hidden future runs: C-feeder fails at 14:20, and D follows 12 minutes later, as predicted.
+6. Score card: "Warned 47 minutes early. 312 of 400 residents ready. Without Flicker: 0 minutes of warning."
+7. Re-demo: a judge types a new report in a different sector, and the risk moves there.
+
+**Hardware:** none. **Overlap:** none at GMU.
+**Risks:** the forecast is only as good as the scenario pack, so the reveal step is what makes it believable. Keep the risk model simple and visible.
+**Scores:** W4 A4 F4 D4 C4
+
+---
+
+## P2. Fair Share: rationing the deep levels can check  ·  software only  ·  **22/25**
+
+**Problem:** when supply runs short, the Directorate decides and the deep levels always lose. Share power, water, and food fairly.
+
+**Crazy version:** a rationing system that no one has to trust, because anyone can check every decision.
+
+**How it solves it:**
+- **Input:** household needs (number of people, children, medical devices, sickness, heat exposure) entered on a form; the supply for the day (power, water, food); and the rules, which are public ("medical devices always on", "every person gets a minimum", "no sector dark for more than 8 hours in a row", "rotate cuts").
+- **Process:** an optimizer (linear programming with a fairness goal: raise the worst-off household first) makes the plan and a rotating cut schedule.
+- **Outcome:** each household gets its share and its cut hours, plus a **receipt** that proves the share came from the published rules and the published inputs (a hash of both). Anyone can re-run the plan in the browser and get the same answer. Households can **appeal** ("my child uses an oxygen concentrator"); the plan updates and shows what changed for whom.
+
+**Full demo (about 90 s):**
+1. Three judges or teammates join as households and fill in the form (one has a medical device).
+2. Set supply to 100%. Everyone is fine.
+3. Drag supply to 60%. Two plans appear side by side: "Directorate default" (deep levels dark for 3 days) and "Fair Share" (rotating 4-hour cuts, medical always on). A meter shows "heat-danger hours: 2,140 → 310".
+4. A household opens its receipt and presses "Verify". It re-computes in the browser and shows a green check.
+5. We change one number in the plan on the server. Verify now shows red: "This plan does not match the published rules."
+6. A household submits an appeal. The plan updates in under a second and shows who gave up 20 minutes of power to cover it.
+
+**Hardware:** none. **Overlap:** GeoGuard (resource allocation) won in Feb 2026; the "verify it yourself" and appeal steps make it different.
+**Risks:** can look like a dashboard if the user does not act. Keep the form, the appeal, and the verify button in the demo.
+**Scores:** W4 A5 F4 D5 C4
+
+---
+
+## P3. Draft: move cool air down to the people who need it most  ·  software only  ·  **20/25**
+
+**Problem:** the plants are aging, the deep levels get hotter, and the cooling fans fall behind. Keep the lower levels livable.
+
+**Crazy version:** the whole Hollow breathes as one system, pulling cool air from the upper levels down to the hottest rooms.
+
+**How it solves it:**
+- **Input:** heat reports from residents ("room 31 °C, fan dead"), the vent and fan map of the sector (a graph), fan repair status, and who is at risk (elderly, infants, sick).
+- **Process:** two planners. (1) **Airflow:** a max-flow calculation on the vent graph decides which dampers to open and which fans to run, to send the most cool air to the rooms with the most at-risk people, within the power budget. (2) **Repairs:** schedules the repair crews to fix the fans that protect the most people per repair hour.
+- **Outcome:** a vent plan, a crew route, and "cool room" assignments (where at-risk people go during the hottest hours), with a heat-risk score based on real heat-stress limits (wet-bulb temperature).
+
+**Full demo (about 75 s):**
+1. A cross-section of Levels 6–10. The deep rooms are red.
+2. Residents report "fan dead in corridor 9-B" and "room 9-14 at 33 °C, baby inside".
+3. Press "Plan". Arrows show cool air routed from Level 6 to Level 9; three dampers open. Two crews get routes. The baby's household is moved to a cool room.
+4. The meter shows "people above the danger limit: 180 → 22".
+5. Mark one fan as repaired. The plan re-runs and frees a crew.
+6. Drop the power budget. The plan keeps the at-risk rooms cool and lets an empty storage tunnel warm up.
+
+**Hardware:** none. **Overlap:** none.
+**Risks:** airflow physics is simplified (a capacity graph, not fluid dynamics). Say so.
+**Scores:** W4 A5 F3 D4 C4
+
+---
+
+## P4. Snow: find the broken recycler from the first sick reports  ·  software only  ·  **23/25**
+
+**Problem:** water recyclers in the lower levels are breaking down, and the taps make people sick. Catch bad water before people drink it.
+
+**Name:** in 1854, John Snow mapped cholera cases in London and traced them to one water pump. Snow does that for the Hollow, in minutes.
+
+**How it solves it:**
+- **Input:** reports tied to a tap or room ("tap 14 smells like eggs", "two kids vomiting in 9-C", "water cloudy"), the pipe network (a directed graph from recyclers to taps), and the recycler service log.
+- **Process:** each report marks a tap. Snow walks the pipe graph **upstream** from every reporting tap and scores each recycler and pipe junction by how many reports sit downstream of it, against how many healthy taps also sit downstream (a likelihood score). The top suspect is the most likely failure point. A cluster test checks that the reports are more than chance.
+- **Outcome:** a "do not drink" alert to every household **downstream** of the suspect (and only them), a list of the nearest safe taps for each household, and a work order for the suspect recycler. When people report again after the repair, the alert clears.
+
+**Full demo (about 75 s):**
+1. The Level 9 pipe map: 3 recyclers, 40 taps, all blue.
+2. On phones, type 4 reports at 4 different taps that look unrelated on the map.
+3. Snow traces lines upstream. They meet at recycler R-2. "R-2 is the likely source (91%). 212 households are downstream."
+4. Press "Alert". Phones of downstream households show "Do not drink. Nearest safe tap: T-31, 2 min walk." A phone upstream gets nothing.
+5. A judge adds a report at a tap that is **not** downstream of R-2. Snow updates: "A second source is possible at junction J-6."
+6. Mark R-2 repaired. Two "water OK" reports clear the alert.
+
+**Hardware:** none. **Overlap:** none at GMU. The John Snow story is easy for judges.
+**Risks:** keep the pipe graph small and readable.
+**Scores:** W5 A5 F4 D5 C4
+
+---
+
+## P5. Floodline: see which neighborhood gets cut off before the water arrives  ·  software only  ·  **22/25**
+
+**Problem:** sewage backs up into the tunnels, and one flooded section can cut off a whole neighborhood. Keep the tunnels safe to live in and move through.
+
+**How it solves it:**
+- **Input:** reports of water or blockage at a junction ("sewage ankle-deep at J7"), the tunnel map with the height of each junction, and pump locations.
+- **Process:** water flows downhill on the tunnel graph. Floodline spreads the reported water to lower junctions over time, using the reported depth and the tunnel slope. It then checks, for each neighborhood, when its last dry route out is cut (graph connectivity over time).
+- **Outcome:** "Neighborhood Low Market will be cut off in about 3 hours. 400 people." It gives (1) a route out for people who must leave now, (2) a "move these supplies in first" list (medicine, food, water) for people who stay, (3) where to send the pumps to keep the main route open the longest, and (4) a live safe-route finder for anyone moving through the tunnels.
+
+**Full demo (about 75 s):**
+1. A tunnel map with heights shown as shading.
+2. Report "sewage ankle-deep at J7".
+3. Press "Project". Blue water spreads through the low tunnels on a time slider (+1 h, +2 h, +3 h). At +3 h, the Low Market neighborhood turns red: "cut off".
+4. Floodline gives the deadline, the evacuation route, and the supply list. Phones in Low Market get the alert.
+5. Drag a pump onto junction J9. The projection re-runs: the main route stays open 5 more hours.
+6. A judge asks for a route from A to B. The route goes around the water.
+
+**Hardware:** none. **Overlap:** Rescue Safe (crowdsourced evacuation, 2022) is related; the flood projection and "cut-off deadline" are new.
+**Scores:** W5 A4 F4 D5 C4
+
+---
+
+## P6. Swapline: room swaps and shared beds that give everyone more space  ·  software only  ·  **20/25**
+
+**Problem:** families are packed into rooms meant for one. Find or make more space, or help people share it.
+
+**How it solves it:** the space exists, but it is badly matched. A family of 5 has one room while a single worker on night shift has a room for 3 that is empty all day.
+- **Input:** each household enters its size, its room size, its shifts (when people sleep), and needs (accessible room, near a clinic).
+- **Process:** two matchers. (1) **Swap cycles:** find chains of room swaps (A → B → C → A) in which every household gets a better fit. This is the same math as kidney-exchange chains (cycle finding in a graph). (2) **Shift sharing:** match beds between people whose sleep hours do not overlap, so one bed serves two people safely, by consent.
+- **Outcome:** proposed swaps that every member of the chain must accept; a bed-sharing calendar; and a meter of "space per person" for the sector.
+
+**Full demo (about 75 s):**
+1. 30 households from the scenario pack on a floor plan. Overcrowded rooms are red.
+2. Three people join live and enter their household.
+3. Press "Find swaps". An animation shows a 4-way swap chain; each household in it moves to a better room. "Space per person +38%. Red rooms: 11 → 3."
+4. One household rejects the swap. Swapline finds a different chain without them.
+5. Show the shift calendar: two night-shift workers share a bed with a day-shift worker.
+
+**Hardware:** none. **Overlap:** none.
+**Risks:** "shared beds" can sound grim. Present it as optional and consent-based.
+**Scores:** W4 A5 F4 D4 C3
+
+---
+
+## P7. Lantern: messages that travel without the network  ·  software only  ·  **23/25**
+
+**Problem:** the Directorate can shut down the network. People must organize, share information, and call for help without it.
+
+**Why this one is real, not pretend:** in the demo we really turn the network off.
+
+**How it solves it:**
+- **Input:** messages typed by residents: help calls, notices, organizing plans.
+- **Process:** phones pass messages to nearby phones with no network, then those phones carry them further as people walk between levels ("store and carry"). Transports that work in a browser with no network: short sound chirps (the open-source `ggwave` library), and animated QR codes scanned by the camera. Every message is signed, so a fake message from the Directorate is rejected, and private messages are encrypted. Each message has a priority (help calls first) and a time limit.
+- **Outcome:** help calls reach a responder, and notices reach a whole level, with the network off.
+
+**Full demo (about 90 s):**
+1. Three phones and a laptop. Turn on airplane mode on all three phones on camera.
+2. Phone A (Level 9) writes "Medical help needed, room 9-14". It chirps to Phone B.
+3. Phone B "walks" across the room (Level 8) and chirps to Phone C (the Level 7 clinic). The help call appears at the clinic with its route: A → B → C, signed by A.
+4. The clinic replies "Runner on the way". The reply goes back the same way.
+5. A "Directorate" laptop sends a fake notice with A's name. Every phone rejects it: "Signature does not match."
+6. Turn Wi-Fi back on: everything syncs, with no duplicates.
+
+**Hardware:** none (phones and laptops). **Overlap:** none at GMU.
+**Risks:** sound range is about 1 m and needs a quiet room. Keep QR as a fallback. Browsers need HTTPS or localhost for the mic and camera.
+**Scores:** W5 A4 F4 D5 C5
+
+---
+
+## P8. Kin: know your family is safe during a blackout  ·  software only  ·  **21/25**
+
+**Problem:** when a blackout hits, families split across levels cannot tell if each other are OK. Reconnect them.
+
+**How it solves it:** uses Lantern's offline relay, plus **beacon stations**: a laptop or old phone at each stairwell that keeps the latest check-ins and passes them on whenever a phone comes near.
+- **Input:** one tap, "I'm OK" or "I need help", with an optional short note. Families register their members once.
+- **Process:** check-ins move phone → beacon → phone. Each family sees the newest status of each member. If a member has no check-in after a set time, Kin flags them to responders with their last known place.
+- **Outcome:** a family card: green (OK), red (needs help), grey (no news, with last known place and time). Responders get one list of everyone grey or red in their area.
+
+**Full demo (about 75 s):**
+1. A family of 4 on Levels 3, 6, 9, and 10 (four devices). The network is on; all cards are green.
+2. Press "Blackout" and turn off Wi-Fi on all devices.
+3. Each member taps "I'm OK". The check-ins chirp to the beacon laptop and on to the others. In about 30 s, Grandma's phone shows 3 green and 1 grey.
+4. Wait the set time. The grey member (Level 10) goes to the responder list with "last seen: stairwell 10-B, 14:02".
+5. That member taps "I need help". The card turns red and the responder sees it.
+
+**Hardware:** none. **Overlap:** Yap (finding people in rubble) is related.
+**Note:** Kin and Lantern share most code. Build them as one feature set.
+**Scores:** W4 A4 F4 D5 C4
+
+---
+
+## P9. Truthcount: the real outbreak, next to the official one  ·  software only  ·  **22/25**
+
+**Problem:** lung sickness is spreading, and the Directorate's numbers do not match what people see. Track the real outbreak and get supplies where they are needed.
+
+**How it solves it:**
+- **Input:** anonymous symptom reports from residents (cough, fever, short of breath, how many in the household), clinic visit counts, and the Directorate's official count. Each report is signed by a device key, so one person cannot flood the system, but the person stays anonymous.
+- **Process:** (1) remove duplicates and bot floods; (2) estimate the real number of cases, correcting for people who do not report (a nowcast); (3) find hotspots by sector; (4) project the next 7 days.
+- **Outcome:** two curves (official and estimated), a hotspot map, and an **allocation plan** for masks, oxygen, and medicine that sends them to the hotspots. Proof of method: the same model run on real CDC flu data (ILINet), labeled as a test.
+
+**Full demo (about 90 s):**
+1. Two curves: "Official: 310 cases" and "Truthcount estimate: 1,240 (range 980–1,500)". They split apart on day 6.
+2. Three people submit symptom reports on phones. The estimate and the hotspot map update.
+3. A "bot" script sends 200 fake reports from one device. Truthcount drops them: "200 reports from one key ignored."
+4. Press "Allocate 500 masks and 40 oxygen units". The plan sends 70% to Levels 9–10. Compare with the Directorate's plan (even split by population).
+5. Switch to "Method check": the same model on a real US flu season catches the rise about one week before the official peak (from the real data; we must measure this number).
+
+**Hardware:** none. **Overlap:** Inquire (early detection) is related.
+**Risks:** the estimate needs a clear, simple method; do not overclaim.
+**Scores:** W4 A5 F4 D5 C4
+
+---
+
+## P10. Runner: basic care, delivered levels away  ·  software only  ·  **20/25**
+
+**Problem:** medicine runs out in the deep levels first, and the clinic can be levels away. Get basic care to people who cannot reach it.
+
+**How it solves it:**
+- **Input:** a symptom check by a resident or a neighbor (a fixed question tree based on a real triage protocol for low-resource care, not a chatbot), clinic stock lists, and volunteer runners.
+- **Process:** triage gives a level: "self-care", "needs medicine within 12 h", or "go now". For medicine, Runner finds the nearest clinic with stock, asks a clinician to approve (store and forward, works with Lantern when the network is down), and assigns the nearest free runner with a route that avoids floods.
+- **Outcome:** the patient gets care steps right away and a delivery time; the runner gets a pickup QR; the clinic stock updates; and the stock map shows where medicine is running low, before it runs out.
+
+**Full demo (about 75 s):**
+1. A neighbor answers the triage questions for a child on Level 10: fever, fast breathing.
+2. Result: "Needs medicine within 12 hours. Go now if lips turn blue." Care steps appear.
+3. Runner finds stock 2 levels up. A clinician approves on another screen.
+4. A runner phone gets the job, the route, and a QR. The runner scans it at the clinic; stock goes down by one.
+5. The stock map shows Level 10 low on antibiotics: "Runs out in 2 days. Move 30 doses from Level 5."
+
+**Hardware:** none. **Overlap:** CarePilot (triage kiosk, Feb 2026) won. Runner must lead with delivery and stock, not triage.
+**Risks:** must not look like a medical chatbot. Use a fixed, published protocol.
+**Scores:** W3 A5 F4 D4 C4
+
+---
+
+## P11. Dawnline: a shared sunrise for people who never see the sun  ·  software only  ·  **17/25**
+
+**Problem:** no sunlight changes sleep, mood, and the body, and nobody measures it. Track and treat it.
+
+**How it solves it:**
+- **Input:** a 20-second daily check-in (sleep times, mood with the 2-question PHQ-2, energy) and the lamp schedule of the level.
+- **Process:** finds people whose sleep is drifting later each day (body clock drift) and whose mood is falling. Plans the level's light schedule as an artificial day: bright, blue-rich light in the morning, warm and dim at night, inside the power budget. Books scarce full-spectrum lamp sessions for the people who need them most.
+- **Outcome:** a personal light and sleep plan, a lamp booking, and a level report (how many people are drifting), so the Directorate cannot say "nobody measures it".
+
+**Full demo (about 60 s):**
+1. A resident's 14 days of check-ins: sleep moves 25 minutes later each day; mood falls.
+2. Dawnline flags "body clock drift" and books a lamp session at 07:00 for the next 5 days.
+3. The level view shows the planned "sunrise" (lamp color and brightness over 24 h) and the power it uses.
+4. Cut the power budget. The plan keeps the morning light and cuts evening light first.
+
+**Hardware:** none. **Overlap:** none, but the wow is low.
+**Scores:** W2 A4 F4 D4 C3
+
+---
+
+## P12. Larder: how many days of food a cut-off neighborhood has, and how to make it more  ·  software only  ·  **22/25**
+
+**Problem:** if the central farms cut off a neighborhood, it has days of food left. Help it grow and share its own food.
+
+**How it solves it:**
+- **Input:** pantry reports from households (a quick form: items and amounts), the space, water, and power the neighborhood has, and a crop table with real data (yield, days to harvest, light need, water need, calories). Crops that need no light, such as mushrooms, and fast crops, such as microgreens and potatoes, matter most.
+- **Process:** (1) a **food runway**: total calories and nutrients divided by need, in days; (2) a grow plan by linear programming: what to plant where, to get the most calories and cover nutrients within the power, water, and space; (3) a fair share plan for the pantry stock until the harvest.
+- **Outcome:** a runway number that grows, a planting plan per room or tunnel, a harvest calendar, and a sharing schedule.
+
+**Full demo (about 75 s):**
+1. Press "Central farm cut off". Runway: **4.2 days** in red.
+2. Three households submit pantry reports on phones. Runway: 5.1 days.
+3. Press "Plan". Larder plants mushrooms in a dark side tunnel, microgreens under two lamps, and potatoes in a storage room. With sharing and the first harvests, runway: **23 days**.
+4. Cut the power by half. The plan moves more space to mushrooms. Runway: 19 days.
+5. The harvest calendar shows the day each crop is ready.
+
+**Hardware:** none. **Overlap:** none.
+**Scores:** W4 A5 F4 D5 C4
+
+---
+
+## P13. Witness: surface readings no one can fake, and an answer everyone can check  ·  software only  ·  **21/25**
+
+**Problem:** many think the surface has healed; the Directorate says the air would kill you. Prove whether it is safe and get the true answer to everyone.
+
+**How it solves it:** the question is not only "is it safe" but "whom do you trust". Witness makes the data impossible to change in secret and the verdict easy to check.
+- **Input:** a probe log from the scenario pack (air gases, particles, radiation, temperature, with time and place) and any probe photos.
+- **Process:** (1) each reading is signed by the probe's key and chained by hash, so changing one reading breaks the chain; (2) copies go to many independent devices (residents' phones via Lantern), so the Directorate cannot delete them; (3) a verdict engine compares the readings with **real** human safety limits (WHO and OSHA limits for CO, CO2, O2, particles, radiation dose) and gives a plain answer per activity.
+- **Outcome:** "Safe for 4 hours in a suit. Not safe to live unprotected (particles 6× the limit)." Anyone can press "Verify" and check every reading and every limit.
+
+**Full demo (about 75 s):**
+1. Load the probe log. 300 readings appear on a chart, each with a green "signed" mark.
+2. The verdict: per activity (no suit / mask / suit / sealed dome), with the limit each one fails.
+3. A "Directorate" user edits one particle reading to look worse. Every copy shows red: "Reading #214 was changed after signing."
+4. Send the verdict over Lantern with Wi-Fi off. It arrives on another phone with its proof.
+
+**Hardware:** none. **Overlap:** none.
+**Risks:** the surface readings are fictional; the limits and the proof are real. Say so.
+**Scores:** W4 A4 F4 D5 C4
+
+---
+
+## P14. Vanguard: which way up, and who goes first  ·  software only  ·  **20/25**
+
+**Problem:** the first people up will need suits, domes, or sealed outposts. Decide which option works and who should try first.
+
+**How it solves it:**
+- **Input:** surface conditions (from Witness), the options with their numbers (cost, build time, how long they protect, failure rate), and a list of volunteers (health, skills, dependents, consent).
+- **Process:** a Monte Carlo simulation runs each option thousands of times with random failures (suit breach, storm, machine encounter, supply delay) and gives the chance of success and the expected cost. A crew picker chooses a team that covers the needed skills (medic, engineer, pilot) with the lowest total risk, and leaves out people with young children unless they opt in.
+- **Outcome:** a ranked option with its numbers, a crew with the reason for each pick, and what would change the answer.
+
+**Full demo (about 75 s):**
+1. Enter surface conditions. Press "Run 10,000 missions". Three bars fill: suits 61%, domes 84%, outposts 92% success over 30 days.
+2. Raise radiation. The answer flips: domes are best, because outposts take too long to build.
+3. Press "Pick crew". 12 volunteers chosen from 200, with skills covered. One volunteer withdraws; the crew updates.
+
+**Hardware:** none. **Overlap:** none.
+**Scores:** W4 A4 F4 D4 C4
+
+---
+
+## P15. Exodus: plan the move of hundreds of millions back up  ·  software only  ·  **21/25**
+
+**Problem:** if the surface is safe, hundreds of millions will want to go up. Plan the move.
+
+**How it solves it:**
+- **Input:** the shafts and lifts with their capacity, the surface sites with build rates, food and water capacity, and the population by level with priority rules (for example: the deep levels and the sick first, families kept together).
+- **Process:** a flow-over-time model (max flow on a time-expanded graph): people move from levels through shafts to sites, each step limited by capacity and by how fast sites are built. It finds the bottleneck at each stage.
+- **Outcome:** the full timeline ("everyone up in 7.3 years"), the bottleneck ("shaft 3 lifts"), what each investment saves ("one more lift in shaft 3 saves 11 months"), and a ticket for each family with its wave and date.
+
+**Full demo (about 75 s):**
+1. A cross-section of the Hollow and the surface. Press "Plan". Dots flow up the shafts in waves. "All 2 billion up in 9.1 years."
+2. The bottleneck turns red: "Shaft 3 lifts limit 41% of the plan."
+3. Add one lift to shaft 3. Re-run: "7.3 years".
+4. Change the rule to "deep levels first". The timeline changes, and Level 10 moves from year 6 to year 1.
+5. A judge enters a family: they get a wave, a date, and a site.
+
+**Hardware:** none. **Overlap:** none.
+**Risks:** a scale demo, not a daily tool. Keep it interactive with the sliders and the family ticket.
+**Scores:** W4 A4 F4 D4 C5
+
+---
+
+## Ranking (round 15)
+
+| Rank | Problem | Idea | 30-second moment | W | A | F | D | C | **/25** |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | 4 | **Snow** | Four unrelated reports trace upstream to one broken recycler | 5 | 5 | 4 | 5 | 4 | **23** |
+| 2 | 7 | **Lantern** | Airplane mode on; a help call hops phone to phone and a fake notice is rejected | 5 | 4 | 4 | 5 | 5 | **23** |
+| 3 | 5 | Floodline | Water spreads on a time slider; a neighborhood turns red: "cut off in 3 h" | 5 | 4 | 4 | 5 | 4 | 22 |
+| 4 | 2 | Fair Share | Supply to 60%; deep levels stop losing; "Verify" catches a changed plan | 4 | 5 | 4 | 5 | 4 | 22 |
+| 5 | 12 | Larder | Food runway 4.2 days → 23 days | 4 | 5 | 4 | 5 | 4 | 22 |
+| 6 | 9 | Truthcount | Official 310 vs real 1,240; a bot flood is ignored | 4 | 5 | 4 | 5 | 4 | 22 |
+| 7 | 8 | Kin | Network off; Grandma's phone shows 3 green, 1 grey | 4 | 4 | 4 | 5 | 4 | 21 |
+| 8 | 13 | Witness | One changed reading turns every copy red | 4 | 4 | 4 | 5 | 4 | 21 |
+| 9 | 15 | Exodus | "One more lift saves 11 months" | 4 | 4 | 4 | 4 | 5 | 21 |
+| 10 | 1 | Flicker | Reports → countdown → the hidden future plays and the outage hits on time | 4 | 4 | 4 | 4 | 4 | 20 |
+| 11 | 3 | Draft | Cool air routed down to the baby's room | 4 | 5 | 3 | 4 | 4 | 20 |
+| 12 | 6 | Swapline | A 4-way room swap chain, +38% space | 4 | 5 | 4 | 4 | 3 | 20 |
+| 13 | 10 | Runner | Triage → clinician approves → runner gets the QR | 3 | 5 | 4 | 4 | 4 | 20 |
+| 14 | 14 | Vanguard | 10,000 missions; the answer flips when radiation rises | 4 | 4 | 4 | 4 | 4 | 20 |
+| 15 | 11 | Dawnline | Body-clock drift flagged, lamp booked | 2 | 4 | 4 | 4 | 3 | 17 |
+
+Ties are broken by Wow.
+
+**Natural groups for combining later:**
+- **Infrastructure (one sector graph):** Flicker (1), Fair Share (2), Draft (3), Snow (4), Floodline (5). All are "report → locate on a graph → act".
+- **People and health:** Truthcount (9), Runner (10), Dawnline (11), Larder (12), Swapline (6).
+- **Communication:** Lantern (7) and Kin (8). This is the delivery layer for all the others.
+- **The way back:** Witness (13) → Vanguard (14) → Exodus (15). One chain.
+
+---
+
+# Round 14 (Adarsh, Tue Nov 17, 5 PM): the Hollow
+
+**Why a new round:** the organizers' doc gives a specific world, "Life underground" (see `context/hollow-brief.md`), with 15 problems. Rounds 1–13 do not fit it. Adarsh's criteria for this round:
+
+1. A clear wow for the judges.
+2. Solves most of the 15 problems, ideally with one connected system.
+3. An **active** product: it takes input, processes it, and gives a useful outcome, with the user in the loop. Not a passive dashboard.
+4. Helps residents survive and thrive, and/or makes the Directorate efficient, and/or helps people return to the surface.
+5. Can be shown in a short video, prepared in time, and shown again easily.
+
+**Scores (round 14, /25):** W = Wow, P = Problems covered (5 = 10 or more of 15, 4 = 7–9, 3 = 4–6, 2 = 2–3, 1 = one), A = Active loop (input → process → outcome), F = Feasible by Thu night, D = Demo-able live and again on demand.
+
+## How to build for a world that does not exist
+
+The problems are fictional, but the product must be real. Use this pattern:
+
+1. **Split the world from the product.** The *world* is a simulation of a Hollow sector (a "digital twin"): levels, power feeders, heat, water quality, people. The *product* is real software that reads data, decides, and acts. The product sees data only through one interface. It does not know whether the data comes from the simulation or from a real sensor.
+2. **Use real stand-ins for fictional signals.** A laptop that stops charging is a real power cut. A real cough into a real microphone is a real cough. A real water test strip in front of a real camera is a real water test. A fan that slows down sounds different. So the inputs in the demo are real, even though the Hollow is not.
+3. **Do not script the outcome.** The simulation is a model with rules (load, capacity, heat, spread), not a recording. It uses a seeded random number generator: the same seed gives the same run for a clean re-demo, and a new seed gives a new run. A "chaos panel" lets anyone (a judge, too) break a plant, a recycler, or the network at any moment, and the product must respond on its own.
+4. **Prove the methods on real data where you can.** For example, run the outbreak detector on public CDC flu-like-illness data (ILINet) and show that it would have flagged a real season early. This tells judges the logic is not tuned to a story.
+5. **Show the outcome as a number that changes.** For example: "without the product, 340 people lose power with no warning; with it, they get 6 minutes of warning." The simulation computes both runs from the same seed.
+
+So the answer to "do we give it the problems?" is: **no. We give it a world that produces the problems, and it finds and handles them by itself.** We give it data (from the twin and from real phones). The results are warnings, decisions, routes, and messages, and the twin then reacts to them.
+
+---
+
+## H1. Canary: every resident's phone becomes a sensor the Directorate cannot fake  ·  software (optional props)  ·  **22/25**
+
+**Name:** miners carried canaries to detect bad air before people felt it. The Hollow is in old mines.
+
+**Crazy version:** 2 billion phones form a living nervous system of the Hollow. It senses every blackout, bad tap, failing fan, and cough, predicts what happens next, and spreads warnings phone to phone by sound when the Directorate cuts the network.
+
+**Buildable version:** a phone web app (no install, join by QR code) plus a "Hollow map" console.
+- **Inputs (real phone sensors as stand-ins):**
+  - Power: the Battery Status API reports when a plugged-in device stops charging. Many devices in one sector that stop charging at once = a power cut.
+  - Light exposure: average camera brightness over the day (problem 11, life without sunlight).
+  - Fans and air: the microphone hears the cooling fan; a spectrum change against its baseline = a fan slowing or failing (problem 3).
+  - Lung sickness: an on-device sound classifier (YAMNet in TensorFlow.js has a "Cough" class) counts coughs, as numbers only. No audio leaves the phone (problem 9).
+  - Water: hold a real water test strip up to the camera; the app reads the pad colors against the chart and flags unsafe water (problem 4).
+  - Reports: one-tap reports for flooding, heat, a sick person, "I am OK" (problems 5, 8, 10).
+- **Processing:** a fusion service places every reading on the twin's map of levels and sectors. A cascade model on the power feeder graph predicts which feeder fails next when load moves to it (problem 1). Heat and fan data predict when a level becomes unsafe (problem 3). Cough counts and reports build an outbreak curve that is compared to the Directorate's "official" curve (problem 9).
+- **Outcomes (the active part):**
+  - Warnings to the exact sectors at risk, with a time estimate ("Level 9, sector C: power loss likely in about 6 minutes. Charge lamps now.").
+  - Routes around flooded tunnels and to the nearest working clinic or supply point (problems 5, 10).
+  - Supply requests sent to where the real outbreak is, not where the official numbers say (problem 9).
+  - **Offline relay:** when the network is "shut down", warnings and "I am OK" check-ins travel phone to phone as short sound chirps (data over sound; the open-source `ggwave` library runs in the browser). Families across levels see each other's status (problems 7, 8).
+  - Tamper-evident record: each reading is signed on the device and hash-chained, so anyone can prove the numbers were not changed later (supports problems 9 and 13).
+
+**Winning demo (30 s):** three laptops and two phones join "Level 9". The map shows them as live dots. A teammate **unplugs two chargers**: the sector goes dark on the map, and Canary predicts "Level 8 feeder overloads in about 5 minutes" and pushes a warning. Then we **turn off Wi-Fi** on one phone: the laptop chirps, and the phone shows the warning and a family check-in with no network. Last, a real **test strip dipped in tap water with a drop of vinegar** turns that tap red on the map.
+
+**How it works:** TypeScript web app (PWA). Simulation and fusion service in Node or Python. WebSockets for live updates. TensorFlow.js YAMNet for coughs, Web Audio FFT for fan sound, `ggwave` (WASM) for chirps, Web Crypto for signatures. Cascade forecaster: a feeder graph with capacities; when a feeder trips, its load moves to its neighbors; time-to-trip comes from the load trend (a good CP task).
+
+**Hardware (gate):** passes. Phones and laptops the team owns. Optional props: water test strips (CVS, Walmart, or Amazon, about $10–15, available today) and a small USB or desk fan. Every input also has a simulated feed, so remote members can build against the twin with no props.
+
+**Overlap with past winners:** Rescue Safe (crowdsourced evacuation) and GeoGuard are related. Canary is sharper: real phone sensors, a forecast, and an offline relay in one loop.
+
+**Risks / Ethics:** opt-in, anonymous by sector; only counts leave the phone. Risks: the Battery Status API works in Chrome (desktop and Android), not in iOS Safari, so demo with Chrome devices. Mic and camera need HTTPS or localhost. `ggwave` range is about 1 m, which is fine on camera. Scope risk: many inputs, so the minimum version is power + chirps + one more input.
+
+**Problems covered:** 1, 3, 4, 5, 7, 8, 9, 10, 11, part of 13 (10 of 15).
+
+**Scores:** W5 P5 A5 F3 D4
+
+---
+
+## H2. Fair Share: the rationing plan the deep levels can check  ·  software only  ·  **21/25**
+
+**Crazy version:** an AI council that runs every plant, recycler, and farm in the Hollow, and that no one has to trust, because every decision can be checked.
+
+**Buildable version:** a Directorate console on the twin. When supply drops (a plant fails, a recycler breaks, a farm is cut off), an optimizer makes a new plan for power, water, food, and cooling. It uses fairness rules that residents can see (for example: medical needs first, a minimum for every person, no level dark for more than N hours, rotate the cuts). It shows the current Directorate plan next to the fair plan, with the result of each in the simulation: heat-hours above the safe limit, people without water, missed medicine. Residents can open a public page that proves their share was computed by the published rules (a hash of the inputs and the plan).
+
+**Winning demo (30 s):** a 3D slice of a city with 8 stacked levels, lit by power. Press "Plant 2 at 40%". The Directorate's default plan darkens levels 6–8 for 3 days, and the deep levels turn red for heat. Press "Fair Share": the cuts rotate, every level keeps a minimum, and the score says "heat-danger hours: 2,140 → 310". Drag a rule ("hospitals always on") and the plan updates in under a second.
+
+**How it works:** simulation in TypeScript or Python. Optimizer: linear programming with fairness constraints (max-min fairness) and a rotating-cut schedule (a strong CP and algorithms task). 3D view with Three.js, or a clean 2D cross-section.
+
+**Hardware (gate):** none.
+
+**Overlap with past winners:** GeoGuard (resource allocation) won at GMU in Feb 2026. Fair Share needs the "check it yourself" angle to stand apart.
+
+**Risks / Ethics:** it can look like a passive dashboard unless the user changes rules and sees results. Simulated data only; no real input.
+
+**Problems covered:** 1, 2, 3, 5, 6, 12 (6 of 15). It streamlines the Directorate.
+
+**Scores:** W4 P3 A5 F4 D5
+
+---
+
+## H3. Undergrid: Canary + Fair Share on one twin (two views)  ·  software (optional props)  ·  **21/25**
+
+**Idea:** residents' phones (Canary) send ground truth up. The Directorate console (Fair Share) plans with that truth instead of its own numbers. One twin, two screens: "the people" and "the Directorate".
+
+**Winning demo (45 s):** the Canary demo above, then the console: the real outbreak and the real outage feed the optimizer, which sends masks and power to the right level, and the residents' phones get the new plan.
+
+**Problems covered:** 1–12 and part of 13 (12 of 15).
+
+**Risks:** about twice the work of H1. Add the Fair Share view only if H1's minimum version works by Wed night.
+
+**Scores:** W5 P5 A5 F2 D4
+
+---
+
+## H4. First Light: prove the surface is safe, then plan the way back  ·  software (optional sensor)  ·  **19/25**
+
+**Crazy version:** a probe goes up the old shaft, sends readings that no one can fake, and the Hollow votes on who goes first.
+
+**Buildable version:** three steps.
+1. **Proof (problem 13):** readings from a "surface probe" are signed on the device and posted to a public, hash-chained log. Anyone can check that the Directorate did not change them. A "tamper" button shows a changed reading being caught.
+2. **First wave (problem 14):** a trial simulator compares suits, domes, and sealed outposts on the probe's readings (air, radiation, temperature, machine activity) and picks volunteers by health and skill, with the risk shown.
+3. **The move (problem 15):** a scheduler moves people in waves through the shafts, with limits on lift capacity, outpost beds, and food.
+
+**Winning demo (30 s):** a phone acts as the probe and sends signed readings. A teammate edits one number in the database: the public page turns red, "Reading #214 was changed after signing." Then press "Plan wave 1": 1,200 volunteers, 3 outposts, 14 days, shown as a timeline.
+
+**Hardware (gate):** an air-quality sensor would not arrive by Tue night, so a phone acts as the probe.
+
+**Overlap with past winners:** none found.
+
+**Risks:** the surface data is fictional, so the proof step is about trust in data, not about the air itself. It covers only the bonus path.
+
+**Scores:** W4 P3 A4 F4 D4
+
+---
+
+## H5. Lantern: messages without the network  ·  software only  ·  **19/25**  ·  fold into H1
+
+Phone-to-phone messages by sound chirps, with store-and-forward relay across levels, family check-ins, and help calls. A strong live moment (Wi-Fi off, the message still arrives), but it covers only problems 7, 8, and part of 1 and 9. It is the "offline relay" part of Canary.
+
+**Scores:** W4 P2 A4 F4 D5
+
+---
+
+## H6. Deep Clinic: care for people who cannot reach a clinic  ·  software only  ·  **16/25**
+
+Offline triage on the phone, medicine stock across clinics, and a runner route to deliver it (problems 9, 10, 11). It is close to "AI assistant for X", which rarely places at GMU.
+
+**Scores:** W2 P2 A4 F4 D4
+
+---
+
+## Ranking (round 14)
+
+| Rank | Idea | Problems | W | P | A | F | D | **/25** |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | **H1. Canary** | 1, 3, 4, 5, 7, 8, 9, 10, 11, (13) | 5 | 5 | 5 | 3 | 4 | **22** |
+| 2 | H3. Undergrid (H1 + H2) | 1–12, (13) | 5 | 5 | 5 | 2 | 4 | 21 |
+| 3 | H2. Fair Share | 1, 2, 3, 5, 6, 12 | 4 | 3 | 5 | 4 | 5 | 21 |
+| 4 | H4. First Light | 13, 14, 15 | 4 | 3 | 4 | 4 | 4 | 19 |
+| 5 | H5. Lantern (fold into H1) | 7, 8, (1), (9) | 4 | 2 | 4 | 4 | 5 | 19 |
+| 6 | H6. Deep Clinic | 9, 10, 11 | 2 | 2 | 4 | 4 | 4 | 16 |
+
+Ties are broken by Wow.
+
 
 ---
 
@@ -624,7 +1174,7 @@ It is already new (no consumer defense against LLM authorship attribution), but 
 
 ---
 
-# Round 14 (Tue Nov 17): the Hollow brief, in depth
+# Round 14 (Neil, Tue Nov 17): the Hollow brief, in depth
 
 Rules for this round (Neil): compare with Canary (`ideation/hollow-pivot.md`, 23/25), and go deep on 2–3 ideas that combine with recent research for a big wow factor, rather than going for breadth. Scores are /25, the same as in the pivot doc: W = Wow, C = Cover (Hollow problems addressed directly, `context/track.md`), F = Feasible by Fri 6 pm, R = Real-world impact, V = shows well on Video.
 
