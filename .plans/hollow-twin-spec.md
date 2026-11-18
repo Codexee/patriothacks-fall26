@@ -1,214 +1,219 @@
 # Hollow Twin — Master Spec
-Status: draft   ·   Last updated: 2026-11-17   ·   Owner: Neil (workstreams chosen at the team sync)
+Status: locked (v2)   ·   Last updated: 2026-11-18   ·   Owner: Neil
+
+v2 replaces v1 (Nov 17). v1 described 4 checkbox tools. v2 follows the product design on `prototype/hollow-twin-product` (Adarsh) and adds a real-world impact act and a visual effects pass. The evaluation behind v2 is in `.plans/hollow-twin-evaluation.md`.
 
 ## One-liner
-A pixel-art cutaway of the Hollow that you scroll through, with 50 levels and 8 sections per level. It runs real-world datasets and published models (power, air, heat, water, disease, food, medicine, crowding) as the Hollow. It shows how the Directorate's decisions and lies decide the Hollow's fate, and it challenges players to keep the Hollow alive longer with 4 resident tools. It then measures which tool made the difference.
+Hollow Twin is a residents' system: 9 software modules that read only what residents can know (meter readings, reports, official bulletins) and send alerts, power plans and findings. We prove the modules on real disasters on Earth (Texas 2021, Flint 2015, Wuhan 2020), then run them in the Hollow, a pixel-art city of 2 billion people under a Directorate that lies.
 
 ## The winning demo (30-second scene)
-1. Scroll down the cutaway, from the ruins on the surface to Level 50. A fixed panel shows the day, the population, the Directorate bulletin ("All levels nominal"), and the measured truth next to it.
-2. Load the **Texas, Feb 2021** scenario pack. Hover over Plant 3: "Supply curve: ERCOT hourly data (EIA-930), Feb 10–20, 2021, rescaled to the Hollow." Press **Next day**. Each day plays as a 3–5 s time-lapse. The plants trip, the deep sections go dark tile by tile, and the CO₂ and heat overlays rise. The Directorate's run ends on **Day 19: Hollow lost**.
-3. Turn on the tools and play the same seed. The Early Warning flags the cascade 40 hours early. Fair Share spreads the cuts. The Ledger exposes "Plant 3 is fine" as a lie, so residents act 2 weeks earlier. The run reaches **Day 71: Stable Hollow**.
-4. The attribution panel shows each tool's share, for example "Ledger +24 days · Fair Share +17 · Early Warning +9 · Layout +2."
-5. The auto-summary appears: "The lie about Plant 3 cost the most. Fair Share saved Levels 44–50." The leaderboard shows the player's run above the rival algorithm.
+1. **Earth (0–10 s).** A real map of Texas. The counties go dark hour by hour, Feb 14–18, 2021, from real outage data. A counter shows customers without power. A marker appears: "ERCOT emergency order, Feb 15, 1:25 am."
+2. **The claim (10–15 s).** Our Early Warning module, which ran on the real EIA-930 hourly data, shows its alert line: "Warned N hours before the order." (N is the measured result of the backtest.)
+3. **The turn (15–20 s).** "Now imagine a world where this never stops." The camera falls through the surface into the Hollow cutaway. The Texas map stays on the left, on the same clock.
+4. **The Hollow (20–30 s).** Plant 3 sparks and trips. The lights die tile by tile toward the deep levels. The Directorate's bulletin says "Plant 3 is operating normally." The Ledger exposes the lie: the line glitches and is struck out, and a wave of light spreads down the levels as the residents act. The counter shows "lives saved" climbing.
 
-Line for the judges: *"Same plants, same failures. Different decisions."*
+Line for the judges: *"Same failures. Different decisions. Tested on Earth first."*
 
 ## Problem, user, and why now
-- **The problem:** in the Hollow, as on Earth, deaths in a crisis depend on decisions and on the truth: who loses power first, and how long officials hide the data. Real cases:
-  - **Texas, Feb 2021:** about 70% of ERCOT customers lost power. The official death count is 246; estimates go up to 702.
-  - **Chicago, 1995:** the deaths in the heat wave clustered in poor, isolated areas.
-  - **Flint, 2014–15:** officials said the water was safe.
-  - **Wuhan, 2020:** Lai et al. (Nature, 2020) estimate that acting 1, 2 or 3 weeks earlier would have cut cases by 66%, 86% and 95%.
-- **The user:**
-  - judges and players, who try to keep the Hollow alive
-  - in the story, the residents' council, which uses the tools against the Directorate
-- **Why it's credible:** every system runs on a published model or a real dataset, and hovering shows the source.
+- **The problem:** in a crisis, deaths depend on two things: who loses service first, and how long officials hide the data. Real cases:
+  - **Texas, Feb 2021:** peak load shed was about 20,000 MW. About 4.3 million customers lost power. The official death count is 246.
+  - **Flint, 2015:** citizen samples (Virginia Tech, Aug 20–Sep 10, 2015) showed a 90th percentile of 26.8 ppb lead, against the 15 ppb action level. The state admitted the problem in early Oct 2015.
+  - **Wuhan, Jan 2020:** the official count was 41 cases on Jan 16. Imperial College estimated 1,723 cases (95% CI 427–4,471) with onset by Jan 12.
+- **The user:** the residents' council in the story; on Earth, a community group or local emergency office that has public data but not the operator's internal data.
+- **Why it is credible:** the modules run unchanged on real public data, and every number on screen links to its source.
 
 ## Track fit (Life underground: which of the 15 Hollow problems it covers, by number)
-**Problems 1, 2, 3, 4, 5, 6, 9, 10, 11, 12** (and 13–14 through the "Stable Hollow" ending). Problem 7 (network shutdown) is a possible later rare event. One connected system covers 10 of the 15 problems.
+Working modules for **1, 2, 3, 4, 7, 8, 9, 12, 13** (9 of 15). Problems 5, 6, 10, 11, 14 and 15 are named in the pitch as next steps, with designs in `ideation/projects-1-15.md`.
 
 ## Scope
 ### Must ship (demo path)
-1. **Simulation engine** (TypeScript, deterministic, seeded):
-   - 50 levels × 8 sections = 400 sections. One tick is 1 hour; one day is 24 ticks.
-   - It runs in a Web Worker, so the page doesn't freeze.
-   - Same seed + same moves = same result.
-2. **Systems and models** (each has a source shown on hover):
+1. **The product modules** (already on `prototype/hollow-twin-product`): Early Warning (1), Fair Share (2), Ledger + Truthcount (9), Snow (4), Lantern (7), Kin (8), Layout (3), Larder (12), Witness (13). Each reads only observations.
+2. **The test world (sim):** the Hollow keeps the hidden truth, makes noisy observations, and applies the modules' outputs.
+   - **8 sample districts.** Each district has its own seed, plant ages and plant mix. Each district stands for 156 similar districts, so the 8 together stand for 1,250 districts of 1.6 million people (2 billion in all). The hover says so.
+   - Target: one run of 8 districts in under 150 ms.
+3. **The Directorate as an agent with goals.** It chooses its policies to maximize 3 goals: order (no riots), output of the upper levels, and its own trust. Each choice (a lie, the power order, a network cut, the farm diversion) records its motive, its short-term gain and its cost. Example: "Cut the network 48 h. Why: stop riots after the Plant 3 finding. Gain: 0 riots for 2 days. Cost: 40,000 people missed the heat alert."
+4. **Score: lives first.** Score = lives saved against the no-module run of the same seed, then fairness, then days. A run with more deaths must never score higher.
+5. **Earth act (real-world impact).** The same module code runs on real data. The results show on screen in the opening of the video and on an "On Earth" view:
 
-   | System | Model | Problem |
-   | --- | --- | --- |
-   | **Power** | Plant capacity that ages; demand per section; overload trips push load onto other plants (simplified cascading failure) | 1, 2 |
-   | **Air** | CO₂ balance per section; fans need power | 1 |
-   | **Lung sickness** | Wells–Riley with the Rudnick–Milton CO₂ method (rebreathed fraction), plus a crowding factor | 9 |
-   | **Heat** | Geothermal gradient + body heat − cooling; stress limit at a wet-bulb temperature of 31 °C (Vecellio et al., 2022) | 3 |
-   | **Water** | Recycler capacity, aging and contamination, leading to waterborne illness | 4 |
-   | **Food** | Farm output depends on lamp power; each section has days of reserve | 12 |
-   | **Medicine** | Clinic stock and reach, measured in levels | 10 |
-   | **Crowding and movement** | People per room; the Directorate controls the lifts between levels | 6 |
-   | **Sewage** | Pumps need power; a flooded section cuts off the sections next to it | 5 |
-   | **Darkness** | Hours without light raise the sickness rate | 11 |
-   | **Aging parts** | Spare parts and maintenance crews are limited | — |
+   | Backtest | Module | Real data | Output on screen |
+   | --- | --- | --- | --- |
+   | Texas 2021 | Early Warning | EIA-930 ERCOT hourly demand, day-ahead forecast, net generation and generation by fuel, Feb 8–22, 2021 | Hours of warning before the EEA3 order (Feb 15, 1:25 am CST) |
+   | Texas 2021 | Fair Share | EIA-930 + county outages (4TU, 3-hour, by county) | Longest outage per county: real rotation against our rotation plan |
+   | Flint 2015 | Snow | Virginia Tech 271 samples (ZIP, ward, 3 draws) | Wards flagged above 15 ppb, and the date the data supported a warning against the state's admission |
+   | Wuhan 2020 | Truthcount | JHU CSSE Hubei counts from Jan 22; official 59 (Jan 5) and 41 (Jan 11–16); Imperial 1,723 | Estimated true cases against the official count, by day |
 
-3. **The Directorate:**
-   - Its policies (for example "upper levels first") and its **lies** ("hide the outbreak", "water is safe", "Plant 3 is fine") are part of each scenario.
-   - A lie **delays the residents' response**, calibrated to Lai et al.'s delay curve.
-   - When the truth comes out, **trust falls**, and fewer residents follow alerts.
-   - The panel shows each lie next to the truth.
-4. **4 resident tools.** Each tool costs crews or power, so every combination involves a trade-off:
-   - **Early Warning (problems 1, 3):** forecasts failures from measured signals.
-   - **Fair Share (problems 2, 3, 12):** an allocation optimizer that aims to make the worst-off section as well off as possible (max-min fairness).
-   - **Ledger (problems 9, 13):** residents' own measurements, published. It removes the delay caused by a lie.
-   - **Layout planner (problems 3, 6):** move or build fans, pumps, farms, clinics and recyclers, within the parts and crews available.
-5. **Turns:**
-   1. The player makes the day's choices: allocation, which tools are on, layout changes, and lift access.
-   2. The player presses **Next day**, and the day plays as a 3–5 s time-lapse.
-   3. The run ends at **"Hollow lost"**: more than half of the population is lost, or 10 levels are fully lost.
-   4. It also ends at **"Stable Hollow"** (equilibrium): 14 days in a row with the power margin at 0 or above, the wet-bulb temperature below 31 °C, safe CO₂, food reserves not falling, and infections falling. *(Claude's default for these thresholds.)*
-6. **Modes:**
-   - **Challenge:** a fixed daily seed, the leaderboard, and at most 3 hints.
-   - **Sandbox:** any scenario pack, tools and lies, and unlimited hints. The hint button is shown only when the player asks for it. A small nudge appears when the player is failing or has stopped making progress.
-7. **Rival and helper:** a search algorithm with a fixed compute budget per day (beam search or Monte Carlo rollouts, about 2,000 rollouts, running during the time-lapse).
-   - **As the rival,** it plays the same seed, and its score is on the leaderboard.
-   - **As the helper,** it suggests the single best next move and gives its reason.
-8. **Attribution panel:** after a run, or on request in the sandbox, the worker replays the run with all 16 on/off combinations of the 4 tools. It then shows each tool's share of the result as **Shapley values**, a standard method for dividing credit fairly among the parts that produced a result.
-9. **Scenario packs:** each pack is a real dataset, bundled as JSON and rescaled to drive one system:
-
-   | Pack | Data | Drives |
-   | --- | --- | --- |
-   | Texas, Feb 2021 | EIA-930 ERCOT hourly supply and demand | the plants and the cascade |
-   | Chicago, July 1995 | NOAA hourly temperature and humidity | the heat |
-   | Wuhan delay, 2020 | Lai et al. delay results | the outbreak and the cost of each lie |
-   | Flint, 2014–15 | lead sampling results | the water and the "water is safe" lie |
-
-10. **Score:** weighted points, with the parts shown: days survived, people alive, and fairness (the gap between the best and worst level). A bonus is added for reaching "Stable Hollow". *(The exact weights are Claude's default, to be tuned on Thu.)*
-11. **Findings summary:**
-    1. The simulation computes the facts: what failed and when, which tool mattered, and which lie cost the most.
-    2. Claude (claude-opus-5-5, through a serverless function) writes a short report from those facts only.
-    3. If the API fails, a fixed template writes the report instead.
-12. **Shared leaderboard:** Supabase. Each entry holds a name, the seed, the score with its parts, and the list of moves. A serverless function replays the moves to check the score. No accounts.
-13. **Hover:** every tile and every number in the panel shows the model, its equation, the dataset, and a link to the source.
+6. **Live grid.** The judge picks any EIA-930 balancing area and date range. Early Warning and Fair Share run on it in the browser. A Vercel function holds the EIA key and forwards the request. If the EIA API fails, the page uses cached JSON for Texas 2021, Winter Storm Elliott (Dec 2022) and one recent week.
+7. **Visual effects:**
+   - **Twin split:** the Texas county map (real outages) beside the Hollow cutaway, on one clock.
+   - **Cinematic cascade:** the camera pans and zooms to each key event. A plant sparks and trips, the lights die tile by tile, and CO₂ fog and heat shimmer rise.
+   - **Truth wave + Lantern packets:** when the Ledger exposes a lie, the bulletin line glitches and is struck out, and a wave of light spreads through the levels. Lantern messages hop between sections as visible packets while the network is cut.
+8. **Story mode.** A fixed seed that plays by itself. It pauses 2–3 s at each key event, moves the camera to it, and shows a one-line caption. The video is recorded from story mode, and the same mode runs live if there is a call.
+9. **Directorate panel.** A third column with the Directorate's 3 goals, its score over time, and its last choice with its motive. To make room, the module console and the event log move into hovers and overlays (see UI).
+10. **Claude recap.** After each run, Claude (claude-opus-5-5, through a Vercel function) writes 3–4 sentences in Standard Technical English from the event log and the attribution only: which lie cost the most lives, and which module saved which levels. With no key or on an error, a fixed template writes it.
+11. **Attribution:** lives saved by each module (sampled Shapley, labelled "estimate").
+12. **Deploy:** a public Vercel URL. It works in a private window and on a phone.
 
 ### Nice to have (only after must-ship is green)
-- A network-shutdown event (problem 7) that happens rarely: alerts spread only from section to section.
-- Return to the surface (problems 13–14): scouts and suits after a "Stable Hollow" ending.
-- More scenario packs (Iberia 2025 grid oscillations).
-- Art polish, animation and sound.
+- Shared leaderboard (Supabase) with replay check.
+- Rival algorithm and helper.
+- Exact Shapley.
+- Problems 5, 6, 10, 11, 14, 15 as working modules.
+- Sound.
 
 ### Explicit non-goals
-- Real-time play (turns are deliberate, so runs can be replayed and checked).
 - Accounts and login.
-- Precise forecasts of real-world events. The models are illustrative: they use published equations and data, rescaled to the Hollow. The site says so.
-- Copying Terraria's art or assets. Only the visual style is a reference.
+- Claims that the backtests predict future events. A backtest shows what the module would have said on past data.
+- Targeting or naming private people. All real data is public and aggregated (counties, wards, cities).
+- Copying Terraria's art or assets.
 
 ## Architecture
 ```
-packages/sim      deterministic engine: systems, Directorate, tools, scoring, end states (pure TS, no DOM)
-packages/search   rival + helper (budgeted search), Shapley attribution (16 runs)
-data/packs        scenario packs (JSON) + loaders/rescalers + source metadata for hovers
-apps/web          Vite + React (panel, controls, hovers, leaderboard, summary) + PixiJS (cutaway renderer)
-                  sim + search run in Web Workers
-api/              serverless: POST /summary (Claude, facts only) · POST /score (replay-verify, write Supabase)
+app/                        the Vite + React + PixiJS app (moved from prototypes/hollow-twin-poc)
+  src/sim/                  test world: districts, Directorate agent, observations, outputs, score
+  src/product/              the 9 modules (read observations only) + run.ts
+  src/earth/                backtest adapters: real data → observations → the same modules
+  src/world/                PixiJS cutaway, camera, effects (cascade, truth wave, packets)
+  src/map/                  Texas county map (SVG or Pixi) on the shared clock
+  src/story/                story mode script: seed, events, captions, camera moves
+  src/ui/                   panels, hovers, overlays
+  api/                      Vercel functions: /eia (key proxy), /recap (Claude, template fallback)
+data/                       fetch scripts + committed JSON (EIA, 4TU, county GeoJSON, Flint, JHU) with source metadata
 ```
-Data flow for one day:
-1. The player's choices go to the sim worker.
-2. The worker runs 24 ticks and sends back a state frame for each tick.
-3. PixiJS animates the frames as the 3–5 s time-lapse.
-4. The panel updates.
-5. During the time-lapse, the rival worker thinks about its own move for the next day.
+Data flow in the Earth act:
+1. A fetch script downloads the real data once and saves JSON with its source.
+2. An adapter in `src/earth/` turns each record into the same observation types the Hollow makes (for example, an EIA-930 hour becomes a plant meter reading and a demand reading).
+3. The unchanged module code reads the observations and sends its outputs.
+4. The page compares the outputs with what really happened.
 
 ## Data & seeding plan
-- **Scenario packs:** each dataset is downloaded once and committed as JSON with its source metadata. The loaders rescale each dataset to the Hollow's units. For example, the ERCOT supply curve becomes a plant capacity curve.
-- **Daily seed:** the seed comes from the date. The demo uses a fixed seed and a fixed pack, rehearsed in advance.
-- **Validation:** a script shows that the outbreak model with lie delays of 1, 2 and 3 weeks reproduces about 66/86/95% fewer cases (Lai et al.). The page shows the result as a chart.
+| Data | Source | Format and size | Notes |
+| --- | --- | --- | --- |
+| ERCOT hourly | EIA API v2, `electricity/rto/region-data` and `fuel-type-data`, respondent `ERCO`, UTC hours | JSON, about 336 rows per series | Free key in the URL. CORS is open, but the key must not ship in the client: use `/api/eia` |
+| Texas county outages | 4TU.ResearchData, DOI 10.4121/fd2fd715-41eb-476a-a9b7-f50d886afb75.v1, CC BY 4.0 | CSV, 6 MB, 3-hour steps from Feb 11, 2021 | Check against ORNL EAGLE-I (CC BY 4.0, 15-min) if time allows |
+| County shapes | US Census cartographic boundary files (public domain) | GeoJSON, Texas only | Simplify to under 500 KB |
+| EEA3 and load shed | ERCOT EEA overview (Jun 2021); ERCOT Feb 24, 2021 presentation | Two numbers | 1:25 am CST Feb 15; about 20,000 MW peak shed |
+| Flint lead | flintwaterstudy.org, `Flint-Samples-FINAL.xlsx`, 271 samples | XLSX → JSON | No per-sample dates; sampling window Aug 20–Sep 10, 2015. Admission date about Oct 8, 2015 (to confirm) |
+| Hubei cases | JHU CSSE time series (CC BY 4.0) | CSV, 1.8 MB | Starts Jan 22, 2020. Earlier points typed in with citations (WHO DON233, Imperial Report 1) |
+| Elliott, Dec 2022 | EIA API v2, TVA and Duke balancing areas | JSON | Cache for the live grid fallback |
+
+The demo uses one fixed seed per scenario, chosen and rehearsed Thu evening.
 
 ## UI / UX direction
-- **The cutaway:** one tall page you scroll. Each level is a row of 8 section tiles, in the style of Terraria: side view, cave and industrial tiles.
-- **Status overlays on the tiles:**
-
-  | Overlay | Shows |
-  | --- | --- |
-  | Dark tiles | no power |
-  | Red haze | heat |
-  | Grey-green fog | CO₂ |
-  | Brown drips | bad water |
-  | Blue water | flooding |
-  | Icons | farms, clinics, fans, pumps |
-
-- **The fixed panel:**
-  - the day and the end-state progress
-  - the population
-  - the Directorate bulletin next to the measured values
-  - tool toggles
-  - the Next day button
-  - the hint button
-- **Art:** functionality comes first. Use a CC0 tileset (Kenney or itch.io) and recolor it. Make any missing sprite with the Codixel Claude Code skill (github.com/mankidev/codixel, MIT). Don't polish the art before the sim works.
+- **Layout (3 columns on desktop):** the cutaway (or the twin split in the Earth act), the residents' phone, and the Directorate panel.
+- **Declutter (to do before freeze):** move the module console, the event log and the hidden-truth list into hovers and overlays. The screen must be readable in a 1080p video at a glance: at most about 12 lines of text visible at once outside a hover.
+- **Effects:** see Scope §7. Effects play in story mode and in normal play.
+- **Art:** keep the current pixel style. Effects come after story mode works.
 
 ## Hardware (if hybrid)
 None. Software only.
 
 ## Workstreams
-Owners are chosen at the sync.
+Owners are not fixed (team decision, Nov 18). Each line owns its directories, so parallel agents do not edit the same files.
 
-| # | Workstream | Owner | Files/dirs owned | Depends on | Done when |
-| --- | --- | --- | --- | --- | --- |
-| 1 | Sim engine + models | tbd | `packages/sim` | — | Texas pack seed runs 60 days deterministically; each system unit-tested; Lai validation script passes |
-| 2 | Scenario packs | tbd | `data/packs` | 1 (interfaces) | 4 packs load, rescale, and carry source metadata |
-| 3 | Renderer | tbd | `apps/web/src/world` | 1 (state frame type) | 400 tiles with overlays at 60 fps; day time-lapse |
-| 4 | Panel, controls, hovers | tbd | `apps/web/src/ui` | 1, 2 | Full day loop playable; every hover shows a source |
-| 5 | Rival, helper, attribution | tbd | `packages/search` | 1 | Rival beats random play; helper suggests in < 5 s; Shapley panel for 16 combos |
-| 6 | API + leaderboard + summary | tbd | `api/` | 1, 5 | Score replay-verified; Claude summary with template fallback |
-| 7 | Pitch + video | tbd | `pitch/` | all | 3-minute video |
+| # | Workstream | Files/dirs owned | Depends on | Done when |
+| --- | --- | --- | --- | --- |
+| 1 | Sim: districts, Directorate agent, score | `app/src/sim` | — | 8 districts in < 150 ms; each Directorate choice has motive, gain and cost; more deaths never scores higher |
+| 2 | Modules + balance | `app/src/product` | 1 (observation types) | All 9 modules run on 8 districts; demo seed stable with all on |
+| 3 | Earth data + backtests | `data/`, `app/src/earth` | 2 (module interfaces) | 4 backtests give a number with a source; cached JSON committed |
+| 4 | Live grid + API | `app/api`, `app/src/earth/live` | 3 | Any balancing area runs; fallback works with the network off |
+| 5 | World effects + map | `app/src/world`, `app/src/map` | 1 (state frame) | Twin split on one clock; cascade, truth wave and packets at 60 fps |
+| 6 | Story mode + UI | `app/src/story`, `app/src/ui` | 1, 2, 5 | Story mode plays the 3-minute script without input; screen passes the declutter rule |
+| 7 | Recap + deploy | `app/api/recap`, Vercel config | 2 | Public URL works in a private window; recap falls back to the template |
+| 8 | Pitch + video | `pitch/` | all | Video uploaded; write-up done |
 
-**Day-1 interfaces** (agree on these first, in `packages/sim/src/types.ts`):
-- `State`
-- `Action`
-- `Scenario`
-- `step(state, actions, seed) → frames[]`
-- `score(state)`
-- `endState(state)`
+## Step-by-step plan
+All times US Eastern. Submit by **Fri 6:00 pm**.
+
+**Wed evening (now → about 1 am)**
+1. Merge `prototype/hollow-twin-product` into `main`. Move the app to `app/`. Set this spec to `Status: locked`.
+2. Write the fetch scripts and commit the JSON: ERCOT Feb 8–22, 2021; the 4TU county CSV; Texas county GeoJSON; Flint XLSX; JHU Hubei.
+3. Change the score to lives first.
+4. Run Early Warning on the real ERCOT data and measure the warning hours. This number is the opening claim, so it comes first.
+5. Start the Texas county map on a shared clock.
+
+**Thu morning (8 am → 12 pm)**
+6. 8 districts and the Directorate agent with motives.
+7. Story mode with the demo seed and captions.
+8. Cinematic cascade (camera and tile effects).
+9. Fair Share, Flint and Wuhan backtests.
+10. **12:00 pm: deploy to Vercel. Feature freeze (G3).**
+
+**Thu afternoon (12 pm → 6 pm)**
+11. Directorate panel; move the console and log into hovers (declutter).
+12. Truth wave and Lantern packets.
+13. Live grid page with the `/api/eia` proxy and the cached fallback.
+14. Claude recap with the template fallback.
+15. `/codex review`, `/webapp-testing` on story mode, fix bugs.
+
+**Thu evening (6 pm → midnight)**
+16. `/pitch`: write the script. Choose and rehearse the demo seed.
+17. Check the Earth claims against their sources one more time.
+
+**Fri (8 am → 6 pm)**
+18. Record the video from story mode; add overlays with `/hyperframes`.
+19. Write the Devpost text with `/ste`, then `/humanizer`.
+20. 2:00 pm: final deploy; check in a private window and on a phone.
+21. **6:00 pm: submit.** Enter all 4 members.
+
+## Cut priority (cut from the top when a gate fails)
+1. Leaderboard and rival (already in Nice to have)
+2. Exact Shapley (keep the estimate)
+3. Lantern packets (keep the truth wave)
+4. Wuhan backtest
+5. Live grid for any area (keep the cached Texas and Elliott data)
+6. Flint backtest
+7. Claude recap (keep the template)
+8. 8 districts (fall back to 1 district, scaled ×1,250, labelled)
+9. Directorate agent (fall back to the fixed script with a motive line per choice)
+10. Truth wave
+11. Cinematic camera (keep the tile effects)
+12. Fair Share backtest
+
+**Never cut:** the Texas Early Warning backtest, the twin split, story mode, the lives-first score, the deploy, the video.
 
 ## Risks & fallbacks
 | Risk | Fallback |
 | --- | --- |
-| The sim is too slow for 16 attribution runs at 400 sections | Run the attribution at 1 tick per 4 hours; or show only "each tool alone" (5 runs) |
-| The models are too complex to finish | Ship power, air, heat, sickness and the Directorate first; add water, food, medicine, sewage, darkness and parts in that order |
-| The game is too easy or too hard | Tune on Thu with the rival's score as the reference |
-| The rival is weak | Make it a greedy rule-based player; it is still a baseline to beat |
-| Judges call it "just a game" | Hover sources, the Lai validation chart, the real-data packs, and the fate report written as a plan |
-| Supabase or Claude is down | Local leaderboard; template summary |
-| Pixel art takes too long | Flat colored tiles with overlays; art is the last thing we polish |
+| The Texas Early Warning result is weak (for example, under 6 h) | Tune the thresholds (team decision). Show the Fair Share result first if it is stronger |
+| The EIA API fails or rate-limits during judging | Cached JSON for 3 events; the page says "cached" |
+| The 4TU outage counts do not match EAGLE-I | Use EAGLE-I filtered to Texas, Feb 8–22, as a small committed file |
+| 8 districts are too slow for attribution | Attribution on 1 district; results on 8 |
+| The screen is too dense for video | Story mode hides the console and shows captions only |
+| Claude API down | Template recap |
 
 ## Demo script & pitch beats (3 min, assumed)
-1. **0:00–0:20:** the Hollow, and its real-world twin: Texas 2021, Chicago 1995, Flint, Wuhan. "The same thing kills people: bad decisions and hidden truth."
-2. **0:20–1:10:** scroll the cutaway, load the Texas pack, hover over a source, and play the Directorate's run until the Hollow is lost.
-3. **1:10–2:10:** play the same seed with the tools until the Hollow is stable. Then show the attribution panel and the lie that cost the most.
-4. **2:10–2:40:** a challenge run against the rival, the hints, and the leaderboard and summary.
-5. **2:40–3:00:** the Lai validation chart, then "Try to keep the Hollow alive" and the URL.
+1. **0:00–0:20 · Earth.** The Texas map goes dark. "246 people died. The data showed it coming." Early Warning's line: "Warned N hours before the emergency order."
+2. **0:20–0:40 · More of Earth.** Flint: the wards our Snow module flags from citizen samples, weeks before the state's admission. Wuhan: Truthcount's estimate against the official 41.
+3. **0:40–1:00 · The turn.** "Now a world where this never stops." The camera falls into the Hollow. The Directorate and its 3 goals.
+4. **1:00–1:40 · Without the product.** The Directorate run. The cascade. Its choices and its reasons, for example the network cut. The Hollow is lost.
+5. **1:40–2:30 · With the product.** Same seed. Early Warning, Ledger (truth wave), Fair Share, Snow. Then 20 s for Lantern, Kin, Layout, Larder and Witness.
+6. **2:30–2:50 · Result.** Lives saved, by module. The Claude recap.
+7. **2:50–3:00 · Try it.** The live grid, and the URL.
 
 ## Decisions made in this interview
 | Decision | Answer | Source |
 | --- | --- | --- |
-| Layout | Levels split into sections with status tiles; fixed panel | User |
-| Emotional hook | No single family; the hook is that the sim runs real-world data as the Hollow | User |
-| Sources | Hover on every tile and number shows the model and data source | User |
-| Core loop | Challenge + sandbox | User |
-| Real data | Bundled scenario packs: Texas 2021, Chicago 1995, Wuhan delay, Flint | User |
-| Tool effects | Any combination; Shapley attribution over 16 runs | User |
-| Optimizer | Rival and helper: unlimited hints in the sandbox, on request only; 3 hints in competitive mode | User |
-| Turns | One turn per day; the day plays as a 3–5 s time-lapse; ends at "Hollow lost" or at a stable equilibrium | User |
-| Lies | They delay the response, and trust falls when the truth comes out | User |
-| Factors | Food, medicine, crowding, movement, sewage, darkness, aging parts (plus the core systems) | User |
-| Network shutdown | Out for now; a possible rare event later | User |
-| Summary | Facts computed by the sim + a Claude narrative, with a template fallback | User |
-| Competition | Shared leaderboard with replay verification | User (replay verification: Claude's default) |
-| Score | Weighted points, with the parts shown | User (weights: Claude's default) |
-| Scale | 50 levels × 8 sections | User |
-| Stack | Vite + React + PixiJS, sim in Web Workers, Supabase, serverless functions | User |
-| Art | CC0 tileset + Codixel for missing sprites; the demo works before the art is polished | User |
-| Thresholds for the end states | As listed in Scope §5 | Claude's default |
+| Base branch | `prototype/hollow-twin-product` | User |
+| Demo modules | 4 featured (Early Warning, Ledger, Fair Share, Snow) + 5 in a 20 s segment | User |
+| Score | Lives first, then fairness, then days | User |
+| Data | Real hourly data, not typed approximations | User |
+| Story mode | Scripted, auto-playing, pauses at key events | User |
+| Cuts | None now; keep a cut priority list | User |
+| Deploy | Vercel | User |
+| Scale | 2 billion, through 8 sample districts (each stands for 156) | User (8 districts: Claude's recommendation) |
+| Directorate | Agent with goals; each choice has a motive, gain and cost | User |
+| Directorate display | A separate panel; move other text into hovers and overlays | User |
+| Witness trade-off | Keep it, as a sign that the Directorate's choices have reasons | User |
+| Claude recap | Cause-and-effect, 3–4 sentences, in STE, template fallback | User |
+| Real-world impact | Texas, Flint and Wuhan backtests + live grid for any balancing area | User |
+| Effects | Twin split, cinematic cascade, truth wave + Lantern packets | User |
+| Earth act placement | It opens the video | User |
+| Opening | Real Texas map, then the Early Warning claim | User |
+| Weak backtest result | Tune until the result is strong | User |
+| Roles | Not fixed; everyone codes with AI agents | User |
 
 ## Open questions
-- The score weights, and the exact thresholds for "Stable Hollow". Tune them Thu.
-- Raw data availability. ERCOT Feb 2021 (EIA-930) and NOAA hourly for Chicago Midway, July 1995, should be public. Flint lead sampling: Virginia Tech's Flint Water Study data. Confirm each one Wed morning.
-- Is the judging format a video only? Is there a video length limit?
-- Who owns each workstream? Decide at the sync.
+- **Tuning on the test event.** The team chose to tune Early Warning until the Texas result is strong. If the thresholds are fitted to Feb 2021, then "warned N hours earlier" shows what the module can do on that event, not what it would have done. A judge can ask. Claude recommends two guards: the hover says "thresholds set on this event", and the same thresholds also run on Winter Storm Elliott (Dec 2022) with that result shown. Team to decide.
+- The Flint admission date (Oct 1, Oct 8 or Oct 16, 2015). Confirm from a primary source.
+- Is the judging by video only? Is there a length limit? Ask at the Thu JC check-in.
+- The Directorate agent's goal weights. Set Thu morning so that its choices look reasonable from its own side.

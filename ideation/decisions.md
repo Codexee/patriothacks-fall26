@@ -46,3 +46,8 @@ Add one line per decision: date · decision · why · who. Newest last.
 - 2026-11-17 · A software project can win this event (both 2025 PatriotHacks winners were software, and judging is by video) · Claude; Earshot recommended, pending Neil
 - 2026-11-17 · Earshot dropped (too many unknowns: accuracy, data, props); pure-code projects only · Neil
 - 2026-11-17 · Hollow Twin chosen and interviewed; draft spec at .plans/hollow-twin-spec.md (pixel cutaway, 50×8 sections, real-data scenario packs, lies as delay + trust, 4 tools with Shapley attribution, rival/helper, leaderboard, Claude summary) · Neil
+- 2026-11-18 · Hollow Twin spec v2: base is prototype/hollow-twin-product (real modules on a test-world sim); 4 featured modules + 5 in a montage; score is lives first · the "just a game" risk and a score that ranked 465k deaths near 3k · Neil
+- 2026-11-18 · Real-world impact act opens the video: the unchanged modules run on real data (Texas 2021 EIA-930 + county outages, Flint 2015 VT samples, Wuhan 2020 JHU + Imperial) plus a live grid page for any EIA-930 balancing area · Neil wants demonstrable impact · Neil
+- 2026-11-18 · Visual effects: twin split (real Texas map + cutaway on one clock), cinematic cascade, truth wave + Lantern packets; scripted story mode for the video · more spectacle · Neil
+- 2026-11-18 · Directorate becomes an agent with 3 goals (order, upper-level output, trust); each choice shows motive, gain, cost in its own panel · choices should be multifaceted · Neil
+- 2026-11-18 · Scale to 2 billion through 8 sample districts (each stands for 156); Vercel deploy; Claude recap in STE with template fallback; roles not fixed · Neil
