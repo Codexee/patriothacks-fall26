@@ -2,9 +2,9 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "hollow-twin-poc",
+      "name": "hollow-twin",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "prototypes/hollow-twin-poc", "run", "dev"],
+      "runtimeArgs": ["--prefix", "app", "run", "dev"],
       "port": 5180
     }
   ]

@@ -2,6 +2,16 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-18 (17): Spec v2 locked; the app now lives in `app/`
+
+- **`.plans/hollow-twin-spec.md` is locked (v2).** It is the source of truth. The evaluation behind it is `.plans/hollow-twin-evaluation.md`.
+  - The base is Adarsh's product design: 9 modules read only observations, and the sim is the test world.
+  - New: an **Earth act** that opens the video. The same modules run on real data (Texas 2021 EIA-930 + county outages, Flint 2015, Wuhan 2020), plus a live grid page.
+  - New: twin split (real Texas map beside the cutaway), cinematic cascade, truth wave + Lantern packets, scripted story mode, a Directorate agent with goals and its own panel, 8 sample districts (2 billion people), and a lives-first score.
+  - The spec has a step-by-step plan (Wed night → Fri 6 pm) and a cut priority list.
+- **`prototype/hollow-twin-product` is merged into `main`, and the app moved from `prototypes/hollow-twin-poc/` to `app/`.** The launch config is now named `hollow-twin`.
+- **Action for everyone:** `git pull` on `main`, then `cd app && npm install`. Read the spec's "Step-by-step plan" and pick the next open step. Roles are not fixed. Stay inside the directories that the step's workstream owns.
+
 ## 2026-11-17 (16): New direction: Hollow Twin (software only)
 
 - **The track is the Hollow** (`context/track.md`). Off the Record is on hold. Hardware is out (no parts in time). Earshot is dropped (too many unknowns).

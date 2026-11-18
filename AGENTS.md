@@ -20,10 +20,10 @@ We are a 4-person team competing in **Patriot HackFest Fall 2026** (George Mason
 
 ## Where we are (update this section after every milestone)
 
-- **Phase:** Tue Nov 17. Track changed to the Hollow; software only. **Hollow Twin spec drafted** (`.plans/hollow-twin-spec.md`). Off the Record is on hold.
-- **Done:** repo, shared context, skills, hooks, and **ideation rounds 1–13** (`ideation/ideas.md`, `ideation/shortlist.md`). **Read the top entry of `CHANGELOG.md`.**
-- **Next:** the team reads `.plans/hollow-twin-spec.md`, picks workstreams at the sync, agrees on the day-1 interfaces in `packages/sim/src/types.ts`, sets `Status: locked`, then `/parallelize`.
-- **Blockers:** the spec is a draft; confirm the raw data for the 4 scenario packs Wed morning; the judging criteria are not published.
+- **Phase:** Wed Nov 18. **Hollow Twin spec v2 is locked** (`.plans/hollow-twin-spec.md`). The app is in `app/` (Vite + React + PixiJS). Off the Record is on hold.
+- **Done:** ideation rounds 1–16; the product prototype (9 modules on a test-world sim) merged into `main`. **Read the top entry of `CHANGELOG.md`.**
+- **Next:** follow the spec's "Step-by-step plan": fetch the real data, make the score lives-first, then measure Early Warning on the real ERCOT data (the opening claim).
+- **Blockers:** the judging criteria and the video length are not published; the Flint admission date needs a primary source.
 
 ## Start of every session (all AIs)
 
