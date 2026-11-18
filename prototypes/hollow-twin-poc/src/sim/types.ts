@@ -13,10 +13,61 @@ export function sectionIndex(level: number, col: number): number {
 
 export type StructureKind = 'plant' | 'fan' | 'farm' | 'recycler' | 'clinic';
 
-export type ToolKey = 'earlyWarning' | 'fairShare' | 'ledger' | 'layout';
+/**
+ * PRODUCT BRANCH (prototype/hollow-twin-product): a ToolKey is now a module of the residents' system
+ * (src/product/). The sim no longer contains any tool logic. It only produces Observations and applies Outputs.
+ * Truthcount is part of the Ledger module.
+ */
+export type ToolKey = 'earlyWarning' | 'fairShare' | 'ledger' | 'snow';
 export type ToolSet = Record<ToolKey, boolean>;
-export const NO_TOOLS: ToolSet = { earlyWarning: false, fairShare: false, ledger: false, layout: false };
-export const ALL_TOOLS: ToolSet = { earlyWarning: true, fairShare: true, ledger: true, layout: true };
+export const NO_TOOLS: ToolSet = { earlyWarning: false, fairShare: false, ledger: false, snow: false };
+export const ALL_TOOLS: ToolSet = { earlyWarning: true, fairShare: true, ledger: true, snow: true };
+
+// ---------- Observations: the ONLY data the residents' system may read ----------
+export type ReportTopic = 'cough' | 'water' | 'dark' | 'hot';
+
+export type Observation =
+  /** Feeder-line meter on a plant's output, hourly. 0 when the plant is offline. About ±3% noise; ~5% of readings missing. */
+  | { kind: 'plantMeter'; plant: number; level: number; hour: number; output: number }
+  /** Total load meter at the main switchyard, hourly. served = power delivered, demand = power asked for. About ±2% noise. */
+  | { kind: 'feeder'; hour: number; served: number; demand: number }
+  /** Daily averages from a residents' sensor box. Only 2 sections per level have one. Noisy; some days missing. */
+  | { kind: 'sensor'; level: number; col: number; day: number; co2: number; wetBulb: number; power: number; water: number }
+  /** Resident reports for one section and topic on one day, counted. text is one sample report. */
+  | { kind: 'reports'; level: number; col: number; day: number; topic: ReportTopic; count: number; text: string; byUser?: boolean }
+  /** Cases a clinic saw today. Most sick residents never reach a clinic. */
+  | { kind: 'clinic'; level: number; day: number; cases: number }
+  /** What the Directorate says today. officialCases is its public case count. */
+  | { kind: 'bulletin'; day: number; lines: string[]; claims: LieId[]; officialCases: number }
+  /**
+   * Public weather and grid outlook for the next 48 h, issued at `fromHour` (like a weather service forecast).
+   * supply = share of normal plant output expected; demand = load multiplier expected. About ±4% error.
+   */
+  | { kind: 'outlook'; fromHour: number; supply: number[]; demand: number[] }
+  /** Section council census: residents, power asked for (critical part too), and the facilities in the section. */
+  | { kind: 'census'; level: number; col: number; day: number; people: number; demand: number; critical: number; facilities: StructureKind[] };
+
+// ---------- Outputs: what the residents' system produces; the sim applies them ----------
+export type AlertAction = 'shed' | 'boilWater' | 'isolateSick';
+
+export type Output =
+  /**
+   * An alert to every section in levels [from, to]. Residents follow it in proportion to their trust in the system.
+   * shed: switch off `amount` (0..1) of non-critical load. boilWater / isolateSick: protective behavior.
+   */
+  | { kind: 'alert'; id: string; module: ToolKey; action: AlertAction; from: number; to: number; hours: number; amount?: number; text: string; evidence: string[] }
+  /** A power plan for the next day: share of critical and non-critical demand each section may draw (0..1). */
+  | { kind: 'allocation'; module: ToolKey; crit: number[]; non: number[]; text: string }
+  /** A published finding. When `lie` is set, it contradicts a Directorate claim. hash chains it to the previous finding. */
+  | { kind: 'finding'; id: string; module: ToolKey; lie?: LieId; text: string; evidence: string[]; hash: string }
+  /** Send a residents' repair crew to the recycler on `level`. It takes 2 days. */
+  | { kind: 'repair'; module: ToolKey; level: number; text: string };
+
+/** Events a person can inject into the world (the judge's buttons). */
+export type WorldEvent =
+  | { type: 'breakRecycler'; level: number }
+  | { type: 'tripPlant'; plant: number }
+  | { type: 'outbreak'; level: number };
 
 /** Where a number or model comes from. Shown in the hover card. */
 export interface Source {
@@ -79,6 +130,9 @@ export interface Totals {
 /** Player choices for one day. */
 export type Action =
   | { type: 'setTools'; tools: ToolSet }
+  | { type: 'outputs'; outputs: Output[] } // from the residents' system (src/product/)
+  | { type: 'event'; event: WorldEvent } // injected by a person
+  | { type: 'report'; level: number; col: number; text: string } // a report typed by a person, as a resident
   | { type: 'build'; kind: Exclude<StructureKind, 'plant'>; level: number; col: number }
   | { type: 'remove'; level: number; col: number; kind: Exclude<StructureKind, 'plant'> };
 
@@ -100,7 +154,11 @@ export interface SimState {
   scenario: Scenario;
   day: number;
   tools: ToolSet;
-  trust: number; // 0..1
+  trust: number; // 0..1, residents' trust in the Directorate
+  /** 0..1, residents' trust in their own system. It sets how many follow its alerts. Right findings raise it; wrong ones lower it. */
+  systemTrust: number;
+  /** What the residents' system can see about the day just simulated. Empty on day 0. */
+  observations: Observation[];
   lies: Lie[];
   totals: Totals;
   bulletin: Bulletin;

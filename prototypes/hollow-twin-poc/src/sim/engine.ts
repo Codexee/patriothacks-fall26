@@ -1,10 +1,16 @@
 // PROTOTYPE engine for Hollow Twin. Deterministic, seeded, hourly ticks over 50 levels × 8 sections.
-// Rough on purpose: it proves the core loop (grounded models + the lies of the Directorate + 4 tools).
+// Rough on purpose: it proves the core loop (grounded models + the lies of the Directorate).
 // Runs under Vite and plain Node type-stripping: relative .ts imports, no enums, no parameter properties.
+//
+// PRODUCT BRANCH: the engine is now the TEST WORLD. It contains no tool logic. It
+//   1. applies the Outputs of the residents' system (alerts, a power plan, findings, repairs), and
+//   2. produces Observations: the noisy, partial data residents could really have.
+// The residents' system (src/product/) reads only Observations. It never reads SimState.internal.
 import {
   HOURS_PER_DAY, LEVELS, SECTIONS_PER_LEVEL, SECTION_COUNT, sectionIndex,
-  type Action, type Bulletin, type DayResult, type Frame, type Lie, type LieId, type Scenario, type Score,
-  type SectionView, type SimState, type StructureKind, type ToolSet,
+  type Action, type AlertAction, type Bulletin, type DayResult, type Frame, type Lie, type LieId, type Observation,
+  type Output, type ReportTopic, type Scenario, type Score, type SectionView, type SimState, type StructureKind,
+  type ToolSet, type WorldEvent,
 } from './types.ts';
 import { mulberry32 } from './rng.ts';
 import { heatOffsetFor } from '../data/index.ts';
@@ -15,7 +21,7 @@ const STABLE_DAYS = 14;
 const PLANT_LEVELS = [8, 18, 27, 34, 41, 47];
 const PLANT3 = 2; // index into plants: the plant on level 27
 const CAPACITY_MARGIN = 1.1; // nominal capacity ÷ normal demand
-const TOOL_POWER_COST = 0.005; // Early Warning and Ledger each use 0.5% of capacity
+const TOOL_POWER_COST = 0.005; // the sensor network of Early Warning and of the Ledger each use 0.5% of capacity
 const LOAD: Record<StructureKind, number> = { plant: 0, fan: 300, recycler: 600, farm: 1500, clinic: 200 };
 const SPACE_LOAD = 4000; // every section has the same floor space; deep levels are just more crowded
 const CRITICAL_RES_SHARE = 0.25; // share of residential load that is life support (air handling)
@@ -30,18 +36,32 @@ const RECOVERY_H = 240; // ≈10 days
 const BASE_CFR = 0.08;
 const HEAT_DEATH = 0.001; // hourly death share per °C above the wet-bulb limit
 const WETBULB_LIMIT = 31; // °C (Vecellio et al. 2022)
-const LIE_DELAY_H = 14 * 24;
-const LEDGER_DELAY_H = 24;
-const EW_HORIZON_H = 40;
+const LIE_DELAY_H = 14 * 24; // without published evidence, residents learn the truth 14 days late
 const STRESS_TRIP = 0.004; // hourly trip chance per plant when the Directorate runs the plants at ≥99% load
 const PLANT3_DECAY = 0.1; // health lost per day by Plant 3 from day 4 (hidden by the lie)
 const AGING_PER_DAY = 0.002; // all plants
 const LOST_SHARE = 0.25; // a section is lost (cannot function) when fewer than 25% of its residents remain
+const REPAIR_H = 48; // a residents' crew needs 2 days to repair a recycler
+
+// Observation noise and reporting rates (what the residents' system can see).
+const SENSOR_COLS = [1, 5]; // 2 sensor boxes per level
+const REPORT_RATE: Record<ReportTopic, number> = { cough: 0.01, water: 0.004, dark: 0.0008, hot: 0.0006 };
+const FALSE_REPORTS = 0.03; // background reports per section, topic and day that are not true
+const CLINIC_SHARE = 0.05; // share of the sick within ±2 levels that a clinic sees each day
+const OFFICIAL_SHARE_LYING = 0.12; // the Directorate's public case count while it denies the outbreak
 
 type Problem = 'power' | 'outbreak' | 'water';
 const LIE_FOR: Record<Problem, LieId> = { power: 'plantFine', outbreak: 'noOutbreak', water: 'waterSafe' };
+const PROBLEM_FOR: Record<LieId, Problem> = { plantFine: 'power', noOutbreak: 'outbreak', waterSafe: 'water' };
 const ONSET_H: Record<Problem, number> = { outbreak: 2 * 24, power: 3 * 24, water: 5 * 24 }; // day 3, 4, 6
 const FAILED_RECYCLER_LEVEL = 38;
+
+const REPORT_TEXT: Record<ReportTopic, string> = {
+  cough: 'Neighbors have been coughing for days, and two children cannot catch their breath.',
+  water: 'The tap water smells like metal, and people on our corridor are getting sick.',
+  dark: 'The power has been off for most of the day.',
+  hot: 'It is too hot to sleep, and the fans barely move the air.',
+};
 
 interface Plant {
   level: number;
@@ -50,8 +70,11 @@ interface Plant {
   offlineUntil: number; // absolute hour; online when hour >= offlineUntil
 }
 
+interface ActiveAlert { action: AlertAction; from: number; to: number; until: number; amount: number }
+
 interface Internal {
   rng: number;
+  obsRng: number; // separate stream: observations never change what happens in the world
   hour: number; // absolute hours simulated
   startPeople: number[];
   people: number[];
@@ -67,14 +90,18 @@ interface Internal {
   qBase: number[]; // m³/s at full fan power
   plants: Plant[];
   darkLevel: number[]; // cumulative dark-hour equivalents per level
-  respStart: Record<Problem, number>; // absolute hour the residents' response began, -1 if not yet
-  ewConserveUntil: number;
-  ewLastWarn: number;
+  respStart: Record<Problem, number>; // absolute hour the residents' general response began, -1 if not yet
   capPrev: number; // capacity the Directorate dispatched against last hour
   loadPrev: number; // served ÷ capacity last hour
   stableStreak: number;
   prevInfected: number;
+  prevMinFood: number;
   levelLost: boolean[];
+  // Outputs of the residents' system that are in force.
+  alerts: ActiveAlert[];
+  plan: { crit: number[]; non: number[] } | null; // today's power plan (Fair Share), cleared each day
+  repairs: { i: number; at: number }[];
+  userReports: { level: number; col: number; text: string }[];
 }
 
 const DEFAULT_LIES: Lie[] = [
@@ -107,6 +134,32 @@ function nearestDistance(level: number, levels: number[]): number {
   let d = 99;
   for (const l of levels) d = Math.min(d, Math.abs(l - level));
   return d;
+}
+
+// Observation randomness (its own stream).
+function urand(s: Internal): number {
+  let r: number;
+  [r, s.obsRng] = mulberry32(s.obsRng);
+  return r;
+}
+function gauss(s: Internal): number {
+  const u = Math.max(1e-9, urand(s));
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * urand(s));
+}
+function poisson(s: Internal, lambda: number): number {
+  if (lambda <= 0) return 0;
+  if (lambda > 30) return Math.max(0, Math.round(lambda + Math.sqrt(lambda) * gauss(s)));
+  const L = Math.exp(-lambda);
+  let k = 0, p = 1;
+  do { k++; p *= urand(s); } while (p > L);
+  return k - 1;
+}
+function topicOf(text: string): ReportTopic {
+  const t = text.toLowerCase();
+  if (/water|tap|taste|metal|smell|drink/.test(t)) return 'water';
+  if (/cough|breath|fever|sick|lung/.test(t)) return 'cough';
+  if (/dark|power|light|blackout/.test(t)) return 'dark';
+  return 'hot';
 }
 
 /** Residential load: 15% scales with residents, 85% with the section's space (cooling, air, pumps, light). */
@@ -149,6 +202,7 @@ export function createState(scenario: Scenario, seed: number, tools: ToolSet): S
   const infected = startPeople.map((p) => p * 0.0005);
   const internal: Internal = {
     rng: seed >>> 0,
+    obsRng: (seed ^ 0x9e3779b9) >>> 0,
     hour: 0,
     startPeople,
     people: startPeople.slice(),
@@ -165,17 +219,20 @@ export function createState(scenario: Scenario, seed: number, tools: ToolSet): S
     plants,
     darkLevel: new Array(LEVELS).fill(0),
     respStart: { power: -1, outbreak: -1, water: -1 },
-    ewConserveUntil: -1,
-    ewLastWarn: -999,
     capPrev: normal * CAPACITY_MARGIN,
     loadPrev: 0.9,
     stableStreak: 0,
     prevInfected: infected.reduce((a, b) => a + b, 0),
+    prevMinFood: 20,
     levelLost: new Array(LEVELS).fill(false),
+    alerts: [],
+    plan: null,
+    repairs: [],
+    userReports: [],
   };
   const startPopulation = startPeople.reduce((a, b) => a + b, 0);
   const state: SimState = {
-    seed, scenario, day: 0, tools: { ...tools }, trust: 0.7,
+    seed, scenario, day: 0, tools: { ...tools }, trust: 0.7, systemTrust: 0.7, observations: [],
     lies: DEFAULT_LIES.map((l) => ({ ...l })),
     totals: { population: startPopulation, startPopulation, deaths: 0, sectionsLost: 0, hoursDarkDeepest: 0 },
     bulletin: { directorate: [], measured: [] },
@@ -184,7 +241,45 @@ export function createState(scenario: Scenario, seed: number, tools: ToolSet): S
     internal,
   };
   state.bulletin = makeBulletin(state, internal);
+  state.observations = warmupObservations(state, internal);
   return state;
+}
+
+/**
+ * The residents' system was already running the day before the scenario starts. This gives it that day's
+ * observations (normal conditions: supply and demand as in the first hours of the scenario), so it can plan day 1.
+ */
+function warmupObservations(state: SimState, s: Internal): Observation[] {
+  const obs: Observation[] = [];
+  const fullC = new Array<number>(SECTION_COUNT), fullN = new Array<number>(SECTION_COUNT);
+  const sumPow = new Array<number>(SECTION_COUNT).fill(HOURS_PER_DAY);
+  const sumWet = s.wet.map((w) => w * HOURS_PER_DAY);
+  const sumCo2 = s.co2.map((c) => c * HOURS_PER_DAY);
+  const sumInf = s.infected.map((x) => x * HOURS_PER_DAY);
+  const costF = 1 - TOOL_POWER_COST * ((state.tools.earlyWarning ? 1 : 0) + (state.tools.ledger ? 1 : 0));
+  for (let h = 0; h < HOURS_PER_DAY; h++) {
+    const mult = scenarioAt(state.scenario.demand, h);
+    let D = 0;
+    for (let i = 0; i < SECTION_COUNT; i++) {
+      const res = resLoad(s.people[i]);
+      let c = res * CRITICAL_RES_SHARE, nc = res * (1 - CRITICAL_RES_SHARE);
+      for (const k of s.structures[i]) { if (k === 'farm') nc += LOAD.farm; else c += LOAD[k]; }
+      fullC[i] = c * mult; fullN[i] = nc * mult; D += fullC[i] + fullN[i];
+    }
+    let cap = 0;
+    for (let k = 0; k < s.plants.length; k++) {
+      const p = s.plants[k];
+      const out = p.nominal * scenarioAt(state.scenario.supply, h) * costF;
+      cap += out;
+      if (urand(s) < 0.05) continue;
+      obs.push({ kind: 'plantMeter', plant: k, level: p.level, hour: h - HOURS_PER_DAY, output: Math.round(out * (1 + 0.03 * gauss(s))) });
+    }
+    obs.push({ kind: 'feeder', hour: h - HOURS_PER_DAY, served: Math.round(Math.min(D, cap) * (1 + 0.02 * gauss(s))), demand: Math.round(D * (1 + 0.02 * gauss(s))) });
+  }
+  let I = 0;
+  for (const x of s.infected) I += x;
+  dailyObservations(state, s, 0, obs, { sumPow, sumWet, sumCo2, sumInf }, I, fullC, fullN);
+  return obs;
 }
 
 // ---------- Frames and bulletins ----------
@@ -227,8 +322,9 @@ function makeBulletin(state: SimState, s: Internal): Bulletin {
     if (lvl(i) >= 41) { Id += s.infected[i]; Nd += s.people[i]; }
   }
   measured.push(`Infected ${((I / Math.max(1, N)) * 100).toFixed(1)}% (levels 41–50: ${((Id / Math.max(1, Nd)) * 100).toFixed(1)}%)`);
-  const r = sectionIndex(FAILED_RECYCLER_LEVEL, 4);
-  measured.push(`Recycler L${FAILED_RECYCLER_LEVEL} water quality ${s.waterQ[r].toFixed(2)}`);
+  const broken: number[] = [];
+  for (let i = 0; i < SECTION_COUNT; i++) if (s.recyclerBroken[i]) broken.push(lvl(i));
+  measured.push(broken.length ? `Recyclers failing: L${broken.join(', L')}` : 'All recyclers working');
   measured.push(`Deaths ${Math.round(state.totals.deaths).toLocaleString('en-US')}`);
   return { directorate, measured };
 }
@@ -246,6 +342,75 @@ function sectionWater(s: Internal, i: number): number {
   return best;
 }
 
+/** Is the problem behind a Directorate lie really happening now? Used to judge a published finding. */
+function problemIsReal(s: Internal, p: Problem): boolean {
+  if (p === 'power') return s.plants[PLANT3].health < 0.97 || s.plants.some((pl) => s.hour < pl.offlineUntil);
+  if (p === 'water') return s.recyclerBroken.some((b) => b);
+  let I = 0, N = 0;
+  for (let i = 0; i < SECTION_COUNT; i++) { I += s.infected[i]; N += s.people[i]; }
+  return I / Math.max(1, N) > 0.002;
+}
+
+function recyclerNear(s: Internal, level: number): number {
+  let best = -1, bestD = 99;
+  for (let i = 0; i < SECTION_COUNT; i++) {
+    if (!s.structures[i].includes('recycler')) continue;
+    const d = Math.abs(lvl(i) - level);
+    if (d < bestD) { bestD = d; best = i; }
+  }
+  return best;
+}
+
+// ---------- Applying outputs and events ----------
+function applyOutputs(state: SimState, s: Internal, outputs: Output[], events: string[]): void {
+  const h = s.hour;
+  for (const o of outputs) {
+    if (o.kind === 'alert') {
+      s.alerts.push({ action: o.action, from: o.from, to: o.to, until: h + o.hours, amount: o.amount ?? 1 });
+    } else if (o.kind === 'allocation') {
+      s.plan = { crit: o.crit.slice(), non: o.non.slice() };
+    } else if (o.kind === 'repair') {
+      const i = recyclerNear(s, o.level);
+      if (i >= 0 && Math.abs(lvl(i) - o.level) <= 1) {
+        if (!s.repairs.some((r) => r.i === i)) s.repairs.push({ i, at: h + REPAIR_H });
+      } else {
+        events.push(`${stamp(h)} · Repair crew found no recycler on level ${o.level}`);
+      }
+    } else if (o.kind === 'finding' && o.lie) {
+      const lie = state.lies.find((l) => l.id === o.lie)!;
+      if (!lie.active) continue;
+      const p = PROBLEM_FOR[o.lie];
+      if (problemIsReal(s, p)) {
+        lie.active = false;
+        lie.exposed = true;
+        state.trust = Math.max(0.1, Math.round((state.trust - 0.15) * 100) / 100);
+        state.systemTrust = Math.min(1, Math.round((state.systemTrust + 0.05) * 100) / 100);
+        if (s.respStart[p] < 0) s.respStart[p] = h;
+        events.push(`${stamp(h)} · Published finding exposed a lie: "${lie.bulletin}". ${o.text}`);
+      } else {
+        state.systemTrust = Math.max(0.1, Math.round((state.systemTrust - 0.1) * 100) / 100);
+        events.push(`${stamp(h)} · A published finding turned out wrong; residents trust the system less`);
+      }
+    }
+  }
+}
+
+function applyEvent(s: Internal, e: WorldEvent, events: string[]): void {
+  const h = s.hour;
+  if (e.type === 'breakRecycler') {
+    const i = recyclerNear(s, e.level);
+    if (i >= 0) { s.recyclerBroken[i] = true; events.push(`${stamp(h)} · EVENT: the recycler on level ${lvl(i)} started failing`); }
+  } else if (e.type === 'tripPlant') {
+    const p = s.plants[clamp(e.plant, 0, s.plants.length - 1)];
+    p.offlineUntil = h + 24;
+    events.push(`${stamp(h)} · EVENT: Plant ${e.plant + 1} tripped`);
+  } else if (e.type === 'outbreak') {
+    const l = clamp(Math.round(e.level), 1, LEVELS);
+    for (let c = 0; c < SECTIONS_PER_LEVEL; c++) { const i = sectionIndex(l, c); s.infected[i] += s.people[i] * 0.015; }
+    events.push(`${stamp(h)} · EVENT: an outbreak started on level ${l}`);
+  }
+}
+
 // ---------- One day ----------
 export function stepDay(prev: SimState, actions: Action[]): DayResult {
   const state: SimState = structuredClone(prev);
@@ -256,11 +421,15 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
     return { state, frames, events };
   }
   const day = state.day + 1;
+  Object.assign(s, { plan: null }); // (not `s.plan = null`: TypeScript would then narrow s.plan to null below)
 
-  // Player actions.
+  // Actions: player builds, the residents' system's outputs, injected events, typed reports.
   let builds = 0;
   for (const a of actions) {
     if (a.type === 'setTools') state.tools = { ...a.tools };
+    else if (a.type === 'outputs') applyOutputs(state, s, a.outputs, events);
+    else if (a.type === 'event') applyEvent(s, a.event, events);
+    else if (a.type === 'report') s.userReports.push({ level: a.level, col: a.col, text: a.text });
     else if (a.type === 'build') {
       if (builds >= 2) { events.push(`Day ${day} 00:00 · Build refused: at most 2 parts per day`); continue; }
       const i = sectionIndex(a.level, a.col);
@@ -277,40 +446,60 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
     }
   }
   const tools = state.tools;
-  if (tools.layout) autoLayout(s, day, events);
 
-  // Daily stability bookkeeping.
-  let minPower = 1, maxWet = 0, maxCo2 = 0;
+  // Daily stability bookkeeping and the day's observations.
+  let maxWet = 0, maxCo2 = 0, shortHours = 0;
   const frames: Frame[] = [];
-  const demand = new Array<number>(SECTION_COUNT);
-  const crit = new Array<number>(SECTION_COUNT);
+  const obs: Observation[] = [];
+  const fullC = new Array<number>(SECTION_COUNT);
+  const fullN = new Array<number>(SECTION_COUNT);
+  const reqC = new Array<number>(SECTION_COUNT);
+  const reqN = new Array<number>(SECTION_COUNT);
   const critFrac = new Array<number>(SECTION_COUNT);
   const nonFrac = new Array<number>(SECTION_COUNT);
+  const shed = new Array<number>(SECTION_COUNT);
+  const boilA = new Array<number>(SECTION_COUNT);
+  const isoA = new Array<number>(SECTION_COUNT);
+  const sumPow = new Array<number>(SECTION_COUNT).fill(0);
+  const sumWet = new Array<number>(SECTION_COUNT).fill(0);
+  const sumCo2 = new Array<number>(SECTION_COUNT).fill(0);
+  const sumInf = new Array<number>(SECTION_COUNT).fill(0);
   const scen = state.scenario;
 
   for (let hod = 0; hod < HOURS_PER_DAY; hod++) {
     const h = s.hour;
 
-    // --- Directorate lies and the residents' response ---
+    // --- Directorate lies: without a published finding, residents learn the truth 14 days late ---
     for (const p of ['outbreak', 'power', 'water'] as Problem[]) {
       if (s.respStart[p] >= 0 || h < ONSET_H[p]) continue;
-      const delay = tools.ledger ? LEDGER_DELAY_H : LIE_DELAY_H;
-      if (h >= ONSET_H[p] + delay) {
+      if (h >= ONSET_H[p] + LIE_DELAY_H) {
         s.respStart[p] = h;
         const lie = state.lies.find((l) => l.id === LIE_FOR[p])!;
         if (lie.active) {
           lie.active = false;
           lie.exposed = true;
           state.trust = Math.max(0.1, Math.round((state.trust - 0.15) * 100) / 100);
-          events.push(tools.ledger
-            ? `${stamp(h)} · Ledger exposed a lie: "${lie.bulletin}". Truth: ${lie.truth}`
-            : `${stamp(h)} · After 14 days residents learned: ${lie.truth}`);
+          events.push(`${stamp(h)} · After 14 days residents learned: ${lie.truth}`);
         }
-        events.push(`${stamp(h)} · Residents respond: ${p === 'power' ? 'conserving power' : p === 'outbreak' ? 'isolating the sick' : 'boiling and rationing water'}`);
       }
     }
     const strength = 0.4 + 0.6 * state.trust;
     const resp = (p: Problem) => (s.respStart[p] >= 0 ? strength : 0);
+
+    // --- Alerts of the residents' system in force this hour ---
+    const comply = 0.5 + 0.5 * state.systemTrust; // share of residents who follow the system's alerts
+    s.alerts = s.alerts.filter((a) => a.until > h);
+    shed.fill(0); boilA.fill(0); isoA.fill(0);
+    for (const a of s.alerts) {
+      for (let l = Math.max(1, a.from); l <= Math.min(LEVELS, a.to); l++) {
+        for (let c = 0; c < SECTIONS_PER_LEVEL; c++) {
+          const i = sectionIndex(l, c);
+          if (a.action === 'shed') shed[i] = Math.max(shed[i], clamp(a.amount, 0, 1) * comply);
+          else if (a.action === 'boilWater') boilA[i] = comply;
+          else isoA[i] = comply;
+        }
+      }
+    }
 
     // --- Events that the scenario schedules ---
     if (h === ONSET_H.outbreak) {
@@ -328,93 +517,87 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
       events.push(`${stamp(h)} · Recycler on level ${FAILED_RECYCLER_LEVEL} started failing`);
     }
     for (const p of s.plants) p.health = Math.max(0.2, p.health - AGING_PER_DAY / 24);
+    for (const r of s.repairs) {
+      if (r.at === h) {
+        if (s.recyclerBroken[r.i]) {
+          s.recyclerBroken[r.i] = false;
+          events.push(`${stamp(h)} · Residents' crew repaired the recycler on level ${lvl(r.i)}`);
+        } else events.push(`${stamp(h)} · Repair crew found the recycler on level ${lvl(r.i)} working`);
+      }
+    }
+    s.repairs = s.repairs.filter((r) => r.at > h);
 
-    // --- Power: demand ---
-    const conserve = (1 - 0.2 * resp('power')) * (tools.earlyWarning && h < s.ewConserveUntil ? 0.9 : 1);
-    const mult = scenarioAt(scen.demand, h) * conserve;
-    let D = 0, C = 0;
+    // --- Power: demand. Full = what the section needs; requested = after the plan and any shedding ---
+    const mult = scenarioAt(scen.demand, h) * (1 - 0.2 * resp('power'));
+    let D = 0, RC = 0, RN = 0;
     for (let i = 0; i < SECTION_COUNT; i++) {
-      if (s.lost[i]) { demand[i] = 0; crit[i] = 0; continue; }
-      const st = s.structures[i];
+      if (s.lost[i]) { fullC[i] = fullN[i] = reqC[i] = reqN[i] = 0; continue; }
       const res = resLoad(s.people[i]);
       let c = res * CRITICAL_RES_SHARE, nc = res * (1 - CRITICAL_RES_SHARE);
-      for (const k of st) { if (k === 'farm') nc += LOAD.farm; else c += LOAD[k]; }
-      demand[i] = (c + nc) * mult;
-      crit[i] = c * mult;
-      D += demand[i]; C += crit[i];
+      for (const k of s.structures[i]) { if (k === 'farm') nc += LOAD.farm; else c += LOAD[k]; }
+      fullC[i] = c * mult;
+      fullN[i] = nc * mult;
+      reqC[i] = fullC[i] * (s.plan ? s.plan.crit[i] : 1);
+      reqN[i] = fullN[i] * (s.plan ? s.plan.non[i] : 1) * (1 - shed[i]);
+      RC += reqC[i]; RN += reqN[i];
     }
+    D = RC + RN;
 
-    // --- Power: capacity, trips, cascade ---
+    // --- Power: capacity, trips, cascade (the Directorate dispatches; the residents cannot) ---
     const supply = scenarioAt(scen.supply, h);
     const costF = 1 - TOOL_POWER_COST * ((tools.earlyWarning ? 1 : 0) + (tools.ledger ? 1 : 0));
     let cap = 0;
     for (const p of s.plants) if (h >= p.offlineUntil) cap += p.nominal * p.health * supply * costF;
-    let served: number;
-    if (tools.earlyWarning) {
-      // Forecast 40 h ahead from measured plant state and the known load curve.
-      const fh = h + EW_HORIZON_H;
-      let fcap = 0;
-      for (const p of s.plants) if (fh >= p.offlineUntil) fcap += p.nominal * (p.health - PLANT3_DECAY * (fh - h) / 24 * (s.plants.indexOf(p) === PLANT3 && h >= ONSET_H.power ? 1 : 0)) * scenarioAt(scen.supply, fh) * costF;
-      const fD = (D / Math.max(1e-9, mult)) * scenarioAt(scen.demand, fh) * (1 - 0.2 * resp('power'));
-      if (fD > fcap) {
-        s.ewConserveUntil = Math.max(s.ewConserveUntil, h + 24);
-        if (h - s.ewLastWarn >= 24) {
-          s.ewLastWarn = h;
-          events.push(`${stamp(h)} · Early Warning: plant overload forecast in ${EW_HORIZON_H} h; residents conserve`);
+    // The Directorate dispatches against last hour's capacity. A sudden drop overloads the plants.
+    // While "Plant 3 is operating normally" is believed, dispatch also counts the capacity Plant 3 has lost.
+    const p3 = s.plants[PLANT3];
+    const plantLie = state.lies.find((l) => l.id === 'plantFine')!.active;
+    const lieGap = plantLie && h >= p3.offlineUntil ? p3.nominal * (1 - p3.health) * supply * costF : 0;
+    const target = Math.min(D, s.capPrev + lieGap);
+    // Plants run at full load are stressed: a small hourly chance that one trips.
+    if (s.loadPrev >= 0.99) {
+      for (let k = 0; k < s.plants.length; k++) {
+        const p = s.plants[k];
+        if (h < p.offlineUntil) continue;
+        let r: number;
+        [r, s.rng] = mulberry32(s.rng);
+        if (r < STRESS_TRIP) {
+          let r2: number;
+          [r2, s.rng] = mulberry32(s.rng);
+          p.offlineUntil = h + 12 + Math.floor(r2 * 25);
+          events.push(`${stamp(h)} · Plant ${k + 1} tripped (run at full load)`);
+          break;
         }
       }
-      served = Math.min(D, 0.95 * cap); // plants kept below 0.95 load: no overload trips
-    } else {
-      // The Directorate dispatches against last hour's capacity. A sudden drop overloads the plants.
-      // While "Plant 3 is operating normally" is believed, dispatch also counts the capacity Plant 3 has lost.
-      const p3 = s.plants[PLANT3];
-      const plantLie = state.lies.find((l) => l.id === 'plantFine')!.active;
-      const lieGap = plantLie && h >= p3.offlineUntil ? p3.nominal * (1 - p3.health) * supply * costF : 0;
-      const target = Math.min(D, s.capPrev + lieGap);
-      // Plants run at full load are stressed: a small hourly chance that one trips.
-      if (s.loadPrev >= 0.99) {
-        for (let k = 0; k < s.plants.length; k++) {
-          const p = s.plants[k];
-          if (h < p.offlineUntil) continue;
-          let r: number;
-          [r, s.rng] = mulberry32(s.rng);
-          if (r < STRESS_TRIP) {
-            let r2: number;
-            [r2, s.rng] = mulberry32(s.rng);
-            p.offlineUntil = h + 12 + Math.floor(r2 * 25);
-            events.push(`${stamp(h)} · Plant ${k + 1} tripped (run at full load)`);
-            break;
-          }
-        }
-        cap = 0;
-        for (const p of s.plants) if (h >= p.offlineUntil) cap += p.nominal * p.health * supply * costF;
-      }
-      let ratio = target / Math.max(1e-9, cap);
-      let guard = 0;
-      while (ratio > 1.005 && guard++ < 6) {
-        let tripped = false;
-        for (let k = 0; k < s.plants.length; k++) {
-          const p = s.plants[k];
-          if (h < p.offlineUntil) continue;
-          let r: number;
-          [r, s.rng] = mulberry32(s.rng);
-          const pTrip = clamp(8 * (ratio - 1.005), 0, 0.85);
-          if (r < pTrip) {
-            let r2: number;
-            [r2, s.rng] = mulberry32(s.rng);
-            p.offlineUntil = h + 12 + Math.floor(r2 * 25); // offline 12–36 h
-            events.push(`${stamp(h)} · Plant ${k + 1} tripped (load ${Math.round(ratio * 100)}%)`);
-            tripped = true;
-            break; // its load shifts to the others: re-check the cascade
-          }
-        }
-        if (!tripped) break;
-        cap = 0;
-        for (const p of s.plants) if (h >= p.offlineUntil) cap += p.nominal * p.health * supply * costF;
-        ratio = target / Math.max(1e-9, cap);
-      }
-      served = Math.min(target, cap);
+      cap = 0;
+      for (const p of s.plants) if (h >= p.offlineUntil) cap += p.nominal * p.health * supply * costF;
     }
+    let ratio = target / Math.max(1e-9, cap);
+    let guard = 0;
+    while (ratio > 1.005 && guard++ < 6) {
+      let tripped = false;
+      for (let k = 0; k < s.plants.length; k++) {
+        const p = s.plants[k];
+        if (h < p.offlineUntil) continue;
+        let r: number;
+        [r, s.rng] = mulberry32(s.rng);
+        const pTrip = clamp(8 * (ratio - 1.005), 0, 0.85);
+        if (r < pTrip) {
+          let r2: number;
+          [r2, s.rng] = mulberry32(s.rng);
+          p.offlineUntil = h + 12 + Math.floor(r2 * 25); // offline 12–36 h
+          events.push(`${stamp(h)} · Plant ${k + 1} tripped (load ${Math.round(ratio * 100)}%)`);
+          tripped = true;
+          break; // its load shifts to the others: re-check the cascade
+        }
+      }
+      if (!tripped) break;
+      cap = 0;
+      for (const p of s.plants) if (h >= p.offlineUntil) cap += p.nominal * p.health * supply * costF;
+      ratio = target / Math.max(1e-9, cap);
+    }
+    const served = Math.min(target, cap);
+    if (served < 0.99 * D) shortHours++;
     s.capPrev = cap;
     s.loadPrev = served / Math.max(1e-9, cap);
     for (let k = 0; k < s.plants.length; k++) {
@@ -422,21 +605,34 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
     }
 
     // --- Power: allocation ---
-    if (tools.fairShare) {
-      // Max-min fair: critical loads (air, recyclers, clinics) first, then the same share for everyone.
-      const cf = C > 0 ? Math.min(1, served / C) : 1;
-      const r = D - C > 0 ? clamp((served - C) / (D - C), 0, 1) : 1;
-      for (let i = 0; i < SECTION_COUNT; i++) { critFrac[i] = cf; nonFrac[i] = r; }
+    if (s.plan) {
+      // The residents' plan (Fair Share): critical loads everywhere first, then the planned non-critical shares.
+      const cf = RC > 0 ? Math.min(1, served / RC) : 1;
+      const nf = RN > 0 ? clamp((served - cf * RC) / RN, 0, 1) : 1;
+      for (let i = 0; i < SECTION_COUNT; i++) {
+        critFrac[i] = fullC[i] > 0 ? (reqC[i] * cf) / fullC[i] : 1;
+        nonFrac[i] = fullN[i] > 0 ? (reqN[i] * nf) / fullN[i] : 1;
+      }
     } else {
       // Directorate policy "upper levels first": serve top-down until capacity runs out.
       let left = served;
       for (let i = 0; i < SECTION_COUNT; i++) {
-        const d = demand[i];
+        const d = reqC[i] + reqN[i];
         const f = d <= 0 ? 1 : clamp(left / d, 0, 1);
         left -= f * d;
-        critFrac[i] = f; nonFrac[i] = f;
+        critFrac[i] = fullC[i] > 0 ? (f * reqC[i]) / fullC[i] : 1;
+        nonFrac[i] = fullN[i] > 0 ? (f * reqN[i]) / fullN[i] : 1;
       }
     }
+
+    // --- Observations: meters on plant feeders and the main switchyard ---
+    for (let k = 0; k < s.plants.length; k++) {
+      if (urand(s) < 0.05) continue; // missing reading
+      const p = s.plants[k];
+      const out = h >= p.offlineUntil ? p.nominal * p.health * supply * costF * (1 + 0.03 * gauss(s)) : 0;
+      obs.push({ kind: 'plantMeter', plant: k, level: p.level, hour: h, output: Math.max(0, Math.round(out)) });
+    }
+    obs.push({ kind: 'feeder', hour: h, served: Math.round(served * (1 + 0.02 * gauss(s))), demand: Math.round(D * (1 + 0.02 * gauss(s))) });
 
     // --- Per-section physics ---
     const prevPrev = new Array<number>(LEVELS + 2).fill(0);
@@ -447,8 +643,6 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
     }
     prevPrev[0] = prevPrev[1]; prevPrev[LEVELS + 1] = prevPrev[LEVELS];
     const heatOff = heatOffsetFor(scen.id, h);
-    const isolation = 1 - 0.7 * resp('outbreak');
-    const boil = 0.35 * resp('water');
     let deathsHour = 0;
 
     // Recycler quality.
@@ -468,8 +662,10 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
     for (let i = 0; i < SECTION_COUNT; i++) {
       const level = lvl(i);
       const n = s.people[i];
-      const p = demand[i] > 0 ? (critFrac[i] * crit[i] + nonFrac[i] * (demand[i] - crit[i])) / demand[i] : 0;
+      const fd = fullC[i] + fullN[i];
+      const p = fd > 0 ? (critFrac[i] * fullC[i] + nonFrac[i] * fullN[i]) / fd : 0;
       s.power[i] = s.lost[i] ? 0 : p;
+      sumPow[i] += s.power[i];
       if (s.lost[i] || n <= 0) continue;
 
       // Air: analytic solution of dC/dt = (N·G − Q·v·(C − Cout))/V over one hour.
@@ -485,11 +681,13 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
       const target = baseWet(level) + heatOff + 6 - 12 * Math.sqrt(nonFrac[i]);
       s.wet[i] += (target - s.wet[i]) * 0.1;
 
-      // Water.
+      // Water: boiling comes from the general response or from a boil-water alert in this section.
       const water = sectionWater(s, i);
+      const boil = 0.35 * Math.max(resp('water'), boilA[i]);
       const wEff = Math.min(1, water + boil);
 
       // Lung sickness: Wells–Riley with the Rudnick–Milton rebreathed fraction.
+      const isolation = 1 - 0.7 * Math.max(resp('outbreak'), isoA[i]);
       const f = Math.max(0, (s.co2[i] - CO2_OUT) / 38000);
       const crowd = Math.pow(n / 4000, 0.3);
       const dark = s.power[i] < 0.5 ? 1.25 : 1;
@@ -523,6 +721,9 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
       s.people[i] = Math.max(0, n - infDeaths - other);
       if (s.infected[i] > s.people[i]) s.infected[i] = s.people[i];
       deathsHour += infDeaths + other;
+      sumWet[i] += s.wet[i];
+      sumCo2[i] += s.co2[i];
+      sumInf[i] += s.infected[i];
 
       if (s.people[i] < s.startPeople[i] * LOST_SHARE) {
         s.lost[i] = true;
@@ -551,7 +752,6 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
 
     for (let i = 0; i < SECTION_COUNT; i++) {
       if (s.lost[i]) continue;
-      if (s.power[i] < minPower) minPower = s.power[i];
       if (s.wet[i] > maxWet) maxWet = s.wet[i];
       if (s.co2[i] > maxCo2) maxCo2 = s.co2[i];
     }
@@ -569,7 +769,14 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
   state.day = day;
   const falling = I <= s.prevInfected || I / Math.max(1, pop) < 0.001;
   s.prevInfected = I;
-  const calm = minPower >= 0.95 && maxWet < WETBULB_LIMIT && maxCo2 < 1500 && falling;
+  let minFood = Infinity;
+  for (let i = 0; i < SECTION_COUNT; i++) if (!s.lost[i]) minFood = Math.min(minFood, s.food[i]);
+  const foodOk = minFood >= s.prevMinFood - 0.05 || minFood >= 15;
+  s.prevMinFood = minFood;
+  // "Stable Hollow" as in the spec: power margin ≥ 0 all day (plants deliver what is asked for, so no unplanned
+  // blackout), wet-bulb below the limit, safe CO₂, food reserves not falling, infections falling.
+  // (Neil's first version tested power ≥ 95% in every section; that can never hold while residents ration on purpose.)
+  const calm = shortHours === 0 && maxWet < WETBULB_LIMIT && maxCo2 < 1500 && falling && foodOk;
   s.stableStreak = calm ? s.stableStreak + 1 : 0;
 
   if (pop < 0.5 * state.totals.startPopulation) {
@@ -588,46 +795,84 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
 
   state.lastFrame = frames[frames.length - 1];
   state.bulletin = makeBulletin(state, s);
+  dailyObservations(state, s, day, obs, { sumPow, sumWet, sumCo2, sumInf }, I, fullC, fullN);
+  state.observations = obs;
   return { state, frames, events };
 }
 
-// ---------- Layout planner ----------
-function autoLayout(s: Internal, day: number, events: string[]): void {
-  type Cand = { i: number; kind: 'fan' | 'recycler' | 'clinic'; bad: number };
-  const cands: Cand[] = [];
-  const clinicLevels: number[] = [];
-  for (let i = 0; i < SECTION_COUNT; i++) if (s.structures[i].includes('clinic') && !s.lost[i]) clinicLevels.push(lvl(i));
+// ---------- Daily observations: what residents' sensors, reports, clinics and councils can see ----------
+function dailyObservations(
+  state: SimState, s: Internal, day: number, obs: Observation[],
+  sums: { sumPow: number[]; sumWet: number[]; sumCo2: number[]; sumInf: number[] },
+  totalInfected: number, fullC: number[], fullN: number[],
+): void {
+  const H = HOURS_PER_DAY;
   for (let i = 0; i < SECTION_COUNT; i++) {
-    if (s.lost[i]) continue;
-    const w = sectionWater(s, i);
-    if (w < 0.7) cands.push({ i, kind: 'recycler', bad: (0.7 - w) * 10 });
-    // Fans only help where the air is bad although the power is on (dark sections need power, not fans).
-    // More air also cuts lung-sickness spread (Wells–Riley), so sick sections rank higher.
-    const sick = s.people[i] > 0 ? s.infected[i] / s.people[i] : 0;
-    if (s.power[i] >= 0.9 && (s.co2[i] > 1300 || sick > 0.01)) cands.push({ i, kind: 'fan', bad: (s.co2[i] - 1000) / 300 + sick * 20 });
-    // A field clinic where many are sick and the nearest clinic is 3 or more levels away.
-    const dist = nearestDistance(lvl(i), clinicLevels);
-    if (sick > 0.03 && dist >= 3) cands.push({ i, kind: 'clinic', bad: sick * 20 * dist / 2 });
+    const level = lvl(i), col = i % SECTIONS_PER_LEVEL;
+    const n = s.people[i];
+    if (!s.lost[i]) {
+      // Sensor boxes: 2 per level, about 10% of days missing.
+      if (SENSOR_COLS.includes(col) && urand(s) > 0.1) {
+        obs.push({
+          kind: 'sensor', level, col, day,
+          co2: Math.round((sums.sumCo2[i] / H) * (1 + 0.05 * gauss(s))),
+          wetBulb: Math.round((sums.sumWet[i] / H + 0.3 * gauss(s)) * 10) / 10,
+          power: Math.round(clamp(sums.sumPow[i] / H + 0.03 * gauss(s), 0, 1) * 100) / 100,
+          water: Math.round(clamp(sectionWater(s, i) + 0.04 * gauss(s), 0, 1) * 100) / 100,
+        });
+      }
+      // Resident reports: true reports in proportion to the problem, plus a few false ones.
+      const water = sectionWater(s, i);
+      const lambda: Record<ReportTopic, number> = {
+        cough: (sums.sumInf[i] / H) * REPORT_RATE.cough,
+        water: n * REPORT_RATE.water * Math.max(0, 0.8 - water),
+        dark: n * REPORT_RATE.dark * Math.max(0, 0.6 - sums.sumPow[i] / H),
+        hot: n * REPORT_RATE.hot * Math.max(0, sums.sumWet[i] / H - 29),
+      };
+      for (const t of ['cough', 'water', 'dark', 'hot'] as ReportTopic[]) {
+        const c = poisson(s, lambda[t] + FALSE_REPORTS);
+        if (c > 0) obs.push({ kind: 'reports', level, col, day, topic: t, count: c, text: REPORT_TEXT[t] });
+      }
+    }
+    // Section council census (people rounded; power asked for, with ±3% noise).
+    obs.push({
+      kind: 'census', level, col, day,
+      people: Math.round(n / 10) * 10,
+      demand: Math.round((fullC[i] + fullN[i]) * (1 + 0.03 * gauss(s))),
+      critical: Math.round(fullC[i] * (1 + 0.03 * gauss(s))),
+      facilities: s.structures[i].slice(),
+    });
   }
-  cands.sort((a, b) => b.bad - a.bad || a.i - b.i);
-  let placed = 0;
-  const recyclerLevels: number[] = [];
-  for (const c of cands) {
-    if (placed >= 2) break;
-    const level = lvl(c.i);
-    if (c.kind === 'clinic') {
-      if (nearestDistance(level, clinicLevels) < 3) continue;
-      clinicLevels.push(level);
-    } else if (c.kind === 'recycler') {
-      if (recyclerLevels.some((l) => Math.abs(l - level) <= 4)) continue;
-      recyclerLevels.push(level);
-      s.waterQ[c.i] = 1;
-      s.recyclerBroken[c.i] = false;
-    } else if (count(s.structures[c.i], 'fan') >= 3) continue;
-    s.structures[c.i].push(c.kind);
-    placed++;
-    events.push(`Day ${day} 00:00 · Layout placed a spare ${c.kind} on level ${level}`);
+  for (const r of s.userReports) {
+    obs.push({ kind: 'reports', level: r.level, col: r.col, day, topic: topicOf(r.text), count: 1, text: r.text, byUser: true });
   }
+  s.userReports = [];
+  // Clinics: each sees a small share of the sick within ±2 levels.
+  for (let i = 0; i < SECTION_COUNT; i++) {
+    if (!s.structures[i].includes('clinic') || s.lost[i]) continue;
+    const L = lvl(i);
+    let sick = 0;
+    for (let l = Math.max(1, L - 2); l <= Math.min(LEVELS, L + 2); l++) {
+      for (let c = 0; c < SECTIONS_PER_LEVEL; c++) sick += s.infected[sectionIndex(l, c)];
+    }
+    obs.push({ kind: 'clinic', level: L, day, cases: Math.max(0, Math.round(sick * CLINIC_SHARE * (1 + 0.2 * gauss(s)))) });
+  }
+  // Public weather and grid outlook for the next 48 h: one bias per forecast (±3%, independent for supply and
+  // demand) plus ±1.5% hourly error.
+  const biasS = 1 + 0.03 * gauss(s), biasD = 1 + 0.03 * gauss(s);
+  const supply: number[] = [], demand: number[] = [];
+  for (let t = 0; t < 48; t++) {
+    supply.push(Math.round(scenarioAt(state.scenario.supply, s.hour + t) * biasS * (1 + 0.015 * gauss(s)) * 1000) / 1000);
+    demand.push(Math.round(scenarioAt(state.scenario.demand, s.hour + t) * biasD * (1 + 0.015 * gauss(s)) * 1000) / 1000);
+  }
+  obs.push({ kind: 'outlook', fromHour: s.hour, supply, demand });
+  // The Directorate's bulletin and its public case count.
+  const denying = state.lies.find((l) => l.id === 'noOutbreak')!.active;
+  obs.push({
+    kind: 'bulletin', day, lines: state.bulletin.directorate.slice(),
+    claims: state.lies.filter((l) => l.active).map((l) => l.id),
+    officialCases: Math.round(totalInfected * (denying ? OFFICIAL_SHARE_LYING : 0.9)),
+  });
 }
 
 // ---------- Score ----------

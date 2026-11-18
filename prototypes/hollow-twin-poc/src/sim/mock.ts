@@ -35,7 +35,7 @@ export const mockSim: SimApi = {
   scenarios: [mockScenario],
   createState(_id, seed, tools = NO_TOOLS): SimState {
     return {
-      seed, scenario: mockScenario, day: 0, tools, trust: 0.7,
+      seed, scenario: mockScenario, day: 0, tools, trust: 0.7, systemTrust: 0.7, observations: [],
       lies: [{ id: 'plantFine', bulletin: 'Plant 3 is operating normally', truth: 'Plant 3 is at 40% capacity', active: true, exposed: false }],
       totals: { population: 1_500_000, startPopulation: 1_500_000, deaths: 0, sectionsLost: 0, hoursDarkDeepest: 0 },
       bulletin: { directorate: ['All levels nominal'], measured: ['Levels 41–50: power 60%'] },

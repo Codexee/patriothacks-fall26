@@ -1,9 +1,9 @@
 // PROTOTYPE: the fixed right panel. Presentational; App owns the state and the sim calls.
 import { useState, type ReactNode } from 'react';
 import { sim } from '../sim/index.ts';
-import type { Frame, Score, SimState, ToolKey, ToolSet } from '../sim/types.ts';
+import type { Action, Frame, Score, SimState, ToolKey, ToolSet, WorldEvent } from '../sim/types.ts';
 import { HoverCard, SourceInfo } from './HoverCard.tsx';
-import { TOOL_KEYS, TOOL_LABELS, type Attribution, type RunResult } from './compare.ts';
+import { TOOL_HINTS, TOOL_KEYS, TOOL_LABELS, type Attribution, type RunResult } from './compare.ts';
 
 export interface PanelProps {
   state: SimState;
@@ -19,6 +19,8 @@ export interface PanelProps {
   compare: { without: RunResult; withTools: RunResult } | null;
   attr: Attribution | null;
   attrProgress: { done: number; total: number } | null;
+  queued: Action[];
+  onEvent: (e: WorldEvent) => void;
   onScenario: (id: string) => void;
   onSeed: (seed: number) => void;
   onReset: () => void;
@@ -53,6 +55,41 @@ function RunCol({ title, r }: { title: string; r: RunResult }) {
   );
 }
 
+function describe(a: Action): string {
+  if (a.type === 'event') {
+    const e = a.event;
+    return e.type === 'breakRecycler' ? `Break the recycler near L${e.level}` : e.type === 'tripPlant' ? `Trip Plant ${e.plant + 1}` : `Outbreak on L${e.level}`;
+  }
+  if (a.type === 'report') return `Report from L${a.level} S${a.col + 1}: “${a.text}”`;
+  return a.type;
+}
+
+function WorldEvents({ onEvent, disabled }: { onEvent: (e: WorldEvent) => void; disabled: boolean }) {
+  const [recycler, setRecycler] = useState(18);
+  const [plant, setPlant] = useState(0);
+  const [outbreak, setOutbreak] = useState(30);
+  return (
+    <div className="events">
+      <div className="row">
+        <button disabled={disabled} onClick={() => onEvent({ type: 'breakRecycler', level: recycler })}>Break recycler</button>
+        <select value={recycler} onChange={(e) => setRecycler(+e.target.value)} aria-label="Recycler level">
+          {[3, 8, 13, 18, 23, 28, 33, 38, 43, 48].map((l) => <option key={l} value={l}>L{l}</option>)}
+        </select>
+      </div>
+      <div className="row">
+        <button disabled={disabled} onClick={() => onEvent({ type: 'tripPlant', plant })}>Trip plant</button>
+        <select value={plant} onChange={(e) => setPlant(+e.target.value)} aria-label="Plant">
+          {[1, 2, 3, 4, 5, 6].map((k) => <option key={k} value={k - 1}>Plant {k}</option>)}
+        </select>
+      </div>
+      <div className="row">
+        <button disabled={disabled} onClick={() => onEvent({ type: 'outbreak', level: outbreak })}>Start outbreak</button>
+        <input type="number" min={1} max={50} value={outbreak} onChange={(e) => setOutbreak(+e.target.value || 1)} aria-label="Outbreak level" />
+      </div>
+    </div>
+  );
+}
+
 export function Panel(p: PanelProps) {
   const [open, setOpen] = useState(true);
   const { state, frame } = p;
@@ -76,12 +113,24 @@ export function Panel(p: PanelProps) {
             <select value={p.scenarioId} disabled={locked} onChange={(e) => p.onScenario(e.target.value)} aria-label="Scenario">
               {sim.scenarios.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
-            <label className="seed">Seed
-              <input type="number" value={p.seed} disabled={locked} onChange={(e) => p.onSeed(Number(e.target.value) || 0)} />
-            </label>
             <button disabled={locked} onClick={p.onReset}>Reset</button>
           </div>
           <p className="muted small">{state.scenario.summary}</p>
+          <details className="advanced">
+            <summary>Advanced / replay</summary>
+            <label className="seed">Seed
+              <input type="number" value={p.seed} disabled={locked} onChange={(e) => p.onSeed(Number(e.target.value) || 0)} />
+            </label>
+            <p className="muted small">The same seed replays the same disaster, so runs with and without modules are a fair comparison.</p>
+          </details>
+        </Section>
+
+        <Section title="World events">
+          <p className="muted small">Change the world. The residents' system is not told; it must notice from its data.</p>
+          <WorldEvents onEvent={p.onEvent} disabled={locked || !!state.end} />
+          {p.queued.length > 0 && (
+            <ul className="queued">{p.queued.map((a, i) => <li key={i}>Next day: {describe(a)}</li>)}</ul>
+          )}
         </Section>
 
         {state.end && (
@@ -100,9 +149,14 @@ export function Panel(p: PanelProps) {
             <div><span className="k">Plants</span><span className="v">{frame.plantsOnline}/{frame.plantsTotal}</span></div>
           </div>
           <div className="trust">
-            <span className="k">Trust</span>
+            <span className="k" title="Residents' trust in the Directorate. Each exposed lie lowers it.">Trust in Directorate</span>
             <div className="bar"><div style={{ width: `${Math.round(state.trust * 100)}%` }} /></div>
             <span className="v">{Math.round(state.trust * 100)}%</span>
+          </div>
+          <div className="trust">
+            <span className="k" title="Residents' trust in their own system. It sets how many follow its alerts. Right findings raise it; wrong ones lower it.">Trust in system</span>
+            <div className="bar good"><div style={{ width: `${Math.round(state.systemTrust * 100)}%` }} /></div>
+            <span className="v">{Math.round(state.systemTrust * 100)}%</span>
           </div>
         </Section>
 
@@ -113,7 +167,7 @@ export function Panel(p: PanelProps) {
               <ul>{state.bulletin.directorate.map((l, i) => <li key={i}>{l}</li>)}</ul>
             </div>
             <div>
-              <h3>Measured</h3>
+              <h3 title="Only the sim knows this. The residents' system never reads it.">Hidden truth (sim only)</h3>
               <ul>{state.bulletin.measured.map((l, i) => <li key={i} className="measured">{l}</li>)}</ul>
             </div>
           </div>
@@ -132,10 +186,10 @@ export function Panel(p: PanelProps) {
           )}
         </Section>
 
-        <Section title="Resident tools">
+        <Section title="Residents' system: modules">
           <div className="tools">
             {TOOL_KEYS.map((k) => (
-              <label key={k} className={`tool ${p.pendingTools[k] ? 'on' : ''}`}>
+              <label key={k} className={`tool ${p.pendingTools[k] ? 'on' : ''}`} title={TOOL_HINTS[k]}>
                 <input type="checkbox" checked={p.pendingTools[k]} disabled={locked || !!state.end} onChange={() => p.onToggleTool(k)} />
                 {TOOL_LABELS[k]}
               </label>
@@ -173,8 +227,8 @@ export function Panel(p: PanelProps) {
           {p.busy && <p className="muted small">{p.busy}</p>}
           {p.compare && (
             <div className="compare">
-              <RunCol title="No tools" r={p.compare.without} />
-              <RunCol title="Your tools" r={p.compare.withTools} />
+              <RunCol title="No modules" r={p.compare.without} />
+              <RunCol title="Your modules" r={p.compare.withTools} />
             </div>
           )}
           {p.attrProgress && !p.attr && (

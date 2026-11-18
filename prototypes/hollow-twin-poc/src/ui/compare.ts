@@ -1,13 +1,20 @@
-// PROTOTYPE: batch runs (Compare, Attribution) and Shapley values. Uses only SimApi.
+// PROTOTYPE: batch runs (Compare, Attribution) and Shapley values. Each run is the residents' system + the sim.
 import { sim } from '../sim/index.ts';
-import { NO_TOOLS, type EndState, type Score, type SimState, type ToolKey, type ToolSet } from '../sim/types.ts';
+import { NO_TOOLS, type EndState, type Score, type ToolKey, type ToolSet } from '../sim/types.ts';
+import { createRun, stepRun, type Run } from '../product/run.ts';
 
-export const TOOL_KEYS: ToolKey[] = ['earlyWarning', 'fairShare', 'ledger', 'layout'];
+export const TOOL_KEYS: ToolKey[] = ['earlyWarning', 'fairShare', 'ledger', 'snow'];
 export const TOOL_LABELS: Record<ToolKey, string> = {
   earlyWarning: 'Early Warning',
   fairShare: 'Fair Share',
   ledger: 'Ledger',
-  layout: 'Layout',
+  snow: 'Snow',
+};
+export const TOOL_HINTS: Record<ToolKey, string> = {
+  earlyWarning: 'Forecasts plant output vs demand from feeder meters and the public outlook; asks residents to cut load before plants trip.',
+  fairShare: 'Plans power from the census: life support in every section first, then the same share for all, more for hot levels and farms.',
+  ledger: 'Checks Directorate claims against residents\' own data (incl. Truthcount case estimates) and publishes signed findings.',
+  snow: 'Traces water complaints and tap readings to the failing recycler, warns only the levels it serves, sends a repair crew.',
 };
 
 /** Safety cap so a run that never ends cannot hang the page. */
@@ -23,19 +30,15 @@ export interface RunResult {
 
 const tick = () => new Promise<void>((r) => setTimeout(r, 0));
 
-/** Steps one state to its end (or the cap) with no animation. */
-export function finishRun(start: SimState, tools: ToolSet): SimState {
-  let state = start;
-  let first = true;
-  while (!state.end && state.day < MAX_DAYS) {
-    state = sim.stepDay(state, first ? [{ type: 'setTools', tools }] : []).state;
-    first = false;
-  }
-  return state;
+/** Steps a run to its end (or the cap) with no animation. */
+export function finishRun(start: Run, tools: ToolSet): Run {
+  let run = start;
+  while (!run.sim.end && run.sim.day < MAX_DAYS) run = stepRun(run, tools).run;
+  return run;
 }
 
 export function runToEnd(scenarioId: string, seed: number, tools: ToolSet): RunResult {
-  const end = finishRun(sim.createState(scenarioId, seed, tools), tools);
+  const end = finishRun(createRun(scenarioId, seed, tools), tools).sim;
   return {
     tools,
     days: end.end ? end.end.day : end.day,

@@ -1,91 +1,92 @@
-// PROTOTYPE: the playable day loop around the cutaway. Uses only SimApi from ../sim/index.ts.
+// PROTOTYPE: the playable day loop. Each day the residents' system (src/product/) reads yesterday's observations
+// and sends outputs; the sim (the test world) applies them. A person can inject world events and type reports.
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { sim } from '../sim/index.ts';
-import { LEVELS, NO_TOOLS, SECTIONS_PER_LEVEL, type Action, type DayResult, type Frame, type SimState, type ToolKey, type ToolSet } from '../sim/types.ts';
+import { LEVELS, NO_TOOLS, SECTIONS_PER_LEVEL, type Action, type Frame, type ToolSet, type WorldEvent } from '../sim/types.ts';
+import { createRun, stepRun, type Run } from '../product/run.ts';
 import { World } from '../world/index.tsx';
 import { Panel } from './Panel.tsx';
+import { ProductView } from './ProductView.tsx';
 import { MAX_DAYS, attribution, compareRuns, type Attribution, type RunResult } from './compare.ts';
 import './styles.css';
 
 const FRAME_MS = 170; // 24 frames ≈ 4 s per day
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
-const sameTools = (a: ToolSet, b: ToolSet) => (Object.keys(a) as ToolKey[]).every((k) => a[k] === b[k]);
 const DEBUG = typeof location !== 'undefined' && new URLSearchParams(location.search).has('debug');
 
 export function App() {
   const [scenarioId, setScenarioId] = useState(sim.scenarios[0].id);
   const [seed, setSeed] = useState(1);
   const [pendingTools, setPendingTools] = useState<ToolSet>(NO_TOOLS);
-  const [state, setState] = useState<SimState>(() => sim.createState(sim.scenarios[0].id, 1, NO_TOOLS));
-  const [frame, setFrame] = useState<Frame>(state.lastFrame);
+  const [run, setRun] = useState<Run>(() => createRun(sim.scenarios[0].id, 1, NO_TOOLS));
+  const [frame, setFrame] = useState<Frame>(run.sim.lastFrame);
   const [events, setEvents] = useState<string[]>([]);
+  const [queued, setQueued] = useState<Action[]>([]); // a person's events and reports for the next day
   const [playing, setPlaying] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [hover, setHover] = useState<{ level: number; col: number } | null>(null);
+  const [phoneSection, setPhoneSection] = useState({ level: 39, col: 2 });
   const [compare, setCompare] = useState<{ without: RunResult; withTools: RunResult } | null>(null);
   const [attr, setAttr] = useState<Attribution | null>(null);
   const [attrProgress, setAttrProgress] = useState<{ done: number; total: number } | null>(null);
   const skipRef = useRef(false);
+  const state = run.sim;
 
   const reset = useCallback((id: string, s: number, tools: ToolSet) => {
-    const fresh = sim.createState(id, s, tools);
-    setState(fresh);
-    setFrame(fresh.lastFrame);
+    const fresh = createRun(id, s, tools);
+    setRun(fresh);
+    setFrame(fresh.sim.lastFrame);
     setEvents([]);
+    setQueued([]);
     setCompare(null);
     setAttr(null);
     setAttrProgress(null);
   }, []);
 
-  const actionsFor = (st: SimState, tools: ToolSet): Action[] =>
-    sameTools(st.tools, tools) ? [] : [{ type: 'setTools', tools }];
-
-  const apply = (r: DayResult) => {
-    setState(r.state);
-    setFrame(r.state.lastFrame);
-    setEvents((prev) => [...[...r.events].reverse(), ...prev]);
-  };
-
   /** Runs the remaining days with no animation. */
-  const fastForward = async (from: SimState, tools: ToolSet) => {
+  const fastForward = async (from: Run, tools: ToolSet, extra: Action[]) => {
     setBusy('Skipping to the end…');
-    let st = from;
-    let acts = actionsFor(st, tools);
+    let r = from;
+    let acts = extra;
     const collected: string[] = [];
-    while (!st.end && st.day < MAX_DAYS) {
-      const r = sim.stepDay(st, acts);
+    while (!r.sim.end && r.sim.day < MAX_DAYS) {
+      const d = stepRun(r, tools, acts);
       acts = [];
-      st = r.state;
-      collected.push(...r.events);
-      if (st.day % 10 === 0) await sleep(0);
+      r = d.run;
+      collected.push(...d.events);
+      if (r.sim.day % 5 === 0) await sleep(0);
     }
-    setState(st);
-    setFrame(st.lastFrame);
+    setRun(r);
+    setFrame(r.sim.lastFrame);
+    setQueued([]);
     setEvents((prev) => [...collected.reverse(), ...prev]);
     setBusy(null);
   };
 
   const nextDay = async () => {
     if (playing || state.end) return;
-    const r = sim.stepDay(state, actionsFor(state, pendingTools));
+    const d = stepRun(run, pendingTools, queued);
+    setQueued([]);
     setPlaying(true);
     skipRef.current = false;
-    for (const f of r.frames) {
+    for (const f of d.frames) {
       if (skipRef.current) break;
       setFrame(f);
       await sleep(FRAME_MS);
     }
-    apply(r);
+    setRun(d.run);
+    setFrame(d.run.sim.lastFrame);
+    setEvents((prev) => [...[...d.events].reverse(), ...prev]);
     setPlaying(false);
     if (skipRef.current) {
       skipRef.current = false;
-      await fastForward(r.state, pendingTools);
+      await fastForward(d.run, pendingTools, []);
     }
   };
 
   const skipToEnd = () => {
     if (playing) { skipRef.current = true; return; } // nextDay finishes the day, then fast-forwards
-    void fastForward(state, pendingTools);
+    void fastForward(run, pendingTools, queued);
   };
 
   const runCompare = async () => {
@@ -96,7 +97,7 @@ export function App() {
   };
 
   const runAttribution = async () => {
-    setBusy('Running all 16 tool combinations…');
+    setBusy('Running all 16 module combinations…');
     setAttr(null);
     setAttrProgress({ done: 0, total: 16 });
     await sleep(0);
@@ -105,24 +106,35 @@ export function App() {
     setBusy(null);
   };
 
-  // Keep the hover card alive after the pointer leaves, so its source buttons stay clickable.
-  const onHover = useCallback((t: { level: number; col: number } | null) => { if (t) setHover(t); }, []);
+  const queueEvent = (event: WorldEvent) => setQueued((q) => [...q, { type: 'event', event }]);
+  const queueReport = (level: number, col: number, text: string) => setQueued((q) => [...q, { type: 'report', level, col, text }]);
+
+  // Hovering the cutaway also picks the phone's section; keep the hover card alive after the pointer leaves.
+  const onHover = useCallback((t: { level: number; col: number } | null) => {
+    if (t) { setHover(t); setPhoneSection(t); }
+  }, []);
   useEffect(() => { document.title = `Day ${state.day} · Hollow Twin`; }, [state.day]);
 
   return (
     <div className="app">
       <main className="world-col">
-        <World frame={frame} onHover={onHover} selected={hover} />
+        <World frame={frame} onHover={onHover} selected={hover ?? phoneSection} />
         {DEBUG && <DebugHover onHover={onHover} />}
       </main>
+      <ProductView
+        run={run} modules={state.tools} section={phoneSection} onPickSection={setPhoneSection}
+        onReport={queueReport} queuedReports={queued.filter((a) => a.type === 'report').length}
+        locked={playing || busy !== null || !!state.end}
+      />
       <Panel
         state={state} frame={frame} scenarioId={scenarioId} seed={seed} pendingTools={pendingTools}
         playing={playing} busy={busy} events={events} score={sim.score(state)} hover={hover}
-        compare={compare} attr={attr} attrProgress={attrProgress}
+        compare={compare} attr={attr} attrProgress={attrProgress} queued={queued}
         onScenario={(id) => { setScenarioId(id); reset(id, seed, pendingTools); }}
         onSeed={(s) => { setSeed(s); reset(scenarioId, s, pendingTools); }}
         onReset={() => reset(scenarioId, seed, pendingTools)}
         onToggleTool={(k) => setPendingTools((t) => ({ ...t, [k]: !t[k] }))}
+        onEvent={queueEvent}
         onNextDay={nextDay}
         onSkipToEnd={skipToEnd}
         onCompare={runCompare}
