@@ -69,7 +69,7 @@ export function ledger(m: ProductMemory, day: number, incoming: Finding[]):
   const official = m.officialCases;
   if (pop > 0 && estimated > GAP_FACTOR * Math.max(1, official) && estimated / pop > MIN_PREVALENCE) {
     candidates.push({
-      id: 'outbreak', module: 'ledger (Truthcount)', lie: 'noOutbreak',
+      id: 'outbreak', module: 'ledger', lie: 'noOutbreak',
       text: `There is an outbreak. Official count ${official.toLocaleString('en-US')}; estimated ${estimated.toLocaleString('en-US')}.`,
       evidence: [
         `Cough reports: about ${Math.round(fromReports).toLocaleString('en-US')} sick (reporting rate 1%/day, background removed)`,

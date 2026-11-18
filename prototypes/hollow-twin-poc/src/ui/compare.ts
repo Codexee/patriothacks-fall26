@@ -2,19 +2,10 @@
 import { sim } from '../sim/index.ts';
 import { NO_TOOLS, type EndState, type Score, type ToolKey, type ToolSet } from '../sim/types.ts';
 import { createRun, stepRun, type Run } from '../product/run.ts';
+import { MODULE_NAMES } from '../product/names.ts';
 
 export const TOOL_KEYS: ToolKey[] = ['earlyWarning', 'fairShare', 'ledger', 'snow', 'lantern', 'kin', 'layout', 'larder', 'witness'];
-export const TOOL_LABELS: Record<ToolKey, string> = {
-  earlyWarning: 'Early Warning',
-  fairShare: 'Fair Share',
-  ledger: 'Ledger',
-  snow: 'Snow',
-  lantern: 'Lantern',
-  kin: 'Kin',
-  layout: 'Layout',
-  larder: 'Larder',
-  witness: 'Witness',
-};
+export const TOOL_LABELS: Record<ToolKey, string> = MODULE_NAMES;
 /** The track's problem numbers each module answers. */
 export const TOOL_PROBLEMS: Record<ToolKey, string> = {
   earlyWarning: '1', fairShare: '2', ledger: '9', snow: '4', lantern: '7', kin: '8', layout: '3', larder: '12, 2', witness: '13',
@@ -27,7 +18,7 @@ export const TOOL_HINTS: Record<ToolKey, string> = {
   witness: 'Verifies signed surface probe readings, rejects fakes, and broadcasts whether the surface is safe.',
   earlyWarning: 'Forecasts plant output vs demand from feeder meters and the public outlook; asks residents to cut load before plants trip.',
   fairShare: 'Plans power from the census: life support in every section first, then the same share for all, more for hot levels and farms.',
-  ledger: 'Checks Directorate claims against residents\' own data (incl. Truthcount case estimates) and publishes signed findings.',
+  ledger: 'Checks Directorate claims against residents\' own data (including the real outbreak count) and publishes them in a record nobody can quietly change.',
   snow: 'Traces water complaints and tap readings to the failing recycler, warns only the levels it serves, sends a repair crew.',
 };
 

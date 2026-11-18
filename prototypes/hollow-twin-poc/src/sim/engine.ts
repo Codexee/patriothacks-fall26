@@ -470,7 +470,7 @@ function applyOutputs(state: SimState, s: Internal, outputs: Output[], day: numb
   const reach = computeReach(s, tools, h);
   const reached = share(reach);
   if (!networkUp(s, h)) {
-    events.push(`${stamp(h)} · Network is down. ${tools.lantern ? `The Lantern mesh reaches ${Math.round(reached * 100)}% of sections.` : 'Residents\' alerts reach no one.'}`);
+    events.push(`${stamp(h)} · Network is down. ${tools.lantern ? `Off-Network Messaging (phone to phone) reaches ${Math.round(reached * 100)}% of sections.` : 'Residents\' alerts reach no one.'}`);
   }
   // Findings held back during an earlier shutdown go out now if residents can be reached.
   const all = [...s.pendingFindings, ...outputs];

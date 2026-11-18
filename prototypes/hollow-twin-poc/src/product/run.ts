@@ -4,6 +4,7 @@ import { sim } from '../sim/index.ts';
 import type { Action, Frame, Output, SimState, ToolSet } from '../sim/types.ts';
 import { createMemory, stepProduct } from './index.ts';
 import type { ProductLog, ProductMemory } from './types.ts';
+import { moduleName } from './names.ts';
 
 export interface Run {
   sim: SimState;
@@ -29,12 +30,12 @@ export function stepRun(run: Run, modules: ToolSet, extra: Action[] = []): { run
   const sent: string[] = [];
   for (const o of step.outputs) {
     if (o.kind === 'alert') sent.push(`Day ${day} 00:00 · ${label(o.module)} alert → L${o.from}–${o.to}: ${o.text}`);
-    else if (o.kind === 'finding') sent.push(`Day ${day} 00:00 · Ledger published #${o.hash}: ${o.text}`);
+    else if (o.kind === 'finding') sent.push(`Day ${day} 00:00 · Truth Check published #${o.hash}: ${o.text}`);
     else if (o.kind === 'repair') sent.push(`Day ${day} 00:00 · ${label(o.module)}: ${o.text}`);
-    else if (o.kind === 'allocation') sent.push(`Day ${day} 00:00 · Fair Share: ${o.text}`);
+    else if (o.kind === 'allocation') sent.push(`Day ${day} 00:00 · ${label(o.module)}: ${o.text}`);
     else if (o.kind === 'welfare' || o.kind === 'moveFan' || o.kind === 'foodTransfer' || o.kind === 'grow' || o.kind === 'verdict') {
       sent.push(`Day ${day} 00:00 · ${label(o.module)}: ${o.text}`);
-    } else if (o.kind === 'relays' && !r_networkUp(run)) sent.push(`Day ${day} 00:00 · Lantern: ${o.text}`);
+    } else if (o.kind === 'relays' && !r_networkUp(run)) sent.push(`Day ${day} 00:00 · ${label(o.module)}: ${o.text}`);
   }
   return {
     run: { sim: r.state, memory: step.memory, outputs: step.outputs, log: step.log },
@@ -44,10 +45,7 @@ export function stepRun(run: Run, modules: ToolSet, extra: Action[] = []): { run
 }
 
 export function label(module: string): string {
-  return ({
-    earlyWarning: 'Early Warning', fairShare: 'Fair Share', ledger: 'Ledger', snow: 'Snow',
-    lantern: 'Lantern', kin: 'Kin', layout: 'Layout', larder: 'Larder', witness: 'Witness',
-  } as Record<string, string>)[module] ?? module;
+  return moduleName(module);
 }
 
 /** Whether the network was up at the end of the last simulated day (as the system saw it). */

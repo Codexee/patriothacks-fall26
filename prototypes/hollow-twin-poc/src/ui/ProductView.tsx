@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { SECTIONS_PER_LEVEL, type Output, type ToolSet } from '../sim/types.ts';
 import type { Run } from '../product/run.ts';
 import { label } from '../product/run.ts';
+import { moduleName } from '../product/names.ts';
 
 export interface ProductViewProps {
   run: Run;
@@ -78,11 +79,11 @@ export function ProductView(p: ProductViewProps) {
         {!anyOn && <p className="phone-empty">No modules are on. Residents have only the Directorate's bulletin.</p>}
         {!run.sim.totals.networkUp && (
           <p className={`net-banner ${reachedHere ? 'ok' : ''}`}>
-            {reachedHere ? 'Network cut by the Directorate. Messages arrive over the Lantern mesh.' : 'Network cut by the Directorate. Nothing reaches this phone.'}
+            {reachedHere ? 'Network cut by the Directorate. Messages arrive phone to phone (Off-Network Messaging).' : 'Network cut by the Directorate. Nothing reaches this phone.'}
           </p>
         )}
         {verdict && (
-          <p className="verdict"><span className="tag">Witness</span> {verdict.text}</p>
+          <p className="verdict"><span className="tag">{moduleName('witness')}</span> {verdict.text}</p>
         )}
 
         <h3>Alerts for your level</h3>
@@ -101,7 +102,7 @@ export function ProductView(p: ProductViewProps) {
         <h3>Your power today</h3>
         {plan ? (
           <p>Life support <b>{Math.round(plan.crit[idx] * 100)}%</b> · other power <b>{Math.round(plan.non[idx] * 100)}%</b>
-            <span className="muted small block">From Fair Share's plan for all 400 sections.</span></p>
+            <span className="muted small block">From the Fair Rationing plan for all 400 sections.</span></p>
         ) : <p className="muted">No residents' plan. The Directorate decides: upper levels first.</p>}
 
         {p.modules.larder && runway !== null && (
@@ -141,19 +142,19 @@ export function ProductView(p: ProductViewProps) {
 
         {p.modules.earlyWarning && log?.earlyWarning && (
           <div className="mod">
-            <h3>Early Warning</h3>
+            <h3>{moduleName('earlyWarning')} <span className="muted small">#1</span></h3>
             <p>Plant output now {fmt(log.earlyWarning.capNow)}; forecast {fmt(log.earlyWarning.capForecast)} in {log.earlyWarning.inHours} h against demand {fmt(log.earlyWarning.demandForecast)}.</p>
             <p className={log.earlyWarning.shortfallPct > 0 ? 'bad' : 'good'}>
               {log.earlyWarning.shortfallPct > 0 ? `At the worst hour, full demand is ${Math.round(log.earlyWarning.shortfallPct)}% more than the plants can safely give.` : 'No shortfall forecast.'}
               {log.earlyWarning.shed > 0 && !p.modules.fairShare ? ` Asked residents to cut ${Math.round(log.earlyWarning.shed * 100)}% of non-essential load.` : ''}
-              {log.earlyWarning.shortfallPct > 0 && p.modules.fairShare ? ' Forecast sent to Fair Share.' : ''}
+              {log.earlyWarning.shortfallPct > 0 && p.modules.fairShare ? ' Forecast sent to Fair Rationing.' : ''}
             </p>
           </div>
         )}
 
         {p.modules.fairShare && log?.fairShare && (
           <div className="mod">
-            <h3>Fair Share</h3>
+            <h3>{moduleName('fairShare')} <span className="muted small">#2</span></h3>
             <p>Plans for {fmt(log.fairShare.available)} units (88% of the forecast, as a margin). Life support {Math.round(log.fairShare.criticalShare * 100)}% everywhere; other power {Math.round(log.fairShare.nonCriticalShare * 100)}% for everyone; farms in full.</p>
             {log.fairShare.hotLevels.length > 0 && <p className="muted small">More cooling on hot levels: {log.fairShare.hotLevels.join(', ')}</p>}
           </div>
@@ -161,7 +162,7 @@ export function ProductView(p: ProductViewProps) {
 
         {p.modules.snow && log?.snow && (
           <div className="mod">
-            <h3>Snow</h3>
+            <h3>{moduleName('snow')} <span className="muted small">#4</span></h3>
             {log.snow.suspects.length === 0 ? <p className="muted">No recycler stands out. Typical: {log.snow.baseline.toFixed(2)} complaints per 1,000.</p> : (
               <ul>{log.snow.suspects.map((s) => (
                 <li key={s.level} className="bad">Recycler L{s.level}: {s.reports} complaints ({s.reportsPer1000.toFixed(2)}/1,000 vs {log.snow!.baseline.toFixed(2)}){s.tap !== null ? `, tap ${s.tap.toFixed(2)}` : ''}</li>
@@ -172,7 +173,7 @@ export function ProductView(p: ProductViewProps) {
 
         {p.modules.lantern && log?.lantern && (
           <div className="mod">
-            <h3>Lantern</h3>
+            <h3>{moduleName('lantern')} <span className="muted small">#7</span></h3>
             <p>{log.lantern.relays} battery relays placed. If the network is cut, the mesh should reach {Math.round(log.lantern.predictedReach * 100)}% of sections.</p>
             {log.lantern.darkLevels.length > 0 && <p className="muted small">Dark levels bridged: {log.lantern.darkLevels.join(', ')}</p>}
             {log.lantern.networkDownHours > 0 && <p className="bad">Network was cut for {log.lantern.networkDownHours} h yesterday.</p>}
@@ -181,7 +182,7 @@ export function ProductView(p: ProductViewProps) {
 
         {p.modules.kin && log?.kin && (
           <div className="mod">
-            <h3>Kin</h3>
+            <h3>{moduleName('kin')} <span className="muted small">#8</span></h3>
             <p>{fmt(log.kin.received)} of {fmt(log.kin.expected)} family check-ins arrived. {log.kin.unheardSections > 0 ? `${log.kin.unheardSections} sections not heard from.` : ''}</p>
             {log.kin.flagged.length > 0 && <p className="warn-text">Neighbors sent to {log.kin.flagged.length} quiet sections.</p>}
           </div>
@@ -189,7 +190,7 @@ export function ProductView(p: ProductViewProps) {
 
         {p.modules.layout && log?.layout && (
           <div className="mod">
-            <h3>Layout</h3>
+            <h3>{moduleName('layout')} <span className="muted small">#3</span></h3>
             {log.layout.hotLevels.length === 0 ? <p className="muted">No level is above 29.5 °C wet-bulb.</p> : <p>Hot levels: {log.layout.hotLevels.join(', ')}</p>}
             {log.layout.moves.map((mv, i) => <p key={i} className="small">Fan moved: L{mv.from} → L{mv.to}</p>)}
           </div>
@@ -197,7 +198,7 @@ export function ProductView(p: ProductViewProps) {
 
         {p.modules.larder && log?.larder && (
           <div className="mod">
-            <h3>Larder</h3>
+            <h3>{moduleName('larder')} <span className="muted small">#12</span></h3>
             <p className="small">Lowest food runway: {log.larder.lowest.map((r) => `L${r.level} ${r.runway.toFixed(1)} d`).join(' · ')}</p>
             {log.larder.transfers.map((tr, i) => <p key={i} className="small">Food carried: L{tr.from} → L{tr.to} ({tr.days} days)</p>)}
             {log.larder.grow !== null && <p className="small">Grow-lamp farm built on L{log.larder.grow}</p>}
@@ -206,7 +207,7 @@ export function ProductView(p: ProductViewProps) {
 
         {p.modules.witness && log?.witness && (
           <div className="mod">
-            <h3>Witness</h3>
+            <h3>{moduleName('witness')} <span className="muted small">#13</span></h3>
             {log.witness.median !== null ? (
               <p>Surface toxicity <b>{log.witness.median.toFixed(2)}</b> from {log.witness.valid} signed readings: {log.witness.verdict}.</p>
             ) : <p className="muted">Not enough signed readings (network cut?).</p>}
@@ -217,7 +218,7 @@ export function ProductView(p: ProductViewProps) {
 
         {p.modules.ledger && log?.ledger && (
           <div className="mod">
-            <h3>Ledger · Truthcount</h3>
+            <h3>{moduleName('ledger')}: real outbreak count <span className="muted small">#9</span></h3>
             <div className="truth">
               <div><span className="k">Official cases</span><span className="v">{fmt(log.ledger.official)}</span></div>
               <div><span className="k">Estimated</span><span className={`v ${log.ledger.estimated > 2.5 * Math.max(1, log.ledger.official) ? 'bad' : ''}`}>{fmt(log.ledger.estimated)}</span></div>
@@ -235,7 +236,7 @@ export function ProductView(p: ProductViewProps) {
               <ol className="chain">
                 {[...ledger].reverse().map((r) => (
                   <li key={r.id}>
-                    <div className="chain-head"><span className="hash">#{r.hash}</span><span className="muted small">day {r.day} · {r.module} · prev #{r.prevHash}</span></div>
+                    <div className="chain-head"><span className="hash">#{r.hash}</span><span className="muted small">day {r.day} · {moduleName(r.module)} · prev #{r.prevHash}</span></div>
                     <div>{r.text}</div>
                     {r.lie && <span className="tag bad">contradicts the Directorate</span>}
                     <Evidence items={r.evidence} />

@@ -27,7 +27,7 @@ const fixed: Record<'co2' | 'infected' | 'wetBulb' | 'directorate' | 'water' | '
   directorate: {
     label: 'Cost of a late response (Lai et al. 2020)',
     detail:
-      'While a lie is told and residents have no Ledger, their protective response (conserve power, isolate the sick, boil water) starts 14 days late. Lai et al. estimate that acting 1, 2 or 3 weeks earlier in Wuhan would have cut cases by 66%, 86% and 95%. With the Ledger, the delay ends when the Ledger publishes a finding that the evidence supports, however long that takes; each exposed lie lowers trust by 0.15.',
+      'While a lie is told and residents have no Truth Check, their protective response (conserve power, isolate the sick, boil water) starts 14 days late. Lai et al. estimate that acting 1, 2 or 3 weeks earlier in Wuhan would have cut cases by 66%, 86% and 95%. With Truth Check, the delay ends when the Ledger publishes a finding that the evidence supports, however long that takes; each exposed lie lowers trust by 0.15.',
     url: 'https://doi.org/10.1038/s41586-020-2293-x',
   },
   water: {

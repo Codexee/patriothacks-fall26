@@ -10,17 +10,19 @@ The sim is the **test world** (it keeps the hidden truth). The **residents' syst
 
 ## Modules and the track's problems
 
+On screen each module has a plain name after the problem it solves (`src/product/names.ts`). The code keys in brackets are the internal names.
+
 | Module | Problem | Reads (observations only) | Does |
 | --- | --- | --- | --- |
-| Early Warning | 1 | Plant feeder meters, public weather/grid outlook, census | Forecasts each plant (its own health trend × the outlook) against demand 36 h ahead; asks for load shedding before plants trip |
-| Fair Share | 2 | Census, forecast, sensor heat | Plans power for the daily peak with a 12% margin: life support and farms first, the same share for everyone, more cooling for hot levels |
-| Ledger + Truthcount | 9 (and publishes for 4, 13) | Plant meters, cough reports, clinics, bulletin | Catches Plant 3 failing; estimates real cases against the official count; hash-chained findings that expose lies |
-| Snow | 4 | Water complaints, tap sensors | Traces bad water to the recycler; boil alerts to its levels only; repair crew |
-| **Lantern** | **7** | Sensor power per level | Places battery relays so the phone mesh still reaches every level when the Directorate cuts the network |
-| **Kin** | **8** | Family check-ins per section | Finds sections whose families went quiet; sends neighbors (welfare checks cut deaths there by 25% for a day) |
-| **Layout** | **3** | Sensor wet-bulb per level, fan locations | Moves fans from cool upper levels to the hottest levels (2 crews a day) |
-| **Larder** | **12, 2** | Census food stores | Food runway per level; carries food from surplus levels; builds grow-lamp farms where food runs out |
-| **Witness** | **13** | Signed surface probe readings | Rejects unsigned devices, takes the median of the council's probes, broadcasts the verified answer, and publishes it (exposes "the air kills in minutes") |
+| Blackout Warning (`earlyWarning`) | 1 | Plant feeder meters, public weather/grid outlook, census | Forecasts each plant (its own health trend × the outlook) against demand 36 h ahead; asks for load shedding before plants trip |
+| Fair Rationing (`fairShare`) | 2 | Census, forecast, sensor heat | Plans power for the daily peak with a 12% margin: life support and farms first, the same share for everyone, more cooling for hot levels |
+| Truth Check (`ledger`, includes the real outbreak count) | 9 (and publishes for 4, 13) | Plant meters, cough reports, clinics, bulletin | Catches Plant 3 failing; estimates real cases against the official count; hash-chained findings that expose lies |
+| Water Safety (`snow`) | 4 | Water complaints, tap sensors | Traces bad water to the recycler; boil alerts to its levels only; repair crew |
+| **Off-Network Messaging** (`lantern`) | **7** | Sensor power per level | Places battery relays so the phone mesh still reaches every level when the Directorate cuts the network |
+| **Family Check-In** (`kin`) | **8** | Family check-ins per section | Finds sections whose families went quiet; sends neighbors (welfare checks cut deaths there by 25% for a day) |
+| **Cooling** (`layout`) | **3** | Sensor wet-bulb per level, fan locations | Moves fans from cool upper levels to the hottest levels (2 crews a day) |
+| **Food Sharing** (`larder`) | **12, 2** | Census food stores | Food runway per level; carries food from surplus levels; builds grow-lamp farms where food runs out |
+| **Surface Truth** (`witness`) | **13** | Signed surface probe readings | Rejects unsigned devices, takes the median of the council's probes, broadcasts the verified answer, and publishes it (exposes "the air kills in minutes") |
 
 ## The world (what the sim adds for these problems)
 
