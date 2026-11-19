@@ -20,10 +20,10 @@ We are a 4-person team competing in **Patriot HackFest Fall 2026** (George Mason
 
 ## Where we are (update this section after every milestone)
 
-- **Phase:** Wed Nov 18, night. **Pivot: Earth is the product.** **Spec locked:** `.plans/before-during-after-spec.md` (project unnamed) replaces `.plans/hollow-twin-spec.md` v2. Reason: another team ships a deployed 3D "Hollow Twin" with no real data; no team trains on real disasters.
-- **Done:** ideation rounds 1–17 (round 17 = this pivot); the Hollow Twin prototype in `app/` (its cutaway and 9 modules leave the demo path; keep the code). **Read the top entry of `CHANGELOG.md`.**
-- **Next:** the spec's "Step-by-step plan": download EIA-930 and EAGLE-I, build the event library (gate G1, 3 am), train the Before model (G2, Thu 10 am).
-- **Blockers:** the judging criteria and the video length are not published; the Flint admission date needs a primary source.
+- **Phase:** Wed Nov 18, late night. **Earth is the product.** Locked spec: `.plans/before-during-after-spec.md` (project unnamed). Contracts: `contracts/README.md`.
+- **Done:** data pipeline (`data/`): 1,477 real US outage events, 2015–2024 (gate G1 passed). Models v2 (`models/RESULTS.md`): on the untouched 2023–2024 test, 13% of events warned 12 h ahead without a weather forecast, 51% with one (upper bound: the backtest uses observed weather); the check-first ranking beats its baseline. App (`app/`, run `npm run dev`, routes `#/`, `#/event/<id>`, `#/?story=texas2021`, `#/brief/<fips>`, `#/evidence`, `#/live`). **Read the top entry of `CHANGELOG.md`.**
+- **Next:** the real-archived-forecast test for 2024 (running), deploy to Vercel with `EIA_API_KEY`, trim `app/public/data` (33 MB), then the ladder (heat first) and the pitch.
+- **Blockers:** the judging criteria and the video length are not published. The warning model does not beat every simple rule without a weather forecast: the pitch must say so (see `models/RESULTS.md`).
 
 ## Start of every session (all AIs)
 

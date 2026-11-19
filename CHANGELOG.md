@@ -2,6 +2,14 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-18 (19): First full build: data, models v2, map, story, brief, evidence
+
+- **Data:** `data/` builds 1,477 real outage events (2015–2024) from EAGLE-I and EIA-930. Set up: `brew install uv libomp`, then `cd data && uv sync`. Raw files (about 12 GB) stay in `data/raw/`, which git ignores; see `data/README.md` to fetch them.
+- **Models v2:** trained on 2015–2020, designed on 2021–2022, tested once on 2023–2024. Read `models/RESULTS.md` before you write any claim. Short version: 13% of events warned 12 h ahead without a weather forecast; 51% with one, as an upper bound; Texas 2021 alert 13 h before the first outage (19 h before the load-shed order) with the forecast model.
+- **App:** `cd app && npm install && npm run dev`. Story mode: `#/?story=texas2021`. The old Hollow Twin screen is at `#/legacy`.
+- **Rules for parallel work:** `contracts/README.md` says who owns which directories. Do not edit `app/package.json` or the contracts in a workstream branch.
+- **Action for everyone:** `git pull`, read `models/RESULTS.md` and the spec, then pick an open item from "Next" in `AGENTS.md`. The live page needs `EIA_API_KEY` (see `.env.example`).
+
 ## 2026-11-18 (18): Pivot to Earth as the product (spec locked, project unnamed)
 
 - **`.plans/before-during-after-spec.md` is locked** and replaces `.plans/hollow-twin-spec.md`. The working name is "Before, During, After"; the project is unnamed because another team (anudeep-bonagiri/hollow-twin) already uses "Hollow Twin".
