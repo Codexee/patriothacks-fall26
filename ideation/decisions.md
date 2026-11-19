@@ -64,3 +64,4 @@ Add one line per decision: date · decision · why · who. Newest last.
 - 2026-11-18 · Contracts frozen in contracts/README.md + app/src/contracts.ts; app shell owns routing and package.json; app/public/data/v1 is written by data/build/export_app.py (moved from workstream 4 to 1); old Hollow Twin UI frozen at #/legacy; weather from NOAA ISD-Lite, not Open-Meteo · /parallelize · Neil and Claude
 - 2026-11-19 · Map drawn as one smooth surface (no county outlines; depth and color interpolated across borders; hover keeps exact county values) · Neil asked for it · Neil
 - 2026-11-19 · Protocol: Claude runs its own agents; Paradev only to run Codex when the rules send work there · Neil
+- 2026-11-19 · Hollow work lives on branch `hollow` (from hollow-rebuild); old prototype/hollow-twin-* branches archived as archive/hollow-twin-* tags and deleted · Adarsh

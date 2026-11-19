@@ -2,6 +2,12 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-19 (22): Hollow work moves to branch `hollow`; old Hollow branches archived
+
+- **New branch: `hollow`** (Adarsh). It holds hollow-rebuild, the Residents' System prototype in `prototypes/hollow-twin-poc/` (Blackout Warning with the slow ease-off, the illustrated cutaway, the Modules panel). `main` and the Earth product do not change.
+- **Archived as tags, branches deleted:** `archive/hollow-twin-poc`, `archive/hollow-twin-product`, `archive/hollow-twin-rebuild`, `archive/hollow-twin-rebuild-ui`, `archive/hollow-twin-revamp`. Each tag points at the last commit of that branch, so nothing is lost. To look at one: `git fetch --tags`, then `git switch --detach archive/hollow-twin-rebuild`.
+- **Action for everyone:** `git fetch --prune --tags`. If you had a local `prototype/hollow-twin-*` branch, delete it. To work on the Hollow: `git switch hollow`.
+
 ## 2026-11-19 (21): Proposal: bring Neil's Earth work into hollow-rebuild
 
 - **New: `docs/integrateEarthIntoRebuild.md`** (Adarsh). It checks each part of Before, During, After against the track brief and says what fits in hollow-rebuild and what does not.
