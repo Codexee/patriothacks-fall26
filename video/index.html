@@ -103,7 +103,7 @@
       </div>
 
       <div id="event" class="clip" data-start="0" data-duration="11.2" data-track-index="5" data-track-kind="graphics">
-        <p id="event-p"><span id="event-day">Day 5</span>: <span data-var-text="event">Plants 4 and 5 lose output</span></p>
+        <p id="event-p"><span id="event-day">Day 5: </span><span data-var-text="event">Plants 4 and 5 lose output</span></p>
       </div>
 
       <div id="end" class="clip" data-start="11.2" data-duration="3.8" data-track-index="6" data-track-kind="graphics">
@@ -134,7 +134,8 @@
         return { day, wo: a.withoutDeaths + (b.withoutDeaths - a.withoutDeaths) * f, wi: a.withDeaths + (b.withDeaths - a.withDeaths) * f };
       }
       const dayEl = document.getElementById('day-v'), woEl = document.getElementById('wo-v'), wiEl = document.getElementById('wi-v');
-      document.getElementById('event-day').textContent = `Day ${eventDay}`;
+      // A day prefix only for an event that starts later ("Day 5: …"); a condition from day 1 reads without one.
+      document.getElementById('event-day').textContent = eventDay > 1 ? `Day ${eventDay}: ` : '';
 
       const tl = gsap.timeline({ paused: true });
       const clock = { t: 0 };

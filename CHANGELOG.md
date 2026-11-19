@@ -2,6 +2,13 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-20 (25): 3D twin and homepage films
+
+- **`#/demo` is now a 3D twin** (react-three-fiber): two Hollow shafts, without and with Blackout Warning, on the same disaster and a typical held-out seed, synced day by day, with a disaster dropdown, play/pause, a day scrubber and speed. The old 2D cutaway is at `#/demo/classic`.
+- **Homepage film:** a 15 s HyperFrames film per disaster loops muted beside the headline numbers, with a dropdown for the 7 disasters (`public/films/`). The film shows the real 3D footage, live death counters per side, the event and the held-out result.
+- **Rebuild the films:** `cd prototypes/hollow-twin-poc && npm run films` (3D footage, about 31 s each), then `cd video && node build-data.mjs && npx --yes hyperframes@0.9.70 render --batch rows.json --output "renders/{name}.mp4"`, then re-encode to `public/films/` (see `video/build-data.mjs`).
+- **Action for everyone:** `git pull`; run `npm install` in `prototypes/hollow-twin-poc` (new: three, @react-three/fiber, @react-three/drei, playwright).
+
 ## 2026-11-20 (24): `main` is the Hollow; the models are the product; results site
 
 - **`main` now holds the Hollow** (merged from `hollow`, no force push). The old Earth main is tag `archive/earth-main`. `models/` and `data/` (code only; raw data stays local) came over. The shared context (this file, `ideation/`, `context/hollow-brief.md`, handoffs) was restored from the old main after the merge.
