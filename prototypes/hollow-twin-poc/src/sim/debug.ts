@@ -5,7 +5,7 @@ import { sim } from './index.ts';
 const proc = (globalThis as unknown as { process: { argv: string[] } }).process;
 const which = proc.argv[2] ?? 'none';
 const tools: ToolSet = which === 'all' ? ALL_TOOLS : which === 'none' ? NO_TOOLS : { ...NO_TOOLS, [which]: true };
-let st = sim.createState(proc.argv[3] ?? 'texas2021', 1, tools);
+let st = sim.createState(proc.argv[3] ?? 'baseline', 1, tools);
 while (!st.end) {
   const r = sim.stepDay(st, []);
   st = r.state;

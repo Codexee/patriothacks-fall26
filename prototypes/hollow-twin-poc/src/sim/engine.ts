@@ -21,7 +21,7 @@ import { outages as realOutages, sections as realSections, air as realAir, cited
 /**
  * REBUILD: which of the Hollow's problems exist in the test world. We add them one at a time, together with
  * the residents' feature that answers each one. Problem numbers follow the track brief.
- * Step 1 (now): only power (#1) — plants that age, fail and trip in a storm, and blackouts — and the air that
+ * Step 1 (now): only power (#1) — plants that age, lose output and trip when overloaded, and blackouts (no storms: spec hollow-real-data) — and the air that
  * goes bad when fans lose power. Everything else is switched off.
  */
 export const WORLD = {

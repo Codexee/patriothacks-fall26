@@ -14,8 +14,8 @@ import { ModulesPanel } from './ModulesPanel.tsx';
 import { MAX_DAYS, attribution, compareRuns, type Attribution, type RunResult } from './compare.ts';
 import './styles.css';
 
-/** The steady Hollow is the default; Texas and Chicago stay in the list. */
-const DEFAULT_SCENARIO = sim.scenarios.find((x) => x.id === 'baseline')?.id ?? sim.scenarios[0].id;
+/** Cascade is the default: it is the demo scenario (spec: .plans/hollow-real-data-spec.md). */
+const DEFAULT_SCENARIO = sim.scenarios.find((x) => x.id === 'cascade')?.id ?? sim.scenarios[0].id;
 const FRAME_MS = 170; // 24 frames ≈ 4 s per day
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 const DEBUG = typeof location !== 'undefined' && new URLSearchParams(location.search).has('debug');

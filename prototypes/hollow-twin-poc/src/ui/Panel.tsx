@@ -84,7 +84,7 @@ export function Panel(p: PanelProps) {
           <button className="ghost" onClick={p.onMinimize} title="Minimize to the demo bar (T)">Minimize</button>
         </header>
 
-        <Section title="1. Choose a disaster" hint={state.scenario.summary} extra={<SourceInfo source={sim.sourceFor('scenario')} label="scenario" />}>
+        <Section title="1. Choose a scenario" hint={state.scenario.summary} extra={<SourceInfo source={sim.sourceFor('scenario')} label="scenario" />}>
           <div className="row">
             <select value={p.scenarioId} disabled={locked} onChange={(e) => p.onScenario(e.target.value)} aria-label="Scenario">
               {sim.scenarios.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
@@ -132,7 +132,7 @@ export function Panel(p: PanelProps) {
           </div>
         </Section>
 
-        <Section title="Same storm: with and without the system">
+        <Section title="Same scenario: with and without the system">
           <button disabled={locked} onClick={p.onCompare}>Compare</button>
           {p.busy && <p className="muted small">{p.busy}</p>}
           {p.compare && (
