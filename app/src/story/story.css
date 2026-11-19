@@ -1,0 +1,25 @@
+/* Story mode: captions only. Sizes are set for a 1080p recording. */
+.st-root { position: absolute; inset: 0; pointer-events: none; }
+.st-veil { position: absolute; inset: 0; background: var(--bg); opacity: 1; }
+
+.st-caption { position: absolute; left: 7vw; right: 7vw; bottom: 9.5vh; margin: 0; display: grid; gap: 0.2em;
+  font-size: clamp(22px, 2.5vw, 50px); line-height: 1.18; font-weight: 600; letter-spacing: -0.018em; max-width: 26em;
+  text-shadow: 0 2px 30px var(--bg), 0 0 8px var(--bg); }
+.st-caption span { animation: st-in 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.st-caption span:nth-child(2) { animation-delay: 1.3s; color: var(--text-dim); }
+/* The Hollow speaks in a serif face; Earth speaks in the plain face of the product. */
+.st-hollow { font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif; font-weight: 400; letter-spacing: -0.01em; }
+.st-hollow span:nth-child(2) { color: var(--lit); }
+.st-earth span:nth-child(2) { color: var(--text); }
+.st-caption .st-second { animation-delay: 0s; font-size: 0.62em; font-weight: 500; color: var(--text-dim); letter-spacing: 0; }
+.st-caption a { pointer-events: auto; color: var(--lit); border-bottom: 2px solid currentColor; }
+
+.st-chart { position: absolute; left: 7vw; right: 7vw; top: 5vh; animation: st-in 0.8s both; }
+.st-chart { z-index: 2; }
+.st-chart .em-timeline { position: static; animation: none; padding: 12px 18px; background: rgba(9, 11, 16, 0.88); }
+.st-chart .em-track { cursor: default; }
+.st-root:has(.st-list) .st-chart { right: calc(7vw + 440px); }
+.st-list .em-check { top: 5vh; right: 7vw; z-index: 2; }
+.st-root:has(.st-chart) .st-caption { bottom: 9.5vh; }
+
+@keyframes st-in { from { opacity: 0; transform: translateY(0.35em); } }
