@@ -1,0 +1,312 @@
+{
+ "generated": "2026-11-19T21:48:18+00:00",
+ "name": "Check-first model (residents-only)",
+ "task": "In an outage event, rank the areas of the region by how many hours each will stay dark, so that crews and neighbors check the longest-dark areas first.",
+ "method": "LightGBM regression on log1p(dark hours), 200 trees, 7 leaves, at least 200 rows per leaf; one row per area per event; inputs known at the event start",
+ "inputs": [
+  {
+   "name": "out_prev1h",
+   "plain": "Homes reporting no power in the area, 1 hour before the event start",
+   "hollowEquivalent": "Number of homes in the section that reported no power in the last hour"
+  },
+  {
+   "name": "out_max_prev6h",
+   "plain": "Most homes reporting no power in the area, in the 6 hours before the event start",
+   "hollowEquivalent": "Largest number of homes in the section that reported no power in the last 6 hours"
+  },
+  {
+   "name": "month",
+   "plain": "Month of the event start",
+   "hollowEquivalent": "Month on the Hollow calendar"
+  },
+  {
+   "name": "hod",
+   "plain": "Hour of day of the event start",
+   "hollowEquivalent": "Hour on the residents' clocks"
+  },
+  {
+   "name": "ba_past_events",
+   "plain": "Number of earlier outage events in the region",
+   "hollowEquivalent": "Number of earlier blackouts in the district"
+  },
+  {
+   "name": "ba_past_mean_hours",
+   "plain": "Mean length of earlier outage events in the region",
+   "hollowEquivalent": "Mean length of earlier blackouts in the district"
+  },
+  {
+   "name": "ba_hours_since_last",
+   "plain": "Hours since the region's last outage event ended",
+   "hollowEquivalent": "Hours since the district's last blackout ended"
+  },
+  {
+   "name": "past_events",
+   "plain": "Number of earlier events with a known outcome for the area",
+   "hollowEquivalent": "Number of earlier blackouts the section lived through"
+  },
+  {
+   "name": "past_dark_mean",
+   "plain": "Mean dark hours of the area in earlier events (the history baseline)",
+   "hollowEquivalent": "Mean hours the section stayed dark in earlier blackouts"
+  },
+  {
+   "name": "past_dark_max",
+   "plain": "Most dark hours of the area in one earlier event",
+   "hollowEquivalent": "Longest time the section stayed dark in one earlier blackout"
+  },
+  {
+   "name": "past_dark_share",
+   "plain": "Share of earlier events in which the area had at least 1 dark hour",
+   "hollowEquivalent": "Share of earlier blackouts in which the section went dark"
+  },
+  {
+   "name": "customers",
+   "plain": "Estimated electricity customers in the area (EIA-861, 2012: each utility's count split evenly over the counties it serves)",
+   "hollowEquivalent": "Number of homes in the section (count of rooms)"
+  },
+  {
+   "name": "pop",
+   "plain": "Population of the area",
+   "hollowEquivalent": "Head count of the section"
+  },
+  {
+   "name": "svi",
+   "plain": "CDC Social Vulnerability Index, overall percentile (2010)",
+   "hollowEquivalent": "Depth and vulnerability of the section's level"
+  },
+  {
+   "name": "svi_t1",
+   "plain": "SVI theme 1: income, jobs and education",
+   "hollowEquivalent": "Vulnerability of the level: income and work"
+  },
+  {
+   "name": "svi_t2",
+   "plain": "SVI theme 2: age, disability and single parents",
+   "hollowEquivalent": "Vulnerability of the level: elderly, disabled, single parents"
+  },
+  {
+   "name": "svi_t3",
+   "plain": "SVI theme 3: minority status and language",
+   "hollowEquivalent": "Vulnerability of the level: language and minority status"
+  },
+  {
+   "name": "svi_t4",
+   "plain": "SVI theme 4: housing type and transport",
+   "hollowEquivalent": "Vulnerability of the level: crowded housing and access"
+  },
+  {
+   "name": "utilities",
+   "plain": "Number of electric utilities that serve the area",
+   "hollowEquivalent": "Number of repair crews that serve the section"
+  },
+  {
+   "name": "ba_is_*",
+   "plain": "Which region the area belongs to (one 0/1 column per training region, 36 regions)",
+   "hollowEquivalent": "Which district the section belongs to"
+  }
+ ],
+ "excluded": [
+  "Weather at the event start (temperature, dew point, pressure, wind, rain, 24 h extremes): residents of the Hollow have no weather.",
+  "Weather forecasts: residents have no forecast.",
+  "Grid-operator data from EIA-930 (demand against the day-ahead forecast and against the 30-day peak, share of power imported, share from gas, 6 h changes in generation): the Directorate does not give residents grid figures.",
+  "HHS emPOWER (people on powered medical equipment): our copy is a 2026 snapshot, so it was not known before the 2015-2024 events. It is a fair Hollow input (residents can report it), but it cannot be tested on this history."
+ ],
+ "periods": {
+  "train": "July 2015 to December 2020 (events that ended before 2021)",
+  "dev": "2021 to 2022 (used to choose the inputs)",
+  "test": "2023 to 2024 (scored once, after every choice was frozen)"
+ },
+ "test": {
+  "events": 390,
+  "areaEvents": 34877,
+  "rows": [
+   {
+    "metric": "Within-event Spearman (rank agreement between predicted and actual dark hours, across the areas of one event; 0 = chance)",
+    "model": 0.3164,
+    "history": 0.2197,
+    "chance": 0.0,
+    "better": "higher"
+   },
+   {
+    "metric": "Top-10 overlap (share of the 10 longest-dark areas that the model also ranks in its top 10)",
+    "model": 0.4592,
+    "history": 0.2776,
+    "chance": 0.1318,
+    "better": "higher"
+   },
+   {
+    "metric": "Mean absolute error of dark hours per area (h)",
+    "model": 2.2679,
+    "history": 3.5766,
+    "chance": null,
+    "better": "lower"
+   }
+  ]
+ },
+ "dev": {
+  "events": 309,
+  "areaEvents": 19708,
+  "rows": [
+   {
+    "metric": "Within-event Spearman (rank agreement between predicted and actual dark hours, across the areas of one event; 0 = chance)",
+    "model": 0.3396,
+    "history": 0.2099,
+    "chance": 0.0,
+    "better": "higher"
+   },
+   {
+    "metric": "Top-10 overlap (share of the 10 longest-dark areas that the model also ranks in its top 10)",
+    "model": 0.4423,
+    "history": 0.2558,
+    "chance": 0.1351,
+    "better": "higher"
+   },
+   {
+    "metric": "Mean absolute error of dark hours per area (h)",
+    "model": 2.5127,
+    "history": 4.1265,
+    "chance": null,
+    "better": "lower"
+   }
+  ]
+ },
+ "comparison": {
+  "label": "The v2 model with weather and grid-operator inputs (not usable in the Hollow), same FINAL TEST",
+  "rows": [
+   {
+    "metric": "Within-event Spearman (rank agreement between predicted and actual dark hours, across the areas of one event; 0 = chance)",
+    "model": 0.3096,
+    "history": 0.2197,
+    "chance": 0.0,
+    "better": "higher"
+   },
+   {
+    "metric": "Top-10 overlap (share of the 10 longest-dark areas that the model also ranks in its top 10)",
+    "model": 0.46,
+    "history": 0.2776,
+    "chance": 0.1318,
+    "better": "higher"
+   },
+   {
+    "metric": "Mean absolute error of dark hours per area (h)",
+    "model": 2.2257,
+    "history": 3.5766,
+    "chance": null,
+    "better": "lower"
+   }
+  ]
+ },
+ "importance": [
+  {
+   "feature": "Homes reporting no power in the area, 1 hour before the event start",
+   "share": 0.2924
+  },
+  {
+   "feature": "Month of the event start",
+   "share": 0.1243
+  },
+  {
+   "feature": "Mean length of earlier outage events in the region",
+   "share": 0.0956
+  },
+  {
+   "feature": "Population of the area",
+   "share": 0.0877
+  },
+  {
+   "feature": "Share of earlier events in which the area had at least 1 dark hour",
+   "share": 0.0872
+  },
+  {
+   "feature": "Most homes reporting no power in the area, in the 6 hours before the event start",
+   "share": 0.0589
+  },
+  {
+   "feature": "Hours since the region's last outage event ended",
+   "share": 0.0538
+  },
+  {
+   "feature": "Number of earlier events with a known outcome for the area",
+   "share": 0.0345
+  },
+  {
+   "feature": "Which region the area belongs to (one 0/1 column per training region, 36 regions)",
+   "share": 0.0343
+  },
+  {
+   "feature": "Number of earlier outage events in the region",
+   "share": 0.0266
+  }
+ ],
+ "example": {
+  "event": "Hurricane Beryl, Texas (ERCOT region, 188 counties, 49 went dark). The model's top 10 held 7 of the 10 longest-dark counties; the history baseline held 2.",
+  "date": "2024-07-08",
+  "topAreas": [
+   {
+    "name": "Matagorda County, Texas",
+    "predictedHours": 13.4,
+    "actualHours": 86.0
+   },
+   {
+    "name": "Calhoun County, Texas",
+    "predictedHours": 10.0,
+    "actualHours": 4.0
+   },
+   {
+    "name": "Wharton County, Texas",
+    "predictedHours": 8.8,
+    "actualHours": 120.0
+   },
+   {
+    "name": "Colorado County, Texas",
+    "predictedHours": 5.9,
+    "actualHours": 37.0
+   },
+   {
+    "name": "Jackson County, Texas",
+    "predictedHours": 5.5,
+    "actualHours": 17.0
+   },
+   {
+    "name": "Brazoria County, Texas",
+    "predictedHours": 4.1,
+    "actualHours": 165.0
+   },
+   {
+    "name": "Galveston County, Texas",
+    "predictedHours": 4.0,
+    "actualHours": 151.0
+   },
+   {
+    "name": "Liberty County, Texas",
+    "predictedHours": 2.6,
+    "actualHours": 143.0
+   },
+   {
+    "name": "Chambers County, Texas",
+    "predictedHours": 1.9,
+    "actualHours": 104.0
+   },
+   {
+    "name": "Waller County, Texas",
+    "predictedHours": 1.3,
+    "actualHours": 81.0
+   }
+  ]
+ },
+ "limits": [
+  "95% intervals on FINAL TEST (2,000 bootstrap resamples of events): within-event Spearman 0.285 to 0.347 (history 0.183 to 0.254); top-10 overlap 0.421 to 0.494 (history 0.243 to 0.316).",
+  "The model ranks areas. Its hour values are much too low in large events (in Hurricane Beryl, Brazoria County: 4.1 h predicted, 165 h actual). Use the order, not the hours.",
+  "Predicting 0 hours everywhere has a lower mean error (2.00 h) than the model (2.27 h), because most areas have no dark hour. The error metric does not measure the ranking.",
+  "The data is real US outages (EAGLE-I county outage reports, 2015-2024). The Hollow inputs are stand-ins: reported outages for residents' reports, CDC SVI for depth, counties for sections, balancing-authority regions for districts.",
+  "Month and hour may carry storm-season information. The Hollow has no storms, so part of what the model learned from the calendar may not carry over.",
+  "Events are defined from outage reports (at least a set share of the region's customers out). The model does not predict whether an event starts, only which areas stay dark longest once it has started.",
+  "In Hurricane Beryl the model missed Harris County, the longest-dark county (176 h): the outage reports showed only 214 of about 1.8 million customers out 1 hour before the event start, so the model predicted 0 h. The model is only as good as the residents' reports.",
+  "Removing weather and grid inputs did not lower the score: those inputs have one value per event, so they cannot rank areas inside one event by themselves."
+ ],
+ "source": {
+  "label": "EAGLE-I county outages (ORNL), CDC SVI, Census, EIA-861",
+  "detail": "Model and scores: models/train_dark_residents.py and models/final_test_residents.py; full write-up in models/RESULTS_RESIDENTS.md.",
+  "url": "https://doi.org/10.6084/m9.figshare.24237376"
+ }
+}
