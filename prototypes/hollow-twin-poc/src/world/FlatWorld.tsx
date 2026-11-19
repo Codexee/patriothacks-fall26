@@ -122,6 +122,8 @@ export function FlatWorld(props: WorldProps) {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let staticCv: HTMLCanvasElement | null = null, staticKey = '';
     let raf = 0, last = performance.now(), lastDraw = 0, peopleMax = 1;
+    const prevTarget = new Float32Array(SECTION_COUNT).fill(1);
+    let sparks: { x: number; y: number; vx: number; vy: number; life: number }[] = [];
     const t0 = performance.now();
 
     const draw = (now: number) => {
@@ -151,7 +153,15 @@ export function FlatWorld(props: WorldProps) {
         const target = !s || s.lost ? 0 : s.lifeSupport < BLACKOUT ? 0 : 0.6 + 0.4 * Math.max(0, Math.min(1, s.power));
         const v = shown.current[i] + (target - shown.current[i]) * k;
         shown.current[i] = Math.abs(target - v) < 0.003 ? target : v;
+        // A lamp that dies throws a few sparks.
+        if (!reduce && prevTarget[i] >= 0.5 && target === 0 && s && !s.lost && sparks.length < 400) {
+          const lx = g.x(i % SECTIONS_PER_LEVEL) + g.roomW / 2, ly = g.y(Math.floor(i / SECTIONS_PER_LEVEL) + 1) + 2;
+          for (let q = 0; q < 5; q++) sparks.push({ x: lx, y: ly, vx: (hash(i, q + now) - 0.5) * 40, vy: -hash(q, i + now) * 25, life: 0.5 + hash(i, q) * 0.4 });
+        }
+        prevTarget[i] = target;
       }
+      sparks = sparks.filter((p) => (p.life -= dt) > 0);
+      for (const p of sparks) { p.vy += 120 * dt; p.x += p.vx * dt; p.y += p.vy * dt; }
 
       // The surface: smoke drifting over the ruins, and a machine's searchlight sweeping the sky.
       ctx.save(); ctx.beginPath(); ctx.rect(0, 0, width, SURFACE); ctx.clip();
@@ -167,6 +177,17 @@ export function FlatWorld(props: WorldProps) {
       ctx.fillStyle = beam; ctx.beginPath(); ctx.moveTo(sx, sy);
       ctx.lineTo(sx + Math.cos(ang - 0.09) * 140, sy + Math.sin(ang - 0.09) * 140);
       ctx.lineTo(sx + Math.cos(ang + 0.09) * 140, sy + Math.sin(ang + 0.09) * 140); ctx.fill();
+      // Two of the machines' drones patrol over the ruins, scanning the ground.
+      for (let d = 0; d < 2; d++) {
+        const dir = d ? -1 : 1, span = width + 120;
+        const raw = (t * (22 + d * 9) + d * span * 0.5) % span;
+        const dx = dir > 0 ? raw - 60 : width + 60 - raw, dy = 22 + d * 14 + Math.sin(t * 1.4 + d) * 3;
+        ctx.fillStyle = 'rgba(255,90,70,0.10)';
+        ctx.beginPath(); ctx.moveTo(dx - 1.5, dy + 2); ctx.lineTo(dx + 1.5, dy + 2); ctx.lineTo(dx + 9, SURFACE); ctx.lineTo(dx - 9, SURFACE); ctx.fill();
+        ctx.fillStyle = '#17121a'; ctx.beginPath(); ctx.ellipse(dx, dy, 6, 2.2, 0, 0, 7); ctx.fill();
+        ctx.fillRect(dx - 9, dy - 1.5, 18, 0.8);
+        ctx.fillStyle = `rgba(255,70,50,${Math.sin(t * 6 + d * 2) > 0 ? 1 : 0.25})`; ctx.beginPath(); ctx.arc(dx, dy + 1.5, 1.1, 0, 7); ctx.fill();
+      }
       ctx.restore();
 
       // Machine lights on the surface.
@@ -180,10 +201,21 @@ export function FlatWorld(props: WorldProps) {
       ctx.fillStyle = 'rgba(255,236,220,0.85)';
       ctx.fillText('The surface: closed for 30 years, held by the machines', GUTTER_L, 14);
 
-      // The lift, going up and down the shaft.
-      const liftY = g.top + ((Math.sin(t / 7) + 1) / 2) * (LEVELS * ROW - 14);
-      ctx.fillStyle = '#c9a46a'; ctx.fillRect(SHAFT_X + 2, liftY, SHAFT_W - 4, 12);
-      ctx.fillStyle = 'rgba(255,220,150,0.9)'; ctx.fillRect(SHAFT_X + 3, liftY + 2, SHAFT_W - 6, 3);
+      // The lift: travels between levels, stops, and lights the landing while its door is open.
+      const HOP = 7, hop = Math.floor(t / HOP), u = (t % HOP) / HOP;
+      const stopAt = (n: number) => 1 + Math.floor(hash(n, 90) * LEVELS);
+      const from = stopAt(hop), to = stopAt(hop + 1);
+      const m = u < 0.45 ? 0 : (1 - Math.cos(((u - 0.45) / 0.55) * Math.PI)) / 2;
+      const liftLevel = from + (to - from) * m;
+      const liftY = g.y(liftLevel) + 2;
+      ctx.fillStyle = 'rgba(160,170,185,0.35)'; ctx.fillRect(SHAFT_X + SHAFT_W / 2 - 0.4, g.top - 6, 0.8, liftY - g.top + 6); // cable
+      ctx.fillStyle = '#c9a46a'; ctx.fillRect(SHAFT_X + 2, liftY, SHAFT_W - 4, 13);
+      ctx.fillStyle = 'rgba(255,220,150,0.95)'; ctx.fillRect(SHAFT_X + 3, liftY + 2, SHAFT_W - 6, 3);
+      if (m === 0) { // stopped: the landing light is on
+        const lg = ctx.createRadialGradient(SHAFT_X + SHAFT_W, liftY + 6, 0, SHAFT_X + SHAFT_W, liftY + 6, 14);
+        lg.addColorStop(0, 'rgba(255,215,140,0.55)'); lg.addColorStop(1, 'rgba(255,215,140,0)');
+        ctx.fillStyle = lg; ctx.fillRect(SHAFT_X - 4, liftY - 8, 30, 28);
+      }
 
       // Light spilling out of lit rooms onto the rock.
       ctx.globalCompositeOperation = 'lighter';
@@ -251,6 +283,13 @@ export function FlatWorld(props: WorldProps) {
               ctx.fillStyle = `rgba(255,235,190,${0.16 * lit * shimmer})`;
               ctx.beginPath(); ctx.moveTo(x + w * 0.42, y + 2.5); ctx.lineTo(x + w * 0.58, y + 2.5);
               ctx.lineTo(x + w * 0.85, y + h); ctx.lineTo(x + w * 0.15, y + h); ctx.fill();
+              if (lit > 0.6 && !reduce) { // dust drifting down through the light
+                ctx.fillStyle = `rgba(255,250,235,${0.55 * lit})`;
+                for (let q = 0; q < 2; q++) {
+                  const dy = ((t * (2.5 + q) + hash(i, q + 50) * h) % (h - 4)) + 3;
+                  ctx.fillRect(x + w * 0.5 + Math.sin(t * 0.7 + i + q * 2) * w * 0.18, y + dy, 1, 1);
+                }
+              }
             }
             if (bad) { // emergency strip and a red haze
               const p = reduce ? 0.8 : 0.45 + 0.55 * Math.max(0, Math.sin(t * 3.2 + i));
@@ -297,6 +336,12 @@ export function FlatWorld(props: WorldProps) {
             ctx.strokeStyle = 'rgba(30,24,20,0.9)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(cx, cy, 4.2, 0, 7); ctx.stroke();
           }
         }
+      }
+
+      // Sparks from lamps that just died.
+      for (const p of sparks) {
+        ctx.fillStyle = `rgba(255,${Math.round(180 + 60 * p.life)},120,${Math.min(1, p.life * 2)})`;
+        ctx.fillRect(p.x, p.y, 1.6, 1.6);
       }
 
       // The blackout line: below it, levels have no air or fans.
