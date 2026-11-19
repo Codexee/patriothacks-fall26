@@ -1,4 +1,80 @@
-# Shortlist (round 15, Tue Nov 17): the Hollow brief
+# Shortlist (Tue Nov 17): the Hollow brief
+
+## Round 17 (Wed Nov 18, night): Earth is the product
+
+Scores /30: Wow, Track fit, Feasible by Thu noon, Remote-OK, Live-demo-able, **Applicable** (replaces Team fit). Details: `ideation/ideas.md` → Round 17. The project stays unnamed (another team already uses "Hollow Twin").
+
+| Rank | Idea | 30-second moment | Problems | **/30** |
+| --- | --- | --- | --- | --- |
+| 1 | **R17-A. Before, During, After** (3 models trained on hundreds of US disasters) | Pick Texas 2021: warned N h early, the vulnerable counties to check, then the official count against the model's | 1, 2, 3, 8, 9, 10, 13 | **27** |
+| 2 | R17-D. Dark Hours (who stays dark longest) | "The most vulnerable counties stayed dark X% longer" | 2, 8, 10 | 26 |
+| 3 | R17-C. The Undercount (independent death counts) | Official deaths against the model's estimate, disaster by disaster | 9, 13 | 25 |
+| 4 | R17-B. Warn only, deep | Warning line before every one of 300 events, with its false-alarm rate | 1, 3 | 23 |
+
+**Recommendation:** R17-A, because its three parts are B, C and D, so each part can fail without losing the project, and no other team on the track trains on real data.
+
+---
+
+> **Chosen (Neil, Nov 17): Hollow Twin.** Software only. Spec: `.plans/hollow-twin-spec.md`. See "Neil's round 14 table" below.
+
+> **Merge note (Nov 17):** Adarsh ran rounds 14–16 in parallel with Neil, before seeing the Hollow Twin choice. They are kept here as input for the sync, and they have not been reconciled with Hollow Twin yet. Many of the 15 one-problem ideas (Fair Share, Flicker, Snow, Truthcount) could become tools inside Hollow Twin.
+
+## Adarsh's round 15 (Tue Nov 17, evening): one idea per problem
+
+> **Adarsh's round 16 (Nov 17):** every project below now has a full build-and-demo sheet (what judges see, the full process, the video script, what we prepare, build hours, risks) in `ideation/projects-1-15.md`.
+
+> **Inputs rule (Adarsh, Nov 17):** we do not pretend real-world sensors are the Hollow. Inputs are resident reports, a fictional "scenario pack" for one sector, user choices, a hidden future for honest forecast reveals, and real safety standards. Turning off the network is real, so ideas 7 and 8 use real phones. Details: `ideation/ideas.md` → Round 15.
+
+Scores are /25: Wow, Active loop, Feasible by Thu night, Demo-able, Connects to the shared spine (report intake, sector graph, offline relay).
+
+| Rank | # | Idea | 30-second moment | **/25** |
+| --- | --- | --- | --- | --- |
+| 1 | 4 | **Snow** (trace bad water to the broken recycler) | Four unrelated reports trace upstream to one recycler | **23** |
+| 2 | 7 | **Lantern** (messages with no network) | Airplane mode on; a help call hops phone to phone; a fake notice is rejected | **23** |
+| 3 | 5 | Floodline (flood spread and cut-off deadline) | "Low Market cut off in 3 h, 400 people" | 22 |
+| 4 | 2 | Fair Share (verifiable rationing) | Supply to 60%; "Verify" catches a changed plan | 22 |
+| 5 | 12 | Larder (food runway and grow plan) | Runway 4.2 days → 23 days | 22 |
+| 6 | 9 | Truthcount (real outbreak vs official) | Official 310 vs real 1,240 | 22 |
+| 7 | 8 | Kin (family check-ins offline) | 3 green, 1 grey, responder flagged | 21 |
+| 8 | 13 | Witness (tamper-proof surface readings) | One changed reading turns every copy red | 21 |
+| 9 | 15 | Exodus (plan the move up) | "One more lift saves 11 months" | 21 |
+| 10 | 1 | Flicker (blackout early warning) | The hidden future plays; the outage hits as predicted | 20 |
+| 11 | 3 | Draft (route cool air down) | Cool air routed to the baby's room | 20 |
+| 12 | 6 | Swapline (room swap chains, shared beds) | A 4-way swap, +38% space | 20 |
+| 13 | 10 | Runner (triage and medicine delivery) | Clinician approves; runner gets the QR | 20 |
+| 14 | 14 | Vanguard (which option, who goes first) | 10,000 missions; the answer flips | 20 |
+| 15 | 11 | Dawnline (light and sleep plan) | Body-clock drift flagged | 17 |
+
+**Recommendation for `/interview` (before combining):**
+1. **Snow**, because its demo is the clearest cause-and-effect moment (the John Snow story), and its "report → trace on a graph → alert only the right people" engine is the same engine Flicker, Floodline, and Draft need.
+2. **Lantern**, because the network is really off in the demo, so nothing is pretend, and it is the delivery layer every other idea uses.
+
+---
+
+## Adarsh's round 14 table (replaced by his round 15: its inputs pretended real sensors were the Hollow)
+
+> **The track changed.** The organizers' doc sets a specific world, "Life underground" (the Hollow), with 15 problems (`context/hollow-brief.md`). Off the Record, Pinpoint, and the Flock ideas do not fit it. Round 14 replaces them. The Off the Record spec and schedule in `.plans/` are no longer the plan.
+
+> **How we build for a fictional world:** a simulated Hollow (a digital twin) produces the problems; the product is real software that reads data, decides, and acts; real phone signals stand in for the fictional ones (a charger pulled = a power cut). Details: `ideation/ideas.md` → Round 14 → "How to build for a world that does not exist".
+
+Scores are /25: Wow, Problems covered, Active loop, Feasible by Thu night, Demo-able.
+
+| Rank | Idea | Hook | Problems | **/25** | Next step |
+| --- | --- | --- | --- | --- | --- |
+| 1 | **H1. Canary** (residents' phones as sensors, forecasts, offline sound relay) | Pull a charger: the map predicts the next blackout. Turn off Wi-Fi: the warning still arrives by sound. | 10 of 15 | **22** | `/interview Canary` |
+| 2 | H3. Undergrid (Canary + Fair Share) | The people's data drives the Directorate's plan | 12 of 15 | 21 | Stretch goal for H1 |
+| 3 | H2. Fair Share (verifiable rationing optimizer) | "Heat-danger hours: 2,140 → 310" | 6 of 15 | 21 | Fold into H1 as act 3 |
+| 4 | H4. First Light (signed surface readings, first wave, the move) | A changed reading is caught on the public page | 3 of 15 (bonus path) | 19 | Optional closing scene |
+| 5 | H5. Lantern (sound-chirp messaging) | Message arrives with Wi-Fi off | 2–4 of 15 | 19 | Part of H1 |
+| 6 | H6. Deep Clinic | Offline triage and medicine runs | 3 of 15 | 16 | Drop |
+
+**Recommendation:**
+1. **Canary**, because it is the only idea whose demo inputs are real (a pulled charger, a real cough, a real test strip, Wi-Fi turned off), so judges see it work, and it covers 10 of the 15 problems in one loop.
+2. **Fair Share as act 3 of Canary (= Undergrid)**, only if Canary's minimum version (power + forecast + sound relay) works by Wed night, because it adds problems 2, 6, and 12 and gives the Directorate side.
+
+---
+
+## Neil's round 14 table
 
 > **Chosen (Neil, Nov 17): Hollow Twin.** Software only. Spec: `.plans/hollow-twin-spec.md`. Earshot and Canary are dropped (unknowns and hardware).
 

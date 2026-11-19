@@ -2,6 +2,71 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-20 (24): `main` is the Hollow; the models are the product; results site
+
+- **`main` now holds the Hollow** (merged from `hollow`, no force push). The old Earth main is tag `archive/earth-main`. `models/` and `data/` (code only; raw data stays local) came over. The shared context (this file, `ideation/`, `context/hollow-brief.md`, handoffs) was restored from the old main after the merge.
+- **The product is the models.** (1) Blackout Warning, gated: across 7 disasters and held-out seeds 11–20, deaths fall from 20,965,011 to 5,903 (sim scale), and 70 of 70 runs end stable. (2) A new residents-only check-first model (LightGBM, no weather or grid data), tested once on 2023–2024: top-10 overlap 0.459 (0.421–0.494) against 0.278 for history and 0.132 for chance; the weather model scores 0.460. See `models/RESULTS_RESIDENTS.md`.
+- **3 new disasters** shaped from real plant losses (EIA-930): TVA coal in Winter Storm Elliott 2022, TVA and CPLE together, SPP wind in Feb 2021. `npm run results` writes `public/results/scenarios.json`.
+- **Results site** (`prototypes/hollow-twin-poc`, `npm run dev`): `#/` results, `#/disaster/<id>`, `#/model`, `#/demo` (the cutaway).
+- **Read `docs/competitor-analysis.md`:** STRATUM is the team to beat. Our gaps are coverage, a live URL and the video.
+- **Action for everyone:** `git fetch --tags`, then `git switch main` and `git pull`. If git refuses because your local main has its own commits, ask before you reset.
+
+## 2026-11-19 (23): The Hollow is the product; real data in its test world
+
+- **Decision (Neil):** the Earth map (Before, During, After) is abandoned. Adarsh's Hollow on branch `hollow` is the project. `main` keeps the Earth work and the shared context.
+- **New locked spec on `hollow`:** `.plans/hollow-real-data-spec.md`. The test world now uses real data: ERCOT demand (EIA-930), plant repair times from 100 real outages (EAGLE-I), the 400 sections built from 3,133 US counties sorted by SVI, and a cited CO₂ limit. The Residents' System still reads only residents' reports.
+- **No storms:** Texas 2021 and Chicago 1995 are gone. Scenarios: Cascade (default: Plant 2 loss shaped like ERCOT Feb 2021), Baseline, Aging, Crowding.
+- **`npm run gate`** (in `prototypes/hollow-twin-poc`): tune seeds 1–5, check 6–10, test 11–20. Blackout Warning retuned: `safeLoad` 0.82, `assumedCompliance` 0.75. Test set, run once: 3,628 deaths and 87 trips, against 20,382 and 184 with the first guesses (12.3 M without the module).
+- **Adarsh's headline numbers changed** (Texas seed 1 is gone). New tables and limits: `prototypes/hollow-twin-poc/REBUILD.md`, Step 2.
+- **Action for everyone:** `git fetch`, `git switch hollow`, `git pull`, then read REBUILD.md Step 2.
+
+## 2026-11-19 (22): Hollow work moves to branch `hollow`; old Hollow branches archived
+
+- **New branch: `hollow`** (Adarsh). It holds hollow-rebuild, the Residents' System prototype in `prototypes/hollow-twin-poc/` (Blackout Warning with the slow ease-off, the illustrated cutaway, the Modules panel). `main` and the Earth product do not change.
+- **Archived as tags, branches deleted:** `archive/hollow-twin-poc`, `archive/hollow-twin-product`, `archive/hollow-twin-rebuild`, `archive/hollow-twin-rebuild-ui`, `archive/hollow-twin-revamp`. Each tag points at the last commit of that branch, so nothing is lost. To look at one: `git fetch --tags`, then `git switch --detach archive/hollow-twin-rebuild`.
+- **Action for everyone:** `git fetch --prune --tags`. If you had a local `prototype/hollow-twin-*` branch, delete it. To work on the Hollow: `git switch hollow`.
+
+## 2026-11-19 (21): Proposal: bring Neil's Earth work into hollow-rebuild
+
+- **New: `docs/integrateEarthIntoRebuild.md`** (Adarsh). It checks each part of Before, During, After against the track brief and says what fits in hollow-rebuild and what does not.
+- **Short version:** Neil's warning model does not fit, because residents have no weather or grid-operator data. His data (real counties shaping the levels) and his train / tune / test-once method do fit. The plan adds a "record line" warning and a "who to check first" list to Blackout Warning, each kept only if a regression gate shows no result gets worse.
+- **This is a proposal, not a decision.** It has 4 open decisions, including which screen leads the video.
+- **Action for everyone (Neil especially):** read it before the sync and give your view on the open decisions.
+
+## 2026-11-19 (20): Handoff to Adarsh; real-forecast result; cross-section; deploy prep
+
+- **Adarsh: start with `docs/handoffs/2026-11-19-earth-product.md`.** It says what works, what is not verified, the numbers to use and the next steps. Neil is offline until later on Thursday.
+- **Models:** tested on real archived weather forecasts for 2024: 51% of events warned 12 h ahead, about 11 false alarms per area per year. A comparison at equal false-alarm rates is in `models/RESULTS.md` and on the evidence page.
+- **App:** Hollow cross-section (`#/hollow`), Without/With the warning, live counters, detailed evidence and brief pages, live page with record features. App data trimmed to 14 MB.
+- **Deploy:** not done. Steps are in `docs/deploy.md`; it needs a Vercel account and a free EIA key.
+- **Action for everyone:** `git pull`, read the handoff and `TODO.md`, claim an item in `TODO.md` by writing your name after it.
+
+## 2026-11-18 (19): First full build: data, models v2, map, story, brief, evidence
+
+- **Data:** `data/` builds 1,477 real outage events (2015–2024) from EAGLE-I and EIA-930. Set up: `brew install uv libomp`, then `cd data && uv sync`. Raw files (about 12 GB) stay in `data/raw/`, which git ignores; see `data/README.md` to fetch them.
+- **Models v2:** trained on 2015–2020, designed on 2021–2022, tested once on 2023–2024. Read `models/RESULTS.md` before you write any claim. Short version: 13% of events warned 12 h ahead without a weather forecast; 51% with one, as an upper bound; Texas 2021 alert 13 h before the first outage (19 h before the load-shed order) with the forecast model.
+- **App:** `cd app && npm install && npm run dev`. Story mode: `#/?story=texas2021`. The old Hollow Twin screen is at `#/legacy`.
+- **Rules for parallel work:** `contracts/README.md` says who owns which directories. Do not edit `app/package.json` or the contracts in a workstream branch.
+- **Action for everyone:** `git pull`, read `models/RESULTS.md` and the spec, then pick an open item from "Next" in `AGENTS.md`. The live page needs `EIA_API_KEY` (see `.env.example`).
+
+## 2026-11-18 (18): Pivot to Earth as the product (spec locked, project unnamed)
+
+- **`.plans/before-during-after-spec.md` is locked** and replaces `.plans/hollow-twin-spec.md`. The working name is "Before, During, After"; the project is unnamed because another team (anudeep-bonagiri/hollow-twin) already uses "Hollow Twin".
+- **What changes:** two models trained on real US outages since 2015 (a 48-hour grid warning from EIA-930, and who stays dark longest from EAGLE-I with CDC SVI and HHS emPOWER), tested on 2021 onward. A deck.gl county map where counties sink by vulnerability (the Hollow's "deep levels"), a county brief, an evidence view, and a live page. Gated stretch ladder: heat → true count → air → water.
+- **What leaves the demo path:** the PixiJS cutaway and the 9 hand-written modules (`app/src/world`, `app/src/product`, `app/src/sim`). Do not delete them.
+- **Why:** `ideation/ideas.md` → Round 17 (6 competing repos; none uses real disaster data).
+- **Action for everyone:** read the new spec, agree or object in the chat, then pick an open workstream. Python work goes in `data/` and `models/` (uv, DuckDB, LightGBM).
+
+## 2026-11-18 (17): Spec v2 locked; the app now lives in `app/`
+
+- **`.plans/hollow-twin-spec.md` is locked (v2).** It is the source of truth. The evaluation behind it is `.plans/hollow-twin-evaluation.md`.
+  - The base is Adarsh's product design: 9 modules read only observations, and the sim is the test world.
+  - New: an **Earth act** that opens the video. The same modules run on real data (Texas 2021 EIA-930 + county outages, Flint 2015, Wuhan 2020), plus a live grid page.
+  - New: twin split (real Texas map beside the cutaway), cinematic cascade, truth wave + Lantern packets, scripted story mode, a Directorate agent with goals and its own panel, 8 sample districts (2 billion people), and a lives-first score.
+  - The spec has a step-by-step plan (Wed night → Fri 6 pm) and a cut priority list.
+- **`prototype/hollow-twin-product` is merged into `main`, and the app moved from `prototypes/hollow-twin-poc/` to `app/`.** The launch config is now named `hollow-twin`.
+- **Action for everyone:** `git pull` on `main`, then `cd app && npm install`. Read the spec's "Step-by-step plan" and pick the next open step. Roles are not fixed. Stay inside the directories that the step's workstream owns.
+
 ## 2026-11-17 (16): New direction: Hollow Twin (software only)
 
 - **The track is the Hollow** (`context/track.md`). Off the Record is on hold. Hardware is out (no parts in time). Earshot is dropped (too many unknowns).

@@ -20,10 +20,10 @@ We are a 4-person team competing in **Patriot HackFest Fall 2026** (George Mason
 
 ## Where we are (update this section after every milestone)
 
-- **Phase:** Thu Nov 19, night. **The Hollow (branch `hollow`) is the product**; the Earth map on `main` is abandoned (Neil). Locked spec: `.plans/hollow-real-data-spec.md`.
-- **Done:** Blackout Warning (problem #1) on residents' data only; real data in the test world (EIA-930 demand, EAGLE-I repair times, real counties as sections, cited CO₂ limit); no storms (scenarios Cascade, Baseline, Aging, Crowding); `npm run gate` with tune/check/test seeds; module retuned. Results: `prototypes/hollow-twin-poc/REBUILD.md` Step 2.
-- **Next:** pitch and video; problem #2 onward, one at a time, each through the gate.
-- **Blockers:** judging criteria not published. Cascade looks like Baseline with the module on (see REBUILD.md limits).
+- **Phase:** Fri Nov 20, early. `main` is the Hollow. **The product is the statistical models; the simulation is the demo.** Specs: `.plans/results-site-spec.md`, `.plans/hollow-real-data-spec.md`.
+- **Done:** Blackout Warning gated on 7 disasters (held-out seeds); residents-only check-first model tested on 2023–2024 (`models/RESULTS_RESIDENTS.md`); results site in `prototypes/hollow-twin-poc`. Competitor analysis: `docs/competitor-analysis.md`. **Read the top entry of `CHANGELOG.md`.**
+- **Next (in order):** deploy the site (Vercel account needed); a coverage-matrix page; label every number REAL DATA or SIMULATED; README with reproduce commands; video by 6 pm; Devpost text.
+- **Blockers:** judging criteria not published. One lost plant does not change the "with" results; only Two Plants tests the module.
 
 ## Start of every session (all AIs)
 

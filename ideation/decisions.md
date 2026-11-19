@@ -46,3 +46,30 @@ Add one line per decision: date · decision · why · who. Newest last.
 - 2026-11-17 · A software project can win this event (both 2025 PatriotHacks winners were software, and judging is by video) · Claude; Earshot recommended, pending Neil
 - 2026-11-17 · Earshot dropped (too many unknowns: accuracy, data, props); pure-code projects only · Neil
 - 2026-11-17 · Hollow Twin chosen and interviewed; draft spec at .plans/hollow-twin-spec.md (pixel cutaway, 50×8 sections, real-data scenario packs, lies as delay + trust, 4 tools with Shapley attribution, rival/helper, leaderboard, Claude summary) · Neil
+- 2026-11-17 · (Adarsh, in parallel with Neil, before seeing Hollow Twin) The organizers' doc sets the track to 'Life underground' (the Hollow, 15 problems; context/hollow-brief.md). Off the Record and earlier ideas do not fit. Adarsh's round 14 ranks Canary first (22/25) · Adarsh and Claude
+- 2026-11-17 · (Adarsh, parallel) Inputs must exist inside the story: resident reports, a fictional scenario pack, user choices, hidden-future reveals, real safety standards. No real sensors posing as the Hollow. Adarsh's round 15 gives one idea per problem; Snow and Lantern lead (23/25) · Adarsh
+- 2026-11-18 · Hollow Twin spec v2: base is prototype/hollow-twin-product (real modules on a test-world sim); 4 featured modules + 5 in a montage; score is lives first · the "just a game" risk and a score that ranked 465k deaths near 3k · Neil
+- 2026-11-18 · Real-world impact act opens the video: the unchanged modules run on real data (Texas 2021 EIA-930 + county outages, Flint 2015 VT samples, Wuhan 2020 JHU + Imperial) plus a live grid page for any EIA-930 balancing area · Neil wants demonstrable impact · Neil
+- 2026-11-18 · Visual effects: twin split (real Texas map + cutaway on one clock), cinematic cascade, truth wave + Lantern packets; scripted story mode for the video · more spectacle · Neil
+- 2026-11-18 · Directorate becomes an agent with 3 goals (order, upper-level output, trust); each choice shows motive, gain, cost in its own panel · choices should be multifaceted · Neil
+- 2026-11-18 · Scale to 2 billion through 8 sample districts (each stands for 156); Vercel deploy; Claude recap in STE with template fallback; roles not fixed · Neil
+- 2026-11-18 · Competitor scan: 6 other teams on the track; anudeep-bonagiri/hollow-twin has our name, a deployed 3D cutaway and no real data; no team trains on real disasters · GitHub search · Claude
+- 2026-11-18 · Pivot: Earth is the product (Before, During, After; working name, project unnamed). Real models trained on real US outages; the Hollow is the frame. Draft spec .plans/before-during-after-spec.md replaces hollow-twin-spec v2 once locked · stop competing on the Hollow sim · Neil
+- 2026-11-18 · Before (48 h grid warning) + During (who stays dark, check-first list) must ship; ladder heat → true count → air → water, each gated · Neil
+- 2026-11-18 · Earth user: county emergency office; output: county brief + evidence view with CSV/JSON/static API · Neil
+- 2026-11-18 · Visual: US county map, counties extruded downward by vulnerability (depth = vulnerability); deck.gl + MapLibre; labels show Earth name + smaller Hollow level · Neil
+- 2026-11-18 · Video opens in the Hollow, then reveals "This is Texas, February 2021" · Neil
+- 2026-11-18 · Labels from EAGLE-I (1% of a BA's customers out 4 h+); train 2015–2020, test 2021+; lives saved only as a labelled estimate · Neil (thresholds and split: Claude)
+- 2026-11-18 · Before-during-after spec locked; data work starts tonight · Neil
+- 2026-11-18 · Contracts frozen in contracts/README.md + app/src/contracts.ts; app shell owns routing and package.json; app/public/data/v1 is written by data/build/export_app.py (moved from workstream 4 to 1); old Hollow Twin UI frozen at #/legacy; weather from NOAA ISD-Lite, not Open-Meteo · /parallelize · Neil and Claude
+- 2026-11-19 · Map drawn as one smooth surface (no county outlines; depth and color interpolated across borders; hover keeps exact county values) · Neil asked for it · Neil
+- 2026-11-19 · Protocol: Claude runs its own agents; Paradev only to run Codex when the rules send work there · Neil
+- 2026-11-19 · Hollow work lives on branch `hollow` (from hollow-rebuild); old prototype/hollow-twin-* branches archived as archive/hollow-twin-* tags and deleted · Adarsh
+- 2026-11-19 · Earth map abandoned; the Hollow on branch `hollow` is the project · Adarsh's product and plan · Neil
+- 2026-11-19 · Real data goes into the Hollow's hidden test world (EIA-930 demand, EAGLE-I repair times, counties by SVI, cited constants); the Residents' System stays on residents' data only · spec .plans/hollow-real-data-spec.md (on hollow) · Neil
+- 2026-11-19 · Storms removed; scenarios Cascade, Baseline, Aging, Crowding; Aging and Crowding play 4 real years in 120 days, labelled · the brief names no weather · Neil (compression: Claude default)
+- 2026-11-19 · Blackout Warning retuned through the gate: safeLoad 0.82, assumedCompliance 0.75 (test set 3,628 deaths vs 20,382) · tune/check/test method · Claude
+- 2026-11-20 · `hollow` becomes `main` by merge (old main tagged archive/earth-main); shared context restored from the old main · Neil
+- 2026-11-20 · The product is the statistical models (Blackout Warning + residents-only check-first LightGBM); the simulation is a demo page · Neil
+- 2026-11-20 · 3 more real-shaped plant-loss disasters (Elliott TVA, TVA+CPLE, SPP Feb 2021); Two Plants leads the results page as the hard case · Neil (order: Claude)
+- 2026-11-20 · Results site lands on results first; cutaway at #/demo · Neil

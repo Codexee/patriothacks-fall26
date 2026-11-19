@@ -10,3 +10,6 @@ __pycache__/
 .venv/
 *.log
 .claude/settings.local.json
+data/raw/
+data/.venv/
+!data/build/
