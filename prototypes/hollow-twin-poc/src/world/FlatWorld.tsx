@@ -21,6 +21,7 @@ interface District {
   rails: Path2D;
   lamps: number[]; // x of each ceiling lamp
   subway: boolean;
+  x: number; y: number; w: number; h: number;
 }
 function buildDistrict(i: number, level: number, x: number, y: number, w: number, h: number): District {
   const subway = level <= SUBWAY_LEVELS;
@@ -58,7 +59,99 @@ function buildDistrict(i: number, level: number, x: number, y: number, w: number
   const lamps: number[] = [];
   const nl = Math.max(2, Math.round(w / 26));
   for (let q = 0; q < nl; q++) lamps.push(x + ((q + 0.5) * w) / nl);
-  return { shell, ribs, blocks, windows, rails, lamps, subway };
+  return { shell, ribs, blocks, windows, rails, lamps, subway, x, y, w, h };
+}
+
+/**
+ * PERFORMANCE: a section's still picture depends only on its state, so each state is painted once for all 400
+ * sections into its own sheet. Every frame then just copies rectangles from the sheets (and blends two of them while
+ * the light changes), and only the small moving parts are drawn live.
+ */
+type Mode = 'lit' | 'dim' | 'dark' | 'bad' | 'empty';
+type Sheets = Record<Mode, HTMLCanvasElement>;
+function paintSheet(mode: Mode, cw: number, ch: number, dpr: number, districts: District[], structs: string[][]): HTMLCanvasElement {
+  const cv = document.createElement('canvas');
+  cv.width = cw; cv.height = ch;
+  const ctx = cv.getContext('2d')!;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const lit = mode === 'lit' ? 1 : mode === 'dim' ? 0.6 : 0;
+  const warm = mode === 'lit' ? 1 : 0, bad = mode === 'bad';
+  for (let i = 0; i < districts.length; i++) {
+    const D = districts[i], { x, y, w, h } = D, st = structs[i] ?? [];
+    ctx.save(); ctx.clip(D.shell);
+    if (mode === 'empty') { // abandoned: grey, unlit
+      ctx.fillStyle = '#23272d'; ctx.fillRect(x, y, w, h);
+      ctx.fillStyle = '#2f343b'; ctx.fill(D.blocks);
+      ctx.strokeStyle = 'rgba(60,66,76,0.8)'; ctx.lineWidth = 1; ctx.beginPath();
+      for (let d = -h; d < w; d += 6) { ctx.moveTo(x + d, y + h); ctx.lineTo(x + d + h, y); }
+      ctx.stroke(); ctx.restore(); continue;
+    }
+    const top = lit >= 0.6 ? rgb(D.subway ? [150, 128, 96] : [120, 92, 64], LAMP_HOT, warm * 0.75) : rgb(bad ? [36, 12, 14] : [12, 15, 21], [110, 90, 64], 0);
+    const bottom = lit >= 0.6 ? rgb([70, 52, 34], [150, 108, 64], warm) : rgb(bad ? [22, 8, 10] : [8, 10, 14], [70, 52, 34], 0);
+    const wall = ctx.createLinearGradient(0, y, 0, y + h);
+    wall.addColorStop(0, top); wall.addColorStop(1, bottom);
+    ctx.fillStyle = wall; ctx.fillRect(x, y, w, h);
+    if (D.subway) {
+      ctx.strokeStyle = `rgba(0,0,0,${0.18 + 0.1 * lit})`; ctx.lineWidth = 0.6; ctx.stroke(D.ribs);
+      ctx.fillStyle = `rgba(255,255,255,${0.06 * lit})`; ctx.fillRect(x, y + h * 0.42, w, 0.6);
+    } else { ctx.fillStyle = lit > 0 ? 'rgba(60,40,22,0.55)' : 'rgba(30,30,34,0.6)'; ctx.fill(D.ribs); }
+    if (lit > 0) {
+      for (const lx of D.lamps) {
+        const pool = ctx.createRadialGradient(lx, y + 2, 0, lx, y + 2, h * 1.1);
+        pool.addColorStop(0, `rgba(255,236,190,${0.32 * lit})`); pool.addColorStop(1, 'rgba(255,236,190,0)');
+        ctx.fillStyle = pool; ctx.fillRect(lx - h * 1.1, y, h * 2.2, h);
+      }
+    }
+    ctx.fillStyle = lit > 0 ? rgb([44, 34, 26], [104, 78, 52], lit) : bad ? '#1a0b0d' : '#0d1015';
+    ctx.fill(D.blocks);
+    const share = lit >= 0.6 ? 0.35 + 0.55 * warm : 0;
+    if (share > 0) {
+      ctx.fillStyle = `rgba(255,214,140,${0.75 + 0.25 * warm})`;
+      ctx.beginPath();
+      for (const wn of D.windows) if (wn.k < share) ctx.rect(wn.x, wn.y, 1.1, 1.2);
+      ctx.fill();
+    }
+    ctx.fillStyle = lit > 0 ? 'rgba(30,22,16,0.7)' : 'rgba(60,70,85,0.45)';
+    ctx.fill(D.rails);
+    if (st.includes('farm')) {
+      ctx.fillStyle = lit > 0 ? `rgba(200,120,255,${0.65 * lit})` : 'rgba(80,60,100,0.3)';
+      for (let r = 0; r < 3; r++) ctx.fillRect(x + w * 0.08, y + h - 9 - r * 3, w * 0.22, 0.9);
+      ctx.fillStyle = lit > 0 ? `rgba(90,170,90,${0.8 * lit})` : 'rgba(40,60,40,0.4)';
+      for (let r = 0; r < 3; r++) ctx.fillRect(x + w * 0.08, y + h - 8 - r * 3, w * 0.22, 1.2);
+    }
+    if (st.includes('clinic')) {
+      const cx = x + w * 0.5, cy = y + 6;
+      ctx.fillStyle = lit > 0 ? 'rgba(255,255,255,0.9)' : 'rgba(200,210,230,0.3)';
+      ctx.fillRect(cx - 2.5, cy - 0.8, 5, 1.6); ctx.fillRect(cx - 0.8, cy - 2.5, 1.6, 5);
+    }
+    if (st.includes('recycler')) {
+      ctx.fillStyle = lit > 0 ? 'rgba(110,180,220,0.85)' : 'rgba(60,80,100,0.4)';
+      ctx.beginPath(); ctx.roundRect(x + w * 0.62, y + h - 12, 6, 8, 2); ctx.fill();
+    }
+    if (lit > 0) {
+      ctx.fillStyle = `rgba(255,248,225,${lit})`;
+      for (const lx of D.lamps) ctx.fillRect(lx - 1.5, y + (D.subway ? 2.2 : 3), 3, 1.3);
+    }
+    if (bad) { // a steady part of the emergency light; the pulse is drawn live
+      ctx.fillStyle = 'rgba(255,70,55,0.35)'; ctx.fillRect(x, y + (D.subway ? 3 : 4), w, 1.2);
+      ctx.fillStyle = 'rgba(200,40,40,0.06)'; ctx.fillRect(x, y, w, h);
+    }
+    if (st.includes('fan')) { ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.beginPath(); ctx.arc(x + 7, y + 6.5, 4.6, 0, 7); ctx.fill(); }
+    ctx.restore();
+  }
+  return cv;
+}
+
+/** Soft round glows, made once and stamped with drawImage instead of building a gradient per section per frame. */
+function glowSprite(r: number, dpr: number, color: string): HTMLCanvasElement {
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = Math.max(2, Math.ceil(r * 2 * dpr));
+  const c = cv.getContext('2d')!;
+  const R = cv.width / 2;
+  const gr = c.createRadialGradient(R, R, 0, R, R, R);
+  gr.addColorStop(0, color); gr.addColorStop(1, 'rgba(0,0,0,0)');
+  c.fillStyle = gr; c.fillRect(0, 0, cv.width, cv.height);
+  return cv;
 }
 const SHAFT_X = 28, SHAFT_W = 10;
 const BLACKOUT = 0.5, AIR_BAD = 5000;
@@ -158,6 +251,10 @@ function paintStatic(width: number, height: number, dpr: number): HTMLCanvasElem
     }
     c.fillStyle = '#3a414b'; c.fillRect(GUTTER_L - 6, y + ROOM_H + 1.5, width - GUTTER_L - GUTTER_R + 8, 1.2);
     c.fillStyle = 'rgba(255,255,255,0.08)'; c.fillRect(GUTTER_L - 6, y + ROOM_H + 1.5, width - GUTTER_L - GUTTER_R + 8, 0.5);
+    c.font = '500 10px "Barlow Semi Condensed", system-ui, sans-serif';
+    c.textAlign = 'right'; c.textBaseline = 'middle';
+    c.fillStyle = level % 5 === 0 || level === 1 ? '#d5dbe2' : '#7d8794';
+    c.fillText(String(level), SHAFT_X - 5, y + ROOM_H / 2 + 0.5);
   }
   return cv;
 }
@@ -176,6 +273,9 @@ export function FlatWorld(props: WorldProps) {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let staticCv: HTMLCanvasElement | null = null, staticKey = '';
     let districts: District[] = [];
+    let sheets: Sheets | null = null, sheetKey = '';
+    let sprites: { glow: HTMLCanvasElement; glowR: number; pulse: HTMLCanvasElement } | null = null;
+    let lastFrame: Frame | null = null, structKey = '';
     let raf = 0, last = performance.now(), lastDraw = 0, peopleMax = 1;
     const prevTarget = new Float32Array(SECTION_COUNT).fill(1);
     let sparks: { x: number; y: number; vx: number; vy: number; life: number }[] = [];
@@ -185,7 +285,7 @@ export function FlatWorld(props: WorldProps) {
       raf = 0;
       const width = host.clientWidth;
       const g = geometry(width);
-      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const dpr = Math.min(1.5, window.devicePixelRatio || 1); // sharper than this costs a lot of memory and time
       const key = `${width}x${dpr}`;
       if (key !== staticKey) {
         staticKey = key; staticCv = paintStatic(width, g.height, dpr);
@@ -196,13 +296,33 @@ export function FlatWorld(props: WorldProps) {
         }
         cv.width = Math.round(width * dpr); cv.height = Math.round(g.height * dpr);
         cv.style.width = `${width}px`; cv.style.height = `${g.height}px`;
+        const gr = g.roomW * 0.75;
+        sprites = { glow: glowSprite(gr, dpr, 'rgba(255,180,90,1)'), glowR: gr, pulse: glowSprite(6, dpr, 'rgba(255,205,130,1)') };
       }
+      const { frame, selected } = propsRef.current;
+      // Sheets are repainted only when the size changes or a section's facilities change.
+      if (frame !== lastFrame) { lastFrame = frame; structKey = frame.sections.map((s) => s.structures.join('')).join('|'); }
+      const sk = `${key}:${structKey}`;
+      if (sk !== sheetKey) {
+        sheetKey = sk;
+        const structs = frame.sections.map((s) => s.structures as string[]);
+        sheets = {} as Sheets;
+        for (const m of ['lit', 'dim', 'dark', 'bad', 'empty'] as Mode[]) sheets[m] = paintSheet(m, cv.width, cv.height, dpr, districts, structs);
+      }
+
+      // Only the part of the cutaway on screen is drawn.
+      const rect = cv.getBoundingClientRect();
+      const visTop = Math.max(0, -rect.top), visBot = Math.min(g.height, window.innerHeight - rect.top);
+      if (visBot <= visTop) { if (!reduce) schedule(); return; }
+      const firstLevel = Math.max(1, Math.floor((visTop - g.top) / ROW));
+      const lastLevel = Math.min(LEVELS, Math.max(firstLevel, Math.ceil((visBot - g.top) / ROW) + 1));
+
       const ctx = cv.getContext('2d')!;
       ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.drawImage(staticCv!, 0, 0);
+      const by0 = Math.floor(visTop * dpr), bh = Math.min(cv.height, Math.ceil(visBot * dpr)) - by0;
+      ctx.drawImage(staticCv!, 0, by0, cv.width, bh, 0, by0, cv.width, bh);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       const t = reduce ? 0 : (now - t0) / 1000;
-      const { frame, selected } = propsRef.current;
       for (const s of frame.sections) if (s.people > peopleMax) peopleMax = s.people;
 
       // Ease brightness toward the frame (1 = full power, 0.6 = saving power, 0 = blackout).
@@ -277,180 +397,128 @@ export function FlatWorld(props: WorldProps) {
         ctx.fillStyle = lg; ctx.fillRect(SHAFT_X - 4, liftY - 8, 30, 28);
       }
 
-      // Light spilling out of lit rooms onto the rock.
+      // Light spilling out of lit sections onto the rock, and power flowing along the pipes (pre-made glow sprites).
       ctx.globalCompositeOperation = 'lighter';
-      for (let i = 0; i < SECTION_COUNT; i++) {
+      const gr = sprites!.glowR;
+      for (let i = (firstLevel - 1) * SECTIONS_PER_LEVEL; i < lastLevel * SECTIONS_PER_LEVEL; i++) {
         const b = shown.current[i];
         if (b < 0.1) continue;
-        const level = Math.floor(i / SECTIONS_PER_LEVEL) + 1, col = i % SECTIONS_PER_LEVEL;
-        const cx = g.x(col) + g.roomW / 2, cy = g.y(level) + ROOM_H / 2, r = g.roomW * 0.75;
-        const gl = ctx.createRadialGradient(cx, cy, 2, cx, cy, r);
-        gl.addColorStop(0, `rgba(255,180,90,${0.13 * b})`); gl.addColorStop(1, 'rgba(255,180,90,0)');
-        ctx.fillStyle = gl; ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
+        const D = districts[i];
+        ctx.globalAlpha = 0.13 * b;
+        ctx.drawImage(sprites!.glow, D.x + D.w / 2 - gr, D.y + D.h / 2 - gr, gr * 2, gr * 2);
       }
-      // Power flowing along the floor pipes of every level that has it.
       const pipeW = width - GUTTER_L - GUTTER_R;
-      for (let level = 1; level <= LEVELS && !reduce; level++) {
+      ctx.globalAlpha = 0.75;
+      for (let level = firstLevel; level <= lastLevel && !reduce; level++) {
         let lit = 0;
         for (let c = 0; c < SECTIONS_PER_LEVEL; c++) if (shown.current[(level - 1) * SECTIONS_PER_LEVEL + c] > 0.3) lit++;
         if (lit < SECTIONS_PER_LEVEL / 2) continue;
         const py = g.y(level) + ROOM_H + 2;
         for (let d = 0; d < 2; d++) {
           const px = GUTTER_L + ((t * (34 + hash(level, 70) * 20) + hash(level, d + 71) * pipeW + d * pipeW / 2) % pipeW);
-          const pg = ctx.createRadialGradient(px, py, 0, px, py, 6);
-          pg.addColorStop(0, 'rgba(255,205,130,0.75)'); pg.addColorStop(1, 'rgba(255,205,130,0)');
-          ctx.fillStyle = pg; ctx.fillRect(px - 6, py - 6, 12, 12);
+          ctx.drawImage(sprites!.pulse, px - 6, py - 6, 12, 12);
         }
       }
+      ctx.globalAlpha = 1;
       ctx.globalCompositeOperation = 'source-over';
 
-      // Rooms.
-      ctx.font = '500 10px "Barlow Semi Condensed", system-ui, sans-serif';
-      for (let level = 1; level <= LEVELS; level++) {
-        const y = g.y(level), h = ROOM_H;
-        ctx.textAlign = 'right';
-        ctx.fillStyle = level % 5 === 0 || level === 1 ? '#d5dbe2' : '#7d8794';
-        ctx.fillText(String(level), SHAFT_X - 5, y + h / 2 + 0.5);
-        for (let col = 0; col < SECTIONS_PER_LEVEL; col++) {
-          const i = (level - 1) * SECTIONS_PER_LEVEL + col;
-          const s = frame.sections[i];
-          if (!s) continue;
-          const x = g.x(col), w = g.roomW, st = stateOf(s);
-          // A light that is losing power flickers on its way out.
-          let b = shown.current[i];
-          if (b > 0.04 && b < 0.58 && !reduce) b *= 0.55 + 0.45 * Math.abs(Math.sin(t * 31 + i * 3.7));
-          const D = districts[i];
-          ctx.save();
-          ctx.clip(D.shell);
+      // Sections: copy each one's look from the cached sheets, blending between states while the light changes.
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      const copy = (sheet: HTMLCanvasElement, D: District, alpha: number) => {
+        if (alpha <= 0.01) return;
+        const sx = Math.floor((D.x - 1) * dpr), sy = Math.floor((D.y - 1) * dpr);
+        const sw = Math.ceil((D.w + 2) * dpr), sh = Math.ceil((D.h + 2) * dpr);
+        ctx.globalAlpha = Math.min(1, alpha);
+        ctx.drawImage(sheet, sx, sy, sw, sh, sx, sy, sw, sh);
+      };
+      const bright = new Float32Array(SECTION_COUNT);
+      for (let i = (firstLevel - 1) * SECTIONS_PER_LEVEL; i < lastLevel * SECTIONS_PER_LEVEL; i++) {
+        const s = frame.sections[i];
+        if (!s) continue;
+        const D = districts[i], st = stateOf(s);
+        let b = shown.current[i];
+        if (b > 0.04 && b < 0.58 && !reduce) b *= 0.55 + 0.45 * Math.abs(Math.sin(t * 31 + i * 3.7)); // flicker on the way out
+        bright[i] = b;
+        if (st === 'empty') { copy(sheets!.empty, D, 1); continue; }
+        if (b >= 0.6) { copy(sheets!.dim, D, 1); copy(sheets!.lit, D, (b - 0.6) / 0.4); }
+        else { copy(st === 'dark' && s.co2 >= AIR_BAD ? sheets!.bad : sheets!.dark, D, 1); copy(sheets!.dim, D, b / 0.6); }
+      }
+      ctx.globalAlpha = 1;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-          if (st === 'empty') { // abandoned: grey, unlit, nobody moving
-            ctx.fillStyle = '#23272d'; ctx.fillRect(x, y, w, h);
-            ctx.fillStyle = '#2f343b'; ctx.fill(D.blocks);
-            ctx.strokeStyle = 'rgba(60,66,76,0.8)'; ctx.lineWidth = 1; ctx.beginPath();
-            for (let d = -h; d < w; d += 6) { ctx.moveTo(x + d, y + h); ctx.lineTo(x + d + h, y); }
-            ctx.stroke();
-          } else {
-            const bad = st === 'dark' && s.co2 >= AIR_BAD;
-            const lit = Math.max(0, Math.min(1, b));
-            const warm = lit >= 0.6 ? (lit - 0.6) / 0.4 : 0;
-            // The tunnel's vault or the gallery's rock, lit from the ceiling lamps.
-            const top = lit >= 0.6 ? rgb(D.subway ? [150, 128, 96] : [120, 92, 64], LAMP_HOT, warm * 0.75)
-              : rgb(bad ? [36, 12, 14] : [12, 15, 21], [110, 90, 64], lit / 0.6);
-            const bottom = lit >= 0.6 ? rgb([70, 52, 34], [150, 108, 64], warm)
-              : rgb(bad ? [22, 8, 10] : [8, 10, 14], [70, 52, 34], lit / 0.6);
-            const wall = ctx.createLinearGradient(0, y, 0, y + h);
-            wall.addColorStop(0, top); wall.addColorStop(1, bottom);
-            ctx.fillStyle = wall; ctx.fillRect(x, y, w, h);
-            ctx.strokeStyle = D.subway ? `rgba(0,0,0,${0.18 + 0.1 * lit})` : 'rgba(0,0,0,0)';
-            ctx.lineWidth = 0.6; ctx.stroke(D.ribs);
-            if (D.subway) { // tiled vault: a faint horizontal course line
-              ctx.fillStyle = `rgba(255,255,255,${0.06 * lit})`; ctx.fillRect(x, y + h * 0.42, w, 0.6);
-            }
-
-            // Ceiling lamps, each throwing a pool of light down onto the street.
-            const shimmer = reduce ? 1 : 0.94 + 0.06 * Math.sin(t * 5.3 + i * 1.9);
-            if (lit > 0.05) {
-              for (const lx of D.lamps) {
-                const pool = ctx.createRadialGradient(lx, y + 2, 0, lx, y + 2, h * 1.1);
-                pool.addColorStop(0, `rgba(255,236,190,${0.32 * lit * shimmer})`); pool.addColorStop(1, 'rgba(255,236,190,0)');
-                ctx.fillStyle = pool; ctx.fillRect(lx - h * 1.1, y, h * 2.2, h);
-              }
-            }
-
-            // Housing blocks: lamp-lit faces, or black shapes in a blackout.
-            ctx.fillStyle = lit > 0.05 ? rgb([44, 34, 26], [104, 78, 52], lit) : bad ? '#1a0b0d' : '#0d1015';
-            ctx.fill(D.blocks);
-            // Windows: most are lit with full power, fewer while saving power; in a blackout only a few hand lights.
-            const share = lit >= 0.6 ? 0.35 + 0.55 * warm : lit > 0.05 ? 0.12 * (lit / 0.6) : 0;
-            if (share > 0) {
-              ctx.fillStyle = `rgba(255,214,140,${0.75 + 0.25 * warm})`;
-              ctx.beginPath();
-              for (const wn of D.windows) if (wn.k < share) ctx.rect(wn.x, wn.y, 1.1, 1.2);
-              ctx.fill();
-            } else if (!s.lost) {
-              ctx.fillStyle = bad ? 'rgba(255,170,160,0.55)' : 'rgba(190,210,255,0.6)'; // phones and torches
-              ctx.beginPath();
-              for (const wn of D.windows) {
-                if (wn.k > 0.035) continue;
-                if (!reduce && Math.sin(t * (1.5 + wn.k * 40) + wn.x) < -0.3) continue; // they move and go out
-                ctx.rect(wn.x, wn.y, 1, 1);
-              }
-              ctx.fill();
-            }
-
-            // The street: rails along the floor, and people on it (more in more crowded sections).
-            ctx.fillStyle = lit > 0.05 ? `rgba(30,22,16,${0.7})` : 'rgba(60,70,85,0.45)';
-            ctx.fill(D.rails);
-            const n = Math.max(2, Math.min(14, Math.round((s.people / peopleMax) * 14)));
-            ctx.fillStyle = lit > 0.3 ? 'rgba(28,18,10,0.9)' : bad ? 'rgba(255,150,140,0.35)' : 'rgba(160,180,210,0.28)';
-            for (let p = 0; p < n; p++) {
-              const speed = (hash(i, p + 30) - 0.5) * 6;
-              const px = x + ((hash(i, p) * w + (lit > 0.3 && !reduce ? t * speed : 0)) % w + w) % w;
-              ctx.fillRect(px, y + h - 6.2 - hash(i, p + 9) * 0.8, 1, 2.6);
-            }
-
-            // Facilities the section has.
-            if (s.structures.includes('farm')) { // grow racks under lamps
-              ctx.fillStyle = lit > 0.05 ? `rgba(200,120,255,${0.65 * lit})` : 'rgba(80,60,100,0.3)';
-              for (let r = 0; r < 3; r++) ctx.fillRect(x + w * 0.08, y + h - 9 - r * 3, w * 0.22, 0.9);
-              ctx.fillStyle = lit > 0.05 ? `rgba(90,170,90,${0.8 * lit})` : 'rgba(40,60,40,0.4)';
-              for (let r = 0; r < 3; r++) ctx.fillRect(x + w * 0.08, y + h - 8 - r * 3, w * 0.22, 1.2);
-            }
-            if (s.structures.includes('clinic')) {
-              const cx = x + w * 0.5, cy = y + 6;
-              ctx.fillStyle = lit > 0.05 ? 'rgba(255,255,255,0.9)' : 'rgba(200,210,230,0.3)';
-              ctx.fillRect(cx - 2.5, cy - 0.8, 5, 1.6); ctx.fillRect(cx - 0.8, cy - 2.5, 1.6, 5);
-            }
-            if (s.structures.includes('recycler')) {
-              ctx.fillStyle = lit > 0.05 ? 'rgba(110,180,220,0.85)' : 'rgba(60,80,100,0.4)';
-              ctx.beginPath(); ctx.roundRect(x + w * 0.62, y + h - 12, 6, 8, 2); ctx.fill();
-            }
-
-            if (lit > 0.6 && !reduce) { // dust drifting down through the light
-              ctx.fillStyle = `rgba(255,250,235,${0.5 * lit})`;
-              for (let q = 0; q < 2; q++) {
-                const dy = ((t * (2.5 + q) + hash(i, q + 50) * h) % (h - 4)) + 3;
-                ctx.fillRect(D.lamps[q % D.lamps.length] + Math.sin(t * 0.7 + i + q * 2) * 6, y + dy, 1, 1);
-              }
-            }
-            if (lit > 0.05) { // the lamps themselves
-              ctx.fillStyle = `rgba(255,248,225,${lit * shimmer})`;
-              for (const lx of D.lamps) ctx.fillRect(lx - 1.5, y + (D.subway ? 2.2 : 3), 3, 1.3);
-            }
-            if (bad) { // emergency strip and a red haze
-              const p = reduce ? 0.8 : 0.45 + 0.55 * Math.max(0, Math.sin(t * 3.2 + i));
-              ctx.fillStyle = `rgba(255,70,55,${0.9 * p})`; ctx.fillRect(x, y + (D.subway ? 3 : 4), w, 1.2);
-              ctx.fillStyle = `rgba(200,40,40,${0.09 * p})`; ctx.fillRect(x, y, w, h);
-            }
-            if (s.structures.includes('fan')) { // a ventilation fan in the ceiling, turning with the power
-              const cx = x + 7, cy = y + 6.5, a = t * 10 * (st === 'lit' ? lit : 0) + i;
-              ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.beginPath(); ctx.arc(cx, cy, 4.6, 0, 7); ctx.fill();
-              ctx.strokeStyle = lit > 0.3 ? 'rgba(220,200,170,0.75)' : 'rgba(150,170,200,0.3)'; ctx.lineWidth = 1;
-              for (let bl = 0; bl < 3; bl++) {
-                const ang = a + (bl * Math.PI * 2) / 3;
-                ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(ang) * 3.8, cy + Math.sin(ang) * 3.8); ctx.stroke();
-              }
-            }
-          }
-          ctx.restore();
-
-          if (s.structures.includes('plant') && !s.lost) { // a geothermal plant: a glowing core fed from below
-            const cx = x + w - 8, cy = y + h / 2 + 1;
-            const pulse = reduce ? 1 : 0.75 + 0.25 * Math.sin(t * 2.4 + i);
-            const on = st === 'lit' ? 1 : 0.35;
-            ctx.fillStyle = '#20262e'; ctx.fillRect(cx - 1, cy, 2, y + ROW + 2 - cy);
-            const core = ctx.createRadialGradient(cx, cy, 0.5, cx, cy, 9);
-            core.addColorStop(0, `rgba(255,250,220,${on * pulse})`); core.addColorStop(0.35, `rgba(255,150,60,${0.85 * on * pulse})`);
-            core.addColorStop(1, 'rgba(255,120,40,0)');
-            ctx.fillStyle = core; ctx.beginPath(); ctx.arc(cx, cy, 9, 0, 7); ctx.fill();
-            for (let k = 0; k < 3 && !reduce && st === 'lit'; k++) { // steam rising off the core
-              const ph = (t * 0.45 + k / 3 + hash(i, 80)) % 1;
-              ctx.fillStyle = `rgba(235,225,215,${0.3 * (1 - ph)})`;
-              ctx.beginPath(); ctx.arc(cx + Math.sin(ph * 6 + k) * 1.5, cy - 4 - ph * 9, 1.2 + ph * 2.4, 0, 7); ctx.fill();
-            }
-            ctx.strokeStyle = 'rgba(30,24,20,0.9)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(cx, cy, 4.2, 0, 7); ctx.stroke();
+      // The moving parts, batched: people on the streets, hand lights in the dark, dust, fans, the red pulse.
+      const peopleLit = new Path2D(), peopleDark = new Path2D(), peopleBad = new Path2D();
+      const phones = new Path2D(), phonesBad = new Path2D(), dust = new Path2D();
+      const fansLit = new Path2D(), fansDark = new Path2D();
+      for (let i = (firstLevel - 1) * SECTIONS_PER_LEVEL; i < lastLevel * SECTIONS_PER_LEVEL; i++) {
+        const s = frame.sections[i];
+        if (!s || s.lost) continue;
+        const D = districts[i], x = D.x, y = D.y, w = D.w, h = D.h, st = stateOf(s);
+        const lit = Math.max(0, Math.min(1, bright[i]));
+        const bad = st === 'dark' && s.co2 >= AIR_BAD;
+        const n = Math.max(2, Math.min(14, Math.round((s.people / peopleMax) * 14)));
+        const pp = lit > 0.3 ? peopleLit : bad ? peopleBad : peopleDark;
+        for (let p = 0; p < n; p++) {
+          const speed = (hash(i, p + 30) - 0.5) * 6;
+          const px = x + ((hash(i, p) * w + (lit > 0.3 && !reduce ? t * speed : 0)) % w + w) % w;
+          pp.rect(px, y + h - 6.2 - hash(i, p + 9) * 0.8, 1, 2.6);
+        }
+        if (lit <= 0.05) {
+          const ph = bad ? phonesBad : phones;
+          for (const wn of D.windows) {
+            if (wn.k > 0.035) continue;
+            if (!reduce && Math.sin(t * (1.5 + wn.k * 40) + wn.x) < -0.3) continue; // they move and go out
+            ph.rect(wn.x, wn.y, 1, 1);
           }
         }
+        if (lit > 0.6 && !reduce) {
+          for (let q = 0; q < 2; q++) {
+            const dy = ((t * (2.5 + q) + hash(i, q + 50) * h) % (h - 4)) + 3;
+            dust.rect(D.lamps[q % D.lamps.length] + Math.sin(t * 0.7 + i + q * 2) * 6, y + dy, 1, 1);
+          }
+        }
+        if (bad) {
+          const p = reduce ? 0.8 : 0.45 + 0.55 * Math.max(0, Math.sin(t * 3.2 + i));
+          ctx.fillStyle = `rgba(255,70,55,${0.6 * p})`; ctx.fillRect(x, y + (D.subway ? 3 : 4), w, 1.2);
+        }
+        if (s.structures.includes('fan')) {
+          const cx = x + 7, cy = y + 6.5, a = t * 10 * (st === 'lit' ? lit : 0) + i;
+          const fp = lit > 0.3 ? fansLit : fansDark;
+          for (let bl = 0; bl < 3; bl++) {
+            const ang = a + (bl * Math.PI * 2) / 3;
+            fp.moveTo(cx, cy); fp.lineTo(cx + Math.cos(ang) * 3.8, cy + Math.sin(ang) * 3.8);
+          }
+        }
+      }
+      ctx.fillStyle = 'rgba(28,18,10,0.9)'; ctx.fill(peopleLit);
+      ctx.fillStyle = 'rgba(160,180,210,0.28)'; ctx.fill(peopleDark);
+      ctx.fillStyle = 'rgba(255,150,140,0.35)'; ctx.fill(peopleBad);
+      ctx.fillStyle = 'rgba(190,210,255,0.6)'; ctx.fill(phones);
+      ctx.fillStyle = 'rgba(255,170,160,0.55)'; ctx.fill(phonesBad);
+      ctx.fillStyle = 'rgba(255,250,235,0.5)'; ctx.fill(dust);
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = 'rgba(220,200,170,0.75)'; ctx.stroke(fansLit);
+      ctx.strokeStyle = 'rgba(150,170,200,0.3)'; ctx.stroke(fansDark);
+
+      // Geothermal plants: a glowing core fed from below, with steam while running.
+      for (let i = (firstLevel - 1) * SECTIONS_PER_LEVEL; i < lastLevel * SECTIONS_PER_LEVEL; i++) {
+        const s = frame.sections[i];
+        if (!s || s.lost || !s.structures.includes('plant')) continue;
+        const D = districts[i], st = stateOf(s);
+        const cx = D.x + D.w - 8, cy = D.y + D.h / 2 + 1;
+        const pulse = reduce ? 1 : 0.75 + 0.25 * Math.sin(t * 2.4 + i);
+        const on = st === 'lit' ? 1 : 0.35;
+        ctx.fillStyle = '#20262e'; ctx.fillRect(cx - 1, cy, 2, D.y + ROW + 2 - cy);
+        const core = ctx.createRadialGradient(cx, cy, 0.5, cx, cy, 9);
+        core.addColorStop(0, `rgba(255,250,220,${on * pulse})`); core.addColorStop(0.35, `rgba(255,150,60,${0.85 * on * pulse})`);
+        core.addColorStop(1, 'rgba(255,120,40,0)');
+        ctx.fillStyle = core; ctx.beginPath(); ctx.arc(cx, cy, 9, 0, 7); ctx.fill();
+        for (let k = 0; k < 3 && !reduce && st === 'lit'; k++) {
+          const ph = (t * 0.45 + k / 3 + hash(i, 80)) % 1;
+          ctx.fillStyle = `rgba(235,225,215,${0.3 * (1 - ph)})`;
+          ctx.beginPath(); ctx.arc(cx + Math.sin(ph * 6 + k) * 1.5, cy - 4 - ph * 9, 1.2 + ph * 2.4, 0, 7); ctx.fill();
+        }
+        ctx.strokeStyle = 'rgba(30,24,20,0.9)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(cx, cy, 4.2, 0, 7); ctx.stroke();
       }
 
       // Sparks from lamps that just died.
@@ -518,7 +586,8 @@ export function FlatWorld(props: WorldProps) {
     cv.addEventListener('pointermove', onMove);
     cv.addEventListener('pointerleave', onLeave);
     const ro = new ResizeObserver(() => kickRef.current()); ro.observe(host);
-    document.fonts?.ready.then(() => kickRef.current());
+    if (import.meta.env.DEV) (window as unknown as { __drawHollow?: () => void }).__drawHollow = () => draw(performance.now()); // timing in dev
+    document.fonts?.ready.then(() => { staticKey = ''; sheetKey = ''; kickRef.current(); }); // repaint labels in the real font
     kickRef.current();
     return () => {
       cancelAnimationFrame(raf); raf = 0; kickRef.current = () => {};
