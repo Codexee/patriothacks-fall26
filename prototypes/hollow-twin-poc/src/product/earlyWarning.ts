@@ -22,8 +22,8 @@ import type { PredictedBlackout, ProductLog, ProductMemory } from './types.ts';
 
 /** The 4 guessed constants that the gate tunes (npm run gate -- --set safeLoad=0.9). Defaults = first guesses. */
 export const TUNE = {
-  safeLoad: 0.88, // keep the plants below this share of their output
-  assumedCompliance: 0.85, // share of residents expected to follow a save-power request
+  safeLoad: 0.82, // keep the plants below this share of their output (first guess 0.88; tuned Nov 19, REBUILD.md Step 2)
+  assumedCompliance: 0.75, // share of residents expected to follow a save-power request (first guess 0.85; tuned Nov 19)
   maxTrend: 0.1, // the supply trend is capped at ±10% a day
   tripStep: 0.15, // after a Hollow-wide blackout with no other clue, ask for this much more saving
 };

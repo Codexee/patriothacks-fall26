@@ -130,3 +130,65 @@ Tested on 14 runs (Texas seeds 1, 2, 7; Chicago; Baseline seeds 1–10), each pl
 | **5 points after 5 quiet days (now)** | **27,251** | **29,771** | **58%** | **44%** |
 
 The headline runs do not change (Texas s1: 1,260 deaths, stable day 21, 75% warned); checks pass.
+
+## Step 2: real data in the test world, then the module retuned (Nov 19, Neil)
+
+Spec: `.plans/hollow-real-data-spec.md` (locked). The Residents' System is unchanged: it still reads only residents'
+outage reports and head counts. Only the hidden test world and the module's 4 guessed constants changed.
+
+**The world now uses real data** (all of it in `src/data/real/`, each file with its source; scripts in `scripts/`):
+
+| What | Real data | Old guess |
+| --- | --- | --- |
+| Everyday demand | ERCOT hourly demand, 36 calm weeks of 2023 (EIA-930): a 168-hour week, 0.82–1.17 × mean | flat ±5% daily cycle |
+| Plant repair after a trip | 100 large, sudden US outages 2015–2024 (EAGLE-I): time to restore 90%, median 13 h, p90 36 h | 12–36 h, uniform |
+| People per section | 3,133 US counties sorted into levels by CDC SVI; 8 equal-population sections per level | 2,000 (level 1) to 6,000 (level 50) |
+| Hover card | Real counties, emPOWER power-dependent residents, Census 2020–2024 growth | — |
+| CO₂ danger level | 5,000 ppm: OSHA PEL / NIOSH REL (the value did not change; it is now cited) | 5,000 ppm |
+
+Kept as guesses, with the reason in `src/data/real/airParams.ts`: the air death rate, the share of deaths a warning
+avoids, air volume per person (scaled), the alert follow rate, and the plant trip chance at full load.
+
+**No storms.** The brief names aging plants, crowding and the Directorate as the causes of blackouts, not weather.
+Texas 2021 and Chicago 1995 are removed. The new scenarios:
+
+| Scenario | What happens |
+| --- | --- |
+| Cascade (default) | Plant 2 loses output in the shape of the real ERCOT generation loss of Feb 15–18, 2021 (peak 19.5 GW below Feb 14, 32%), from day 5. No storm, no demand surge. |
+| Baseline | Real demand week, no extra failure. |
+| Aging | Plants lose output at the real post-peak decline of The Geysers, about 10% a year (Foulger et al. 1997): 4 years played in 120 days. Cannot end before day 60. |
+| Crowding | Each section grows at its real counties' 2020–2024 rate: 4 years played in 120 days. Cannot end before day 60. |
+
+**The gate** (`npm run gate`): every scenario, with and without the module, on tune seeds 1–5 and check seeds 6–10;
+`--test` adds seeds 11–20. Constants were chosen on the tune set, kept only if the check set was no worse, then the
+test set was run once.
+
+Tuning (tune set, with the module, deaths / plant trips): first guesses 5,427 / 120. One step each: `safeLoad` 0.85 →
+4,169 / 90; `assumedCompliance` 0.75 → 4,488 / 91; `maxTrend` and `tripStep` changed nothing. Chosen:
+**`safeLoad` 0.82 and `assumedCompliance` 0.75** → 3,564 / 78. Check set: 3,195 / 120 → 2 / 70.
+
+**Test set, run once (seeds 11–20, all 4 scenarios, 40 runs):**
+
+| | Deaths | Plant trips | Stable |
+| --- | --- | --- | --- |
+| Without the module | 12,260,961 | 9,026 | 0 of 40 |
+| With, first-guess constants | 20,382 | 184 | 38 of 40 |
+| **With, tuned constants** | **3,628** | **87** | **40 of 40** |
+
+Seed 1, tuned: every scenario ends with 0 deaths (Cascade and Baseline stable on day 16, Aging day 67, Crowding day 73).
+Without the module: 275,273 (Baseline) to 355,719 (Aging) deaths, never stable.
+
+**Limits (say these in the pitch):**
+- The warned share is low (about 12% on seed 1; 48–62% over the test set) because most blackouts are now prevented, so
+  the few left are short and sudden. Warned share is not a good measure when there are almost no blackouts.
+- The tuned module asks for more power saving (it keeps plants under 82% of their output, not 88%). The sim still
+  does not count the cost of saving that much power.
+- Cascade looks like Baseline on most seeds: the module's power-saving request already leaves room for Plant 2's loss.
+  Without the module the Hollow collapses in every scenario, so the loss shows only in the "without" runs.
+- Crowding changes little: real county growth is small (median about +0.5% a year, −1.3% to +4.1%).
+- Time compression: Aging and Crowding play 4 real years in 120 days, and say so in their summaries.
+- EAGLE-I measures customers getting power back after mostly storm damage to wires. It stands in for plant repair
+  time; it does not measure it. The 10%/yr Geysers rate is the steep post-peak rate (today: 1–2% a year).
+- The 9 counties without SVI (8 old Connecticut counties, Valdez-Cordova AK; 3.6 M people) are left out.
+- Without the module the Hollow never stabilizes, even with real data: real peak demand (1.17) is above the plants'
+  capacity margin (1.1).
