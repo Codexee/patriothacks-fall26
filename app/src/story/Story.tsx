@@ -6,6 +6,8 @@ import { checkFirst, fmtInt, mainGroup, parseUtc } from '../earth/data.ts';
 import type { Live, Scene } from '../earth/data.ts';
 import type { EarthMap, View } from '../earth/map.ts';
 import { CheckFirst, Timeline } from '../earth/panels.tsx';
+import { HollowView } from '../earth/HollowView.tsx';
+import { buildSection, deepVsTop } from '../earth/hollow.ts';
 import { HERO_FACTS, SCRIPT, STORY_SECONDS } from './script.ts';
 import type { Beat, Camera, CaptionId, ClockMark } from './script.ts';
 import './story.css';
@@ -67,6 +69,8 @@ export function warningLines(scene: Scene, live: Live): { main: string; fact: st
   return { main: 'The model did not warn this one.', fact: null, note: null };
 }
 
+const fmtHoursCap = (h: number) => (h < 10 ? h.toFixed(1) : String(Math.round(h)));
+
 const ease = (u: number) => 0.5 - 0.5 * Math.cos(Math.PI * Math.max(0, Math.min(1, u)));
 
 /** The two beats around time t that set `key`, and the position between them (0..1). */
@@ -93,6 +97,7 @@ export function Story({ scene, live, map, clock }: { scene: Scene; live: Live; m
   const facts = useMemo(() => storyFacts(scene, live), [scene, live]);
   const [shown, setShown] = useState<Shown>({ caption: null, chart: false, list: false, labels: 'none' });
   const veilRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const { replay } = live;
@@ -135,6 +140,12 @@ export function Story({ scene, live, map, clock }: { scene: Scene; live: Live; m
       if (bm) map.setBasemap(mix(bm.a, bm.b, bm.u));
       const veil = span('veil', t);
       if (veil && veilRef.current) veilRef.current.style.opacity = String(mix(veil.a, veil.b, veil.u));
+      const sc = span('section', t);
+      if (sc && sectionRef.current) {
+        const o = mix(sc.a, sc.b, sc.u);
+        sectionRef.current.style.opacity = String(o);
+        sectionRef.current.style.visibility = o > 0.001 ? 'visible' : 'hidden';
+      }
 
       const next: Shown = {
         caption: latest('caption', t) ?? null, chart: latest('chart', t) ?? false,
@@ -161,6 +172,7 @@ export function Story({ scene, live, map, clock }: { scene: Scene; live: Live; m
   }, [scene, live, map, clock, facts]);
 
   const { row } = live;
+  const levels = useMemo(() => deepVsTop(scene, live, buildSection(scene, live)), [scene, live]);
   const warning = useMemo(() => warningLines(scene, live), [scene, live]);
   const check = useMemo(() => {
     const { rows } = checkFirst(scene, live);
@@ -171,6 +183,9 @@ export function Story({ scene, live, map, clock }: { scene: Scene; live: Live; m
   return (
     <div className="st-root">
       <div className="st-veil" ref={veilRef} />
+      <div className="st-section" ref={sectionRef}>
+        <HollowView scene={scene} live={live} clock={clock} bare />
+      </div>
       {shown.chart && <div className="st-chart"><Timeline live={live} clock={clock} bare /></div>}
       {shown.list && <div className="st-list"><CheckFirst scene={scene} live={live} count={3} /></div>}
 
@@ -184,6 +199,19 @@ export function Story({ scene, live, map, clock }: { scene: Scene; live: Live; m
         <p className="st-caption st-earth" key="reveal">
           <span>This is not 2087.</span>
           <span>This is {row?.title ?? `the ${live.replay.ba} outage`}.</span>
+        </p>
+      )}
+      {shown.caption === 'levels' && (
+        <p className="st-caption st-hollow" key="levels">
+          {levels.deep > levels.top
+            ? <>
+                <span>The deepest 10 levels: {fmtHoursCap(levels.deep)} hours without power per person.</span>
+                <span>The top 10 levels: {fmtHoursCap(levels.top)}.</span>
+              </>
+            : <>
+                <span>This time the deep levels were not darker.</span>
+                <span>Deepest 10 levels: {fmtHoursCap(levels.deep)} hours per person. Top 10: {fmtHoursCap(levels.top)}.</span>
+              </>}
         </p>
       )}
       {shown.caption === 'warned' && (

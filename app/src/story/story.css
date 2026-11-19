@@ -1,6 +1,9 @@
 /* Story mode: captions only. Sizes are set for a 1080p recording. */
 .st-root { position: absolute; inset: 0; pointer-events: none; }
 .st-veil { position: absolute; inset: 0; background: var(--bg); opacity: 1; }
+/* The cross-section beat: the same counties as the levels of the Hollow, over the map. */
+.st-section { position: absolute; inset: 0; opacity: 0; visibility: hidden; background: radial-gradient(90% 70% at 50% 30%, #0d1118 0%, var(--bg) 70%); }
+.st-section .hv { left: 7vw; right: 7vw; top: 5vh; bottom: 30vh; }
 
 .st-caption { position: absolute; left: 7vw; right: 7vw; bottom: 9.5vh; margin: 0; display: grid; gap: 0.2em;
   font-size: clamp(22px, 2.5vw, 50px); line-height: 1.18; font-weight: 600; letter-spacing: -0.018em; max-width: 26em;
