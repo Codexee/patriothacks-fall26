@@ -1,12 +1,14 @@
 // County brief: #/brief/<fips>. One page a county emergency office can print.
 import { useEffect, useMemo, useState } from 'react';
-import { dataUrl, earthName, hollowName, type County, type EventLibrary, type EventReplay, type EventRow } from '../contracts.ts';
+import { dataUrl, earthName, hollowName, type County, type EventLibrary } from '../contracts.ts';
+import type { MetricsV2 } from '../evidence/metrics.ts';
+import { Compare, PastOutages, WhatYouGet } from './details.tsx';
+import { countyInEvents, useAreaReplays } from './record.ts';
 import { useRoute } from '../shell/router.ts';
 import { getLiveRisk, type LiveRisk } from '../live/data.ts';
-import { PageNav, fetchJson, fmtDay, fmtHours, fmtInt, fmtShare, fmtTime, ordinal, parseUtc, useJson } from './shared.tsx';
+import { PageNav, fmtInt, fmtShare, fmtTime, ordinal, useJson } from './shared.tsx';
 import './brief.css';
 
-const PRINT_ROWS = 6; // past outages that fit on the printed page
 
 export function Names({ county }: { county: County }) {
   return (
@@ -140,110 +142,6 @@ function LevelStrip({ county, peers }: { county: County; peers: County[] }) {
   );
 }
 
-interface CountyInEvent {
-  darkHours: number;
-  peakPct: number | null; // null = under the 2% cutoff of the county record
-}
-// A replay file keeps only the counties that reached 2% of customers out (data/build/export_app.py).
-const UNDER_CUTOFF: CountyInEvent = { darkHours: 0, peakPct: null };
-
-/** Load each replay in turn and keep only this county's two numbers. */
-function useCountyReplays(fips: string, events: EventRow[]): Record<string, CountyInEvent | 'absent' | 'error'> {
-  const [byId, setById] = useState<Record<string, CountyInEvent | 'absent' | 'error'>>({});
-  const ids = events.filter((e) => e.hasReplay).map((e) => e.id).join(',');
-  useEffect(() => {
-    let live = true;
-    setById({});
-    (async () => {
-      for (const id of ids ? ids.split(',') : []) {
-        let value: CountyInEvent | 'absent' | 'error';
-        try {
-          const replay = await fetchJson<EventReplay>(dataUrl(`events/${id}.json`));
-          const c = replay.counties.find((x) => x.fips === fips);
-          value = c ? { darkHours: c.darkHours, peakPct: c.out.reduce((m, v) => (v > m ? v : m), 0) } : 'absent';
-        } catch {
-          value = 'error';
-        }
-        if (!live) return;
-        setById((prev) => ({ ...prev, [id]: value }));
-      }
-    })();
-    return () => {
-      live = false;
-    };
-  }, [fips, ids]);
-  return byId;
-}
-
-function PastOutages({ county, lib }: { county: County; lib: EventLibrary }) {
-  const events = useMemo(
-    () => lib.events.filter((e) => e.ba === county.ba).sort((a, b) => (a.start < b.start ? 1 : -1)),
-    [lib, county.ba],
-  );
-  const replays = useCountyReplays(county.fips, events);
-  // Rows kept on the printed page: events with a county record first, then the largest.
-  const printIds = useMemo(() => {
-    const ranked = [...events].sort((a, b) => Number(b.hasReplay) - Number(a.hasReplay) || b.peakCustomersOut - a.peakCustomersOut);
-    return new Set(ranked.slice(0, PRINT_ROWS).map((e) => e.id));
-  }, [events]);
-
-  if (!county.ba) return <p className="dim">This county has no balancing area on record, so the event library has no outages for it.</p>;
-  if (events.length === 0)
-    return <p className="dim">The event library has no outage in {county.ba} from {lib.years[0]} to {lib.years[1]} that reached 1% of the area's customers for 4 hours.</p>;
-
-  const cell = (e: EventRow, pick: (c: CountyInEvent) => string) => {
-    if (!e.hasReplay) return <span className="faint">no county record</span>;
-    const r = replays[e.id];
-    if (r === undefined) return <span className="faint">loading</span>;
-    if (r === 'error') return <span className="faint">not available</span>;
-    return pick(r === 'absent' ? UNDER_CUTOFF : r);
-  };
-  const hidden = events.length - Math.min(events.length, PRINT_ROWS);
-  return (
-    <>
-      <table className="outages">
-        <thead>
-          <tr>
-            <th>Start (UTC)</th>
-            <th>Event</th>
-            <th className="num">Length</th>
-            <th className="num">Peak customers out, {county.ba}</th>
-            <th className="num">Peak share, {county.ba}</th>
-            <th className="num">This county: dark hours</th>
-            <th className="num">This county: peak share out</th>
-            <th>{lib.stub ? 'Warning' : 'Warned before *'}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {events.map((e) => (
-            <tr key={e.id} className={printIds.has(e.id) ? '' : 'print-hide'}>
-              <td>{fmtDay(parseUtc(e.start))}</td>
-              <td>{e.hasReplay ? <a href={`#/event/${e.id}`}>{e.title ?? 'Replay on the map'}</a> : e.title ?? <span className="faint">{e.id}</span>}</td>
-              <td className="num">{fmtHours(e.hoursAbove)}</td>
-              <td className="num">{fmtInt(e.peakCustomersOut)}</td>
-              <td className="num">{fmtShare(e.peakFrac)}</td>
-              <td className="num">{cell(e, (c) => `${c.darkHours} h`)}</td>
-              <td className="num">{cell(e, (c) => (c.peakPct == null ? 'under 2%' : `${c.peakPct < 10 ? c.peakPct.toFixed(1) : Math.round(c.peakPct)}%`))}</td>
-              <td>{lib.stub ? <span className="faint">pending</span> : e.leadHours != null ? `${Math.round(e.leadHours)} h before` : 'not warned'}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <p className="dim small table-note">
-        {events.length} {events.length === 1 ? 'event' : 'events'} in {county.ba}, {lib.years[0]} to {lib.years[1]}. An event is 4 hours or more with at least 1% of the area's customers out.
-        A dark hour is an hour with 10% or more of this county's customers out. County records exist for the largest events only, and they leave out a county that stayed under 2% out.
-        {hidden > 0 && <span className="print-only"> This page shows {PRINT_ROWS} of them; the Evidence page lists all.</span>}
-        {lib.stub && ' Warning results are pending: the model test has not run yet.'}
-        {!lib.stub && (
-          <>
-            {' '}<strong>* Warned before</strong> is the time from the first alert to the start of the event. {lib.warnNote ?? ''} Events before 2021 were used to train the model.
-          </>
-        )}
-      </p>
-    </>
-  );
-}
-
 function CheckFirst({ county, peers }: { county: County; peers: County[] }) {
   if (!county.ba || peers.length < 2) return <p className="dim">No comparison: this county has no neighbors on record in its balancing area.</p>;
   const byDme = [...peers].filter((p) => p.dme != null).sort((a, b) => b.dme! - a.dme!);
@@ -296,8 +194,28 @@ function CheckFirst({ county, peers }: { county: County; peers: County[] }) {
   );
 }
 
-function Brief({ county, counties, lib }: { county: County; counties: County[]; lib: EventLibrary | null }) {
+function Footer({ lib, className }: { lib: EventLibrary | null; className: string }) {
+  return (
+    <footer className={className}>
+      <p><strong>This is a research prototype. It is not an official warning.</strong> For emergency decisions, use your utility and your emergency management agency.</p>
+      <p>
+        Sources: outages, ORNL EAGLE-I county records{lib ? ` ${lib.years[0]} to ${lib.years[1]}` : ''}; grid data, EIA Form 930; medical equipment, HHS emPOWER (Medicare users only);
+        vulnerability, CDC/ATSDR SVI 2022; population, US Census. Counts are county totals. No data about a person is used.
+      </p>
+      <p>Made {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}. {window.location.href}</p>
+    </footer>
+  );
+}
+
+function Brief({ county, counties, lib, metrics }: { county: County; counties: County[]; lib: EventLibrary | null; metrics: MetricsV2 | null }) {
   const peers = useMemo(() => (county.ba ? counties.filter((c) => c.ba === county.ba) : [county]), [counties, county]);
+  const events = useMemo(
+    () => (lib && county.ba ? lib.events.filter((e) => e.ba === county.ba).sort((a, b) => (a.start < b.start ? 1 : -1)) : []),
+    [lib, county.ba],
+  );
+  const replays = useAreaReplays(events);
+  const areaFips = useMemo(() => new Set(peers.map((c) => c.fips)), [peers]);
+  const rec = useMemo(() => countyInEvents(county.fips, events, replays, areaFips), [county.fips, events, replays, areaFips]);
   useEffect(() => {
     const before = document.title;
     document.title = `County brief: ${earthName(county)}`;
@@ -314,6 +232,9 @@ function Brief({ county, counties, lib }: { county: County; counties: County[]; 
           <h1>{earthName(county)}</h1>
           <p className="hollow-line">{hollowName(county)} <span className="faint">in the Hollow</span></p>
           <p className="dim small">FIPS {county.fips}. Balancing area {county.ba ?? 'not known'}{county.ba && `, with ${fmtInt(peers.length - 1)} other counties`}.</p>
+          {county.level != null && (
+            <p className="small no-print"><a href={`#/hollow?level=${county.level}&fips=${county.fips}`}>See {hollowName(county)} in the cross-section view</a></p>
+          )}
         </div>
         <RiskNow ba={county.ba} />
       </header>
@@ -340,24 +261,22 @@ function Brief({ county, counties, lib }: { county: County; counties: County[]; 
       </dl>
       {county.level != null && <LevelStrip county={county} peers={peers} />}
 
+      {lib && <WhatYouGet county={county} events={events} lib={lib} metrics={metrics} />}
+
       <section>
         <h2>Who to check first</h2>
         <CheckFirst county={county} peers={peers} />
       </section>
 
-      <section>
-        <h2>Past outages</h2>
-        {lib ? <PastOutages county={county} lib={lib} /> : <p className="dim">Loading the event library.</p>}
-      </section>
+      <Compare county={county} peers={peers} all={counties} events={events} replays={replays} />
 
-      <footer className="brief-foot">
-        <p><strong>This is a research prototype. It is not an official warning.</strong> For emergency decisions, use your utility and your emergency management agency.</p>
-        <p>
-          Sources: outages, ORNL EAGLE-I county records{lib ? ` ${lib.years[0]} to ${lib.years[1]}` : ''}; grid data, EIA Form 930; medical equipment, HHS emPOWER (Medicare users only);
-          vulnerability, CDC/ATSDR SVI 2022; population, US Census. Counts are county totals. No data about a person is used.
-        </p>
-        <p>Made {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}. {window.location.href}</p>
-      </footer>
+      <Footer lib={lib} className="brief-foot" />
+
+      <section className="past">
+        <h2>Past outages in {county.ba ?? 'its area'}: {earthName(county)}</h2>
+        {lib ? <PastOutages county={county} lib={lib} events={events} replays={replays} rec={rec} /> : <p className="dim">Loading the event library.</p>}
+        <p className="print-only small">This is a research prototype. It is not an official warning.</p>
+      </section>
     </article>
   );
 }
@@ -367,6 +286,7 @@ export default function Page() {
   const fips = parts[1] ?? null;
   const counties = useJson<County[]>(dataUrl('counties.json'));
   const lib = useJson<EventLibrary>(dataUrl('events.json'));
+  const metrics = useJson<MetricsV2>(`${import.meta.env.BASE_URL}models/metrics.json`);
   const county = useMemo(() => counties.data?.find((c) => c.fips === fips) ?? null, [counties.data, fips]);
   const examples = useMemo(
     () => (counties.data ? [...counties.data].sort((a, b) => (b.dme ?? 0) - (a.dme ?? 0)).slice(0, 6) : []),
@@ -399,7 +319,7 @@ export default function Page() {
         {counties.data && fips && !county && (
           <p className="notice warn"><strong>No county has the FIPS code {fips}.</strong> Search by name above.</p>
         )}
-        {county && counties.data && <Brief county={county} counties={counties.data} lib={lib.data} />}
+        {county && counties.data && <Brief county={county} counties={counties.data} lib={lib.data} metrics={metrics.data} />}
       </main>
     </>
   );
