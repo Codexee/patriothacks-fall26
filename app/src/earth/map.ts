@@ -117,8 +117,8 @@ export class EarthMap {
       },
       getCursor: ({ isDragging }) => (isDragging ? 'grabbing' : 'default'),
       effects: [new LightingEffect({
-        ambient: new AmbientLight({ color: [255, 255, 255], intensity: 2.1 }),
-        sun: new DirectionalLight({ color: [255, 236, 214], intensity: 1.5, direction: [-0.5, 0.9, -1.6] }),
+        ambient: new AmbientLight({ color: [255, 255, 255], intensity: 1.9 }),
+        sun: new DirectionalLight({ color: [255, 226, 196], intensity: 0.85, direction: [-0.5, 0.9, -1.6] }),
       })],
       layers: [],
       onAfterRender: () => this.placeLabels(),

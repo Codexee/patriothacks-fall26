@@ -80,7 +80,7 @@
 .em-threshold { stroke: var(--alert); stroke-width: 1.2; stroke-dasharray: 5 5; vector-effect: non-scaling-stroke; }
 .em-start { stroke: var(--text-dim); stroke-width: 1; vector-effect: non-scaling-stroke; }
 .em-start-label { position: absolute; top: -2px; margin-left: 8px; font-size: 13px; color: var(--text-dim); }
-.em-chart-note { position: absolute; left: 0; top: -2px; font-size: 13px; color: var(--text-dim); }
+.em-chart-note { position: absolute; right: 0; top: -2px; font-size: 13px; color: var(--text-dim); }
 .em-pending { color: var(--text-faint); font-style: italic; }
 .em-head { position: absolute; top: -6px; bottom: -1px; width: 2px; margin-left: -1px; background: var(--text); box-shadow: 0 0 10px rgba(232, 236, 242, 0.6); pointer-events: none; }
 .em-head::before { content: ''; position: absolute; left: -4px; top: -4px; width: 10px; height: 10px; border-radius: 50%; background: var(--text); }

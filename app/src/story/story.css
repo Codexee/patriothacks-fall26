@@ -15,10 +15,11 @@
 .st-caption a { pointer-events: auto; color: var(--lit); border-bottom: 2px solid currentColor; }
 
 .st-chart { position: absolute; left: 7vw; right: 7vw; top: 5vh; animation: st-in 0.8s both; }
-.st-chart .em-timeline { position: static; animation: none; background: none; border: 0; backdrop-filter: none; -webkit-backdrop-filter: none; padding: 0; }
+.st-chart { z-index: 2; }
+.st-chart .em-timeline { position: static; animation: none; padding: 12px 18px; background: rgba(9, 11, 16, 0.88); }
 .st-chart .em-track { cursor: default; }
 .st-root:has(.st-list) .st-chart { right: calc(7vw + 440px); }
-.st-list .em-check { top: 5vh; right: 7vw; }
+.st-list .em-check { top: 5vh; right: 7vw; z-index: 2; }
 .st-root:has(.st-chart) .st-caption { bottom: 9.5vh; }
 
 @keyframes st-in { from { opacity: 0; transform: translateY(0.35em); } }

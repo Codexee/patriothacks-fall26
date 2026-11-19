@@ -36,7 +36,6 @@ export default function Page() {
     const m = new EarthMap(stageRef.current, scene);
     m.onHover = setHover;
     setMap(m);
-    (window as unknown as { __em: EarthMap }).__em = m;
     const off = clock.subscribe(() => m.setHour(clock.hour));
     return () => { off(); m.destroy(); setMap(null); };
   }, [scene, clock]);
