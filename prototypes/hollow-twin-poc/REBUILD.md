@@ -36,7 +36,24 @@ lights; it is not a blackout.
 | Chicago 1995 | not stable, 345,945 | stable day 14, 0 (no blackouts) |
 | Baseline | not stable, 344,666 | stable day 14, 0 (no blackouts) |
 
-Which part does the work (Texas seed 1): warnings only → 374,185 deaths; saving power only → 2,379; both → 1,167.
+### Step 1b: the Directorate's census undercounts (Nov 19)
+
+The brief: 2 billion people, and the Directorate's numbers "don't match what people see". The census now misses a
+share of residents that grows with depth (0% on level 1, 30% on level 50: our assumption). It reports 1.65 billion; the
+real population is 2.00 billion (18% not counted). Only the test world's Hidden truth shows the real number. Blackout
+Warning still trusts the census, so it under-forecasts demand on the deep levels:
+
+| Scenario | Without | With (true census, before) | With (Directorate census, now) |
+| --- | --- | --- | --- |
+| Texas, seed 1 | 637,782 | 1,167, stable day 23, 100% warned | 79,993, never stable, 44% warned |
+| Texas, seed 2 | 565,107 | 1,468, stable day 24, 3% warned | 80,651, never stable, 35% warned |
+| Texas, seed 7 | 624,054 | 0, stable day 21 | 64,506, never stable, 34% warned |
+| Chicago 1995 | 345,945 | 0, stable day 14 | 15,294, never stable, 49% warned |
+| Baseline | 344,666 | 0, stable day 14 | 15,372, never stable, 34% warned |
+
+The results table above is the "before" column.
+
+Which part does the work (Texas seed 1, before the census change): warnings only → 374,185 deaths; saving power only → 2,379; both → 1,167.
 Saving power stops the overloads that black out the whole Hollow; the warnings cut the deaths in the blackouts that
 still happen.
 
