@@ -17,7 +17,7 @@ import { probeSig } from './sign.ts';
 import { heatOffsetFor } from '../data/index.ts';
 
 // ---------- Tunable constants ----------
-const MAX_DAYS = 120;
+export const MAX_DAYS = 120;
 const STABLE_DAYS = 14;
 const PLANT_LEVELS = [8, 18, 27, 34, 41, 47];
 const PLANT3 = 2; // index into plants: the plant on level 27
