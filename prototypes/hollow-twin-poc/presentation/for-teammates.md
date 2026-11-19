@@ -127,8 +127,11 @@ The screen has three areas, from left to right.
 | --- | --- |
 | Outage reports: the hour a section's air and fans lose power, and the hour they come back | Residents, through the app (the brief: residents have phones and a network, problem 7) |
 | Head count: how many people live in each home | Residents, through the app (assumption: everyone reports, honestly) |
-| The Directorate's census | The brief: the Directorate's numbers "don't match what people see". Our census misses people on deep levels. |
+| The Directorate's census | Accurate (decided Nov 19). The brief's "numbers don't match" is about the outbreak, not the population. |
 | "Deep levels lose power first" | The brief: "the deep levels are where the blackouts hit first" |
+
+**Note:** with the accurate census, residents' head count matches it, so the head count changes nothing for
+problem #1 today. It stays in the app for later problems (crowding, #6).
 
 **Not used:** plant meters, a weather or grid forecast, sensor boxes. The brief does not give residents any of these.
 
@@ -156,8 +159,9 @@ The screen has three areas, from left to right.
 - **Scenarios:** *Texas, Feb 2021* (a storm cuts about 40% of plant output for 4 days while demand rises 30%),
   *Chicago, July 1995* (a demand spike), and *Baseline* (no storm). The shapes are approximate.
 - **Scale:** about 1.6 million simulated people stand for the brief's 2 billion (each stands for about 1,250).
-- **The census lie:** the Directorate's census reports 1.65 billion. The real population is 2.00 billion: 18% are
-  not counted. Only the test world shows the real number.
+- **The census is accurate** (decided Nov 19): the brief says the Directorate's numbers don't match reality only
+  about the outbreak. The switch `WORLD.census` in the engine can turn on an undercount of the deep levels (1.65 billion counted against
+  2.00 billion real) as an option; it is our assumption, and it is off.
 - **How alerts change the world:** the share of residents who follow alerts is 50% + 50% × their trust in the system
   (about 85% at the start). Warned residents avoid 60% of the deaths from bad air.
 
@@ -191,7 +195,7 @@ do not match reality; residents have phones and a network that the Directorate c
 
 **Assumptions we made (all are visible in the code and in the info icons):**
 
-- The census misses 0% of people on level 1 and 30% on level 50.
+- (Optional, off) the census misses 0% of people on level 1 and 30% on level 50.
 - Everyone uses the app and reports their head count honestly.
 - 50% + 50% × trust follow alerts; warned people avoid 60% of air deaths (`PREPARED_SAVE` in the engine).
 - Thresholds: 88% safe load, 95% trip zone, 85% expected compliance, +15% after a trip. These are first guesses.
@@ -217,7 +221,7 @@ All paths are under `prototypes/hollow-twin-poc/`.
 
 | Path | What it does |
 | --- | --- |
-| `src/sim/engine.ts` | The test world. `WORLD` switches problems on and off. Census lie, outage reports, `residentsOnly` filter. |
+| `src/sim/engine.ts` | The test world. `WORLD` switches problems on and off. Census (accurate; undercount optional), outage reports, `residentsOnly` filter. |
 | `src/product/earlyWarning.ts` | Blackout Warning (the module). |
 | `src/product/index.ts` | Reads observations into memory and runs the modules each day. |
 | `src/product/names.ts` | `BUILT` (built modules) and `PROBLEMS` (the 15 problems). |

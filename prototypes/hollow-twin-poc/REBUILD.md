@@ -102,3 +102,13 @@ the forecast, which is about ±3% off. Thresholds are first guesses. Without the
 overloaded (plants trip about 3 times a day), so "without" never becomes stable.
 
 Run: `npm install`, then `npm run dev` (UI) or `npm run sim -- texas2021 1 --checks`.
+
+### Step 1e: the census is accurate (Nov 19)
+
+The brief says the Directorate's public numbers "don't match what people see" only about the lung-sickness outbreak
+(and problem #9), never about the population. So the census is now accurate (`WORLD.census = false`); the undercount
+of Step 1b stays in the code as an option. Results do not change, because residents' own head count already gave the
+true numbers: Texas s1 1,260 deaths, stable day 21, 75% warned. The "numbers don't match" lie belongs to problem #9.
+
+Baseline, with Blackout Warning, seeds 1–10: warned 71, 69, 63, –, –, 71, –, 91, 70, 79% ("–" = no blackouts at all);
+deaths 0 to 2,028; stable on day 21–22 (seed 9: day 36). The seed sets which plant trips when and the report noise.

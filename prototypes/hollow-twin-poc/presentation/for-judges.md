@@ -56,16 +56,12 @@ On a resident's phone (for example, a home on level 47):
 The system uses only what residents really have:
 
 - **Their own outage reports.** Residents tap "power out" and "power back" in the app.
-- **Their own head count.** Each home says how many people live there.
+- **Their own head count.** Each home says how many people live there (power needs follow the number of people).
 - **A fact everyone knows:** the deep levels lose power first.
 
 From these it finds the **blackout line**: how many levels from the top still have power, hour by hour. Because power
 goes to the upper levels first, that line shows how much power the plants make. Yesterday's line, and how it moved,
 predicts today's.
-
-**The census lie.** The Directorate's census reports 1.65 billion people. The real number is 2 billion: 18% are not
-counted, most of them on the crowded deep levels. If the system trusted the census, it would plan for too little
-power. Residents' own head count corrects it.
 
 It does **not** use plant meters, weather forecasts or the Directorate's data. Residents do not have them.
 
@@ -122,7 +118,7 @@ The **warnings** reduce the deaths in the blackouts that still happen.
 | 0:15 | Texas disaster, module off. Next day a few times. The red blackout line climbs; deep levels turn black, then pulse red | "No one knows when the next blackout will hit. The deep levels go first." |
 | 0:40 | Reset with Blackout Warning on. A level-47 phone: "Blackout today from about 15:00" | "The Residents' System reads only residents' own reports, and tells each level when its blackout will come." |
 | 1:00 | The Save power alert; levels dim instead of going dark | "It asks everyone to save a little power, so the plants never overload." |
-| 1:20 | The Modules panel: census 1.32 million against residents' count 1.6 million | "The Directorate's census misses one person in five. Residents count themselves." |
+| 1:20 | The Modules panel: yesterday's blackout line and today's predicted blackouts | "It reads the blackout line from residents' reports, and predicts who goes dark next." |
 | 1:35 | Compare: 637,782 against 1,260 | "Same storm. Without it, 40% die. With it, less than 0.1%." |
 | 1:50 | The 15 problem dots, one filled | "One problem solved. Fourteen to go, module by module." |
 
@@ -131,6 +127,5 @@ The **warnings** reduce the deaths in the blackouts that still happen.
 - **Problem #1, solved:** warn people before the power or air cuts out.
 - **Problem #2, partly:** the save-power request shares the shortage across all levels instead of letting the deep
   levels lose everything.
-- **Problems #6 and #9, partly:** residents' own head count shows the crowding the Directorate does not count, and
-  checks the Directorate's numbers against reality.
+- **Problem #6, groundwork:** residents count how many people live in each home, which a crowding module can use.
 - **Path:** making life underground more sustainable.

@@ -87,7 +87,7 @@ In Claude Code, the same server is called **hollow-rebuild**. The older look is 
 - **Demo bar** (bottom of the Hollow): ▶ Next day, ⏭ skip to the end, ↺ reset, then day, deaths and "warned",
   then ⇄ Compare, ⚙ open the full panel, ⓘ shortcuts.
 - **Full Test World panel** (press T): disaster and seed, play, scoreboard, Compare, **Trip a plant**, hidden truth
-  (the census says 1.65 billion; really 2.00 billion), section details, event log.
+  (population 2.00 billion; the census is accurate), section details, event log.
 
 ### Info icons
 
@@ -151,7 +151,7 @@ When the banner says **Stable Hollow on day 21**, press **Keep playing** to cont
 - **Stable on day 21** with the module; never stable without it.
 - **418 → 6** plant trips.
 - **75%** of blackout time was warned.
-- **Census 1.65 billion, real 2.00 billion:** 18% not counted (most on the deep levels).
+- **The census is accurate:** 2.00 billion. (An undercount option exists in the code, switched off.)
 - Each simulated person stands for about **1,250** people of the brief's 2 billion.
 
 ## 8. Questions you may get, and honest answers
@@ -182,14 +182,15 @@ The disaster shapes are approximate copies of real events (Texas 2021, Chicago 1
 simulated. Some rates are our assumptions, and the info icons list them.
 
 **"How does this cover more than one problem?"**
-Problem #1 fully; #2 partly (sharing the shortage); #6 and #9 partly (residents count the crowding the Directorate
-misses). The other modules come next.
+Problem #1 fully; #2 partly (sharing the shortage); #6 groundwork (residents count who lives in each home). The
+other modules come next.
 
 ## 9. What was decided along the way
 
 - **No invented inputs.** If residents do not have it, the module does not use it. Plant meters, the weather
   forecast and sensor boxes were removed.
-- **The census exists, but it lies.** Real population 2 billion; the residents never see the real number in the app.
+- **The census exists, but it lies.** Later replaced: **the census is accurate** (Nov 19), because the brief's "numbers
+  don't match" is about the outbreak, not the population.
 - **Residents count themselves,** and everyone uses the app.
 - **Baseline** is the default disaster. Texas and Chicago stay.
 - **Modules live in their own panel,** minimized by default, so new modules can be added.
