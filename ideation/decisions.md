@@ -53,3 +53,12 @@ Add one line per decision: date · decision · why · who. Newest last.
 - 2026-11-18 · Visual effects: twin split (real Texas map + cutaway on one clock), cinematic cascade, truth wave + Lantern packets; scripted story mode for the video · more spectacle · Neil
 - 2026-11-18 · Directorate becomes an agent with 3 goals (order, upper-level output, trust); each choice shows motive, gain, cost in its own panel · choices should be multifaceted · Neil
 - 2026-11-18 · Scale to 2 billion through 8 sample districts (each stands for 156); Vercel deploy; Claude recap in STE with template fallback; roles not fixed · Neil
+- 2026-11-18 · Competitor scan: 6 other teams on the track; anudeep-bonagiri/hollow-twin has our name, a deployed 3D cutaway and no real data; no team trains on real disasters · GitHub search · Claude
+- 2026-11-18 · Pivot: Earth is the product (Before, During, After; working name, project unnamed). Real models trained on real US outages; the Hollow is the frame. Draft spec .plans/before-during-after-spec.md replaces hollow-twin-spec v2 once locked · stop competing on the Hollow sim · Neil
+- 2026-11-18 · Before (48 h grid warning) + During (who stays dark, check-first list) must ship; ladder heat → true count → air → water, each gated · Neil
+- 2026-11-18 · Earth user: county emergency office; output: county brief + evidence view with CSV/JSON/static API · Neil
+- 2026-11-18 · Visual: US county map, counties extruded downward by vulnerability (depth = vulnerability); deck.gl + MapLibre; labels show Earth name + smaller Hollow level · Neil
+- 2026-11-18 · Video opens in the Hollow, then reveals "This is Texas, February 2021" · Neil
+- 2026-11-18 · Labels from EAGLE-I (1% of a BA's customers out 4 h+); train 2015–2020, test 2021+; lives saved only as a labelled estimate · Neil (thresholds and split: Claude)
+- 2026-11-18 · Before-during-after spec locked; data work starts tonight · Neil
+- 2026-11-18 · Contracts frozen in contracts/README.md + app/src/contracts.ts; app shell owns routing and package.json; app/public/data/v1 is written by data/build/export_app.py (moved from workstream 4 to 1); old Hollow Twin UI frozen at #/legacy; weather from NOAA ISD-Lite, not Open-Meteo · /parallelize · Neil and Claude

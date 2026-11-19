@@ -1,3 +1,3 @@
 import { createRoot } from 'react-dom/client';
-import { App } from './ui/App.tsx';
-createRoot(document.getElementById('root')!).render(<App />);
+import { Shell } from './shell/Shell.tsx';
+createRoot(document.getElementById('root')!).render(<Shell />);

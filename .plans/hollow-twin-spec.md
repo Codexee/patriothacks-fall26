@@ -1,5 +1,5 @@
 # Hollow Twin — Master Spec
-Status: locked (v2)   ·   Last updated: 2026-11-18   ·   Owner: Neil
+Status: superseded by `.plans/before-during-after-spec.md` (locked Nov 18; was: locked v2)   ·   Last updated: 2026-11-18   ·   Owner: Neil
 
 v2 replaces v1 (Nov 17). v1 described 4 checkbox tools. v2 follows the product design on `prototype/hollow-twin-product` (Adarsh) and adds a real-world impact act and a visual effects pass. The evaluation behind v2 is in `.plans/hollow-twin-evaluation.md`.
 

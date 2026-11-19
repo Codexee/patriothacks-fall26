@@ -20,9 +20,9 @@ We are a 4-person team competing in **Patriot HackFest Fall 2026** (George Mason
 
 ## Where we are (update this section after every milestone)
 
-- **Phase:** Wed Nov 18. **Hollow Twin spec v2 is locked** (`.plans/hollow-twin-spec.md`). The app is in `app/` (Vite + React + PixiJS). Off the Record is on hold.
-- **Done:** ideation rounds 1–16; the product prototype (9 modules on a test-world sim) merged into `main`. **Read the top entry of `CHANGELOG.md`.**
-- **Next:** follow the spec's "Step-by-step plan": fetch the real data, make the score lives-first, then measure Early Warning on the real ERCOT data (the opening claim).
+- **Phase:** Wed Nov 18, night. **Pivot: Earth is the product.** **Spec locked:** `.plans/before-during-after-spec.md` (project unnamed) replaces `.plans/hollow-twin-spec.md` v2. Reason: another team ships a deployed 3D "Hollow Twin" with no real data; no team trains on real disasters.
+- **Done:** ideation rounds 1–17 (round 17 = this pivot); the Hollow Twin prototype in `app/` (its cutaway and 9 modules leave the demo path; keep the code). **Read the top entry of `CHANGELOG.md`.**
+- **Next:** the spec's "Step-by-step plan": download EIA-930 and EAGLE-I, build the event library (gate G1, 3 am), train the Before model (G2, Thu 10 am).
 - **Blockers:** the judging criteria and the video length are not published; the Flint admission date needs a primary source.
 
 ## Start of every session (all AIs)

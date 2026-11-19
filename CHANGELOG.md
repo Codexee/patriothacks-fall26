@@ -2,6 +2,14 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-18 (18): Pivot to Earth as the product (spec locked, project unnamed)
+
+- **`.plans/before-during-after-spec.md` is locked** and replaces `.plans/hollow-twin-spec.md`. The working name is "Before, During, After"; the project is unnamed because another team (anudeep-bonagiri/hollow-twin) already uses "Hollow Twin".
+- **What changes:** two models trained on real US outages since 2015 (a 48-hour grid warning from EIA-930, and who stays dark longest from EAGLE-I with CDC SVI and HHS emPOWER), tested on 2021 onward. A deck.gl county map where counties sink by vulnerability (the Hollow's "deep levels"), a county brief, an evidence view, and a live page. Gated stretch ladder: heat → true count → air → water.
+- **What leaves the demo path:** the PixiJS cutaway and the 9 hand-written modules (`app/src/world`, `app/src/product`, `app/src/sim`). Do not delete them.
+- **Why:** `ideation/ideas.md` → Round 17 (6 competing repos; none uses real disaster data).
+- **Action for everyone:** read the new spec, agree or object in the chat, then pick an open workstream. Python work goes in `data/` and `models/` (uv, DuckDB, LightGBM).
+
 ## 2026-11-18 (17): Spec v2 locked; the app now lives in `app/`
 
 - **`.plans/hollow-twin-spec.md` is locked (v2).** It is the source of truth. The evaluation behind it is `.plans/hollow-twin-evaluation.md`.

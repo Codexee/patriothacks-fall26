@@ -1,0 +1,20 @@
+:root {
+  --bg: #07090d;
+  --panel: #0f131a;
+  --panel-2: #161b24;
+  --line: #232a36;
+  --text: #e8ecf2;
+  --text-dim: #8a94a6;
+  --text-faint: #566074;
+  --dark: #05060a;        /* a county with the power out */
+  --lit: #f2c46b;         /* a county with power */
+  --alert: #ff5a4f;       /* warning, darkness */
+  --ok: #58c48a;
+  --accent: #7fb4ff;
+  --font: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: ui-monospace, 'SF Mono', Menlo, monospace;
+}
+html, body, #root { height: 100%; margin: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--font); -webkit-font-smoothing: antialiased; }
+a { color: var(--accent); }
+@media print { body { background: #fff; color: #000; } }

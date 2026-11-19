@@ -1,0 +1,16 @@
+[project]
+name = "bda-data"
+version = "0.1.0"
+description = "Data pipeline and models for the Before, During, After spec (project unnamed)"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "duckdb>=1.1",
+  "polars>=1.10",
+  "pyarrow>=17",
+  "pandas>=2.2",
+  "openpyxl>=3.1",
+  "lightgbm>=4.5",
+  "scikit-learn>=1.5",
+  "statsmodels>=0.14",
+  "requests>=2.32",
+]

@@ -10,6 +10,55 @@ Scores run from 1 to 5. W = Wow, T = Track fit, F = Feasible in Tue–Wed, R = R
 
 ---
 
+# Round 17 (Neil and Claude, Wed Nov 18, night): Earth is the product
+
+**Why a new round:** a GitHub search found 6 other teams on this track. One of them (anudeep-bonagiri/hollow-twin) has our project name, a deployed 3D cutaway, an API and hardware code. Its own plan says "No AI ... there is no real data to train or test on", and its twin uses no real-world data. Stratum has 15 problems with seeds and intervals, but only on a simulated district. **No team trains a model on real disasters.** Neil's direction: stop competing on the Hollow simulation, make the real-world tool the product, train real models, and keep the Hollow as the story frame. The project stays unnamed for now.
+
+**Scoring change:** Team fit is replaced by **A = Applicable** (could a real county emergency office, utility regulator, newsroom or mutual-aid group use it this week?). Team fit stopped being scored on Nov 17. W = Wow, T = Track fit, F = Feasible by Thu noon, R = Remote-OK, L = Live-demo-able. Total /30.
+
+**Data we confirmed tonight (all public, no account):**
+- EIA-930 hourly balance files by balancing area, 2015 → now (about 43 MB per half-year CSV, direct download).
+- EAGLE-I county outages every 15 min, 2014–2025, on figshare (about 13 GB; Brelsford et al., ORNL).
+- CDC NCHS weekly deaths by state (2014–2019 and 2020 → now).
+- CDC/ATSDR Social Vulnerability Index by county; HHS emPOWER (Medicare users of electricity-dependent equipment, by county).
+- DOE OE-417 emergency reports: the old site is gone; the new site (doe417.pnnl.gov) is a JavaScript app. Labels can come from EAGLE-I itself if OE-417 is hard to get.
+
+## R17-A. Before, During, After: three models trained on hundreds of US disasters  ·  software only  ·  **27/30**
+**Crazy version:** every US county gets a live page: grid emergency risk for the next 48 hours, the list of places to check first, and after any disaster, an independent death count against the official one. A county office prints a 1-page brief from it.
+**Buildable version:** one web app with a disaster library (every large outage since 2015 that the data finds, expected 300+). The judge picks any event, or "today", and sees three outputs from three trained models:
+1. **Before (warn):** gradient-boosted trees on EIA-930 + temperature → "grid emergency in this area within 48 h". Trained 2015–2020, tested 2021 → now, so Texas 2021 and Elliott 2022 are never seen in training.
+2. **During (who first):** a model of how long each county stays dark, from EAGLE-I history, crossed with SVI and emPOWER → a ranked "check on these places first" list, and the hours of darkness a fair rotation would have saved for the most vulnerable counties.
+3. **After (the true count):** an expected-deaths model per state-week from NCHS (trained on years with no disaster) → excess deaths after each event, against the official count.
+**Winning demo (30 s):** a US map, calm. The judge picks "Texas, Feb 2021". The clock runs. 31 h (measured number) before the emergency order, Texas turns red: "Warned N h early." The county list appears: "These 14 counties: 9,800 people on home oxygen or dialysis. History says they stay dark longest." The map goes dark; the high-vulnerability counties stay dark longer, as predicted. Then "After": "Official count 246. Our model: X excess deaths." Line: "Every number here is from a real disaster. Now picture a city where the government owns the data and the dark never ends." The camera drops into the Hollow, where the same three models run for the residents.
+**How it works:** Python training on the M5 Pro (LightGBM and a Poisson model, minutes each; data prep is the slow part). Export the trees to JSON and run them in the browser in TypeScript, so the live site needs no server. The Hollow scene sends the same input shapes to the same model weights.
+**Hollow fit:** Before = problem 1 (and 3 through heat waves); During = 2, 8, 10 (who loses power first, who to check on, who needs powered medical equipment); After = 9, 13 (the official numbers do not match reality). 7 problems, each with a real-data result.
+**Overlap with past winners:** GeoGuard (2026) was earthquake risk and resource allocation. Ours is different in kind: trained and tested on real events, with published error rates.
+**Risks / Ethics:** county-level aggregates only, never people. The warning model may be weak; then the claim becomes "the rule we have, tested on 300 events, with its false-alarm rate". Death counts are a sensitive topic: show ranges and sources, never "the officials lied", only "the counts differ by X".
+**Scores:** W 5 · T 4 · F 3 · R 5 · L 5 · A 5 = **27**
+
+## R17-B. Warn only, deep  ·  software only  ·  **23/30**
+**Buildable version:** model 1 of R17-A only, on every balancing area, with a full hindcast (hits, misses, false alarms per year) and a live "today" page.
+**Winning demo (30 s):** the judge picks any of 300 events; the warning line appears hours before the darkness. A table: "Warned 71% of events, 1.2 false alarms per area per year."
+**Why lower:** strongest science, smallest story. Covers 1 (and 3) only.
+**Scores:** W 3 · T 2 · F 5 · R 4 · L 5 · A 4 = **23**
+
+## R17-C. The Undercount: independent death counts after disasters  ·  software only  ·  **25/30**
+**Buildable version:** model 3 of R17-A only, on every disaster in the library plus heat waves and hurricanes (Maria 2017: official 64, later study about 2,975; to verify).
+**Winning demo (30 s):** a list of disasters, each with two bars: official deaths and our estimate with its range. The gap is the story.
+**Why lower:** very applicable (newsrooms, public health), but it acts only after the deaths. Covers 9 and 13.
+**Scores:** W 4 · T 2 · F 4 · R 5 · L 5 · A 5 = **25**
+
+## R17-D. Dark Hours: who stays dark longest  ·  software only  ·  **26/30**
+**Buildable version:** model 2 of R17-A only: across every outage since 2014, measure whether high-vulnerability counties stay dark longer, and how much a fair rotation would change it. A utility regulator could file this.
+**Winning demo (30 s):** "In 300 outages, the most vulnerable counties stayed dark X% longer." Then the rotation plan cuts the gap.
+**Why lower:** the closest real-world copy of the Hollow's "the deep levels always lose", but no warning and no count. Covers 2, 8, 10.
+**Scores:** W 4 · T 3 · F 4 · R 5 · L 5 · A 5 = **26**
+
+## Round 17 verdict
+Take **R17-A** into `/interview`: B, C and D are its three parts, so the cut plan is built in. If a part fails its gate, it drops out and the other two still stand (A without its weakest part becomes D + B or D + C). No other team on this track trains on real data.
+
+---
+
 # Round 15 (Adarsh, Tue Nov 17, evening): one idea per problem
 
 **Why a new round:** Adarsh's feedback on round 14: we cannot pretend that real-world sensor inputs (a pulled charger, a real cough, tap water) are the Hollow. So the inputs must be things that exist *inside* the story. This round gives the best idea for each of the 15 problems on its own. We combine them later.

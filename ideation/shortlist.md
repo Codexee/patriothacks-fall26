@@ -1,5 +1,20 @@
 # Shortlist (Tue Nov 17): the Hollow brief
 
+## Round 17 (Wed Nov 18, night): Earth is the product
+
+Scores /30: Wow, Track fit, Feasible by Thu noon, Remote-OK, Live-demo-able, **Applicable** (replaces Team fit). Details: `ideation/ideas.md` → Round 17. The project stays unnamed (another team already uses "Hollow Twin").
+
+| Rank | Idea | 30-second moment | Problems | **/30** |
+| --- | --- | --- | --- | --- |
+| 1 | **R17-A. Before, During, After** (3 models trained on hundreds of US disasters) | Pick Texas 2021: warned N h early, the vulnerable counties to check, then the official count against the model's | 1, 2, 3, 8, 9, 10, 13 | **27** |
+| 2 | R17-D. Dark Hours (who stays dark longest) | "The most vulnerable counties stayed dark X% longer" | 2, 8, 10 | 26 |
+| 3 | R17-C. The Undercount (independent death counts) | Official deaths against the model's estimate, disaster by disaster | 9, 13 | 25 |
+| 4 | R17-B. Warn only, deep | Warning line before every one of 300 events, with its false-alarm rate | 1, 3 | 23 |
+
+**Recommendation:** R17-A, because its three parts are B, C and D, so each part can fail without losing the project, and no other team on the track trains on real data.
+
+---
+
 > **Chosen (Neil, Nov 17): Hollow Twin.** Software only. Spec: `.plans/hollow-twin-spec.md`. See "Neil's round 14 table" below.
 
 > **Merge note (Nov 17):** Adarsh ran rounds 14–16 in parallel with Neil, before seeing the Hollow Twin choice. They are kept here as input for the sync, and they have not been reconciled with Hollow Twin yet. Many of the 15 one-problem ideas (Fair Share, Flicker, Snow, Truthcount) could become tools inside Hollow Twin.
