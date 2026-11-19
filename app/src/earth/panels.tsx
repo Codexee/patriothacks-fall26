@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
 import { earthName, hollowName } from '../contracts.ts';
 import type { County, EventRow } from '../contracts.ts';
 import type { Clock } from './clock.ts';
-import { checkFirst, fmtDay, fmtHour, fmtInt, parseUtc, playable } from './data.ts';
+import { checkFirst, fmtDay, fmtHour, fmtHours, fmtInt, parseUtc, playable } from './data.ts';
 import type { Live, Scene } from './data.ts';
 
 export function useClockIndex(clock: Clock): number {
@@ -18,6 +18,22 @@ function useClockSpeed(clock: Clock): number {
 }
 
 // ---------------------------------------------------------------- timeline
+
+/** Plain name of the warning model that made the risk line. */
+export function modelLabel(name: string | undefined, short = false): string {
+  if (name === 'warn_fcst') return short ? 'model with a weather forecast' : 'model with a weather forecast (backtest: lead times are an upper bound)';
+  if (name === 'warn_full') return 'model with observed weather';
+  if (name === 'warn_grid') return 'grid-only model';
+  return 'warning model';
+}
+
+/** Replay hour of the first alert (EventRow.firstAlert), or null when the model did not warn. */
+export function firstAlertIndex(live: Live): number | null {
+  const fa = live.row?.firstAlert;
+  if (!fa || live.replay.stub) return null;
+  const h = Math.round((parseUtc(fa) - parseUtc(live.replay.t0)) / 3600_000);
+  return h >= 0 && h < live.replay.hours ? h : null;
+}
 
 const CW = 1000, CH = 84;   // chart coordinates (the SVG stretches to the panel width)
 
@@ -66,8 +82,10 @@ export function Timeline({ live, clock, bare = false }: { live: Live; clock: Clo
       });
       if (replay.alertThreshold != null) thresholdY = y(replay.alertThreshold);
     }
-    return { area, risk, thresholdY, startX: x(replay.eventStartIndex) };
+    const alertIdx = firstAlertIndex(live);
+    return { area, risk, thresholdY, startX: x(replay.eventStartIndex), alertIdx, alertX: alertIdx == null ? null : x(alertIdx) };
   }, [live, replay, last]);
+  const model = modelLabel(replay.warnModel);
 
   const scrub = (e: React.PointerEvent) => {
     const el = trackRef.current;
@@ -108,11 +126,17 @@ export function Timeline({ live, clock, bare = false }: { live: Live; clock: Clo
             {paths.thresholdY != null && <line className="em-threshold" x1="0" x2={CW} y1={paths.thresholdY} y2={paths.thresholdY} />}
             {paths.risk && <path className="em-risk" d={paths.risk} />}
             <line className="em-start" x1={paths.startX} x2={paths.startX} y1="0" y2={CH} />
+            {paths.alertX != null && <line className="em-alert" x1={paths.alertX} x2={paths.alertX} y1="0" y2={CH} />}
           </svg>
           <span className="em-start-label" style={{ left: `${(replay.eventStartIndex / last) * 100}%` }}>first outage</span>
+          {paths.alertIdx != null && (
+            <span className="em-alert-label" style={{ right: `${100 - (paths.alertIdx / last) * 100}%` }}>first alert</span>
+          )}
           {paths.risk
-            ? <span className="em-chart-note">warning model risk, {replay.ba}{paths.thresholdY != null ? '; dashed line = alert' : ''}</span>
-            : <span className="em-chart-note em-pending">warning model risk, {replay.ba}: model output pending</span>}
+            ? <span className="em-chart-note">{bare
+                ? `${replay.ba} risk, ${modelLabel(replay.warnModel, true)}`
+                : `Risk of an outage event in ${replay.ba}, ${model}${paths.thresholdY != null ? '. Dashed line: alert level' : ''}`}</span>
+            : <span className="em-chart-note em-pending">Risk of an outage event in {replay.ba}: model output pending</span>}
           <div className="em-head" ref={headRef} />
         </div>
       </div>
@@ -132,7 +156,7 @@ export function CheckFirst({ scene, live, count = 4, onPoint }: {
     <aside className="em-check" aria-label="Check first">
       <h2>Check first</h2>
       <p className="em-check-sub">
-        {observed ? 'Observed' : 'Predicted'} hours dark × people on powered medical equipment.
+        {observed ? 'Observed' : 'Predicted'} hours dark × people on powered medical equipment{observed ? ' (model output pending)' : ''}.
         {' '}These {top.length} counties: {fmtInt(people)} people.
       </p>
       <ol>
@@ -145,7 +169,11 @@ export function CheckFirst({ scene, live, count = 4, onPoint }: {
             >
               <span className="em-names-2">
                 <span className="em-earth">{earthName(r.county)}</span>
-                <span className="em-hollow">{hollowName(r.county)}, {Math.round(r.hours)} h dark{observed ? ' (observed)' : ''}</span>
+                <span className="em-hollow">
+                  {hollowName(r.county)}, {observed
+                    ? `${Math.round(r.hours)} h dark (observed)`
+                    : `${fmtHours(r.hours)} h predicted, ${Math.round(r.observedHours)} h observed`}
+                </span>
               </span>
               <span className="em-dme">{fmtInt(r.county.dme)}</span>
             </a>

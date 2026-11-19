@@ -79,6 +79,8 @@
 .em-risk { fill: none; stroke: var(--lit); stroke-width: 2; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
 .em-threshold { stroke: var(--alert); stroke-width: 1.2; stroke-dasharray: 5 5; vector-effect: non-scaling-stroke; }
 .em-start { stroke: var(--text-dim); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.em-alert { stroke: var(--alert); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.em-alert-label { position: absolute; top: 14px; margin-right: 6px; font-size: 13px; color: var(--alert); white-space: nowrap; }
 .em-start-label { position: absolute; top: -2px; margin-left: 8px; font-size: 13px; color: var(--text-dim); }
 .em-chart-note { position: absolute; right: 0; top: -2px; font-size: 13px; color: var(--text-dim); }
 .em-pending { color: var(--text-faint); font-style: italic; }

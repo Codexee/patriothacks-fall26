@@ -146,6 +146,7 @@ export function mainGroup(scene: Scene, cis: number[]): number[] {
 export interface CheckRow {
   county: County;
   hours: number;      // predicted dark hours, or observed while the model output is not in
+  observedHours: number;
   score: number;      // hours x dme
 }
 
@@ -159,7 +160,7 @@ export function checkFirst(scene: Scene, live: Live): { rows: CheckRow[]; observ
     const county = scene.counties[i];
     const hours = observed ? rc.darkHours : rc.predDarkHours ?? 0;
     const score = hours * (county.dme ?? 0);
-    if (score > 0) rows.push({ county, hours, score });
+    if (score > 0) rows.push({ county, hours, observedHours: rc.darkHours, score });
   });
   rows.sort((a, b) => b.score - a.score);
   return { rows, observed };
@@ -190,4 +191,5 @@ export function fmtDay(s: string): string {
   const d = new Date(parseUtc(s));
   return `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
 }
+export const fmtHours = (h: number) => (h < 10 ? h.toFixed(1) : String(Math.round(h)));
 export const fmtInt = (n: number | null | undefined) => (n == null ? 'no data' : Math.round(n).toLocaleString('en-US'));
