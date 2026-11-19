@@ -21,7 +21,7 @@ function frameFor(day: number, hour: number): Frame {
       const dark = depth > 0.75 && wave > 0.3;
       sections.push({
         level, col, people: Math.round(5000 * (1 - depth * 0.3)),
-        power: dark ? 0 : 1, co2: 600 + depth * 1800 + (dark ? 900 : 0), wetBulb: 22 + depth * 10,
+        power: dark ? 0 : 1, lifeSupport: dark ? 0 : 1, co2: 600 + depth * 1800 + (dark ? 900 : 0), wetBulb: 22 + depth * 10,
         infected: Math.max(0, depth - 0.6) * 0.5, water: 1 - Math.max(0, depth - 0.7), food: 20 - depth * 10,
         lost: depth > 0.96 && day > 20,
         structures: col === 0 && level % 10 === 5 ? ['plant'] : col === 3 ? ['fan'] : col === 6 && level % 4 === 0 ? ['farm'] : [],
@@ -37,7 +37,7 @@ export const mockSim: SimApi = {
     return {
       seed, scenario: mockScenario, day: 0, tools, trust: 0.7, systemTrust: 0.7, observations: [],
       lies: [{ id: 'plantFine', bulletin: 'Plant 3 is operating normally', truth: 'Plant 3 is at 40% capacity', active: true, exposed: false }],
-      totals: { population: 1_500_000, startPopulation: 1_500_000, deaths: 0, sectionsLost: 0, hoursDarkDeepest: 0, networkUp: true, familiesNoNews: 0, surfaceBelief: 0, climbersLost: 0, hungerDeaths: 0 },
+      totals: { population: 1_500_000, startPopulation: 1_500_000, deaths: 0, sectionsLost: 0, hoursDarkDeepest: 0, networkUp: true, familiesNoNews: 0, surfaceBelief: 0, climbersLost: 0, hungerDeaths: 0, airDeaths: 0, blackoutPersonHours: 0, warnedPersonHours: 0 },
       bulletin: { directorate: ['All levels nominal'], measured: ['Levels 41–50: power 60%'] },
       end: null, lastFrame: frameFor(0, 0), internal: null,
     };

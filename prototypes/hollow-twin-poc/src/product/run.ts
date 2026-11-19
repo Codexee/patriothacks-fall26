@@ -29,13 +29,7 @@ export function stepRun(run: Run, modules: ToolSet, extra: Action[] = []): { run
   const r = sim.stepDay(run.sim, actions);
   const sent: string[] = [];
   for (const o of step.outputs) {
-    if (o.kind === 'alert') sent.push(`Day ${day} 00:00 · ${label(o.module)} alert → L${o.from}–${o.to}: ${o.text}`);
-    else if (o.kind === 'finding') sent.push(`Day ${day} 00:00 · Truth Check published #${o.hash}: ${o.text}`);
-    else if (o.kind === 'repair') sent.push(`Day ${day} 00:00 · ${label(o.module)}: ${o.text}`);
-    else if (o.kind === 'allocation') sent.push(`Day ${day} 00:00 · ${label(o.module)}: ${o.text}`);
-    else if (o.kind === 'welfare' || o.kind === 'moveFan' || o.kind === 'foodTransfer' || o.kind === 'grow' || o.kind === 'verdict') {
-      sent.push(`Day ${day} 00:00 · ${label(o.module)}: ${o.text}`);
-    } else if (o.kind === 'relays' && !r_networkUp(run)) sent.push(`Day ${day} 00:00 · ${label(o.module)}: ${o.text}`);
+    if (o.kind === 'alert') sent.push(`Day ${day} 00:00 · ${label(o.module)} → L${o.from}–${o.to}: ${o.text}`);
   }
   return {
     run: { sim: r.state, memory: step.memory, outputs: step.outputs, log: step.log },
@@ -46,9 +40,4 @@ export function stepRun(run: Run, modules: ToolSet, extra: Action[] = []): { run
 
 export function label(module: string): string {
   return moduleName(module);
-}
-
-/** Whether the network was up at the end of the last simulated day (as the system saw it). */
-function r_networkUp(run: Run): boolean {
-  return run.memory.networkUpNow;
 }

@@ -97,7 +97,7 @@ export function App() {
   };
 
   const runAttribution = async () => {
-    setBusy('Estimating each module\'s share (about 50 runs, up to a minute)…');
+    setBusy('Estimating each feature\'s share…');
     setAttr(null);
     setAttrProgress({ done: 0, total: 1 });
     await sleep(0);
@@ -109,11 +109,14 @@ export function App() {
   const queueEvent = (event: WorldEvent) => setQueued((q) => [...q, { type: 'event', event }]);
   const queueReport = (level: number, col: number, text: string) => setQueued((q) => [...q, { type: 'report', level, col, text }]);
 
-  // Hovering the cutaway also picks the phone's section; keep the hover card alive after the pointer leaves.
+  // Hovering the cutaway shows that section's values; it also moves the phone, unless the home is locked.
+  const [homeLocked, setHomeLocked] = useState(true);
+  const lockRef = useRef(homeLocked);
+  lockRef.current = homeLocked;
   const onHover = useCallback((t: { level: number; col: number } | null) => {
-    if (t) { setHover(t); setPhoneSection(t); }
+    if (t) { setHover(t); if (!lockRef.current) setPhoneSection(t); }
   }, []);
-  useEffect(() => { document.title = `Day ${state.day} · Hollow Twin`; }, [state.day]);
+  useEffect(() => { document.title = `Day ${state.day} · Residents' System (rebuild)`; }, [state.day]);
 
   return (
     <div className="app">
@@ -123,6 +126,7 @@ export function App() {
       </main>
       <ProductView
         run={run} modules={state.tools} section={phoneSection} onPickSection={setPhoneSection}
+        homeLocked={homeLocked} onToggleLock={() => setHomeLocked((v) => !v)}
         onReport={queueReport} queuedReports={queued.filter((a) => a.type === 'report').length}
         locked={playing || busy !== null || !!state.end}
       />

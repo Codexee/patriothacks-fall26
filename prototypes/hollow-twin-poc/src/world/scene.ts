@@ -188,7 +188,9 @@ export class HollowScene {
     this.peopleMax = maxP;
     for (let i = 0; i < SECTION_COUNT && i < secs.length; i++) {
       const v = secs[i], sec = this.sections[i];
-      this.tgt.power[i] = v.lost ? 0 : clamp01(v.power);
+      // REBUILD: a section is DARK only when its life support (air, fans) loses power. Saving non-essential power
+      // dims the lights (brightness 0.6–1) but is not a blackout.
+      this.tgt.power[i] = v.lost ? 0 : v.lifeSupport < 0.5 ? clamp01(v.lifeSupport) * 0.6 : 0.6 + 0.4 * clamp01(v.power);
       this.tgt.heat[i] = clamp01((v.wetBulb - 27) / 8);
       this.tgt.fog[i] = clamp01((v.co2 - 1000) / 4000);
       this.tgt.sick[i] = clamp01(v.infected);

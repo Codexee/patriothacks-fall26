@@ -1,4 +1,5 @@
-// PROTOTYPE: the fixed right panel. Presentational; App owns the state and the sim calls.
+// REBUILD: the right panel = the TEST WORLD (Hollow Twin). It is not the product: it runs a simulated Hollow so we
+// can show the Residents' System working. Step 1: only blackouts and air exist in the world.
 import { useState, type ReactNode } from 'react';
 import { sim } from '../sim/index.ts';
 import type { Action, Frame, Score, SimState, ToolKey, ToolSet, WorldEvent } from '../sim/types.ts';
@@ -31,97 +32,59 @@ export interface PanelProps {
   onAttribution: () => void;
 }
 
-function Section({ title, children, extra }: { title: string; children: ReactNode; extra?: ReactNode }) {
+function Section({ title, hint, children, extra }: { title: string; hint?: string; children: ReactNode; extra?: ReactNode }) {
   return (
     <section className="p-sec">
       <h2>{title}{extra}</h2>
+      {hint && <p className="muted small hint">{hint}</p>}
       {children}
     </section>
   );
 }
 
-const fmt = (n: number) => Math.round(n).toLocaleString();
-const signed = (n: number) => `${n >= 0 ? '+' : '−'}${Math.round(Math.abs(n)).toLocaleString()}`;
+const fmt = (n: number) => Math.round(n).toLocaleString('en-US');
+const pct = (a: number, b: number) => (b > 0 ? Math.round((a / b) * 100) : 0);
 
 function RunCol({ title, r }: { title: string; r: RunResult }) {
   return (
     <div className="run-col">
       <h3>{title}</h3>
-      <div className={`big ${r.end?.kind === 'stable' ? 'good' : 'bad'}`}>Day {r.days}</div>
-      <div>{r.end ? (r.end.kind === 'stable' ? 'Stable Hollow' : `Lost: ${r.end.reason}`) : `Still running at cap`}</div>
-      <div>Deaths {fmt(r.deaths)}</div>
-      <div>Score {fmt(Math.round(r.score.total))}</div>
+      <div className={`big ${r.end?.kind === 'stable' ? 'good' : 'bad'}`}>{fmt(r.deaths)}</div>
+      <div className="muted small">deaths</div>
+      <div>{r.end ? (r.end.kind === 'stable' ? `Stable on day ${r.days}` : `Lost on day ${r.days}`) : 'Still running'}</div>
+      <div>Bad air: {fmt(r.airDeaths)}</div>
+      <div>{r.blackoutHours > 0 ? `Blackouts warned: ${r.warnedPct}%` : 'No blackouts'}</div>
     </div>
   );
 }
 
 function describe(a: Action): string {
-  if (a.type === 'event') {
-    const e = a.event;
-    if (e.type === 'breakRecycler') return `Break the recycler near L${e.level}`;
-    if (e.type === 'tripPlant') return `Trip Plant ${e.plant + 1}`;
-    if (e.type === 'outbreak') return `Outbreak on L${e.level}`;
-    if (e.type === 'cutNetwork') return `Directorate cuts the network for ${e.hours} h`;
-    return `Directorate diverts the farms of L${e.from}–${e.to}`;
-  }
+  if (a.type === 'event' && a.event.type === 'tripPlant') return `Trip Plant ${a.event.plant + 1}`;
   if (a.type === 'report') return `Report from L${a.level} S${a.col + 1}: “${a.text}”`;
   return a.type;
 }
 
-function WorldEvents({ onEvent, disabled }: { onEvent: (e: WorldEvent) => void; disabled: boolean }) {
-  const [recycler, setRecycler] = useState(18);
-  const [plant, setPlant] = useState(0);
-  const [outbreak, setOutbreak] = useState(30);
-  const [divert, setDivert] = useState(30);
-  return (
-    <div className="events">
-      <div className="row">
-        <button disabled={disabled} onClick={() => onEvent({ type: 'breakRecycler', level: recycler })}>Break recycler</button>
-        <select value={recycler} onChange={(e) => setRecycler(+e.target.value)} aria-label="Recycler level">
-          {[3, 8, 13, 18, 23, 28, 33, 38, 43, 48].map((l) => <option key={l} value={l}>L{l}</option>)}
-        </select>
-      </div>
-      <div className="row">
-        <button disabled={disabled} onClick={() => onEvent({ type: 'tripPlant', plant })}>Trip plant</button>
-        <select value={plant} onChange={(e) => setPlant(+e.target.value)} aria-label="Plant">
-          {[1, 2, 3, 4, 5, 6].map((k) => <option key={k} value={k - 1}>Plant {k}</option>)}
-        </select>
-      </div>
-      <div className="row">
-        <button disabled={disabled} onClick={() => onEvent({ type: 'outbreak', level: outbreak })}>Start outbreak</button>
-        <input type="number" min={1} max={50} value={outbreak} onChange={(e) => setOutbreak(+e.target.value || 1)} aria-label="Outbreak level" />
-      </div>
-      <div className="row">
-        <button disabled={disabled} onClick={() => onEvent({ type: 'cutNetwork', hours: 48 })}>Cut network 48 h</button>
-      </div>
-      <div className="row">
-        <button disabled={disabled} onClick={() => onEvent({ type: 'divertFarms', from: Math.max(1, divert - 4), to: Math.min(50, divert + 4) })}>Divert farms</button>
-        <span className="muted">around L</span>
-        <input type="number" min={1} max={50} value={divert} onChange={(e) => setDivert(+e.target.value || 1)} aria-label="Farm diversion level" />
-      </div>
-    </div>
-  );
-}
-
 export function Panel(p: PanelProps) {
   const [open, setOpen] = useState(true);
+  const [plant, setPlant] = useState(0);
   const { state, frame } = p;
   const locked = p.playing || p.busy !== null;
   const t = state.totals;
-  const maxPhi = p.attr ? Math.max(1e-9, ...TOOL_KEYS.map((k) => Math.abs(p.attr!.phi[k]))) : 1;
+  const darkNow = frame.sections.filter((s) => !s.lost && s.lifeSupport < 0.5).length; // life support off = blackout
 
   return (
-    <aside className={`panel ${open ? 'open' : 'closed'}`} aria-label="Control panel">
+    <aside className={`panel ${open ? 'open' : 'closed'}`} aria-label="Test world controls">
       <button className="sheet-toggle" onClick={() => setOpen(!open)} aria-expanded={open}>
         Day {state.day} · {fmt(t.population)} alive {open ? '▾' : '▴'}
       </button>
       <div className="panel-body">
         <header className="p-head">
-          <h1>HOLLOW TWIN</h1>
-          <span className="muted">prototype</span>
+          <h1>TEST WORLD</h1>
+          <span className="muted">Hollow Twin</span>
         </header>
+        <p className="muted small">A simulated Hollow that proves the Residents' System works. It knows the hidden truth; the system does not. Right now it has one problem: blackouts, and the air that goes bad when the fans stop.</p>
 
-        <Section title="Scenario" extra={<SourceInfo source={sim.sourceFor('scenario')} label="scenario" />}>
+        <Section title="1. Choose a disaster" extra={<SourceInfo source={sim.sourceFor('scenario')} label="scenario" />}>
           <div className="row">
             <select value={p.scenarioId} disabled={locked} onChange={(e) => p.onScenario(e.target.value)} aria-label="Scenario">
               {sim.scenarios.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
@@ -134,77 +97,12 @@ export function Panel(p: PanelProps) {
             <label className="seed">Seed
               <input type="number" value={p.seed} disabled={locked} onChange={(e) => p.onSeed(Number(e.target.value) || 0)} />
             </label>
-            <p className="muted small">The same seed replays the same disaster, so runs with and without modules are a fair comparison.</p>
+            <p className="muted small">The same seed replays the same disaster, so runs with and without the system are a fair comparison.</p>
           </details>
         </Section>
 
-        <Section title="World events">
-          <p className="muted small">Change the world. The residents' system is not told; it must notice from its data.</p>
-          <WorldEvents onEvent={p.onEvent} disabled={locked || !!state.end} />
-          {p.queued.length > 0 && (
-            <ul className="queued">{p.queued.map((a, i) => <li key={i}>Next day: {describe(a)}</li>)}</ul>
-          )}
-        </Section>
-
-        {state.end && (
-          <div className={`banner ${state.end.kind}`} role="status">
-            {state.end.kind === 'lost'
-              ? `Hollow lost on day ${state.end.day}: ${state.end.reason}`
-              : `Stable Hollow on day ${state.end.day}`}
-          </div>
-        )}
-
-        <Section title="Status">
-          <div className="stats">
-            <div><span className="k">Day</span><span className="v">{state.day}{p.playing && ` · ${String(frame.hour).padStart(2, '0')}:00`}</span></div>
-            <div><span className="k">Alive</span><span className="v">{fmt(t.population)}</span></div>
-            <div><span className="k">Deaths</span><span className="v bad">{fmt(t.deaths)}</span></div>
-            <div><span className="k">Plants</span><span className="v">{frame.plantsOnline}/{frame.plantsTotal}</span></div>
-            <div><span className="k">Network</span><span className={`v ${t.networkUp ? 'good' : 'bad'}`}>{t.networkUp ? 'up' : 'CUT'}</span></div>
-            <div><span className="k" title="Families with relatives on other levels who do not know if they are okay">No news</span><span className="v">{fmt(t.familiesNoNews)}</span></div>
-            <div><span className="k" title="Residents who went up the closed way, believing the surface has healed">Climbers lost</span><span className="v">{fmt(t.climbersLost)}</span></div>
-            <div><span className="k">Hunger deaths</span><span className="v">{fmt(t.hungerDeaths)}</span></div>
-          </div>
-          <div className="trust">
-            <span className="k" title="Residents' trust in the Directorate. Each exposed lie lowers it.">Trust in Directorate</span>
-            <div className="bar"><div style={{ width: `${Math.round(state.trust * 100)}%` }} /></div>
-            <span className="v">{Math.round(state.trust * 100)}%</span>
-          </div>
-          <div className="trust">
-            <span className="k" title="Residents' trust in their own system. It sets how many follow its alerts. Right findings raise it; wrong ones lower it.">Trust in system</span>
-            <div className="bar good"><div style={{ width: `${Math.round(state.systemTrust * 100)}%` }} /></div>
-            <span className="v">{Math.round(state.systemTrust * 100)}%</span>
-          </div>
-        </Section>
-
-        <Section title="Bulletin" extra={<SourceInfo source={sim.sourceFor('directorate')} label="Directorate" />}>
-          <div className="two-col">
-            <div>
-              <h3>Directorate says</h3>
-              <ul>{state.bulletin.directorate.map((l, i) => <li key={i}>{l}</li>)}</ul>
-            </div>
-            <div>
-              <h3 title="Only the sim knows this. The residents' system never reads it.">Hidden truth (sim only)</h3>
-              <ul>{state.bulletin.measured.map((l, i) => <li key={i} className="measured">{l}</li>)}</ul>
-            </div>
-          </div>
-          {state.lies.length > 0 && (
-            <ul className="lies">
-              {state.lies.map((l) => (
-                <li key={l.id}>
-                  <span className={`tag ${l.exposed ? 'bad' : l.active ? 'warn' : ''}`}>
-                    {l.exposed ? 'EXPOSED' : l.active ? 'ACTIVE' : 'DROPPED'}
-                  </span>
-                  <span>“{l.bulletin}”</span>
-                  <span className="measured">→ {l.truth}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Section>
-
-        <Section title="Residents' system: modules">
-          <div className="tools">
+        <Section title="2. Turn the system on or off" hint="Changes apply from the next day. Press Reset to start over with your choice.">
+          <div className="tools one">
             {TOOL_KEYS.map((k) => (
               <label key={k} className={`tool ${p.pendingTools[k] ? 'on' : ''}`} title={TOOL_HINTS[k]}>
                 <input type="checkbox" checked={p.pendingTools[k]} disabled={locked || !!state.end} onChange={() => p.onToggleTool(k)} />
@@ -212,14 +110,10 @@ export function Panel(p: PanelProps) {
               </label>
             ))}
           </div>
-          <div className="row">
-            <button disabled={locked || !!state.end} onClick={() => TOOL_KEYS.forEach((k) => { if (!p.pendingTools[k]) p.onToggleTool(k); })}>All on</button>
-            <button disabled={locked || !!state.end} onClick={() => TOOL_KEYS.forEach((k) => { if (p.pendingTools[k]) p.onToggleTool(k); })}>All off</button>
-            <span className="muted small">#n = the track's problem number</span>
-          </div>
-          {TOOL_KEYS.some((k) => p.pendingTools[k] !== state.tools[k]) && (
-            <p className="muted small">Changes apply on the next day.</p>
-          )}
+          <p className="muted small">{TOOL_HINTS.earlyWarning}</p>
+        </Section>
+
+        <Section title="3. Play">
           <div className="row">
             <button className="primary" disabled={locked || !!state.end} onClick={p.onNextDay}>
               {p.playing ? 'Playing…' : 'Next day ▸'}
@@ -228,46 +122,64 @@ export function Panel(p: PanelProps) {
           </div>
         </Section>
 
-        <Section title="Section">
-          <HoverCard frame={frame} target={p.hover} />
-        </Section>
+        {state.end && (
+          <div className={`banner ${state.end.kind}`} role="status">
+            {state.end.kind === 'lost' ? `Hollow lost on day ${state.end.day}: ${state.end.reason}` : `Stable Hollow on day ${state.end.day}`}
+          </div>
+        )}
 
-        <Section title="Score">
+        <Section title="Scoreboard">
           <div className="stats">
-            <div><span className="k">Total</span><span className="v">{fmt(Math.round(p.score.total))}</span></div>
-            <div><span className="k">Days</span><span className="v">{p.score.days}</span></div>
-            <div><span className="k">Alive</span><span className="v">{p.score.alivePct.toFixed(1)}%</span></div>
-            <div><span className="k">Fairness</span><span className="v">{p.score.fairness.toFixed(0)}</span></div>
+            <div><span className="k">Day</span><span className="v">{state.day}{p.playing && ` · ${String(frame.hour).padStart(2, '0')}:00`}</span></div>
+            <div><span className="k">Alive</span><span className="v">{fmt(t.population)}</span></div>
+            <div><span className="k">Deaths</span><span className="v bad">{fmt(t.deaths)}</span></div>
+            <div><span className="k" title="Deaths from bad air while the fans were off">from bad air</span><span className="v bad">{fmt(t.airDeaths)}</span></div>
+            <div><span className="k">Plants online</span><span className="v">{frame.plantsOnline}/{frame.plantsTotal}</span></div>
+            <div><span className="k" title="Sections whose life support (air, fans) has less than half its power right now. Saving non-essential power does not count.">Dark sections</span><span className={`v ${darkNow ? 'bad' : ''}`}>{darkNow}</span></div>
+          </div>
+          <div className="trust">
+            <span className="k" title="Share of all blackout hours (per person) that residents had been warned about ahead of time">Blackouts warned ahead</span>
+            <div className="bar good"><div style={{ width: `${t.blackoutPersonHours > 0 ? pct(t.warnedPersonHours, t.blackoutPersonHours) : 0}%` }} /></div>
+            <span className="v">{t.blackoutPersonHours > 0 ? `${pct(t.warnedPersonHours, t.blackoutPersonHours)}%` : 'no blackouts yet'}</span>
           </div>
         </Section>
 
-        <Section title="Same plants, different decisions">
-          <div className="row">
-            <button disabled={locked} onClick={p.onCompare}>Compare</button>
-            <button disabled={locked} onClick={p.onAttribution}>Attribution</button>
-          </div>
+        <Section title="Same storm: with and without the system">
+          <button disabled={locked} onClick={p.onCompare}>Compare</button>
           {p.busy && <p className="muted small">{p.busy}</p>}
           {p.compare && (
             <div className="compare">
-              <RunCol title="No modules" r={p.compare.without} />
-              <RunCol title="Your modules" r={p.compare.withTools} />
+              <RunCol title="Without" r={p.compare.without} />
+              <RunCol title="With the system" r={p.compare.withTools} />
             </div>
           )}
-          {p.attrProgress && !p.attr && (
-            <div className="bar progress"><div style={{ width: `${(p.attrProgress.done / p.attrProgress.total) * 100}%` }} /></div>
-          )}
-          {p.attr && (
-            <div className="attr">
-              <p className="muted small">Shapley share of lives saved, estimated from {p.attr.orderings} random orderings ({p.attr.runs.size} runs).</p>
-              {[...TOOL_KEYS].sort((a, b) => p.attr!.phi[b] - p.attr!.phi[a]).map((k) => (
-                <div key={k} className="attr-row">
-                  <span className="name">{TOOL_LABELS[k]}</span>
-                  <div className="abar"><div className={p.attr!.phi[k] < 0 ? 'neg' : ''} style={{ width: `${(Math.abs(p.attr!.phi[k]) / maxPhi) * 100}%` }} /></div>
-                  <span className="v">{signed(p.attr!.phi[k])} lives</span>
-                </div>
-              ))}
+        </Section>
+
+        <Section title="Break something" hint="Change the world. The system is not told; it has to notice from its data.">
+          <div className="row">
+            <button disabled={locked || !!state.end} onClick={() => p.onEvent({ type: 'tripPlant', plant })}>Trip a plant</button>
+            <select value={plant} onChange={(e) => setPlant(+e.target.value)} aria-label="Plant">
+              {[1, 2, 3, 4, 5, 6].map((k) => <option key={k} value={k - 1}>Plant {k}</option>)}
+            </select>
+          </div>
+          {p.queued.length > 0 && <ul className="queued">{p.queued.map((a, i) => <li key={i}>Next day: {describe(a)}</li>)}</ul>}
+        </Section>
+
+        <Section title="Hidden truth" hint="Only the test world knows this. The Residents' System never reads it." extra={<SourceInfo source={sim.sourceFor('directorate')} label="Directorate" />}>
+          <div className="two-col">
+            <div>
+              <h3>Directorate says</h3>
+              <ul>{state.bulletin.directorate.map((l, i) => <li key={i}>{l}</li>)}</ul>
             </div>
-          )}
+            <div>
+              <h3>Really</h3>
+              <ul>{state.bulletin.measured.map((l, i) => <li key={i} className="measured">{l}</li>)}</ul>
+            </div>
+          </div>
+        </Section>
+
+        <Section title="Section (hover the cutaway)">
+          <HoverCard frame={frame} target={p.hover} />
         </Section>
 
         <Section title="Event log">

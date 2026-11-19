@@ -41,7 +41,7 @@ export type Observation =
   /** Total load meter at the main switchyard, hourly. served = power delivered, demand = power asked for. About ±2% noise. */
   | { kind: 'feeder'; hour: number; served: number; demand: number }
   /** Daily averages from a residents' sensor box. Only 2 sections per level have one. Noisy; some days missing. */
-  | { kind: 'sensor'; level: number; col: number; day: number; co2: number; wetBulb: number; power: number; water: number }
+  | { kind: 'sensor'; level: number; col: number; day: number; co2: number; wetBulb: number; power: number; lifeSupport: number; water: number }
   /** Resident reports for one section and topic on one day, counted. text is one sample report. */
   | { kind: 'reports'; level: number; col: number; day: number; topic: ReportTopic; count: number; text: string; byUser?: boolean }
   /** Cases a clinic saw today. Most sick residents never reach a clinic. */
@@ -67,7 +67,8 @@ export type Observation =
   | { kind: 'probe'; device: string; day: number; value: number; sig: string };
 
 // ---------- Outputs: what the residents' system produces; the sim applies them ----------
-export type AlertAction = 'shed' | 'boilWater' | 'isolateSick';
+/** prepare (#1): a blackout is coming to these levels; get ready (charge lights, store water, plan where to get air). */
+export type AlertAction = 'shed' | 'boilWater' | 'isolateSick' | 'prepare';
 
 export type Output =
   /**
@@ -117,6 +118,7 @@ export interface SectionView {
   col: number; // 0..7
   people: number; // alive residents
   power: number; // 0..1 share of demand served this hour
+  lifeSupport: number; // 0..1 share of life-support power (air, fans) served this hour; < 0.5 = blackout
   co2: number; // ppm
   wetBulb: number; // °C
   infected: number; // 0..1 share of residents sick
@@ -164,6 +166,10 @@ export interface Totals {
   surfaceBelief: number; // 0..1 share of residents who believe the rumor that the surface has healed
   climbersLost: number; // residents who went up the closed way, believing the rumor, and died
   hungerDeaths: number;
+  // REBUILD, problem #1
+  airDeaths: number; // deaths from bad air while the fans were off
+  blackoutPersonHours: number; // person-hours without life-support power
+  warnedPersonHours: number; // of those, person-hours where residents had been warned and prepared
 }
 
 /** Player choices for one day. */

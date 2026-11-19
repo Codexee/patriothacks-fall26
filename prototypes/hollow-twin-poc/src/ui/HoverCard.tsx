@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { sim } from '../sim/index.ts';
 import { sectionIndex, type Frame, type MetricKey, type Source } from '../sim/types.ts';
+import { WORLD } from '../sim/engine.ts';
 
 export function SourceInfo({ source, label }: { source: Source; label?: string }) {
   const [open, setOpen] = useState(false);
@@ -28,11 +29,12 @@ export function HoverCard({ frame, target }: { frame: Frame; target: { level: nu
   const rows: { key: MetricKey | null; label: string; value: string; bad?: boolean }[] = [
     { key: null, label: 'People', value: s.people.toLocaleString() },
     { key: 'power', label: 'Power', value: pct(s.power), bad: s.power < 0.5 },
-    { key: 'co2', label: 'CO₂', value: `${Math.round(s.co2)} ppm`, bad: s.co2 > 2000 },
-    { key: 'wetBulb', label: 'Wet-bulb', value: `${s.wetBulb.toFixed(1)} °C`, bad: s.wetBulb > 31 },
-    { key: 'infected', label: 'Infected', value: pct(s.infected), bad: s.infected > 0.1 },
-    { key: 'water', label: 'Water quality', value: pct(s.water), bad: s.water < 0.8 },
-    { key: 'food', label: 'Food', value: `${s.food.toFixed(1)} days`, bad: s.food < 5 },
+    { key: 'co2', label: 'Air (CO₂)', value: `${Math.round(s.co2)} ppm`, bad: s.co2 > 2000 },
+    // REBUILD: show only what exists in the test world so far.
+    ...(WORLD.heat ? [{ key: 'wetBulb' as MetricKey, label: 'Wet-bulb', value: `${s.wetBulb.toFixed(1)} °C`, bad: s.wetBulb > 31 }] : []),
+    ...(WORLD.sickness ? [{ key: 'infected' as MetricKey, label: 'Infected', value: pct(s.infected), bad: s.infected > 0.1 }] : []),
+    ...(WORLD.water ? [{ key: 'water' as MetricKey, label: 'Water quality', value: pct(s.water), bad: s.water < 0.8 }] : []),
+    ...(WORLD.food ? [{ key: 'food' as MetricKey, label: 'Food', value: `${s.food.toFixed(1)} days`, bad: s.food < 5 }] : []),
   ];
   return (
     <div className="hover-card">

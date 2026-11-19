@@ -2,9 +2,10 @@
 import { sim } from '../sim/index.ts';
 import { NO_TOOLS, type EndState, type Score, type ToolKey, type ToolSet } from '../sim/types.ts';
 import { createRun, stepRun, type Run } from '../product/run.ts';
-import { MODULE_NAMES } from '../product/names.ts';
+import { BUILT, MODULE_NAMES } from '../product/names.ts';
 
-export const TOOL_KEYS: ToolKey[] = ['earlyWarning', 'fairShare', 'ledger', 'snow', 'lantern', 'kin', 'layout', 'larder', 'witness'];
+/** REBUILD: only the features built so far appear on screen. */
+export const TOOL_KEYS: ToolKey[] = BUILT;
 export const TOOL_LABELS: Record<ToolKey, string> = MODULE_NAMES;
 /** The track's problem numbers each module answers. */
 export const TOOL_PROBLEMS: Record<ToolKey, string> = {
@@ -16,7 +17,7 @@ export const TOOL_HINTS: Record<ToolKey, string> = {
   layout: 'Moves fans from cool upper levels to the hottest deep levels, from the sensor boxes.',
   larder: 'Tracks each level\'s food runway; carries food from surplus levels and builds grow-lamp farms where it runs out.',
   witness: 'Verifies signed surface probe readings, rejects fakes, and broadcasts whether the surface is safe.',
-  earlyWarning: 'Forecasts plant output vs demand from feeder meters and the public outlook; asks residents to cut load before plants trip.',
+  earlyWarning: 'Forecasts the power coming (plant meters × the public outlook) against the power needed, works out which levels will go dark and when, and warns them ahead, including when their air turns unsafe.',
   fairShare: 'Plans power from the census: life support in every section first, then the same share for all, more for hot levels and farms.',
   ledger: 'Checks Directorate claims against residents\' own data (including the real outbreak count) and publishes them in a record nobody can quietly change.',
   snow: 'Traces water complaints and tap readings to the failing recycler, warns only the levels it serves, sends a repair crew.',
@@ -30,6 +31,9 @@ export interface RunResult {
   days: number; // days survived (the day the run ended, or the cap)
   end: EndState | null; // null when the cap was reached first
   deaths: number;
+  airDeaths: number;
+  warnedPct: number; // share of blackout person-hours residents were warned about ahead
+  blackoutHours: number; // person-hours without life support
   score: Score;
 }
 
@@ -49,6 +53,9 @@ export function runToEnd(scenarioId: string, seed: number, tools: ToolSet): RunR
     days: end.end ? end.end.day : end.day,
     end: end.end,
     deaths: end.totals.deaths,
+    airDeaths: end.totals.airDeaths,
+    blackoutHours: end.totals.blackoutPersonHours,
+    warnedPct: end.totals.blackoutPersonHours > 0 ? Math.round((end.totals.warnedPersonHours / end.totals.blackoutPersonHours) * 100) : 0,
     score: sim.score(end),
   };
 }

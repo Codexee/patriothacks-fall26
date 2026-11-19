@@ -17,6 +17,31 @@ import { probeSig } from './sign.ts';
 import { heatOffsetFor } from '../data/index.ts';
 
 // ---------- Tunable constants ----------
+/**
+ * REBUILD: which of the Hollow's problems exist in the test world. We add them one at a time, together with
+ * the residents' feature that answers each one. Problem numbers follow the track brief.
+ * Step 1 (now): only power (#1) — plants that age, fail and trip in a storm, and blackouts — and the air that
+ * goes bad when fans lose power. Everything else is switched off.
+ */
+export const WORLD = {
+  power: true, // #1 blackouts (always on: the base of the Hollow)
+  air: true, // #1 "the power or air cuts out": fans need power
+  heat: false, // #3 deep levels get hotter
+  water: false, // #4 recyclers fail
+  sickness: false, // #9 lung sickness
+  food: false, // #12 food runs out (and farms get diverted)
+  lies: false, // #9, #13 the Directorate's false bulletins
+  network: false, // #7 the Directorate cuts the network
+  families: false, // #8 families split across levels
+  surface: false, // #13 the "surface has healed" rumor
+};
+
+// Air (#1): CO2 above AIR_DANGER ppm starts to kill; a warned, prepared resident is much safer.
+const AIR_DANGER = 5000;
+const AIR_DEATH = 0.0001; // hourly death share per 1,000 ppm above the danger level
+const PREPARED_SAVE = 0.6; // share of air deaths avoided by residents who prepared after a warning
+const BLACKOUT = 0.5; // a section is "in a blackout" when it gets less than half of its life-support power
+
 const MAX_DAYS = 120;
 const STABLE_DAYS = 14;
 const PLANT_LEVELS = [8, 18, 27, 34, 41, 47];
@@ -225,7 +250,7 @@ export function createState(scenario: Scenario, seed: number, tools: ToolSet): S
   const plants: Plant[] = PLANT_LEVELS.map((level) => ({
     level, nominal: (normal * CAPACITY_MARGIN) / PLANT_LEVELS.length, health: 1, offlineUntil: 0,
   }));
-  const infected = startPeople.map((p) => p * 0.0005);
+  const infected = startPeople.map((p) => (WORLD.sickness ? p * 0.0005 : 0));
   const internal: Internal = {
     rng: seed >>> 0,
     obsRng: (seed ^ 0x9e3779b9) >>> 0,
@@ -263,16 +288,17 @@ export function createState(scenario: Scenario, seed: number, tools: ToolSet): S
     welfareUntil: new Array(n).fill(-1),
     diversions: [],
     surfaceTox: SURFACE_TOX,
-    belief: 0.03,
+    belief: WORLD.surface ? 0.03 : 0,
     verdictReach: 0,
   };
   const startPopulation = startPeople.reduce((a, b) => a + b, 0);
   const state: SimState = {
     seed, scenario, day: 0, tools: { ...tools }, trust: 0.7, systemTrust: 0.7, observations: [],
-    lies: DEFAULT_LIES.map((l) => ({ ...l })),
+    lies: WORLD.lies ? DEFAULT_LIES.map((l) => ({ ...l })) : [],
     totals: {
       population: startPopulation, startPopulation, deaths: 0, sectionsLost: 0, hoursDarkDeepest: 0,
-      networkUp: true, familiesNoNews: 0, surfaceBelief: 0.03, climbersLost: 0, hungerDeaths: 0,
+      networkUp: true, familiesNoNews: 0, surfaceBelief: 0, climbersLost: 0, hungerDeaths: 0,
+      airDeaths: 0, blackoutPersonHours: 0, warnedPersonHours: 0,
     },
     bulletin: { directorate: [], measured: [] },
     end: null,
@@ -292,6 +318,7 @@ function warmupObservations(state: SimState, s: Internal): Observation[] {
   const obs: Observation[] = [];
   const fullC = new Array<number>(SECTION_COUNT), fullN = new Array<number>(SECTION_COUNT);
   const sumPow = new Array<number>(SECTION_COUNT).fill(HOURS_PER_DAY);
+  const sumLife = new Array<number>(SECTION_COUNT).fill(HOURS_PER_DAY);
   const sumWet = s.wet.map((w) => w * HOURS_PER_DAY);
   const sumCo2 = s.co2.map((c) => c * HOURS_PER_DAY);
   const sumInf = s.infected.map((x) => x * HOURS_PER_DAY);
@@ -318,7 +345,7 @@ function warmupObservations(state: SimState, s: Internal): Observation[] {
   let I = 0;
   for (const x of s.infected) I += x;
   const expected = s.people.map((p) => Math.round(p / FAMILY_SIZE));
-  dailyObservations(state, s, 0, obs, { sumPow, sumWet, sumCo2, sumInf }, I, fullC, fullN, null, expected, expected);
+  dailyObservations(state, s, 0, obs, { sumPow, sumLife, sumWet, sumCo2, sumInf }, I, fullC, fullN, null, expected, expected);
   return obs;
 }
 
@@ -331,6 +358,7 @@ function makeFrame(s: Internal, day: number, hour: number): Frame {
       level: lvl(i), col: i % SECTIONS_PER_LEVEL,
       people: Math.round(n),
       power: Math.round(s.power[i] * 1000) / 1000,
+      lifeSupport: s.lost[i] ? 0 : Math.round(s.critPow[i] * 1000) / 1000,
       co2: Math.round(s.co2[i]),
       wetBulb: Math.round(s.wet[i] * 10) / 10,
       infected: n > 0 ? Math.round((s.infected[i] / n) * 10000) / 10000 : 0,
@@ -361,14 +389,16 @@ function makeBulletin(state: SimState, s: Internal): Bulletin {
     I += s.infected[i]; N += s.people[i];
     if (lvl(i) >= 41) { Id += s.infected[i]; Nd += s.people[i]; }
   }
-  measured.push(`Infected ${((I / Math.max(1, N)) * 100).toFixed(1)}% (levels 41–50: ${((Id / Math.max(1, Nd)) * 100).toFixed(1)}%)`);
+  if (WORLD.sickness) measured.push(`Infected ${((I / Math.max(1, N)) * 100).toFixed(1)}% (levels 41–50: ${((Id / Math.max(1, Nd)) * 100).toFixed(1)}%)`);
   const broken: number[] = [];
   for (let i = 0; i < SECTION_COUNT; i++) if (s.recyclerBroken[i]) broken.push(lvl(i));
-  measured.push(broken.length ? `Recyclers failing: L${broken.join(', L')}` : 'All recyclers working');
+  if (WORLD.water) measured.push(broken.length ? `Recyclers failing: L${broken.join(', L')}` : 'All recyclers working');
   measured.push(`Deaths ${Math.round(state.totals.deaths).toLocaleString('en-US')}`);
-  measured.push(networkUp(s, Math.max(0, s.hour - 1)) ? 'Network up' : `Network CUT (until day ${Math.floor(s.netDownUntil / 24) + 1})`);
-  measured.push(`Surface air ${s.surfaceTox.toFixed(1)} (deadly ≥ 10; survivable with a mask 1–5)`);
-  measured.push(`Believe "surface healed": ${(s.belief * 100).toFixed(1)}%; climbers lost ${Math.round(state.totals.climbersLost)}`);
+  if (WORLD.network) measured.push(networkUp(s, Math.max(0, s.hour - 1)) ? 'Network up' : `Network CUT (until day ${Math.floor(s.netDownUntil / 24) + 1})`);
+  if (WORLD.surface) {
+    measured.push(`Surface air ${s.surfaceTox.toFixed(1)} (deadly ≥ 10; survivable with a mask 1–5)`);
+    measured.push(`Believe "surface healed": ${(s.belief * 100).toFixed(1)}%; climbers lost ${Math.round(state.totals.climbersLost)}`);
+  }
   if (s.diversions.some((d) => s.hour >= d.start)) measured.push(`Farms diverted: L${s.diversions.map((d) => `${d.from}–${d.to}`).join(', L')}`);
   return { directorate, measured };
 }
@@ -630,7 +660,9 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
   const shed = new Array<number>(SECTION_COUNT);
   const boilA = new Array<number>(SECTION_COUNT);
   const isoA = new Array<number>(SECTION_COUNT);
+  const prepA = new Array<number>(SECTION_COUNT).fill(0); // share of residents who prepared for a blackout (#1)
   const sumPow = new Array<number>(SECTION_COUNT).fill(0);
+  const sumLife = new Array<number>(SECTION_COUNT).fill(0); // life-support power (air, fans)
   const sumWet = new Array<number>(SECTION_COUNT).fill(0);
   const sumCo2 = new Array<number>(SECTION_COUNT).fill(0);
   const sumInf = new Array<number>(SECTION_COUNT).fill(0);
@@ -641,6 +673,7 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
 
     // --- Directorate lies: without a published finding, residents learn the truth 14 days late ---
     for (const p of ['outbreak', 'power', 'water'] as Problem[]) {
+      if (!WORLD.lies) break; // no lies in the world yet
       if (s.respStart[p] >= 0 || h < ONSET_H[p]) continue;
       if (h >= ONSET_H[p] + LIE_DELAY_H) {
         s.respStart[p] = h;
@@ -659,7 +692,7 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
     // --- Alerts of the residents' system in force this hour ---
     const comply = 0.5 + 0.5 * state.systemTrust; // share of residents who follow the system's alerts
     s.alerts = s.alerts.filter((a) => a.until > h);
-    shed.fill(0); boilA.fill(0); isoA.fill(0);
+    shed.fill(0); boilA.fill(0); isoA.fill(0); prepA.fill(0);
     for (const a of s.alerts) {
       for (let l = Math.max(1, a.from); l <= Math.min(LEVELS, a.to); l++) {
         for (let c = 0; c < SECTIONS_PER_LEVEL; c++) {
@@ -667,13 +700,14 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
           const got = a.reach[i] * comply; // only sections the alert reached
           if (a.action === 'shed') shed[i] = Math.max(shed[i], clamp(a.amount, 0, 1) * got);
           else if (a.action === 'boilWater') boilA[i] = Math.max(boilA[i], got);
+          else if (a.action === 'prepare') prepA[i] = Math.max(prepA[i], got);
           else isoA[i] = Math.max(isoA[i], got);
         }
       }
     }
 
     // --- Events that the scenario schedules ---
-    if (h === ONSET_H.outbreak) {
+    if (WORLD.sickness && h === ONSET_H.outbreak) {
       for (let l = 44; l <= 48; l++) for (let c = 0; c < SECTIONS_PER_LEVEL; c++) {
         const i = sectionIndex(l, c);
         s.infected[i] += s.people[i] * 0.015;
@@ -683,11 +717,11 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
       const p3 = s.plants[PLANT3];
       p3.health = Math.max(0, p3.health - PLANT3_DECAY / 24);
     }
-    if (h === ONSET_H.water) {
+    if (WORLD.water && h === ONSET_H.water) {
       s.recyclerBroken[sectionIndex(FAILED_RECYCLER_LEVEL, 4)] = true;
       events.push(`${stamp(h)} · Recycler on level ${FAILED_RECYCLER_LEVEL} started failing`);
     }
-    if (h === DIVERT_H) {
+    if (WORLD.food && h === DIVERT_H) {
       s.diversions.push({ from: 40, to: 50, start: h, farms: farmsIn(s, 40, 50) });
       events.push(`${stamp(h)} · The Directorate diverted the farms of levels 40–50 to the upper levels`);
     }
@@ -731,7 +765,7 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
     // The Directorate dispatches against last hour's capacity. A sudden drop overloads the plants.
     // While "Plant 3 is operating normally" is believed, dispatch also counts the capacity Plant 3 has lost.
     const p3 = s.plants[PLANT3];
-    const plantLie = state.lies.find((l) => l.id === 'plantFine')!.active;
+    const plantLie = state.lies.find((l) => l.id === 'plantFine')?.active ?? false;
     const lieGap = plantLie && h >= p3.offlineUntil ? p3.nominal * (1 - p3.health) * supply * costF : 0;
     const target = Math.min(D, s.capPrev + lieGap);
     // Plants run at full load are stressed: a small hourly chance that one trips.
@@ -828,7 +862,7 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
 
     // Recycler quality.
     for (let i = 0; i < SECTION_COUNT; i++) {
-      if (!s.structures[i].includes('recycler')) continue;
+      if (!WORLD.water || !s.structures[i].includes('recycler')) continue;
       const powered = critFrac[i] >= 0.5 && !s.lost[i];
       const target = !powered ? 0.3 : s.recyclerBroken[i] ? 0.25 : 1 - 0.002 * (h / 24);
       s.waterQ[i] += (target - s.waterQ[i]) * (target < s.waterQ[i] ? 0.02 : 0.05);
@@ -855,6 +889,12 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
       s.power[i] = s.lost[i] ? 0 : p;
       s.critPow[i] = s.lost[i] ? 0 : critFrac[i];
       sumPow[i] += s.power[i];
+      sumLife[i] += s.lost[i] ? 0 : critFrac[i];
+      // Blackout bookkeeping (#1): person-hours without life-support power, and how many were warned ahead.
+      if (!s.lost[i] && critFrac[i] < BLACKOUT) {
+        state.totals.blackoutPersonHours += s.people[i];
+        state.totals.warnedPersonHours += s.people[i] * (prepA[i] > 0 ? 1 : 0);
+      }
       if (s.lost[i] || n <= 0) continue;
 
       // Air: analytic solution of dC/dt = (N·G − Q·v·(C − Cout))/V over one hour.
@@ -869,12 +909,12 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
       // Heat: cooling needs power; without it the section drifts toward base + 6.
       // Fans also move hot air out (they are life support, so they run on critical power).
       const target = baseWet(level) + heatOff + 6 - 12 * Math.sqrt(nonFrac[i]) - FAN_COOL * fans * critFrac[i];
-      s.wet[i] += (target - s.wet[i]) * 0.1;
+      if (WORLD.heat) s.wet[i] += (target - s.wet[i]) * 0.1; // heat is problem #3: off for now
 
       // Water: boiling comes from the general response or from a boil-water alert in this section.
       const water = sectionWater(s, i);
       const boil = 0.35 * Math.max(resp('water'), boilA[i]);
-      const wEff = Math.min(1, water + boil);
+      const wEff = WORLD.water ? Math.min(1, water + boil) : 1;
 
       // Lung sickness: Wells–Riley with the Rudnick–Milton rebreathed fraction.
       const isolation = 1 - 0.7 * Math.max(resp('outbreak'), isoA[i]);
@@ -895,15 +935,21 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
 
       // Other deaths: heat above the wet-bulb limit, very high CO₂, bad water, starvation.
       let rate = 0;
-      if (s.wet[i] > WETBULB_LIMIT) rate += HEAT_DEATH * (s.wet[i] - WETBULB_LIMIT);
-      if (s.co2[i] > 5000) rate += 0.0001 * (s.co2[i] - 5000) / 1000;
+      if (WORLD.heat && s.wet[i] > WETBULB_LIMIT) rate += HEAT_DEATH * (s.wet[i] - WETBULB_LIMIT);
+      // Bad air (#1): with the fans off, CO2 builds up. Residents who were warned in time get to better air
+      // (an upper section, a powered shelter, battery fans), so far fewer of them die.
+      if (WORLD.air && s.co2[i] > AIR_DANGER) {
+        const ar = AIR_DEATH * (s.co2[i] - AIR_DANGER) / 1000 * (1 - PREPARED_SAVE * prepA[i]);
+        rate += ar;
+        state.totals.airDeaths += n * ar;
+      }
       if (wEff < 0.6) rate += 0.00005 * (0.6 - wEff) / 0.6;
 
       // Food.
       let prod = 0, nf = 0;
       for (let k = 0; k < farmLevels.length; k++) if (Math.abs(farmLevels[k] - level) <= 3) { prod += farmPow[k]; nf++; }
       const grow = nf > 0 ? Math.min(1.2, (1.05 * prod) / nf) : 0.9;
-      s.food[i] = clamp(s.food[i] + (grow - 1) / 24, 0, 30);
+      if (WORLD.food) s.food[i] = clamp(s.food[i] + (grow - 1) / 24, 0, 30); // food is problem #12: off for now
       rate *= helped;
       if (s.food[i] <= 0) { rate += 0.003; state.totals.hungerDeaths += n * 0.003; }
 
@@ -956,7 +1002,8 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
   // A correct, signed verdict that reaches residents shrinks the rumor; without one it grows.
   let alive = 0;
   for (let i = 0; i < SECTION_COUNT; i++) alive += s.people[i];
-  if (s.verdictReach > 0) s.belief *= 1 - 0.4 * s.verdictReach;
+  if (!WORLD.surface) s.belief = 0; // the rumor is problem #13: off for now
+  else if (s.verdictReach > 0) s.belief *= 1 - 0.4 * s.verdictReach;
   else s.belief = Math.min(0.3, s.belief + 0.003);
   s.verdictReach = 0;
   s.surfaceTox = Math.max(1.5, s.surfaceTox - 0.002);
@@ -984,7 +1031,7 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
     known[i] = expected[i] * (1 - distress) * path;
     noNews += expected[i] - known[i];
   }
-  state.totals.familiesNoNews = Math.round(noNews);
+  state.totals.familiesNoNews = WORLD.families ? Math.round(noNews) : 0;
   state.totals.networkUp = netUpEnd;
   state.totals.surfaceBelief = Math.round(s.belief * 1000) / 1000;
 
@@ -1023,7 +1070,7 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
 
   state.lastFrame = frames[frames.length - 1];
   state.bulletin = makeBulletin(state, s);
-  dailyObservations(state, s, day, obs, { sumPow, sumWet, sumCo2, sumInf }, I, fullC, fullN, netUpEnd ? null : reachEnd, expected, known);
+  dailyObservations(state, s, day, obs, { sumPow, sumLife, sumWet, sumCo2, sumInf }, I, fullC, fullN, netUpEnd ? null : reachEnd, expected, known);
   state.observations = obs;
   return { state, frames, events };
 }
@@ -1031,7 +1078,7 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
 // ---------- Daily observations: what residents' sensors, reports, clinics and councils can see ----------
 function dailyObservations(
   state: SimState, s: Internal, day: number, obs: Observation[],
-  sums: { sumPow: number[]; sumWet: number[]; sumCo2: number[]; sumInf: number[] },
+  sums: { sumPow: number[]; sumLife: number[]; sumWet: number[]; sumCo2: number[]; sumInf: number[] },
   totalInfected: number, fullC: number[], fullN: number[],
   reach: number[] | null, expected: number[], known: number[],
 ): void {
@@ -1050,6 +1097,7 @@ function dailyObservations(
           co2: Math.round((sums.sumCo2[i] / H) * (1 + 0.05 * gauss(s))),
           wetBulb: Math.round((sums.sumWet[i] / H + 0.3 * gauss(s)) * 10) / 10,
           power: Math.round(clamp(sums.sumPow[i] / H + 0.03 * gauss(s), 0, 1) * 100) / 100,
+          lifeSupport: Math.round(clamp(sums.sumLife[i] / H + 0.03 * gauss(s), 0, 1) * 100) / 100, // the air-and-fans circuit
           water: Math.round(clamp(sectionWater(s, i) + 0.04 * gauss(s), 0, 1) * 100) / 100,
         });
       }
@@ -1062,12 +1110,18 @@ function dailyObservations(
         hot: n * REPORT_RATE.hot * Math.max(0, sums.sumWet[i] / H - 29),
         surface: n * s.belief * 0.0005,
       };
-      for (const t of ['cough', 'water', 'dark', 'hot', 'surface'] as ReportTopic[]) {
+      // Residents only report problems that exist in the world (REBUILD: one problem at a time).
+      const topics: ReportTopic[] = ['dark'];
+      if (WORLD.sickness) topics.push('cough');
+      if (WORLD.water) topics.push('water');
+      if (WORLD.heat) topics.push('hot');
+      if (WORLD.surface) topics.push('surface');
+      for (const t of topics) {
         const c = poisson(s, lambda[t] + FALSE_REPORTS);
         if (c > 0) obs.push({ kind: 'reports', level, col, day, topic: t, count: c, text: REPORT_TEXT[t] });
       }
       // Kin check-ins from this section (families with relatives on other levels).
-      if (expected[i] > 0) {
+      if (WORLD.families && expected[i] > 0) {
         obs.push({ kind: 'checkins', level, col, day, expected: expected[i], received: Math.max(0, Math.round(known[i] * (1 + 0.03 * gauss(s)))) });
       }
     }
@@ -1082,13 +1136,13 @@ function dailyObservations(
     });
   }
   // Surface probes: the council's 3 registered vents (signed, ±8% error) plus devices spreading the rumor.
-  if (heard(sectionIndex(1, 0))) {
+  if (WORLD.surface && heard(sectionIndex(1, 0))) {
     for (const [device, key] of Object.entries(PROBE_KEYS)) {
       const value = Math.round(s.surfaceTox * (1 + 0.08 * gauss(s)) * 100) / 100;
       obs.push({ kind: 'probe', device, day, value, sig: probeSig(key, device, day, value) });
     }
   }
-  for (const device of RUMOR_DEVICES) {
+  for (const device of WORLD.surface ? RUMOR_DEVICES : []) {
     const value = Math.round((0.2 + 0.2 * urand(s)) * 100) / 100; // "the surface is healed"
     obs.push({ kind: 'probe', device, day, value, sig: probeSig('unknown', device, day, value) });
   }
@@ -1098,7 +1152,7 @@ function dailyObservations(
   s.userReports = [];
   // Clinics: each sees a small share of the sick within ±2 levels.
   for (let i = 0; i < SECTION_COUNT; i++) {
-    if (!s.structures[i].includes('clinic') || s.lost[i] || !heard(i)) continue;
+    if (!WORLD.sickness || !s.structures[i].includes('clinic') || s.lost[i] || !heard(i)) continue;
     const L = lvl(i);
     let sick = 0;
     for (let l = Math.max(1, L - 2); l <= Math.min(LEVELS, L + 2); l++) {
@@ -1116,7 +1170,7 @@ function dailyObservations(
   }
   obs.push({ kind: 'outlook', fromHour: s.hour, supply, demand });
   // The Directorate's bulletin and its public case count.
-  const denying = state.lies.find((l) => l.id === 'noOutbreak')!.active;
+  const denying = state.lies.find((l) => l.id === 'noOutbreak')?.active ?? false;
   obs.push({
     kind: 'bulletin', day, lines: state.bulletin.directorate.slice(),
     claims: state.lies.filter((l) => l.active).map((l) => l.id),

@@ -1,5 +1,5 @@
-// PROTOTYPE: the names people see for each module of the Residents' System, named after the problem it solves.
-// The code keys (earlyWarning, snow, …) stay the same; only these labels appear on screen.
+// REBUILD: the names people see for each feature of the Residents' System, and the step-by-step progress through
+// the track's 15 problems. The code keys (earlyWarning, …) stay the same; only these labels appear on screen.
 import type { ToolKey } from '../sim/types.ts';
 
 export const MODULE_NAMES: Record<ToolKey, string> = {
@@ -14,7 +14,29 @@ export const MODULE_NAMES: Record<ToolKey, string> = {
   witness: 'Surface Truth',
 };
 
-/** The name to show for a module key (or the key itself, if unknown). */
+/** Features built so far in the rebuild, in the order they were added. */
+export const BUILT: ToolKey[] = ['earlyWarning'];
+
+/** The track's 15 problems, and the feature that answers each one once it is built. */
+export const PROBLEMS: { n: number; title: string; feature: ToolKey | null }[] = [
+  { n: 1, title: 'Warn before the power or air cuts out', feature: 'earlyWarning' },
+  { n: 2, title: 'Share power, water and food fairly', feature: null },
+  { n: 3, title: 'Keep the deep levels livable (heat)', feature: null },
+  { n: 4, title: 'Catch bad water', feature: null },
+  { n: 5, title: 'Keep flooded tunnels safe', feature: null },
+  { n: 6, title: 'Find or share space', feature: null },
+  { n: 7, title: 'Organize without the network', feature: null },
+  { n: 8, title: 'Reconnect families', feature: null },
+  { n: 9, title: 'Track the real outbreak', feature: null },
+  { n: 10, title: 'Get care to people who cannot reach it', feature: null },
+  { n: 11, title: 'Life without sunlight', feature: null },
+  { n: 12, title: 'Grow and share food', feature: null },
+  { n: 13, title: 'Prove whether the surface is safe', feature: null },
+  { n: 14, title: 'Decide who goes up first, and how', feature: null },
+  { n: 15, title: 'Plan the move up', feature: null },
+];
+
+/** The name to show for a feature key (or the key itself, if unknown). */
 export function moduleName(key: string): string {
   return (MODULE_NAMES as Record<string, string>)[key] ?? key;
 }
