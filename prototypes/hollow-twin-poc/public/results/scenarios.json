@@ -1,0 +1,6812 @@
+{
+ "generated": "2026-11-19T21:49:13.806Z",
+ "set": "test",
+ "seeds": [
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20
+ ],
+ "module": "Blackout Warning",
+ "tune": {
+  "safeLoad": 0.82,
+  "assumedCompliance": 0.75,
+  "maxTrend": 0.1,
+  "tripStep": 0.15
+ },
+ "scale": {
+  "simPeople": 1600000,
+  "hollowPeople": 2000000000
+ },
+ "scenarios": [
+  {
+   "id": "aging",
+   "name": "Aging plants (4 years of real geothermal decline, played in 120 days)",
+   "summary": "Normal demand. Every plant loses output at the real rate of The Geysers after its peak: about 10% a year. Four real years (34% of output) are played in the 120-day run, so one day here is about 12 real days.",
+   "kind": "aging",
+   "realData": "The Geysers geothermal output decline, about 10% a year (Foulger et al. 1997)",
+   "source": {
+    "label": "The Geysers geothermal field: output decline after the 1987 peak (Foulger et al. 1997)",
+    "detail": "Foulger, Grant, Ross and Julian, Geophysical Research Letters 24(2), 1997, doi:10.1029/96GL03152: production peaked in the late 1980s at about 1,800 MW and then fell by about 10% per year (Barker et al. 1992) because reservoir pressure fell. Here: 1 - 0.9^4 = 34% lost over 4 years, spread evenly over the 120-day run (0.29% of plant health a day). Demand: EIA-930 ERCOT calm weeks.",
+    "url": "https://doi.org/10.1029/96GL03152"
+   },
+   "without": {
+    "deaths": {
+     "mean": 364754,
+     "lo": 349940,
+     "hi": 379569
+    },
+    "trips": {
+     "mean": 227.6,
+     "lo": 211.9,
+     "hi": 243.3
+    },
+    "darkMh": {
+     "mean": 1748.65,
+     "lo": 1694.66,
+     "hi": 1802.63
+    },
+    "stableShare": 0,
+    "endDay": {
+     "mean": 120,
+     "lo": 120,
+     "hi": 120
+    },
+    "warnedPct": 0
+   },
+   "with": {
+    "deaths": {
+     "mean": 340,
+     "lo": 0,
+     "hi": 853
+    },
+    "trips": {
+     "mean": 3.3,
+     "lo": 0.7,
+     "hi": 5.9
+    },
+    "darkMh": {
+     "mean": 12.73,
+     "lo": 1.04,
+     "hi": 24.42
+    },
+    "stableShare": 1,
+    "endDay": {
+     "mean": 66.2,
+     "lo": 63.7,
+     "hi": 68.7
+    },
+    "warnedPct": 61.6
+   },
+   "livesSaved": {
+    "mean": 364415,
+    "lo": 349763,
+    "hi": 379066
+   },
+   "daily": [
+    {
+     "day": 1,
+     "withoutDeaths": 0,
+     "withDeaths": 0,
+     "withoutDarkSections": 50.8,
+     "withDarkSections": 91.2
+    },
+    {
+     "day": 2,
+     "withoutDeaths": 94,
+     "withDeaths": 8,
+     "withoutDarkSections": 122.1,
+     "withDarkSections": 68.6
+    },
+    {
+     "day": 3,
+     "withoutDeaths": 130,
+     "withDeaths": 8,
+     "withoutDarkSections": 212.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 4,
+     "withoutDeaths": 1286,
+     "withDeaths": 8,
+     "withoutDarkSections": 206.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 5,
+     "withoutDeaths": 3071,
+     "withDeaths": 8,
+     "withoutDarkSections": 169.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 6,
+     "withoutDeaths": 4238,
+     "withDeaths": 8,
+     "withoutDarkSections": 183.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 7,
+     "withoutDeaths": 4966,
+     "withDeaths": 8,
+     "withoutDarkSections": 186,
+     "withDarkSections": 0
+    },
+    {
+     "day": 8,
+     "withoutDeaths": 5427,
+     "withDeaths": 8,
+     "withoutDarkSections": 222.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 9,
+     "withoutDeaths": 6460,
+     "withDeaths": 8,
+     "withoutDarkSections": 219.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 10,
+     "withoutDeaths": 7565,
+     "withDeaths": 8,
+     "withoutDarkSections": 210.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 11,
+     "withoutDeaths": 8628,
+     "withDeaths": 8,
+     "withoutDarkSections": 183.5,
+     "withDarkSections": 31.7
+    },
+    {
+     "day": 12,
+     "withoutDeaths": 10057,
+     "withDeaths": 8,
+     "withoutDarkSections": 166.8,
+     "withDarkSections": 13.8
+    },
+    {
+     "day": 13,
+     "withoutDeaths": 10962,
+     "withDeaths": 8,
+     "withoutDarkSections": 137.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 14,
+     "withoutDeaths": 11682,
+     "withDeaths": 8,
+     "withoutDarkSections": 197.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 15,
+     "withoutDeaths": 14078,
+     "withDeaths": 8,
+     "withoutDarkSections": 211.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 16,
+     "withoutDeaths": 16425,
+     "withDeaths": 8,
+     "withoutDarkSections": 140.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 17,
+     "withoutDeaths": 18012,
+     "withDeaths": 8,
+     "withoutDarkSections": 224.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 18,
+     "withoutDeaths": 20169,
+     "withDeaths": 8,
+     "withoutDarkSections": 234.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 19,
+     "withoutDeaths": 22322,
+     "withDeaths": 8,
+     "withoutDarkSections": 179.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 20,
+     "withoutDeaths": 23907,
+     "withDeaths": 8,
+     "withoutDarkSections": 186.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 21,
+     "withoutDeaths": 24959,
+     "withDeaths": 8,
+     "withoutDarkSections": 294.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 22,
+     "withoutDeaths": 27865,
+     "withDeaths": 8,
+     "withoutDarkSections": 269.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 23,
+     "withoutDeaths": 29983,
+     "withDeaths": 8,
+     "withoutDarkSections": 306.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 24,
+     "withoutDeaths": 32988,
+     "withDeaths": 8,
+     "withoutDarkSections": 240.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 25,
+     "withoutDeaths": 34758,
+     "withDeaths": 8,
+     "withoutDarkSections": 252,
+     "withDarkSections": 0
+    },
+    {
+     "day": 26,
+     "withoutDeaths": 37695,
+     "withDeaths": 8,
+     "withoutDarkSections": 295.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 27,
+     "withoutDeaths": 39276,
+     "withDeaths": 8,
+     "withoutDarkSections": 248.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 28,
+     "withoutDeaths": 40668,
+     "withDeaths": 8,
+     "withoutDarkSections": 296.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 29,
+     "withoutDeaths": 43251,
+     "withDeaths": 8,
+     "withoutDarkSections": 315.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 30,
+     "withoutDeaths": 46616,
+     "withDeaths": 8,
+     "withoutDarkSections": 196.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 31,
+     "withoutDeaths": 47098,
+     "withDeaths": 8,
+     "withoutDarkSections": 156.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 32,
+     "withoutDeaths": 48113,
+     "withDeaths": 8,
+     "withoutDarkSections": 186.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 33,
+     "withoutDeaths": 50374,
+     "withDeaths": 8,
+     "withoutDarkSections": 287,
+     "withDarkSections": 3.6
+    },
+    {
+     "day": 34,
+     "withoutDeaths": 51785,
+     "withDeaths": 8,
+     "withoutDarkSections": 252.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 35,
+     "withoutDeaths": 53009,
+     "withDeaths": 8,
+     "withoutDarkSections": 191,
+     "withDarkSections": 0
+    },
+    {
+     "day": 36,
+     "withoutDeaths": 53872,
+     "withDeaths": 8,
+     "withoutDarkSections": 214.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 37,
+     "withoutDeaths": 54963,
+     "withDeaths": 8,
+     "withoutDarkSections": 215.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 38,
+     "withoutDeaths": 55839,
+     "withDeaths": 8,
+     "withoutDarkSections": 224.4,
+     "withDarkSections": 40
+    },
+    {
+     "day": 39,
+     "withoutDeaths": 58020,
+     "withDeaths": 64,
+     "withoutDarkSections": 294.8,
+     "withDarkSections": 40
+    },
+    {
+     "day": 40,
+     "withoutDeaths": 62653,
+     "withDeaths": 211,
+     "withoutDarkSections": 310.7,
+     "withDarkSections": 20.4
+    },
+    {
+     "day": 41,
+     "withoutDeaths": 66318,
+     "withDeaths": 211,
+     "withoutDarkSections": 245.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 42,
+     "withoutDeaths": 69100,
+     "withDeaths": 211,
+     "withoutDarkSections": 292.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 43,
+     "withoutDeaths": 72859,
+     "withDeaths": 211,
+     "withoutDarkSections": 218.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 44,
+     "withoutDeaths": 75890,
+     "withDeaths": 211,
+     "withoutDarkSections": 261.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 45,
+     "withoutDeaths": 80337,
+     "withDeaths": 211,
+     "withoutDarkSections": 192.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 46,
+     "withoutDeaths": 84184,
+     "withDeaths": 211,
+     "withoutDarkSections": 255,
+     "withDarkSections": 0
+    },
+    {
+     "day": 47,
+     "withoutDeaths": 87890,
+     "withDeaths": 211,
+     "withoutDarkSections": 309.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 48,
+     "withoutDeaths": 92091,
+     "withDeaths": 211,
+     "withoutDarkSections": 335.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 49,
+     "withoutDeaths": 97396,
+     "withDeaths": 211,
+     "withoutDarkSections": 249.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 50,
+     "withoutDeaths": 100110,
+     "withDeaths": 211,
+     "withoutDarkSections": 259.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 51,
+     "withoutDeaths": 103743,
+     "withDeaths": 211,
+     "withoutDarkSections": 303,
+     "withDarkSections": 0
+    },
+    {
+     "day": 52,
+     "withoutDeaths": 107825,
+     "withDeaths": 211,
+     "withoutDarkSections": 280.3,
+     "withDarkSections": 1.6
+    },
+    {
+     "day": 53,
+     "withoutDeaths": 111121,
+     "withDeaths": 211,
+     "withoutDarkSections": 243.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 54,
+     "withoutDeaths": 113631,
+     "withDeaths": 211,
+     "withoutDarkSections": 275.5,
+     "withDarkSections": 43.5
+    },
+    {
+     "day": 55,
+     "withoutDeaths": 115701,
+     "withDeaths": 337,
+     "withoutDarkSections": 203.5,
+     "withDarkSections": 40
+    },
+    {
+     "day": 56,
+     "withoutDeaths": 116992,
+     "withDeaths": 340,
+     "withoutDarkSections": 234.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 57,
+     "withoutDeaths": 119409,
+     "withDeaths": 340,
+     "withoutDarkSections": 331.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 58,
+     "withoutDeaths": 123994,
+     "withDeaths": 340,
+     "withoutDarkSections": 298.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 59,
+     "withoutDeaths": 128820,
+     "withDeaths": 340,
+     "withoutDarkSections": 252.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 60,
+     "withoutDeaths": 131872,
+     "withDeaths": 340,
+     "withoutDarkSections": 274.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 61,
+     "withoutDeaths": 134449,
+     "withDeaths": 340,
+     "withoutDarkSections": 229.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 62,
+     "withoutDeaths": 137239,
+     "withDeaths": 340,
+     "withoutDarkSections": 313.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 63,
+     "withoutDeaths": 140668,
+     "withDeaths": 340,
+     "withoutDarkSections": 256.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 64,
+     "withoutDeaths": 143243,
+     "withDeaths": 340,
+     "withoutDarkSections": 296.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 65,
+     "withoutDeaths": 147119,
+     "withDeaths": 340,
+     "withoutDarkSections": 291.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 66,
+     "withoutDeaths": 149819,
+     "withDeaths": 340,
+     "withoutDarkSections": 233.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 67,
+     "withoutDeaths": 152569,
+     "withDeaths": 340,
+     "withoutDarkSections": 235,
+     "withDarkSections": 0
+    },
+    {
+     "day": 68,
+     "withoutDeaths": 155814,
+     "withDeaths": 340,
+     "withoutDarkSections": 249.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 69,
+     "withoutDeaths": 159921,
+     "withDeaths": 340,
+     "withoutDarkSections": 227.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 70,
+     "withoutDeaths": 163107,
+     "withDeaths": 340,
+     "withoutDarkSections": 196.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 71,
+     "withoutDeaths": 164976,
+     "withDeaths": 340,
+     "withoutDarkSections": 280.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 72,
+     "withoutDeaths": 168393,
+     "withDeaths": 340,
+     "withoutDarkSections": 270.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 73,
+     "withoutDeaths": 171715,
+     "withDeaths": 340,
+     "withoutDarkSections": 232.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 74,
+     "withoutDeaths": 174965,
+     "withDeaths": 340,
+     "withoutDarkSections": 216.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 75,
+     "withoutDeaths": 178669,
+     "withDeaths": 340,
+     "withoutDarkSections": 195.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 76,
+     "withoutDeaths": 181065,
+     "withDeaths": 340,
+     "withoutDarkSections": 274.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 77,
+     "withoutDeaths": 184090,
+     "withDeaths": 340,
+     "withoutDarkSections": 184.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 78,
+     "withoutDeaths": 186272,
+     "withDeaths": 340,
+     "withoutDarkSections": 258,
+     "withDarkSections": 0
+    },
+    {
+     "day": 79,
+     "withoutDeaths": 189330,
+     "withDeaths": 340,
+     "withoutDarkSections": 238,
+     "withDarkSections": 0
+    },
+    {
+     "day": 80,
+     "withoutDeaths": 192215,
+     "withDeaths": 340,
+     "withoutDarkSections": 244.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 81,
+     "withoutDeaths": 195842,
+     "withDeaths": 340,
+     "withoutDarkSections": 267.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 82,
+     "withoutDeaths": 199951,
+     "withDeaths": 340,
+     "withoutDarkSections": 297.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 83,
+     "withoutDeaths": 204654,
+     "withDeaths": 340,
+     "withoutDarkSections": 318.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 84,
+     "withoutDeaths": 209055,
+     "withDeaths": 340,
+     "withoutDarkSections": 267.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 85,
+     "withoutDeaths": 212848,
+     "withDeaths": 340,
+     "withoutDarkSections": 212.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 86,
+     "withoutDeaths": 216921,
+     "withDeaths": 340,
+     "withoutDarkSections": 274.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 87,
+     "withoutDeaths": 220710,
+     "withDeaths": 340,
+     "withoutDarkSections": 273.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 88,
+     "withoutDeaths": 224945,
+     "withDeaths": 340,
+     "withoutDarkSections": 283.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 89,
+     "withoutDeaths": 229024,
+     "withDeaths": 340,
+     "withoutDarkSections": 241.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 90,
+     "withoutDeaths": 232591,
+     "withDeaths": 340,
+     "withoutDarkSections": 284.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 91,
+     "withoutDeaths": 237624,
+     "withDeaths": 340,
+     "withoutDarkSections": 296.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 92,
+     "withoutDeaths": 242505,
+     "withDeaths": 340,
+     "withoutDarkSections": 288,
+     "withDarkSections": 0
+    },
+    {
+     "day": 93,
+     "withoutDeaths": 247998,
+     "withDeaths": 340,
+     "withoutDarkSections": 372.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 94,
+     "withoutDeaths": 253473,
+     "withDeaths": 340,
+     "withoutDarkSections": 283.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 95,
+     "withoutDeaths": 258959,
+     "withDeaths": 340,
+     "withoutDarkSections": 310.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 96,
+     "withoutDeaths": 263724,
+     "withDeaths": 340,
+     "withoutDarkSections": 266,
+     "withDarkSections": 0
+    },
+    {
+     "day": 97,
+     "withoutDeaths": 267113,
+     "withDeaths": 340,
+     "withoutDarkSections": 222.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 98,
+     "withoutDeaths": 269923,
+     "withDeaths": 340,
+     "withoutDarkSections": 246.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 99,
+     "withoutDeaths": 273376,
+     "withDeaths": 340,
+     "withoutDarkSections": 317,
+     "withDarkSections": 0
+    },
+    {
+     "day": 100,
+     "withoutDeaths": 278186,
+     "withDeaths": 340,
+     "withoutDarkSections": 239.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 101,
+     "withoutDeaths": 282084,
+     "withDeaths": 340,
+     "withoutDarkSections": 213.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 102,
+     "withoutDeaths": 285798,
+     "withDeaths": 340,
+     "withoutDarkSections": 240.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 103,
+     "withoutDeaths": 289623,
+     "withDeaths": 340,
+     "withoutDarkSections": 289,
+     "withDarkSections": 0
+    },
+    {
+     "day": 104,
+     "withoutDeaths": 293463,
+     "withDeaths": 340,
+     "withoutDarkSections": 310.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 105,
+     "withoutDeaths": 297490,
+     "withDeaths": 340,
+     "withoutDarkSections": 267.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 106,
+     "withoutDeaths": 302383,
+     "withDeaths": 340,
+     "withoutDarkSections": 321,
+     "withDarkSections": 0
+    },
+    {
+     "day": 107,
+     "withoutDeaths": 307743,
+     "withDeaths": 340,
+     "withoutDarkSections": 279.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 108,
+     "withoutDeaths": 312211,
+     "withDeaths": 340,
+     "withoutDarkSections": 285.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 109,
+     "withoutDeaths": 317233,
+     "withDeaths": 340,
+     "withoutDarkSections": 280,
+     "withDarkSections": 0
+    },
+    {
+     "day": 110,
+     "withoutDeaths": 321904,
+     "withDeaths": 340,
+     "withoutDarkSections": 289.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 111,
+     "withoutDeaths": 326048,
+     "withDeaths": 340,
+     "withoutDarkSections": 296.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 112,
+     "withoutDeaths": 330064,
+     "withDeaths": 340,
+     "withoutDarkSections": 327.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 113,
+     "withoutDeaths": 334364,
+     "withDeaths": 340,
+     "withoutDarkSections": 327,
+     "withDarkSections": 0
+    },
+    {
+     "day": 114,
+     "withoutDeaths": 338894,
+     "withDeaths": 340,
+     "withoutDarkSections": 237,
+     "withDarkSections": 0
+    },
+    {
+     "day": 115,
+     "withoutDeaths": 342598,
+     "withDeaths": 340,
+     "withoutDarkSections": 267.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 116,
+     "withoutDeaths": 346728,
+     "withDeaths": 340,
+     "withoutDarkSections": 310.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 117,
+     "withoutDeaths": 351208,
+     "withDeaths": 340,
+     "withoutDarkSections": 312.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 118,
+     "withoutDeaths": 356080,
+     "withDeaths": 340,
+     "withoutDarkSections": 274.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 119,
+     "withoutDeaths": 359969,
+     "withDeaths": 340,
+     "withoutDarkSections": 332.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 120,
+     "withoutDeaths": 364754,
+     "withDeaths": 340,
+     "withoutDarkSections": 298.4,
+     "withDarkSections": 0
+    }
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "withoutDeaths": 375613,
+     "withDeaths": 2034,
+     "withStable": true
+    },
+    {
+     "seed": 12,
+     "withoutDeaths": 379805,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 13,
+     "withoutDeaths": 373420,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 14,
+     "withoutDeaths": 354244,
+     "withDeaths": 12,
+     "withStable": true
+    },
+    {
+     "seed": 15,
+     "withoutDeaths": 380660,
+     "withDeaths": 1284,
+     "withStable": true
+    },
+    {
+     "seed": 16,
+     "withoutDeaths": 344086,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 17,
+     "withoutDeaths": 352136,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 18,
+     "withoutDeaths": 365952,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 19,
+     "withoutDeaths": 395873,
+     "withDeaths": 66,
+     "withStable": true
+    },
+    {
+     "seed": 20,
+     "withoutDeaths": 325753,
+     "withDeaths": 0,
+     "withStable": true
+    }
+   ]
+  },
+  {
+   "id": "slowloss",
+   "name": "Plant 6 slow 2-week loss shaped like the real SPP wind decline of Feb 6–19, 2021 (no storm, no demand surge)",
+   "summary": "Normal demand. From day 5, Plant 6 loses output slowly over 14 days, in the same shape as the wind output the Southwest Power Pool lost in the cold spell of Feb 2021 (smoothed over 24 hours). At the worst hour the whole plant is offline. After 2 weeks it returns.",
+   "kind": "plant-loss",
+   "realData": "Southwest Power Pool wind net generation, Feb 6–19, 2021 (EIA-930)",
+   "source": {
+    "label": "EIA-930 hourly grid data: Southwest Power Pool (SWPP) wind, February 2021 cold spell",
+    "detail": "SWPP wind net generation, 2021-02-06 to 2021-02-19 (US Central time), smoothed with a centered 24-hour mean, below its mean of 2021-01-08 to 2021-02-04 (10.66 GW). The loss peaks at 9.34 GW (88% of that level) at 2021-02-17 12:00 and is scaled so the peak = one whole plant. Only the shape is used: no storm, no demand surge.",
+    "url": "https://www.eia.gov/electricity/gridmonitor/"
+   },
+   "without": {
+    "deaths": {
+     "mean": 296843,
+     "lo": 280204,
+     "hi": 313482
+    },
+    "trips": {
+     "mean": 228,
+     "lo": 211.4,
+     "hi": 244.6
+    },
+    "darkMh": {
+     "mean": 1667.61,
+     "lo": 1609.81,
+     "hi": 1725.42
+    },
+    "stableShare": 0,
+    "endDay": {
+     "mean": 120,
+     "lo": 120,
+     "hi": 120
+    },
+    "warnedPct": 0
+   },
+   "with": {
+    "deaths": {
+     "mean": 8,
+     "lo": 0,
+     "hi": 22
+    },
+    "trips": {
+     "mean": 1.4,
+     "lo": 0,
+     "hi": 3.3
+    },
+    "darkMh": {
+     "mean": 3.84,
+     "lo": 0,
+     "hi": 9.17
+    },
+    "stableShare": 1,
+    "endDay": {
+     "mean": 20.1,
+     "lo": 18.7,
+     "hi": 21.5
+    },
+    "warnedPct": 63.4
+   },
+   "livesSaved": {
+    "mean": 296835,
+    "lo": 280204,
+    "hi": 313467
+   },
+   "daily": [
+    {
+     "day": 1,
+     "withoutDeaths": 0,
+     "withDeaths": 0,
+     "withoutDarkSections": 50.8,
+     "withDarkSections": 91.2
+    },
+    {
+     "day": 2,
+     "withoutDeaths": 93,
+     "withDeaths": 8,
+     "withoutDarkSections": 121.4,
+     "withDarkSections": 68.6
+    },
+    {
+     "day": 3,
+     "withoutDeaths": 128,
+     "withDeaths": 8,
+     "withoutDarkSections": 136.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 4,
+     "withoutDeaths": 886,
+     "withDeaths": 8,
+     "withoutDarkSections": 206.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 5,
+     "withoutDeaths": 2920,
+     "withDeaths": 8,
+     "withoutDarkSections": 242.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 6,
+     "withoutDeaths": 6873,
+     "withDeaths": 8,
+     "withoutDarkSections": 274.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 7,
+     "withoutDeaths": 10757,
+     "withDeaths": 8,
+     "withoutDarkSections": 235.8,
+     "withDarkSections": 8.9
+    },
+    {
+     "day": 8,
+     "withoutDeaths": 12906,
+     "withDeaths": 8,
+     "withoutDarkSections": 215.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 9,
+     "withoutDeaths": 14827,
+     "withDeaths": 8,
+     "withoutDarkSections": 238.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 10,
+     "withoutDeaths": 18152,
+     "withDeaths": 8,
+     "withoutDarkSections": 194.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 11,
+     "withoutDeaths": 20008,
+     "withDeaths": 8,
+     "withoutDarkSections": 158.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 12,
+     "withoutDeaths": 22018,
+     "withDeaths": 8,
+     "withoutDarkSections": 235.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 13,
+     "withoutDeaths": 24700,
+     "withDeaths": 8,
+     "withoutDarkSections": 225.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 14,
+     "withoutDeaths": 27475,
+     "withDeaths": 8,
+     "withoutDarkSections": 213.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 15,
+     "withoutDeaths": 30788,
+     "withDeaths": 8,
+     "withoutDarkSections": 272.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 16,
+     "withoutDeaths": 34980,
+     "withDeaths": 8,
+     "withoutDarkSections": 219.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 17,
+     "withoutDeaths": 39020,
+     "withDeaths": 8,
+     "withoutDarkSections": 283.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 18,
+     "withoutDeaths": 43220,
+     "withDeaths": 8,
+     "withoutDarkSections": 193.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 19,
+     "withoutDeaths": 44732,
+     "withDeaths": 8,
+     "withoutDarkSections": 246.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 20,
+     "withoutDeaths": 47310,
+     "withDeaths": 8,
+     "withoutDarkSections": 290,
+     "withDarkSections": 0
+    },
+    {
+     "day": 21,
+     "withoutDeaths": 49156,
+     "withDeaths": 8,
+     "withoutDarkSections": 215.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 22,
+     "withoutDeaths": 50631,
+     "withDeaths": 8,
+     "withoutDarkSections": 295.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 23,
+     "withoutDeaths": 53003,
+     "withDeaths": 8,
+     "withoutDarkSections": 288.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 24,
+     "withoutDeaths": 54758,
+     "withDeaths": 8,
+     "withoutDarkSections": 333.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 25,
+     "withoutDeaths": 57668,
+     "withDeaths": 8,
+     "withoutDarkSections": 348.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 26,
+     "withoutDeaths": 59540,
+     "withDeaths": 8,
+     "withoutDarkSections": 225.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 27,
+     "withoutDeaths": 60659,
+     "withDeaths": 8,
+     "withoutDarkSections": 191.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 28,
+     "withoutDeaths": 61241,
+     "withDeaths": 8,
+     "withoutDarkSections": 188.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 29,
+     "withoutDeaths": 62610,
+     "withDeaths": 8,
+     "withoutDarkSections": 231.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 30,
+     "withoutDeaths": 64346,
+     "withDeaths": 8,
+     "withoutDarkSections": 165,
+     "withDarkSections": 0
+    },
+    {
+     "day": 31,
+     "withoutDeaths": 65160,
+     "withDeaths": 8,
+     "withoutDarkSections": 179.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 32,
+     "withoutDeaths": 66449,
+     "withDeaths": 8,
+     "withoutDarkSections": 224.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 33,
+     "withoutDeaths": 67542,
+     "withDeaths": 8,
+     "withoutDarkSections": 187.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 34,
+     "withoutDeaths": 68439,
+     "withDeaths": 8,
+     "withoutDarkSections": 213.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 35,
+     "withoutDeaths": 68882,
+     "withDeaths": 8,
+     "withoutDarkSections": 262.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 36,
+     "withoutDeaths": 70154,
+     "withDeaths": 8,
+     "withoutDarkSections": 274.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 37,
+     "withoutDeaths": 72463,
+     "withDeaths": 8,
+     "withoutDarkSections": 242.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 38,
+     "withoutDeaths": 75556,
+     "withDeaths": 8,
+     "withoutDarkSections": 263.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 39,
+     "withoutDeaths": 78680,
+     "withDeaths": 8,
+     "withoutDarkSections": 273.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 40,
+     "withoutDeaths": 81996,
+     "withDeaths": 8,
+     "withoutDarkSections": 337.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 41,
+     "withoutDeaths": 84737,
+     "withDeaths": 8,
+     "withoutDarkSections": 224.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 42,
+     "withoutDeaths": 87731,
+     "withDeaths": 8,
+     "withoutDarkSections": 241.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 43,
+     "withoutDeaths": 91697,
+     "withDeaths": 8,
+     "withoutDarkSections": 231.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 44,
+     "withoutDeaths": 93491,
+     "withDeaths": 8,
+     "withoutDarkSections": 221,
+     "withDarkSections": 0
+    },
+    {
+     "day": 45,
+     "withoutDeaths": 95315,
+     "withDeaths": 8,
+     "withoutDarkSections": 252.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 46,
+     "withoutDeaths": 98778,
+     "withDeaths": 8,
+     "withoutDarkSections": 290.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 47,
+     "withoutDeaths": 102810,
+     "withDeaths": 8,
+     "withoutDarkSections": 289.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 48,
+     "withoutDeaths": 106523,
+     "withDeaths": 8,
+     "withoutDarkSections": 286.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 49,
+     "withoutDeaths": 109951,
+     "withDeaths": 8,
+     "withoutDarkSections": 287.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 50,
+     "withoutDeaths": 112769,
+     "withDeaths": 8,
+     "withoutDarkSections": 246.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 51,
+     "withoutDeaths": 114456,
+     "withDeaths": 8,
+     "withoutDarkSections": 199.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 52,
+     "withoutDeaths": 115227,
+     "withDeaths": 8,
+     "withoutDarkSections": 248.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 53,
+     "withoutDeaths": 117795,
+     "withDeaths": 8,
+     "withoutDarkSections": 313.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 54,
+     "withoutDeaths": 120034,
+     "withDeaths": 8,
+     "withoutDarkSections": 193.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 55,
+     "withoutDeaths": 121784,
+     "withDeaths": 8,
+     "withoutDarkSections": 193.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 56,
+     "withoutDeaths": 123053,
+     "withDeaths": 8,
+     "withoutDarkSections": 189.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 57,
+     "withoutDeaths": 124850,
+     "withDeaths": 8,
+     "withoutDarkSections": 282.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 58,
+     "withoutDeaths": 127277,
+     "withDeaths": 8,
+     "withoutDarkSections": 276,
+     "withDarkSections": 0
+    },
+    {
+     "day": 59,
+     "withoutDeaths": 130221,
+     "withDeaths": 8,
+     "withoutDarkSections": 290.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 60,
+     "withoutDeaths": 132901,
+     "withDeaths": 8,
+     "withoutDarkSections": 204.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 61,
+     "withoutDeaths": 134349,
+     "withDeaths": 8,
+     "withoutDarkSections": 300.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 62,
+     "withoutDeaths": 136904,
+     "withDeaths": 8,
+     "withoutDarkSections": 296.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 63,
+     "withoutDeaths": 140248,
+     "withDeaths": 8,
+     "withoutDarkSections": 259.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 64,
+     "withoutDeaths": 142221,
+     "withDeaths": 8,
+     "withoutDarkSections": 250.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 65,
+     "withoutDeaths": 144317,
+     "withDeaths": 8,
+     "withoutDarkSections": 270.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 66,
+     "withoutDeaths": 145993,
+     "withDeaths": 8,
+     "withoutDarkSections": 204.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 67,
+     "withoutDeaths": 148048,
+     "withDeaths": 8,
+     "withoutDarkSections": 215.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 68,
+     "withoutDeaths": 150648,
+     "withDeaths": 8,
+     "withoutDarkSections": 212.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 69,
+     "withoutDeaths": 152762,
+     "withDeaths": 8,
+     "withoutDarkSections": 191.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 70,
+     "withoutDeaths": 154321,
+     "withDeaths": 8,
+     "withoutDarkSections": 186.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 71,
+     "withoutDeaths": 155548,
+     "withDeaths": 8,
+     "withoutDarkSections": 205,
+     "withDarkSections": 0
+    },
+    {
+     "day": 72,
+     "withoutDeaths": 156881,
+     "withDeaths": 8,
+     "withoutDarkSections": 250.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 73,
+     "withoutDeaths": 158865,
+     "withDeaths": 8,
+     "withoutDarkSections": 200.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 74,
+     "withoutDeaths": 161353,
+     "withDeaths": 8,
+     "withoutDarkSections": 239.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 75,
+     "withoutDeaths": 164069,
+     "withDeaths": 8,
+     "withoutDarkSections": 217.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 76,
+     "withoutDeaths": 165374,
+     "withDeaths": 8,
+     "withoutDarkSections": 225.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 77,
+     "withoutDeaths": 167507,
+     "withDeaths": 8,
+     "withoutDarkSections": 239.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 78,
+     "withoutDeaths": 170052,
+     "withDeaths": 8,
+     "withoutDarkSections": 188.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 79,
+     "withoutDeaths": 171714,
+     "withDeaths": 8,
+     "withoutDarkSections": 256.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 80,
+     "withoutDeaths": 173595,
+     "withDeaths": 8,
+     "withoutDarkSections": 274.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 81,
+     "withoutDeaths": 176341,
+     "withDeaths": 8,
+     "withoutDarkSections": 319.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 82,
+     "withoutDeaths": 179496,
+     "withDeaths": 8,
+     "withoutDarkSections": 258.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 83,
+     "withoutDeaths": 183346,
+     "withDeaths": 8,
+     "withoutDarkSections": 284.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 84,
+     "withoutDeaths": 185946,
+     "withDeaths": 8,
+     "withoutDarkSections": 248.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 85,
+     "withoutDeaths": 188658,
+     "withDeaths": 8,
+     "withoutDarkSections": 244.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 86,
+     "withoutDeaths": 191533,
+     "withDeaths": 8,
+     "withoutDarkSections": 251.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 87,
+     "withoutDeaths": 194234,
+     "withDeaths": 8,
+     "withoutDarkSections": 203.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 88,
+     "withoutDeaths": 195706,
+     "withDeaths": 8,
+     "withoutDarkSections": 266.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 89,
+     "withoutDeaths": 198642,
+     "withDeaths": 8,
+     "withoutDarkSections": 241.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 90,
+     "withoutDeaths": 201362,
+     "withDeaths": 8,
+     "withoutDarkSections": 272.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 91,
+     "withoutDeaths": 205806,
+     "withDeaths": 8,
+     "withoutDarkSections": 303.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 92,
+     "withoutDeaths": 210028,
+     "withDeaths": 8,
+     "withoutDarkSections": 309.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 93,
+     "withoutDeaths": 213940,
+     "withDeaths": 8,
+     "withoutDarkSections": 331,
+     "withDarkSections": 0
+    },
+    {
+     "day": 94,
+     "withoutDeaths": 218183,
+     "withDeaths": 8,
+     "withoutDarkSections": 269.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 95,
+     "withoutDeaths": 221118,
+     "withDeaths": 8,
+     "withoutDarkSections": 164.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 96,
+     "withoutDeaths": 222897,
+     "withDeaths": 8,
+     "withoutDarkSections": 305.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 97,
+     "withoutDeaths": 226216,
+     "withDeaths": 8,
+     "withoutDarkSections": 277.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 98,
+     "withoutDeaths": 228910,
+     "withDeaths": 8,
+     "withoutDarkSections": 227.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 99,
+     "withoutDeaths": 230999,
+     "withDeaths": 8,
+     "withoutDarkSections": 226.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 100,
+     "withoutDeaths": 232977,
+     "withDeaths": 8,
+     "withoutDarkSections": 238.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 101,
+     "withoutDeaths": 236060,
+     "withDeaths": 8,
+     "withoutDarkSections": 242.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 102,
+     "withoutDeaths": 239841,
+     "withDeaths": 8,
+     "withoutDarkSections": 337.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 103,
+     "withoutDeaths": 243240,
+     "withDeaths": 8,
+     "withoutDarkSections": 214.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 104,
+     "withoutDeaths": 245549,
+     "withDeaths": 8,
+     "withoutDarkSections": 263.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 105,
+     "withoutDeaths": 248173,
+     "withDeaths": 8,
+     "withoutDarkSections": 273.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 106,
+     "withoutDeaths": 252021,
+     "withDeaths": 8,
+     "withoutDarkSections": 278.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 107,
+     "withoutDeaths": 256837,
+     "withDeaths": 8,
+     "withoutDarkSections": 216,
+     "withDarkSections": 0
+    },
+    {
+     "day": 108,
+     "withoutDeaths": 260254,
+     "withDeaths": 8,
+     "withoutDarkSections": 278.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 109,
+     "withoutDeaths": 263658,
+     "withDeaths": 8,
+     "withoutDarkSections": 318.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 110,
+     "withoutDeaths": 267102,
+     "withDeaths": 8,
+     "withoutDarkSections": 266.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 111,
+     "withoutDeaths": 270075,
+     "withDeaths": 8,
+     "withoutDarkSections": 286,
+     "withDarkSections": 0
+    },
+    {
+     "day": 112,
+     "withoutDeaths": 272119,
+     "withDeaths": 8,
+     "withoutDarkSections": 275.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 113,
+     "withoutDeaths": 274102,
+     "withDeaths": 8,
+     "withoutDarkSections": 293.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 114,
+     "withoutDeaths": 277313,
+     "withDeaths": 8,
+     "withoutDarkSections": 323.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 115,
+     "withoutDeaths": 281131,
+     "withDeaths": 8,
+     "withoutDarkSections": 280.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 116,
+     "withoutDeaths": 284945,
+     "withDeaths": 8,
+     "withoutDarkSections": 235.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 117,
+     "withoutDeaths": 287121,
+     "withDeaths": 8,
+     "withoutDarkSections": 274.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 118,
+     "withoutDeaths": 290338,
+     "withDeaths": 8,
+     "withoutDarkSections": 304.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 119,
+     "withoutDeaths": 293522,
+     "withDeaths": 8,
+     "withoutDarkSections": 269,
+     "withDarkSections": 0
+    },
+    {
+     "day": 120,
+     "withoutDeaths": 296843,
+     "withDeaths": 8,
+     "withoutDarkSections": 307.9,
+     "withDarkSections": 0
+    }
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "withoutDeaths": 302394,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 12,
+     "withoutDeaths": 320418,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 13,
+     "withoutDeaths": 301575,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 14,
+     "withoutDeaths": 279638,
+     "withDeaths": 12,
+     "withStable": true
+    },
+    {
+     "seed": 15,
+     "withoutDeaths": 318493,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 16,
+     "withoutDeaths": 271917,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 17,
+     "withoutDeaths": 286974,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 18,
+     "withoutDeaths": 295706,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 19,
+     "withoutDeaths": 332894,
+     "withDeaths": 65,
+     "withStable": true
+    },
+    {
+     "seed": 20,
+     "withoutDeaths": 258420,
+     "withDeaths": 0,
+     "withStable": true
+    }
+   ]
+  },
+  {
+   "id": "cascade",
+   "name": "Plant 2 loss shaped like the real ERCOT generation loss of Feb 2021 (no storm, no demand surge)",
+   "summary": "Normal demand. From day 5, Plant 2 loses output hour by hour in the same shape as the net generation ERCOT lost in the rotating outages of Feb 15–18, 2021. At the worst hour the whole plant is offline. After 4 days it returns.",
+   "kind": "plant-loss",
+   "realData": "ERCOT net generation, Feb 15–18, 2021 (EIA-930)",
+   "source": {
+    "label": "EIA-930 hourly grid data, ERCOT (2023 calm weeks; Feb 2021 generation loss)",
+    "detail": "Demand: ERCOT hourly demand, 2023, US Central time. 36 of 52 Monday-to-Sunday weeks are calm (no data gaps, mean within 5% and peak within 8% of the season, generation within 5% of demand, no hourly jump over 12%, no federal holiday). Each week is divided by its mean, then averaged: 168 multipliers, mean 1. Plant loss: ERCOT net generation, Feb 15-18, 2021, below its mean of Feb 14 (61.2 GW). The loss peaks at 19.5 GW (2021-02-17 01:00) and is scaled so the peak = one whole plant. No demand surge is applied.",
+    "url": "https://www.eia.gov/electricity/gridmonitor/"
+   },
+   "without": {
+    "deaths": {
+     "mean": 292329,
+     "lo": 273253,
+     "hi": 311404
+    },
+    "trips": {
+     "mean": 232.1,
+     "lo": 218.1,
+     "hi": 246.1
+    },
+    "darkMh": {
+     "mean": 1656.73,
+     "lo": 1607.9,
+     "hi": 1705.55
+    },
+    "stableShare": 0,
+    "endDay": {
+     "mean": 120,
+     "lo": 120,
+     "hi": 120
+    },
+    "warnedPct": 0
+   },
+   "with": {
+    "deaths": {
+     "mean": 8,
+     "lo": 0,
+     "hi": 22
+    },
+    "trips": {
+     "mean": 1.8,
+     "lo": 0,
+     "hi": 3.9
+    },
+    "darkMh": {
+     "mean": 4.55,
+     "lo": 0,
+     "hi": 9.9
+    },
+    "stableShare": 1,
+    "endDay": {
+     "mean": 20.2,
+     "lo": 18.8,
+     "hi": 21.6
+    },
+    "warnedPct": 53.5
+   },
+   "livesSaved": {
+    "mean": 292321,
+    "lo": 273253,
+    "hi": 311389
+   },
+   "daily": [
+    {
+     "day": 1,
+     "withoutDeaths": 0,
+     "withDeaths": 0,
+     "withoutDarkSections": 50.8,
+     "withDarkSections": 91.2
+    },
+    {
+     "day": 2,
+     "withoutDeaths": 93,
+     "withDeaths": 8,
+     "withoutDarkSections": 121.4,
+     "withDarkSections": 68.6
+    },
+    {
+     "day": 3,
+     "withoutDeaths": 128,
+     "withDeaths": 8,
+     "withoutDarkSections": 136.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 4,
+     "withoutDeaths": 886,
+     "withDeaths": 8,
+     "withoutDarkSections": 206.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 5,
+     "withoutDeaths": 2854,
+     "withDeaths": 8,
+     "withoutDarkSections": 400,
+     "withDarkSections": 0
+    },
+    {
+     "day": 6,
+     "withoutDeaths": 9261,
+     "withDeaths": 8,
+     "withoutDarkSections": 367.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 7,
+     "withoutDeaths": 16910,
+     "withDeaths": 8,
+     "withoutDarkSections": 349.9,
+     "withDarkSections": 35.3
+    },
+    {
+     "day": 8,
+     "withoutDeaths": 22672,
+     "withDeaths": 8,
+     "withoutDarkSections": 375.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 9,
+     "withoutDeaths": 28159,
+     "withDeaths": 8,
+     "withoutDarkSections": 281,
+     "withDarkSections": 0
+    },
+    {
+     "day": 10,
+     "withoutDeaths": 30151,
+     "withDeaths": 8,
+     "withoutDarkSections": 183.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 11,
+     "withoutDeaths": 31526,
+     "withDeaths": 8,
+     "withoutDarkSections": 237.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 12,
+     "withoutDeaths": 33297,
+     "withDeaths": 8,
+     "withoutDarkSections": 176.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 13,
+     "withoutDeaths": 34056,
+     "withDeaths": 8,
+     "withoutDarkSections": 104,
+     "withDarkSections": 0
+    },
+    {
+     "day": 14,
+     "withoutDeaths": 34403,
+     "withDeaths": 8,
+     "withoutDarkSections": 139.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 15,
+     "withoutDeaths": 35452,
+     "withDeaths": 8,
+     "withoutDarkSections": 208.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 16,
+     "withoutDeaths": 37772,
+     "withDeaths": 8,
+     "withoutDarkSections": 184.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 17,
+     "withoutDeaths": 39610,
+     "withDeaths": 8,
+     "withoutDarkSections": 173.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 18,
+     "withoutDeaths": 41382,
+     "withDeaths": 8,
+     "withoutDarkSections": 160.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 19,
+     "withoutDeaths": 43036,
+     "withDeaths": 8,
+     "withoutDarkSections": 222.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 20,
+     "withoutDeaths": 44314,
+     "withDeaths": 8,
+     "withoutDarkSections": 167.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 21,
+     "withoutDeaths": 45415,
+     "withDeaths": 8,
+     "withoutDarkSections": 223.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 22,
+     "withoutDeaths": 46449,
+     "withDeaths": 8,
+     "withoutDarkSections": 274.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 23,
+     "withoutDeaths": 49097,
+     "withDeaths": 8,
+     "withoutDarkSections": 283.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 24,
+     "withoutDeaths": 51607,
+     "withDeaths": 8,
+     "withoutDarkSections": 263.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 25,
+     "withoutDeaths": 53309,
+     "withDeaths": 8,
+     "withoutDarkSections": 235.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 26,
+     "withoutDeaths": 55899,
+     "withDeaths": 8,
+     "withoutDarkSections": 283.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 27,
+     "withoutDeaths": 58279,
+     "withDeaths": 8,
+     "withoutDarkSections": 268.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 28,
+     "withoutDeaths": 59176,
+     "withDeaths": 8,
+     "withoutDarkSections": 218.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 29,
+     "withoutDeaths": 60658,
+     "withDeaths": 8,
+     "withoutDarkSections": 289.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 30,
+     "withoutDeaths": 62305,
+     "withDeaths": 8,
+     "withoutDarkSections": 263,
+     "withDarkSections": 0
+    },
+    {
+     "day": 31,
+     "withoutDeaths": 64325,
+     "withDeaths": 8,
+     "withoutDarkSections": 163.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 32,
+     "withoutDeaths": 64622,
+     "withDeaths": 8,
+     "withoutDarkSections": 175,
+     "withDarkSections": 0
+    },
+    {
+     "day": 33,
+     "withoutDeaths": 65882,
+     "withDeaths": 8,
+     "withoutDarkSections": 183.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 34,
+     "withoutDeaths": 67689,
+     "withDeaths": 8,
+     "withoutDarkSections": 231,
+     "withDarkSections": 0
+    },
+    {
+     "day": 35,
+     "withoutDeaths": 68623,
+     "withDeaths": 8,
+     "withoutDarkSections": 220.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 36,
+     "withoutDeaths": 69210,
+     "withDeaths": 8,
+     "withoutDarkSections": 208.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 37,
+     "withoutDeaths": 70319,
+     "withDeaths": 8,
+     "withoutDarkSections": 247.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 38,
+     "withoutDeaths": 71651,
+     "withDeaths": 8,
+     "withoutDarkSections": 171.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 39,
+     "withoutDeaths": 71984,
+     "withDeaths": 8,
+     "withoutDarkSections": 245.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 40,
+     "withoutDeaths": 73580,
+     "withDeaths": 8,
+     "withoutDarkSections": 322.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 41,
+     "withoutDeaths": 77496,
+     "withDeaths": 8,
+     "withoutDarkSections": 248.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 42,
+     "withoutDeaths": 80385,
+     "withDeaths": 8,
+     "withoutDarkSections": 190.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 43,
+     "withoutDeaths": 82876,
+     "withDeaths": 8,
+     "withoutDarkSections": 274,
+     "withDarkSections": 0
+    },
+    {
+     "day": 44,
+     "withoutDeaths": 85289,
+     "withDeaths": 8,
+     "withoutDarkSections": 216.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 45,
+     "withoutDeaths": 88086,
+     "withDeaths": 8,
+     "withoutDarkSections": 258.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 46,
+     "withoutDeaths": 91853,
+     "withDeaths": 8,
+     "withoutDarkSections": 258.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 47,
+     "withoutDeaths": 95916,
+     "withDeaths": 8,
+     "withoutDarkSections": 215.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 48,
+     "withoutDeaths": 98455,
+     "withDeaths": 8,
+     "withoutDarkSections": 231,
+     "withDarkSections": 0
+    },
+    {
+     "day": 49,
+     "withoutDeaths": 100554,
+     "withDeaths": 8,
+     "withoutDarkSections": 284,
+     "withDarkSections": 0
+    },
+    {
+     "day": 50,
+     "withoutDeaths": 104681,
+     "withDeaths": 8,
+     "withoutDarkSections": 286,
+     "withDarkSections": 0
+    },
+    {
+     "day": 51,
+     "withoutDeaths": 108162,
+     "withDeaths": 8,
+     "withoutDarkSections": 240,
+     "withDarkSections": 0
+    },
+    {
+     "day": 52,
+     "withoutDeaths": 111414,
+     "withDeaths": 8,
+     "withoutDarkSections": 268.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 53,
+     "withoutDeaths": 114466,
+     "withDeaths": 8,
+     "withoutDarkSections": 275.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 54,
+     "withoutDeaths": 117456,
+     "withDeaths": 8,
+     "withoutDarkSections": 274.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 55,
+     "withoutDeaths": 119964,
+     "withDeaths": 8,
+     "withoutDarkSections": 254.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 56,
+     "withoutDeaths": 121399,
+     "withDeaths": 8,
+     "withoutDarkSections": 200.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 57,
+     "withoutDeaths": 122558,
+     "withDeaths": 8,
+     "withoutDarkSections": 269.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 58,
+     "withoutDeaths": 124318,
+     "withDeaths": 8,
+     "withoutDarkSections": 206.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 59,
+     "withoutDeaths": 126170,
+     "withDeaths": 8,
+     "withoutDarkSections": 242.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 60,
+     "withoutDeaths": 128183,
+     "withDeaths": 8,
+     "withoutDarkSections": 274.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 61,
+     "withoutDeaths": 132089,
+     "withDeaths": 8,
+     "withoutDarkSections": 302.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 62,
+     "withoutDeaths": 135100,
+     "withDeaths": 8,
+     "withoutDarkSections": 207.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 63,
+     "withoutDeaths": 136323,
+     "withDeaths": 8,
+     "withoutDarkSections": 272.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 64,
+     "withoutDeaths": 137988,
+     "withDeaths": 8,
+     "withoutDarkSections": 241.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 65,
+     "withoutDeaths": 140083,
+     "withDeaths": 8,
+     "withoutDarkSections": 257.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 66,
+     "withoutDeaths": 142592,
+     "withDeaths": 8,
+     "withoutDarkSections": 287.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 67,
+     "withoutDeaths": 146488,
+     "withDeaths": 8,
+     "withoutDarkSections": 292.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 68,
+     "withoutDeaths": 148366,
+     "withDeaths": 8,
+     "withoutDarkSections": 217.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 69,
+     "withoutDeaths": 149999,
+     "withDeaths": 8,
+     "withoutDarkSections": 219.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 70,
+     "withoutDeaths": 151522,
+     "withDeaths": 8,
+     "withoutDarkSections": 150,
+     "withDarkSections": 0
+    },
+    {
+     "day": 71,
+     "withoutDeaths": 153298,
+     "withDeaths": 8,
+     "withoutDarkSections": 236.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 72,
+     "withoutDeaths": 156243,
+     "withDeaths": 8,
+     "withoutDarkSections": 164.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 73,
+     "withoutDeaths": 157619,
+     "withDeaths": 8,
+     "withoutDarkSections": 215.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 74,
+     "withoutDeaths": 159888,
+     "withDeaths": 8,
+     "withoutDarkSections": 201.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 75,
+     "withoutDeaths": 161829,
+     "withDeaths": 8,
+     "withoutDarkSections": 267.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 76,
+     "withoutDeaths": 164004,
+     "withDeaths": 8,
+     "withoutDarkSections": 235.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 77,
+     "withoutDeaths": 166176,
+     "withDeaths": 8,
+     "withoutDarkSections": 170,
+     "withDarkSections": 0
+    },
+    {
+     "day": 78,
+     "withoutDeaths": 168857,
+     "withDeaths": 8,
+     "withoutDarkSections": 289.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 79,
+     "withoutDeaths": 171079,
+     "withDeaths": 8,
+     "withoutDarkSections": 223.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 80,
+     "withoutDeaths": 172529,
+     "withDeaths": 8,
+     "withoutDarkSections": 172.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 81,
+     "withoutDeaths": 173885,
+     "withDeaths": 8,
+     "withoutDarkSections": 221.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 82,
+     "withoutDeaths": 176266,
+     "withDeaths": 8,
+     "withoutDarkSections": 229.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 83,
+     "withoutDeaths": 178949,
+     "withDeaths": 8,
+     "withoutDarkSections": 278.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 84,
+     "withoutDeaths": 181394,
+     "withDeaths": 8,
+     "withoutDarkSections": 284,
+     "withDarkSections": 0
+    },
+    {
+     "day": 85,
+     "withoutDeaths": 184101,
+     "withDeaths": 8,
+     "withoutDarkSections": 296.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 86,
+     "withoutDeaths": 187617,
+     "withDeaths": 8,
+     "withoutDarkSections": 250.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 87,
+     "withoutDeaths": 191560,
+     "withDeaths": 8,
+     "withoutDarkSections": 242.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 88,
+     "withoutDeaths": 193852,
+     "withDeaths": 8,
+     "withoutDarkSections": 223.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 89,
+     "withoutDeaths": 196859,
+     "withDeaths": 8,
+     "withoutDarkSections": 282,
+     "withDarkSections": 0
+    },
+    {
+     "day": 90,
+     "withoutDeaths": 200066,
+     "withDeaths": 8,
+     "withoutDarkSections": 264.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 91,
+     "withoutDeaths": 202134,
+     "withDeaths": 8,
+     "withoutDarkSections": 153.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 92,
+     "withoutDeaths": 202887,
+     "withDeaths": 8,
+     "withoutDarkSections": 259.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 93,
+     "withoutDeaths": 205521,
+     "withDeaths": 8,
+     "withoutDarkSections": 301.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 94,
+     "withoutDeaths": 210118,
+     "withDeaths": 8,
+     "withoutDarkSections": 308.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 95,
+     "withoutDeaths": 215863,
+     "withDeaths": 8,
+     "withoutDarkSections": 309.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 96,
+     "withoutDeaths": 220540,
+     "withDeaths": 8,
+     "withoutDarkSections": 306.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 97,
+     "withoutDeaths": 224560,
+     "withDeaths": 8,
+     "withoutDarkSections": 293.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 98,
+     "withoutDeaths": 227731,
+     "withDeaths": 8,
+     "withoutDarkSections": 230,
+     "withDarkSections": 0
+    },
+    {
+     "day": 99,
+     "withoutDeaths": 230127,
+     "withDeaths": 8,
+     "withoutDarkSections": 285.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 100,
+     "withoutDeaths": 232068,
+     "withDeaths": 8,
+     "withoutDarkSections": 247,
+     "withDarkSections": 0
+    },
+    {
+     "day": 101,
+     "withoutDeaths": 234582,
+     "withDeaths": 8,
+     "withoutDarkSections": 312.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 102,
+     "withoutDeaths": 237976,
+     "withDeaths": 8,
+     "withoutDarkSections": 226.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 103,
+     "withoutDeaths": 240967,
+     "withDeaths": 8,
+     "withoutDarkSections": 178.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 104,
+     "withoutDeaths": 243389,
+     "withDeaths": 8,
+     "withoutDarkSections": 254.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 105,
+     "withoutDeaths": 245615,
+     "withDeaths": 8,
+     "withoutDarkSections": 230.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 106,
+     "withoutDeaths": 247969,
+     "withDeaths": 8,
+     "withoutDarkSections": 254.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 107,
+     "withoutDeaths": 250904,
+     "withDeaths": 8,
+     "withoutDarkSections": 243.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 108,
+     "withoutDeaths": 253519,
+     "withDeaths": 8,
+     "withoutDarkSections": 310.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 109,
+     "withoutDeaths": 258060,
+     "withDeaths": 8,
+     "withoutDarkSections": 295.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 110,
+     "withoutDeaths": 262073,
+     "withDeaths": 8,
+     "withoutDarkSections": 252.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 111,
+     "withoutDeaths": 266171,
+     "withDeaths": 8,
+     "withoutDarkSections": 276.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 112,
+     "withoutDeaths": 268092,
+     "withDeaths": 8,
+     "withoutDarkSections": 263.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 113,
+     "withoutDeaths": 270229,
+     "withDeaths": 8,
+     "withoutDarkSections": 339.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 114,
+     "withoutDeaths": 273943,
+     "withDeaths": 8,
+     "withoutDarkSections": 303.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 115,
+     "withoutDeaths": 276777,
+     "withDeaths": 8,
+     "withoutDarkSections": 317.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 116,
+     "withoutDeaths": 279857,
+     "withDeaths": 8,
+     "withoutDarkSections": 269,
+     "withDarkSections": 0
+    },
+    {
+     "day": 117,
+     "withoutDeaths": 283154,
+     "withDeaths": 8,
+     "withoutDarkSections": 326.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 118,
+     "withoutDeaths": 286809,
+     "withDeaths": 8,
+     "withoutDarkSections": 239.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 119,
+     "withoutDeaths": 289510,
+     "withDeaths": 8,
+     "withoutDarkSections": 263.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 120,
+     "withoutDeaths": 292329,
+     "withDeaths": 8,
+     "withoutDarkSections": 228.3,
+     "withDarkSections": 0
+    }
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "withoutDeaths": 295406,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 12,
+     "withoutDeaths": 315663,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 13,
+     "withoutDeaths": 301319,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 14,
+     "withoutDeaths": 273177,
+     "withDeaths": 12,
+     "withStable": true
+    },
+    {
+     "seed": 15,
+     "withoutDeaths": 312574,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 16,
+     "withoutDeaths": 278185,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 17,
+     "withoutDeaths": 280951,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 18,
+     "withoutDeaths": 294650,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 19,
+     "withoutDeaths": 333459,
+     "withDeaths": 65,
+     "withStable": true
+    },
+    {
+     "seed": 20,
+     "withoutDeaths": 237900,
+     "withDeaths": 0,
+     "withStable": true
+    }
+   ]
+  },
+  {
+   "id": "crowding",
+   "name": "Crowding (4 years of real county growth, played in 120 days)",
+   "summary": "Normal plants and demand. Each section grows at the real 2020–2024 rate of its counties. Four real years are played in the 120-day run, so one day here is about 12 real days.",
+   "kind": "crowding",
+   "realData": "US county population growth, 2020–2024 (Census Bureau estimates)",
+   "source": {
+    "label": "Real US counties: CDC SVI, HHS emPOWER, Census",
+    "detail": "3,133 US counties (pop 336,426,684), placed on levels 1-50 by CDC SVI 2022 rank (1 = least vulnerable). Each level is cut into 8 sections of equal population (counties sorted by SVI; a county that crosses a cut is divided). Power-dependent residents: HHS emPOWER. Growth: Census county estimates 2020-2024. The engine rescales each share to its own total population.",
+    "url": "https://www.atsdr.cdc.gov/place-health/php/svi/index.html"
+   },
+   "without": {
+    "deaths": {
+     "mean": 287520,
+     "lo": 270361,
+     "hi": 304678
+    },
+    "trips": {
+     "mean": 222,
+     "lo": 205.7,
+     "hi": 238.3
+    },
+    "darkMh": {
+     "mean": 1643.35,
+     "lo": 1581.3,
+     "hi": 1705.39
+    },
+    "stableShare": 0,
+    "endDay": {
+     "mean": 120,
+     "lo": 120,
+     "hi": 120
+    },
+    "warnedPct": 0
+   },
+   "with": {
+    "deaths": {
+     "mean": 8,
+     "lo": 0,
+     "hi": 22
+    },
+    "trips": {
+     "mean": 1.8,
+     "lo": 0,
+     "hi": 3.9
+    },
+    "darkMh": {
+     "mean": 5.1,
+     "lo": 0,
+     "hi": 10.5
+    },
+    "stableShare": 1,
+    "endDay": {
+     "mean": 61.4,
+     "lo": 59.3,
+     "hi": 63.5
+    },
+    "warnedPct": 47.8
+   },
+   "livesSaved": {
+    "mean": 287512,
+    "lo": 270362,
+    "hi": 304663
+   },
+   "daily": [
+    {
+     "day": 1,
+     "withoutDeaths": 0,
+     "withDeaths": 0,
+     "withoutDarkSections": 50.8,
+     "withDarkSections": 91.2
+    },
+    {
+     "day": 2,
+     "withoutDeaths": 93,
+     "withDeaths": 8,
+     "withoutDarkSections": 121.4,
+     "withDarkSections": 68.6
+    },
+    {
+     "day": 3,
+     "withoutDeaths": 128,
+     "withDeaths": 8,
+     "withoutDarkSections": 136.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 4,
+     "withoutDeaths": 887,
+     "withDeaths": 8,
+     "withoutDarkSections": 206.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 5,
+     "withoutDeaths": 2193,
+     "withDeaths": 8,
+     "withoutDarkSections": 172.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 6,
+     "withoutDeaths": 3614,
+     "withDeaths": 8,
+     "withoutDarkSections": 198.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 7,
+     "withoutDeaths": 5025,
+     "withDeaths": 8,
+     "withoutDarkSections": 213.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 8,
+     "withoutDeaths": 5460,
+     "withDeaths": 8,
+     "withoutDarkSections": 221.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 9,
+     "withoutDeaths": 6567,
+     "withDeaths": 8,
+     "withoutDarkSections": 186,
+     "withDarkSections": 0
+    },
+    {
+     "day": 10,
+     "withoutDeaths": 7463,
+     "withDeaths": 8,
+     "withoutDarkSections": 236.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 11,
+     "withoutDeaths": 8679,
+     "withDeaths": 8,
+     "withoutDarkSections": 155.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 12,
+     "withoutDeaths": 9971,
+     "withDeaths": 8,
+     "withoutDarkSections": 173.3,
+     "withDarkSections": 43.2
+    },
+    {
+     "day": 13,
+     "withoutDeaths": 11096,
+     "withDeaths": 8,
+     "withoutDarkSections": 109.7,
+     "withDarkSections": 0.6
+    },
+    {
+     "day": 14,
+     "withoutDeaths": 11442,
+     "withDeaths": 8,
+     "withoutDarkSections": 170.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 15,
+     "withoutDeaths": 12822,
+     "withDeaths": 8,
+     "withoutDarkSections": 233.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 16,
+     "withoutDeaths": 15763,
+     "withDeaths": 8,
+     "withoutDarkSections": 155.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 17,
+     "withoutDeaths": 17785,
+     "withDeaths": 8,
+     "withoutDarkSections": 206.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 18,
+     "withoutDeaths": 19999,
+     "withDeaths": 8,
+     "withoutDarkSections": 240.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 19,
+     "withoutDeaths": 21518,
+     "withDeaths": 8,
+     "withoutDarkSections": 192.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 20,
+     "withoutDeaths": 23127,
+     "withDeaths": 8,
+     "withoutDarkSections": 158.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 21,
+     "withoutDeaths": 24218,
+     "withDeaths": 8,
+     "withoutDarkSections": 250.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 22,
+     "withoutDeaths": 25298,
+     "withDeaths": 8,
+     "withoutDarkSections": 291.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 23,
+     "withoutDeaths": 28262,
+     "withDeaths": 8,
+     "withoutDarkSections": 269.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 24,
+     "withoutDeaths": 30445,
+     "withDeaths": 8,
+     "withoutDarkSections": 279.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 25,
+     "withoutDeaths": 32348,
+     "withDeaths": 8,
+     "withoutDarkSections": 245.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 26,
+     "withoutDeaths": 35462,
+     "withDeaths": 8,
+     "withoutDarkSections": 264.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 27,
+     "withoutDeaths": 37197,
+     "withDeaths": 8,
+     "withoutDarkSections": 271.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 28,
+     "withoutDeaths": 38249,
+     "withDeaths": 8,
+     "withoutDarkSections": 235.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 29,
+     "withoutDeaths": 39861,
+     "withDeaths": 8,
+     "withoutDarkSections": 318.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 30,
+     "withoutDeaths": 43028,
+     "withDeaths": 8,
+     "withoutDarkSections": 266,
+     "withDarkSections": 0
+    },
+    {
+     "day": 31,
+     "withoutDeaths": 44747,
+     "withDeaths": 8,
+     "withoutDarkSections": 134.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 32,
+     "withoutDeaths": 45200,
+     "withDeaths": 8,
+     "withoutDarkSections": 177.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 33,
+     "withoutDeaths": 46479,
+     "withDeaths": 8,
+     "withoutDarkSections": 152.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 34,
+     "withoutDeaths": 47966,
+     "withDeaths": 8,
+     "withoutDarkSections": 288.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 35,
+     "withoutDeaths": 49287,
+     "withDeaths": 8,
+     "withoutDarkSections": 192.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 36,
+     "withoutDeaths": 50308,
+     "withDeaths": 8,
+     "withoutDarkSections": 189.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 37,
+     "withoutDeaths": 51387,
+     "withDeaths": 8,
+     "withoutDarkSections": 248.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 38,
+     "withoutDeaths": 52696,
+     "withDeaths": 8,
+     "withoutDarkSections": 214.7,
+     "withDarkSections": 9.1
+    },
+    {
+     "day": 39,
+     "withoutDeaths": 53489,
+     "withDeaths": 8,
+     "withoutDarkSections": 260.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 40,
+     "withoutDeaths": 55657,
+     "withDeaths": 8,
+     "withoutDarkSections": 274.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 41,
+     "withoutDeaths": 59056,
+     "withDeaths": 8,
+     "withoutDarkSections": 271.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 42,
+     "withoutDeaths": 62403,
+     "withDeaths": 8,
+     "withoutDarkSections": 224.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 43,
+     "withoutDeaths": 64954,
+     "withDeaths": 8,
+     "withoutDarkSections": 265.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 44,
+     "withoutDeaths": 68026,
+     "withDeaths": 8,
+     "withoutDarkSections": 239.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 45,
+     "withoutDeaths": 71339,
+     "withDeaths": 8,
+     "withoutDarkSections": 264.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 46,
+     "withoutDeaths": 74732,
+     "withDeaths": 8,
+     "withoutDarkSections": 214.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 47,
+     "withoutDeaths": 77828,
+     "withDeaths": 8,
+     "withoutDarkSections": 187,
+     "withDarkSections": 0
+    },
+    {
+     "day": 48,
+     "withoutDeaths": 79978,
+     "withDeaths": 8,
+     "withoutDarkSections": 321.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 49,
+     "withoutDeaths": 83385,
+     "withDeaths": 8,
+     "withoutDarkSections": 310,
+     "withDarkSections": 0
+    },
+    {
+     "day": 50,
+     "withoutDeaths": 88073,
+     "withDeaths": 8,
+     "withoutDarkSections": 280.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 51,
+     "withoutDeaths": 91503,
+     "withDeaths": 8,
+     "withoutDarkSections": 239.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 52,
+     "withoutDeaths": 94099,
+     "withDeaths": 8,
+     "withoutDarkSections": 278.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 53,
+     "withoutDeaths": 97014,
+     "withDeaths": 8,
+     "withoutDarkSections": 285.7,
+     "withDarkSections": 1.2
+    },
+    {
+     "day": 54,
+     "withoutDeaths": 100297,
+     "withDeaths": 8,
+     "withoutDarkSections": 274.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 55,
+     "withoutDeaths": 101689,
+     "withDeaths": 8,
+     "withoutDarkSections": 265.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 56,
+     "withoutDeaths": 103718,
+     "withDeaths": 8,
+     "withoutDarkSections": 218.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 57,
+     "withoutDeaths": 104860,
+     "withDeaths": 8,
+     "withoutDarkSections": 198.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 58,
+     "withoutDeaths": 106547,
+     "withDeaths": 8,
+     "withoutDarkSections": 237.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 59,
+     "withoutDeaths": 108933,
+     "withDeaths": 8,
+     "withoutDarkSections": 273.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 60,
+     "withoutDeaths": 112038,
+     "withDeaths": 8,
+     "withoutDarkSections": 277.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 61,
+     "withoutDeaths": 116817,
+     "withDeaths": 8,
+     "withoutDarkSections": 303.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 62,
+     "withoutDeaths": 119275,
+     "withDeaths": 8,
+     "withoutDarkSections": 227.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 63,
+     "withoutDeaths": 120456,
+     "withDeaths": 8,
+     "withoutDarkSections": 201.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 64,
+     "withoutDeaths": 121907,
+     "withDeaths": 8,
+     "withoutDarkSections": 255.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 65,
+     "withoutDeaths": 124309,
+     "withDeaths": 8,
+     "withoutDarkSections": 285.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 66,
+     "withoutDeaths": 127064,
+     "withDeaths": 8,
+     "withoutDarkSections": 243.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 67,
+     "withoutDeaths": 130558,
+     "withDeaths": 8,
+     "withoutDarkSections": 272.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 68,
+     "withoutDeaths": 133249,
+     "withDeaths": 8,
+     "withoutDarkSections": 217.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 69,
+     "withoutDeaths": 134751,
+     "withDeaths": 8,
+     "withoutDarkSections": 202,
+     "withDarkSections": 0
+    },
+    {
+     "day": 70,
+     "withoutDeaths": 136504,
+     "withDeaths": 8,
+     "withoutDarkSections": 228.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 71,
+     "withoutDeaths": 139185,
+     "withDeaths": 8,
+     "withoutDarkSections": 210,
+     "withDarkSections": 0
+    },
+    {
+     "day": 72,
+     "withoutDeaths": 141786,
+     "withDeaths": 8,
+     "withoutDarkSections": 185.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 73,
+     "withoutDeaths": 143365,
+     "withDeaths": 8,
+     "withoutDarkSections": 181.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 74,
+     "withoutDeaths": 144978,
+     "withDeaths": 8,
+     "withoutDarkSections": 255,
+     "withDarkSections": 0
+    },
+    {
+     "day": 75,
+     "withoutDeaths": 148375,
+     "withDeaths": 8,
+     "withoutDarkSections": 262.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 76,
+     "withoutDeaths": 150683,
+     "withDeaths": 8,
+     "withoutDarkSections": 244.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 77,
+     "withoutDeaths": 153717,
+     "withDeaths": 8,
+     "withoutDarkSections": 191,
+     "withDarkSections": 0
+    },
+    {
+     "day": 78,
+     "withoutDeaths": 155580,
+     "withDeaths": 8,
+     "withoutDarkSections": 213,
+     "withDarkSections": 0
+    },
+    {
+     "day": 79,
+     "withoutDeaths": 156808,
+     "withDeaths": 8,
+     "withoutDarkSections": 225.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 80,
+     "withoutDeaths": 159172,
+     "withDeaths": 8,
+     "withoutDarkSections": 177.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 81,
+     "withoutDeaths": 161362,
+     "withDeaths": 8,
+     "withoutDarkSections": 271.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 82,
+     "withoutDeaths": 164012,
+     "withDeaths": 8,
+     "withoutDarkSections": 241,
+     "withDarkSections": 0
+    },
+    {
+     "day": 83,
+     "withoutDeaths": 166409,
+     "withDeaths": 8,
+     "withoutDarkSections": 303.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 84,
+     "withoutDeaths": 169008,
+     "withDeaths": 8,
+     "withoutDarkSections": 243.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 85,
+     "withoutDeaths": 171577,
+     "withDeaths": 8,
+     "withoutDarkSections": 313.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 86,
+     "withoutDeaths": 175664,
+     "withDeaths": 8,
+     "withoutDarkSections": 281.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 87,
+     "withoutDeaths": 179384,
+     "withDeaths": 8,
+     "withoutDarkSections": 236.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 88,
+     "withoutDeaths": 182177,
+     "withDeaths": 8,
+     "withoutDarkSections": 250.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 89,
+     "withoutDeaths": 184883,
+     "withDeaths": 8,
+     "withoutDarkSections": 253.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 90,
+     "withoutDeaths": 187991,
+     "withDeaths": 8,
+     "withoutDarkSections": 267,
+     "withDarkSections": 0
+    },
+    {
+     "day": 91,
+     "withoutDeaths": 190090,
+     "withDeaths": 8,
+     "withoutDarkSections": 195.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 92,
+     "withoutDeaths": 191216,
+     "withDeaths": 8,
+     "withoutDarkSections": 252.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 93,
+     "withoutDeaths": 194668,
+     "withDeaths": 8,
+     "withoutDarkSections": 331.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 94,
+     "withoutDeaths": 199866,
+     "withDeaths": 8,
+     "withoutDarkSections": 315,
+     "withDarkSections": 0
+    },
+    {
+     "day": 95,
+     "withoutDeaths": 205230,
+     "withDeaths": 8,
+     "withoutDarkSections": 307,
+     "withDarkSections": 0
+    },
+    {
+     "day": 96,
+     "withoutDeaths": 210272,
+     "withDeaths": 8,
+     "withoutDarkSections": 384.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 97,
+     "withoutDeaths": 215295,
+     "withDeaths": 8,
+     "withoutDarkSections": 237.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 98,
+     "withoutDeaths": 217837,
+     "withDeaths": 8,
+     "withoutDarkSections": 213.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 99,
+     "withoutDeaths": 220207,
+     "withDeaths": 8,
+     "withoutDarkSections": 259.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 100,
+     "withoutDeaths": 221966,
+     "withDeaths": 8,
+     "withoutDarkSections": 254.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 101,
+     "withoutDeaths": 224350,
+     "withDeaths": 8,
+     "withoutDarkSections": 270.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 102,
+     "withoutDeaths": 228099,
+     "withDeaths": 8,
+     "withoutDarkSections": 239.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 103,
+     "withoutDeaths": 231678,
+     "withDeaths": 8,
+     "withoutDarkSections": 200.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 104,
+     "withoutDeaths": 234898,
+     "withDeaths": 8,
+     "withoutDarkSections": 275.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 105,
+     "withoutDeaths": 237543,
+     "withDeaths": 8,
+     "withoutDarkSections": 270.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 106,
+     "withoutDeaths": 240756,
+     "withDeaths": 8,
+     "withoutDarkSections": 299.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 107,
+     "withoutDeaths": 243532,
+     "withDeaths": 8,
+     "withoutDarkSections": 226.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 108,
+     "withoutDeaths": 247159,
+     "withDeaths": 8,
+     "withoutDarkSections": 332.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 109,
+     "withoutDeaths": 252548,
+     "withDeaths": 8,
+     "withoutDarkSections": 257.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 110,
+     "withoutDeaths": 256379,
+     "withDeaths": 8,
+     "withoutDarkSections": 230.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 111,
+     "withoutDeaths": 259449,
+     "withDeaths": 8,
+     "withoutDarkSections": 300.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 112,
+     "withoutDeaths": 262697,
+     "withDeaths": 8,
+     "withoutDarkSections": 261.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 113,
+     "withoutDeaths": 265041,
+     "withDeaths": 8,
+     "withoutDarkSections": 324.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 114,
+     "withoutDeaths": 268073,
+     "withDeaths": 8,
+     "withoutDarkSections": 346.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 115,
+     "withoutDeaths": 271714,
+     "withDeaths": 8,
+     "withoutDarkSections": 336.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 116,
+     "withoutDeaths": 274871,
+     "withDeaths": 8,
+     "withoutDarkSections": 224.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 117,
+     "withoutDeaths": 277907,
+     "withDeaths": 8,
+     "withoutDarkSections": 292.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 118,
+     "withoutDeaths": 281475,
+     "withDeaths": 8,
+     "withoutDarkSections": 266.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 119,
+     "withoutDeaths": 285116,
+     "withDeaths": 8,
+     "withoutDarkSections": 232.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 120,
+     "withoutDeaths": 287520,
+     "withDeaths": 8,
+     "withoutDarkSections": 279.4,
+     "withDarkSections": 0
+    }
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "withoutDeaths": 291883,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 12,
+     "withoutDeaths": 307373,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 13,
+     "withoutDeaths": 304713,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 14,
+     "withoutDeaths": 275718,
+     "withDeaths": 12,
+     "withStable": true
+    },
+    {
+     "seed": 15,
+     "withoutDeaths": 302546,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 16,
+     "withoutDeaths": 267889,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 17,
+     "withoutDeaths": 279824,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 18,
+     "withoutDeaths": 276369,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 19,
+     "withoutDeaths": 326375,
+     "withDeaths": 65,
+     "withStable": true
+    },
+    {
+     "seed": 20,
+     "withoutDeaths": 242508,
+     "withDeaths": 0,
+     "withStable": true
+    }
+   ]
+  },
+  {
+   "id": "twoplants",
+   "name": "Plants 4 and 5 lost together, shaped like the real TVA and CPLE coal losses of Dec 23–26, 2022 (no storm, no demand surge)",
+   "summary": "Normal demand. From day 5, two plants lose output at once: Plant 4 in the shape of the TVA coal loss and Plant 5 in the shape of the Duke Energy Progress East (CPLE) coal loss in Winter Storm Elliott, with their real timing. At each worst hour the whole plant is offline; for about a day both are down together. After 4 days they return.",
+   "kind": "plant-loss",
+   "realData": "TVA and Duke Energy Progress East coal net generation, Dec 23–26, 2022 (EIA-930)",
+   "source": {
+    "label": "EIA-930 hourly grid data: TVA coal and CPLE coal, Winter Storm Elliott",
+    "detail": "Plant 4: TVA coal net generation, 2022-12-23 to 2022-12-26 (US Central time), below its mean of 2022-12-22 (3.81 GW). The loss peaks at 2.45 GW (64% of that level) at 2022-12-25 11:00 and is scaled so the peak = one whole plant. Only the shape is used: no storm, no demand surge. Plant 5: CPLE coal net generation, 2022-12-23 to 2022-12-26 (US Central time), below its mean of 2022-12-22 (2.50 GW). The loss peaks at 1.24 GW (50% of that level) at 2022-12-24 18:00 and is scaled so the peak = one whole plant. Only the shape is used: no storm, no demand surge.",
+    "url": "https://www.eia.gov/electricity/gridmonitor/"
+   },
+   "without": {
+    "deaths": {
+     "mean": 288711,
+     "lo": 268852,
+     "hi": 308570
+    },
+    "trips": {
+     "mean": 231.7,
+     "lo": 217.3,
+     "hi": 246.1
+    },
+    "darkMh": {
+     "mean": 1660.83,
+     "lo": 1607.32,
+     "hi": 1714.33
+    },
+    "stableShare": 0,
+    "endDay": {
+     "mean": 120,
+     "lo": 120,
+     "hi": 120
+    },
+    "warnedPct": 0
+   },
+   "with": {
+    "deaths": {
+     "mean": 212,
+     "lo": 0,
+     "hi": 633
+    },
+    "trips": {
+     "mean": 6.7,
+     "lo": 5.6,
+     "hi": 7.8
+    },
+    "darkMh": {
+     "mean": 20.93,
+     "lo": 12.71,
+     "hi": 29.14
+    },
+    "stableShare": 1,
+    "endDay": {
+     "mean": 20.3,
+     "lo": 18.8,
+     "hi": 21.8
+    },
+    "warnedPct": 35.8
+   },
+   "livesSaved": {
+    "mean": 288499,
+    "lo": 268702,
+    "hi": 308296
+   },
+   "daily": [
+    {
+     "day": 1,
+     "withoutDeaths": 0,
+     "withDeaths": 0,
+     "withoutDarkSections": 50.8,
+     "withDarkSections": 91.2
+    },
+    {
+     "day": 2,
+     "withoutDeaths": 93,
+     "withDeaths": 8,
+     "withoutDarkSections": 121.4,
+     "withDarkSections": 68.6
+    },
+    {
+     "day": 3,
+     "withoutDeaths": 128,
+     "withDeaths": 8,
+     "withoutDarkSections": 136.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 4,
+     "withoutDeaths": 886,
+     "withDeaths": 8,
+     "withoutDarkSections": 206.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 5,
+     "withoutDeaths": 2331,
+     "withDeaths": 8,
+     "withoutDarkSections": 378.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 6,
+     "withoutDeaths": 6830,
+     "withDeaths": 8,
+     "withoutDarkSections": 374.6,
+     "withDarkSections": 310.8
+    },
+    {
+     "day": 7,
+     "withoutDeaths": 14454,
+     "withDeaths": 138,
+     "withoutDarkSections": 367.1,
+     "withDarkSections": 101.5
+    },
+    {
+     "day": 8,
+     "withoutDeaths": 18535,
+     "withDeaths": 212,
+     "withoutDarkSections": 377.1,
+     "withDarkSections": 37.5
+    },
+    {
+     "day": 9,
+     "withoutDeaths": 21262,
+     "withDeaths": 212,
+     "withoutDarkSections": 213.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 10,
+     "withoutDeaths": 22694,
+     "withDeaths": 212,
+     "withoutDarkSections": 186.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 11,
+     "withoutDeaths": 23942,
+     "withDeaths": 212,
+     "withoutDarkSections": 203.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 12,
+     "withoutDeaths": 25440,
+     "withDeaths": 212,
+     "withoutDarkSections": 183.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 13,
+     "withoutDeaths": 25869,
+     "withDeaths": 212,
+     "withoutDarkSections": 121.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 14,
+     "withoutDeaths": 26368,
+     "withDeaths": 212,
+     "withoutDarkSections": 94.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 15,
+     "withoutDeaths": 26582,
+     "withDeaths": 212,
+     "withoutDarkSections": 207.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 16,
+     "withoutDeaths": 28717,
+     "withDeaths": 212,
+     "withoutDarkSections": 224.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 17,
+     "withoutDeaths": 31027,
+     "withDeaths": 212,
+     "withoutDarkSections": 189.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 18,
+     "withoutDeaths": 32926,
+     "withDeaths": 212,
+     "withoutDarkSections": 156.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 19,
+     "withoutDeaths": 34509,
+     "withDeaths": 212,
+     "withoutDarkSections": 224.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 20,
+     "withoutDeaths": 37157,
+     "withDeaths": 212,
+     "withoutDarkSections": 202.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 21,
+     "withoutDeaths": 38199,
+     "withDeaths": 212,
+     "withoutDarkSections": 218.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 22,
+     "withoutDeaths": 39472,
+     "withDeaths": 212,
+     "withoutDarkSections": 228,
+     "withDarkSections": 0
+    },
+    {
+     "day": 23,
+     "withoutDeaths": 41379,
+     "withDeaths": 212,
+     "withoutDarkSections": 279.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 24,
+     "withoutDeaths": 44075,
+     "withDeaths": 212,
+     "withoutDarkSections": 254.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 25,
+     "withoutDeaths": 45833,
+     "withDeaths": 212,
+     "withoutDarkSections": 272.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 26,
+     "withoutDeaths": 48207,
+     "withDeaths": 212,
+     "withoutDarkSections": 253.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 27,
+     "withoutDeaths": 50495,
+     "withDeaths": 212,
+     "withoutDarkSections": 274.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 28,
+     "withoutDeaths": 52148,
+     "withDeaths": 212,
+     "withoutDarkSections": 295.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 29,
+     "withoutDeaths": 53812,
+     "withDeaths": 212,
+     "withoutDarkSections": 300.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 30,
+     "withoutDeaths": 56270,
+     "withDeaths": 212,
+     "withoutDarkSections": 266,
+     "withDarkSections": 0
+    },
+    {
+     "day": 31,
+     "withoutDeaths": 57813,
+     "withDeaths": 212,
+     "withoutDarkSections": 172.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 32,
+     "withoutDeaths": 58950,
+     "withDeaths": 212,
+     "withoutDarkSections": 153.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 33,
+     "withoutDeaths": 59501,
+     "withDeaths": 212,
+     "withoutDarkSections": 162.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 34,
+     "withoutDeaths": 60512,
+     "withDeaths": 212,
+     "withoutDarkSections": 189,
+     "withDarkSections": 0
+    },
+    {
+     "day": 35,
+     "withoutDeaths": 62296,
+     "withDeaths": 212,
+     "withoutDarkSections": 270.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 36,
+     "withoutDeaths": 64074,
+     "withDeaths": 212,
+     "withoutDarkSections": 182.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 37,
+     "withoutDeaths": 64290,
+     "withDeaths": 212,
+     "withoutDarkSections": 208.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 38,
+     "withoutDeaths": 65701,
+     "withDeaths": 212,
+     "withoutDarkSections": 274.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 39,
+     "withoutDeaths": 66854,
+     "withDeaths": 212,
+     "withoutDarkSections": 182.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 40,
+     "withoutDeaths": 67391,
+     "withDeaths": 212,
+     "withoutDarkSections": 291.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 41,
+     "withoutDeaths": 70419,
+     "withDeaths": 212,
+     "withoutDarkSections": 260.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 42,
+     "withoutDeaths": 72739,
+     "withDeaths": 212,
+     "withoutDarkSections": 225,
+     "withDarkSections": 0
+    },
+    {
+     "day": 43,
+     "withoutDeaths": 75704,
+     "withDeaths": 212,
+     "withoutDarkSections": 259.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 44,
+     "withoutDeaths": 79146,
+     "withDeaths": 212,
+     "withoutDarkSections": 281.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 45,
+     "withoutDeaths": 82613,
+     "withDeaths": 212,
+     "withoutDarkSections": 254,
+     "withDarkSections": 0
+    },
+    {
+     "day": 46,
+     "withoutDeaths": 86299,
+     "withDeaths": 212,
+     "withoutDarkSections": 214.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 47,
+     "withoutDeaths": 89226,
+     "withDeaths": 212,
+     "withoutDarkSections": 184.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 48,
+     "withoutDeaths": 91193,
+     "withDeaths": 212,
+     "withoutDarkSections": 235.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 49,
+     "withoutDeaths": 93508,
+     "withDeaths": 212,
+     "withoutDarkSections": 310.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 50,
+     "withoutDeaths": 97839,
+     "withDeaths": 212,
+     "withoutDarkSections": 309.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 51,
+     "withoutDeaths": 102006,
+     "withDeaths": 212,
+     "withoutDarkSections": 207.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 52,
+     "withoutDeaths": 105095,
+     "withDeaths": 212,
+     "withoutDarkSections": 271.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 53,
+     "withoutDeaths": 108563,
+     "withDeaths": 212,
+     "withoutDarkSections": 260.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 54,
+     "withoutDeaths": 111708,
+     "withDeaths": 212,
+     "withoutDarkSections": 280.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 55,
+     "withoutDeaths": 113687,
+     "withDeaths": 212,
+     "withoutDarkSections": 258.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 56,
+     "withoutDeaths": 115091,
+     "withDeaths": 212,
+     "withoutDarkSections": 201.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 57,
+     "withoutDeaths": 116208,
+     "withDeaths": 212,
+     "withoutDarkSections": 191.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 58,
+     "withoutDeaths": 117263,
+     "withDeaths": 212,
+     "withoutDarkSections": 192,
+     "withDarkSections": 0
+    },
+    {
+     "day": 59,
+     "withoutDeaths": 119154,
+     "withDeaths": 212,
+     "withoutDarkSections": 281,
+     "withDarkSections": 0
+    },
+    {
+     "day": 60,
+     "withoutDeaths": 122023,
+     "withDeaths": 212,
+     "withoutDarkSections": 262.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 61,
+     "withoutDeaths": 125513,
+     "withDeaths": 212,
+     "withoutDarkSections": 263.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 62,
+     "withoutDeaths": 129401,
+     "withDeaths": 212,
+     "withoutDarkSections": 283.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 63,
+     "withoutDeaths": 131153,
+     "withDeaths": 212,
+     "withoutDarkSections": 255.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 64,
+     "withoutDeaths": 132441,
+     "withDeaths": 212,
+     "withoutDarkSections": 256.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 65,
+     "withoutDeaths": 134492,
+     "withDeaths": 212,
+     "withoutDarkSections": 290.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 66,
+     "withoutDeaths": 138433,
+     "withDeaths": 212,
+     "withoutDarkSections": 290.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 67,
+     "withoutDeaths": 141365,
+     "withDeaths": 212,
+     "withoutDarkSections": 270.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 68,
+     "withoutDeaths": 143349,
+     "withDeaths": 212,
+     "withoutDarkSections": 239.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 69,
+     "withoutDeaths": 144590,
+     "withDeaths": 212,
+     "withoutDarkSections": 204.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 70,
+     "withoutDeaths": 145781,
+     "withDeaths": 212,
+     "withoutDarkSections": 193.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 71,
+     "withoutDeaths": 147514,
+     "withDeaths": 212,
+     "withoutDarkSections": 217.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 72,
+     "withoutDeaths": 150067,
+     "withDeaths": 212,
+     "withoutDarkSections": 207.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 73,
+     "withoutDeaths": 152296,
+     "withDeaths": 212,
+     "withoutDarkSections": 237.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 74,
+     "withoutDeaths": 154144,
+     "withDeaths": 212,
+     "withoutDarkSections": 195.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 75,
+     "withoutDeaths": 156515,
+     "withDeaths": 212,
+     "withoutDarkSections": 275.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 76,
+     "withoutDeaths": 159657,
+     "withDeaths": 212,
+     "withoutDarkSections": 247.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 77,
+     "withoutDeaths": 161714,
+     "withDeaths": 212,
+     "withoutDarkSections": 177.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 78,
+     "withoutDeaths": 164029,
+     "withDeaths": 212,
+     "withoutDarkSections": 260.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 79,
+     "withoutDeaths": 165817,
+     "withDeaths": 212,
+     "withoutDarkSections": 192.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 80,
+     "withoutDeaths": 167249,
+     "withDeaths": 212,
+     "withoutDarkSections": 194.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 81,
+     "withoutDeaths": 169241,
+     "withDeaths": 212,
+     "withoutDarkSections": 183.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 82,
+     "withoutDeaths": 171304,
+     "withDeaths": 212,
+     "withoutDarkSections": 206.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 83,
+     "withoutDeaths": 173583,
+     "withDeaths": 212,
+     "withoutDarkSections": 288.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 84,
+     "withoutDeaths": 175779,
+     "withDeaths": 212,
+     "withoutDarkSections": 294.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 85,
+     "withoutDeaths": 178374,
+     "withDeaths": 212,
+     "withoutDarkSections": 288.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 86,
+     "withoutDeaths": 182264,
+     "withDeaths": 212,
+     "withoutDarkSections": 291.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 87,
+     "withoutDeaths": 185965,
+     "withDeaths": 212,
+     "withoutDarkSections": 232.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 88,
+     "withoutDeaths": 189219,
+     "withDeaths": 212,
+     "withoutDarkSections": 222.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 89,
+     "withoutDeaths": 191726,
+     "withDeaths": 212,
+     "withoutDarkSections": 243.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 90,
+     "withoutDeaths": 195062,
+     "withDeaths": 212,
+     "withoutDarkSections": 326.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 91,
+     "withoutDeaths": 197632,
+     "withDeaths": 212,
+     "withoutDarkSections": 225.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 92,
+     "withoutDeaths": 198784,
+     "withDeaths": 212,
+     "withoutDarkSections": 169.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 93,
+     "withoutDeaths": 200806,
+     "withDeaths": 212,
+     "withoutDarkSections": 265.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 94,
+     "withoutDeaths": 205200,
+     "withDeaths": 212,
+     "withoutDarkSections": 320,
+     "withDarkSections": 0
+    },
+    {
+     "day": 95,
+     "withoutDeaths": 210131,
+     "withDeaths": 212,
+     "withoutDarkSections": 305,
+     "withDarkSections": 0
+    },
+    {
+     "day": 96,
+     "withoutDeaths": 215391,
+     "withDeaths": 212,
+     "withoutDarkSections": 333.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 97,
+     "withoutDeaths": 220410,
+     "withDeaths": 212,
+     "withoutDarkSections": 336.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 98,
+     "withoutDeaths": 224182,
+     "withDeaths": 212,
+     "withoutDarkSections": 197.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 99,
+     "withoutDeaths": 225905,
+     "withDeaths": 212,
+     "withoutDarkSections": 219,
+     "withDarkSections": 0
+    },
+    {
+     "day": 100,
+     "withoutDeaths": 227717,
+     "withDeaths": 212,
+     "withoutDarkSections": 323.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 101,
+     "withoutDeaths": 230643,
+     "withDeaths": 212,
+     "withoutDarkSections": 228.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 102,
+     "withoutDeaths": 233211,
+     "withDeaths": 212,
+     "withoutDarkSections": 292.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 103,
+     "withoutDeaths": 236335,
+     "withDeaths": 212,
+     "withoutDarkSections": 217.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 104,
+     "withoutDeaths": 238971,
+     "withDeaths": 212,
+     "withoutDarkSections": 207.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 105,
+     "withoutDeaths": 241573,
+     "withDeaths": 212,
+     "withoutDarkSections": 264.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 106,
+     "withoutDeaths": 244346,
+     "withDeaths": 212,
+     "withoutDarkSections": 267.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 107,
+     "withoutDeaths": 246702,
+     "withDeaths": 212,
+     "withoutDarkSections": 234.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 108,
+     "withoutDeaths": 249245,
+     "withDeaths": 212,
+     "withoutDarkSections": 290.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 109,
+     "withoutDeaths": 253596,
+     "withDeaths": 212,
+     "withoutDarkSections": 322.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 110,
+     "withoutDeaths": 258370,
+     "withDeaths": 212,
+     "withoutDarkSections": 247.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 111,
+     "withoutDeaths": 261892,
+     "withDeaths": 212,
+     "withoutDarkSections": 265,
+     "withDarkSections": 0
+    },
+    {
+     "day": 112,
+     "withoutDeaths": 264666,
+     "withDeaths": 212,
+     "withoutDarkSections": 290.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 113,
+     "withoutDeaths": 267825,
+     "withDeaths": 212,
+     "withoutDarkSections": 244.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 114,
+     "withoutDeaths": 270459,
+     "withDeaths": 212,
+     "withoutDarkSections": 311.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 115,
+     "withoutDeaths": 273719,
+     "withDeaths": 212,
+     "withoutDarkSections": 301.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 116,
+     "withoutDeaths": 276400,
+     "withDeaths": 212,
+     "withoutDarkSections": 297.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 117,
+     "withoutDeaths": 279682,
+     "withDeaths": 212,
+     "withoutDarkSections": 284.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 118,
+     "withoutDeaths": 282811,
+     "withDeaths": 212,
+     "withoutDarkSections": 268,
+     "withDarkSections": 0
+    },
+    {
+     "day": 119,
+     "withoutDeaths": 285776,
+     "withDeaths": 212,
+     "withoutDarkSections": 244.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 120,
+     "withoutDeaths": 288711,
+     "withDeaths": 212,
+     "withoutDarkSections": 216.8,
+     "withDarkSections": 0
+    }
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "withoutDeaths": 295399,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 12,
+     "withoutDeaths": 305686,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 13,
+     "withoutDeaths": 299608,
+     "withDeaths": 1879,
+     "withStable": true
+    },
+    {
+     "seed": 14,
+     "withoutDeaths": 272108,
+     "withDeaths": 12,
+     "withStable": true
+    },
+    {
+     "seed": 15,
+     "withoutDeaths": 316128,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 16,
+     "withoutDeaths": 263941,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 17,
+     "withoutDeaths": 272977,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 18,
+     "withoutDeaths": 288246,
+     "withDeaths": 165,
+     "withStable": true
+    },
+    {
+     "seed": 19,
+     "withoutDeaths": 334400,
+     "withDeaths": 65,
+     "withStable": true
+    },
+    {
+     "seed": 20,
+     "withoutDeaths": 238618,
+     "withDeaths": 1,
+     "withStable": true
+    }
+   ]
+  },
+  {
+   "id": "elliott",
+   "name": "Plant 4 loss shaped like the real TVA coal loss of Dec 23–26, 2022 (no storm, no demand surge)",
+   "summary": "Normal demand. From day 5, Plant 4 loses output hour by hour in the same shape as the coal output the Tennessee Valley Authority lost in Winter Storm Elliott, while its demand set a record. At the worst hour the whole plant is offline. After 4 days it returns.",
+   "kind": "plant-loss",
+   "realData": "TVA coal net generation, Winter Storm Elliott, Dec 23–26, 2022 (EIA-930)",
+   "source": {
+    "label": "EIA-930 hourly grid data: Tennessee Valley Authority (TVA) coal, Winter Storm Elliott",
+    "detail": "TVA coal net generation, 2022-12-23 to 2022-12-26 (US Central time), below its mean of 2022-12-22 (3.81 GW). The loss peaks at 2.45 GW (64% of that level) at 2022-12-25 11:00 and is scaled so the peak = one whole plant. Only the shape is used: no storm, no demand surge.",
+    "url": "https://www.eia.gov/electricity/gridmonitor/"
+   },
+   "without": {
+    "deaths": {
+     "mean": 284851,
+     "lo": 266250,
+     "hi": 303452
+    },
+    "trips": {
+     "mean": 227.9,
+     "lo": 213.4,
+     "hi": 242.4
+    },
+    "darkMh": {
+     "mean": 1638.31,
+     "lo": 1581.9,
+     "hi": 1694.71
+    },
+    "stableShare": 0,
+    "endDay": {
+     "mean": 120,
+     "lo": 120,
+     "hi": 120
+    },
+    "warnedPct": 0
+   },
+   "with": {
+    "deaths": {
+     "mean": 8,
+     "lo": 0,
+     "hi": 22
+    },
+    "trips": {
+     "mean": 1.8,
+     "lo": 0,
+     "hi": 3.9
+    },
+    "darkMh": {
+     "mean": 4.71,
+     "lo": 0,
+     "hi": 10.06
+    },
+    "stableShare": 1,
+    "endDay": {
+     "mean": 20.2,
+     "lo": 18.8,
+     "hi": 21.6
+    },
+    "warnedPct": 51.7
+   },
+   "livesSaved": {
+    "mean": 284843,
+    "lo": 266250,
+    "hi": 303436
+   },
+   "daily": [
+    {
+     "day": 1,
+     "withoutDeaths": 0,
+     "withDeaths": 0,
+     "withoutDarkSections": 50.8,
+     "withDarkSections": 91.2
+    },
+    {
+     "day": 2,
+     "withoutDeaths": 93,
+     "withDeaths": 8,
+     "withoutDarkSections": 121.4,
+     "withDarkSections": 68.6
+    },
+    {
+     "day": 3,
+     "withoutDeaths": 128,
+     "withDeaths": 8,
+     "withoutDarkSections": 136.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 4,
+     "withoutDeaths": 886,
+     "withDeaths": 8,
+     "withoutDarkSections": 206.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 5,
+     "withoutDeaths": 2275,
+     "withDeaths": 8,
+     "withoutDarkSections": 311.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 6,
+     "withoutDeaths": 4747,
+     "withDeaths": 8,
+     "withoutDarkSections": 369,
+     "withDarkSections": 0
+    },
+    {
+     "day": 7,
+     "withoutDeaths": 8482,
+     "withDeaths": 8,
+     "withoutDarkSections": 330.7,
+     "withDarkSections": 42.3
+    },
+    {
+     "day": 8,
+     "withoutDeaths": 12013,
+     "withDeaths": 8,
+     "withoutDarkSections": 269.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 9,
+     "withoutDeaths": 13069,
+     "withDeaths": 8,
+     "withoutDarkSections": 181.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 10,
+     "withoutDeaths": 13913,
+     "withDeaths": 8,
+     "withoutDarkSections": 200.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 11,
+     "withoutDeaths": 15484,
+     "withDeaths": 8,
+     "withoutDarkSections": 186.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 12,
+     "withoutDeaths": 16744,
+     "withDeaths": 8,
+     "withoutDarkSections": 116.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 13,
+     "withoutDeaths": 16974,
+     "withDeaths": 8,
+     "withoutDarkSections": 68,
+     "withDarkSections": 0
+    },
+    {
+     "day": 14,
+     "withoutDeaths": 16975,
+     "withDeaths": 8,
+     "withoutDarkSections": 187.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 15,
+     "withoutDeaths": 18234,
+     "withDeaths": 8,
+     "withoutDarkSections": 204.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 16,
+     "withoutDeaths": 20502,
+     "withDeaths": 8,
+     "withoutDarkSections": 181.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 17,
+     "withoutDeaths": 21951,
+     "withDeaths": 8,
+     "withoutDarkSections": 244.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 18,
+     "withoutDeaths": 24067,
+     "withDeaths": 8,
+     "withoutDarkSections": 219,
+     "withDarkSections": 0
+    },
+    {
+     "day": 19,
+     "withoutDeaths": 25552,
+     "withDeaths": 8,
+     "withoutDarkSections": 153.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 20,
+     "withoutDeaths": 26501,
+     "withDeaths": 8,
+     "withoutDarkSections": 169.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 21,
+     "withoutDeaths": 27515,
+     "withDeaths": 8,
+     "withoutDarkSections": 257.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 22,
+     "withoutDeaths": 28825,
+     "withDeaths": 8,
+     "withoutDarkSections": 269.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 23,
+     "withoutDeaths": 32180,
+     "withDeaths": 8,
+     "withoutDarkSections": 257.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 24,
+     "withoutDeaths": 33452,
+     "withDeaths": 8,
+     "withoutDarkSections": 302,
+     "withDarkSections": 0
+    },
+    {
+     "day": 25,
+     "withoutDeaths": 35985,
+     "withDeaths": 8,
+     "withoutDarkSections": 252.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 26,
+     "withoutDeaths": 37422,
+     "withDeaths": 8,
+     "withoutDarkSections": 232.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 27,
+     "withoutDeaths": 38590,
+     "withDeaths": 8,
+     "withoutDarkSections": 254.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 28,
+     "withoutDeaths": 39978,
+     "withDeaths": 8,
+     "withoutDarkSections": 309.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 29,
+     "withoutDeaths": 42476,
+     "withDeaths": 8,
+     "withoutDarkSections": 257.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 30,
+     "withoutDeaths": 44361,
+     "withDeaths": 8,
+     "withoutDarkSections": 157.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 31,
+     "withoutDeaths": 45356,
+     "withDeaths": 8,
+     "withoutDarkSections": 206.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 32,
+     "withoutDeaths": 46883,
+     "withDeaths": 8,
+     "withoutDarkSections": 187.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 33,
+     "withoutDeaths": 48642,
+     "withDeaths": 8,
+     "withoutDarkSections": 206,
+     "withDarkSections": 0
+    },
+    {
+     "day": 34,
+     "withoutDeaths": 49377,
+     "withDeaths": 8,
+     "withoutDarkSections": 270.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 35,
+     "withoutDeaths": 51236,
+     "withDeaths": 8,
+     "withoutDarkSections": 249.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 36,
+     "withoutDeaths": 53084,
+     "withDeaths": 8,
+     "withoutDarkSections": 202.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 37,
+     "withoutDeaths": 54208,
+     "withDeaths": 8,
+     "withoutDarkSections": 239.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 38,
+     "withoutDeaths": 54853,
+     "withDeaths": 8,
+     "withoutDarkSections": 220,
+     "withDarkSections": 0
+    },
+    {
+     "day": 39,
+     "withoutDeaths": 56376,
+     "withDeaths": 8,
+     "withoutDarkSections": 247.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 40,
+     "withoutDeaths": 59834,
+     "withDeaths": 8,
+     "withoutDarkSections": 308.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 41,
+     "withoutDeaths": 62511,
+     "withDeaths": 8,
+     "withoutDarkSections": 186.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 42,
+     "withoutDeaths": 65215,
+     "withDeaths": 8,
+     "withoutDarkSections": 245.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 43,
+     "withoutDeaths": 68314,
+     "withDeaths": 8,
+     "withoutDarkSections": 272.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 44,
+     "withoutDeaths": 71607,
+     "withDeaths": 8,
+     "withoutDarkSections": 222.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 45,
+     "withoutDeaths": 74983,
+     "withDeaths": 8,
+     "withoutDarkSections": 247.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 46,
+     "withoutDeaths": 78838,
+     "withDeaths": 8,
+     "withoutDarkSections": 226.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 47,
+     "withoutDeaths": 80616,
+     "withDeaths": 8,
+     "withoutDarkSections": 245,
+     "withDarkSections": 0
+    },
+    {
+     "day": 48,
+     "withoutDeaths": 83434,
+     "withDeaths": 8,
+     "withoutDarkSections": 304.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 49,
+     "withoutDeaths": 87654,
+     "withDeaths": 8,
+     "withoutDarkSections": 291.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 50,
+     "withoutDeaths": 91894,
+     "withDeaths": 8,
+     "withoutDarkSections": 250,
+     "withDarkSections": 0
+    },
+    {
+     "day": 51,
+     "withoutDeaths": 94457,
+     "withDeaths": 8,
+     "withoutDarkSections": 217.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 52,
+     "withoutDeaths": 97110,
+     "withDeaths": 8,
+     "withoutDarkSections": 307.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 53,
+     "withoutDeaths": 100685,
+     "withDeaths": 8,
+     "withoutDarkSections": 279.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 54,
+     "withoutDeaths": 103422,
+     "withDeaths": 8,
+     "withoutDarkSections": 265.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 55,
+     "withoutDeaths": 105066,
+     "withDeaths": 8,
+     "withoutDarkSections": 265,
+     "withDarkSections": 0
+    },
+    {
+     "day": 56,
+     "withoutDeaths": 106342,
+     "withDeaths": 8,
+     "withoutDarkSections": 247.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 57,
+     "withoutDeaths": 107953,
+     "withDeaths": 8,
+     "withoutDarkSections": 156.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 58,
+     "withoutDeaths": 109051,
+     "withDeaths": 8,
+     "withoutDarkSections": 253.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 59,
+     "withoutDeaths": 112001,
+     "withDeaths": 8,
+     "withoutDarkSections": 296.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 60,
+     "withoutDeaths": 116011,
+     "withDeaths": 8,
+     "withoutDarkSections": 306,
+     "withDarkSections": 0
+    },
+    {
+     "day": 61,
+     "withoutDeaths": 119407,
+     "withDeaths": 8,
+     "withoutDarkSections": 251.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 62,
+     "withoutDeaths": 122206,
+     "withDeaths": 8,
+     "withoutDarkSections": 301.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 63,
+     "withoutDeaths": 124321,
+     "withDeaths": 8,
+     "withoutDarkSections": 204.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 64,
+     "withoutDeaths": 124851,
+     "withDeaths": 8,
+     "withoutDarkSections": 230.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 65,
+     "withoutDeaths": 127220,
+     "withDeaths": 8,
+     "withoutDarkSections": 279.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 66,
+     "withoutDeaths": 130647,
+     "withDeaths": 8,
+     "withoutDarkSections": 251.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 67,
+     "withoutDeaths": 133567,
+     "withDeaths": 8,
+     "withoutDarkSections": 268.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 68,
+     "withoutDeaths": 136185,
+     "withDeaths": 8,
+     "withoutDarkSections": 223.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 69,
+     "withoutDeaths": 137925,
+     "withDeaths": 8,
+     "withoutDarkSections": 192,
+     "withDarkSections": 0
+    },
+    {
+     "day": 70,
+     "withoutDeaths": 139739,
+     "withDeaths": 8,
+     "withoutDarkSections": 171.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 71,
+     "withoutDeaths": 141832,
+     "withDeaths": 8,
+     "withoutDarkSections": 173,
+     "withDarkSections": 0
+    },
+    {
+     "day": 72,
+     "withoutDeaths": 143113,
+     "withDeaths": 8,
+     "withoutDarkSections": 211.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 73,
+     "withoutDeaths": 144942,
+     "withDeaths": 8,
+     "withoutDarkSections": 229.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 74,
+     "withoutDeaths": 147229,
+     "withDeaths": 8,
+     "withoutDarkSections": 230.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 75,
+     "withoutDeaths": 149382,
+     "withDeaths": 8,
+     "withoutDarkSections": 264.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 76,
+     "withoutDeaths": 152169,
+     "withDeaths": 8,
+     "withoutDarkSections": 219.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 77,
+     "withoutDeaths": 154786,
+     "withDeaths": 8,
+     "withoutDarkSections": 200.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 78,
+     "withoutDeaths": 156460,
+     "withDeaths": 8,
+     "withoutDarkSections": 221.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 79,
+     "withoutDeaths": 157814,
+     "withDeaths": 8,
+     "withoutDarkSections": 198.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 80,
+     "withoutDeaths": 159571,
+     "withDeaths": 8,
+     "withoutDarkSections": 217.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 81,
+     "withoutDeaths": 161527,
+     "withDeaths": 8,
+     "withoutDarkSections": 218.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 82,
+     "withoutDeaths": 163881,
+     "withDeaths": 8,
+     "withoutDarkSections": 283.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 83,
+     "withoutDeaths": 166726,
+     "withDeaths": 8,
+     "withoutDarkSections": 308,
+     "withDarkSections": 0
+    },
+    {
+     "day": 84,
+     "withoutDeaths": 169621,
+     "withDeaths": 8,
+     "withoutDarkSections": 265.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 85,
+     "withoutDeaths": 172807,
+     "withDeaths": 8,
+     "withoutDarkSections": 306.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 86,
+     "withoutDeaths": 176857,
+     "withDeaths": 8,
+     "withoutDarkSections": 220.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 87,
+     "withoutDeaths": 179455,
+     "withDeaths": 8,
+     "withoutDarkSections": 264.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 88,
+     "withoutDeaths": 182658,
+     "withDeaths": 8,
+     "withoutDarkSections": 229.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 89,
+     "withoutDeaths": 185191,
+     "withDeaths": 8,
+     "withoutDarkSections": 261.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 90,
+     "withoutDeaths": 188687,
+     "withDeaths": 8,
+     "withoutDarkSections": 250.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 91,
+     "withoutDeaths": 189973,
+     "withDeaths": 8,
+     "withoutDarkSections": 183.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 92,
+     "withoutDeaths": 191411,
+     "withDeaths": 8,
+     "withoutDarkSections": 314,
+     "withDarkSections": 0
+    },
+    {
+     "day": 93,
+     "withoutDeaths": 195166,
+     "withDeaths": 8,
+     "withoutDarkSections": 320.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 94,
+     "withoutDeaths": 200252,
+     "withDeaths": 8,
+     "withoutDarkSections": 309.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 95,
+     "withoutDeaths": 205258,
+     "withDeaths": 8,
+     "withoutDarkSections": 298.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 96,
+     "withoutDeaths": 209611,
+     "withDeaths": 8,
+     "withoutDarkSections": 315.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 97,
+     "withoutDeaths": 214185,
+     "withDeaths": 8,
+     "withoutDarkSections": 283,
+     "withDarkSections": 0
+    },
+    {
+     "day": 98,
+     "withoutDeaths": 217266,
+     "withDeaths": 8,
+     "withoutDarkSections": 242.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 99,
+     "withoutDeaths": 218672,
+     "withDeaths": 8,
+     "withoutDarkSections": 260.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 100,
+     "withoutDeaths": 221460,
+     "withDeaths": 8,
+     "withoutDarkSections": 275.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 101,
+     "withoutDeaths": 224803,
+     "withDeaths": 8,
+     "withoutDarkSections": 280.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 102,
+     "withoutDeaths": 228307,
+     "withDeaths": 8,
+     "withoutDarkSections": 239.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 103,
+     "withoutDeaths": 231726,
+     "withDeaths": 8,
+     "withoutDarkSections": 224.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 104,
+     "withoutDeaths": 234489,
+     "withDeaths": 8,
+     "withoutDarkSections": 193.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 105,
+     "withoutDeaths": 236670,
+     "withDeaths": 8,
+     "withoutDarkSections": 251.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 106,
+     "withoutDeaths": 239693,
+     "withDeaths": 8,
+     "withoutDarkSections": 247.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 107,
+     "withoutDeaths": 242441,
+     "withDeaths": 8,
+     "withoutDarkSections": 280.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 108,
+     "withoutDeaths": 246398,
+     "withDeaths": 8,
+     "withoutDarkSections": 330.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 109,
+     "withoutDeaths": 251486,
+     "withDeaths": 8,
+     "withoutDarkSections": 236.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 110,
+     "withoutDeaths": 255134,
+     "withDeaths": 8,
+     "withoutDarkSections": 234.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 111,
+     "withoutDeaths": 257676,
+     "withDeaths": 8,
+     "withoutDarkSections": 251,
+     "withDarkSections": 0
+    },
+    {
+     "day": 112,
+     "withoutDeaths": 260106,
+     "withDeaths": 8,
+     "withoutDarkSections": 287.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 113,
+     "withoutDeaths": 263216,
+     "withDeaths": 8,
+     "withoutDarkSections": 339,
+     "withDarkSections": 0
+    },
+    {
+     "day": 114,
+     "withoutDeaths": 266525,
+     "withDeaths": 8,
+     "withoutDarkSections": 325.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 115,
+     "withoutDeaths": 269531,
+     "withDeaths": 8,
+     "withoutDarkSections": 255,
+     "withDarkSections": 0
+    },
+    {
+     "day": 116,
+     "withoutDeaths": 272464,
+     "withDeaths": 8,
+     "withoutDarkSections": 280.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 117,
+     "withoutDeaths": 275582,
+     "withDeaths": 8,
+     "withoutDarkSections": 298.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 118,
+     "withoutDeaths": 279171,
+     "withDeaths": 8,
+     "withoutDarkSections": 252,
+     "withDarkSections": 0
+    },
+    {
+     "day": 119,
+     "withoutDeaths": 282363,
+     "withDeaths": 8,
+     "withoutDarkSections": 238.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 120,
+     "withoutDeaths": 284851,
+     "withDeaths": 8,
+     "withoutDarkSections": 282.4,
+     "withDarkSections": 0
+    }
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "withoutDeaths": 273612,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 12,
+     "withoutDeaths": 304972,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 13,
+     "withoutDeaths": 299805,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 14,
+     "withoutDeaths": 278111,
+     "withDeaths": 12,
+     "withStable": true
+    },
+    {
+     "seed": 15,
+     "withoutDeaths": 303626,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 16,
+     "withoutDeaths": 264141,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 17,
+     "withoutDeaths": 274550,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 18,
+     "withoutDeaths": 287259,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 19,
+     "withoutDeaths": 327942,
+     "withDeaths": 65,
+     "withStable": true
+    },
+    {
+     "seed": 20,
+     "withoutDeaths": 234494,
+     "withDeaths": 0,
+     "withStable": true
+    }
+   ]
+  },
+  {
+   "id": "baseline",
+   "name": "Baseline (real weekly demand)",
+   "summary": "Normal plants. Demand follows the real hourly and weekly cycle of calm ERCOT weeks in 2023. Plants still age, and the Hollow runs close to its limit, so overloaded plants can still trip.",
+   "kind": "baseline",
+   "realData": "ERCOT hourly demand, 36 calm weeks of 2023 (EIA-930)",
+   "source": {
+    "label": "EIA-930 hourly grid data, ERCOT (2023 calm weeks; Feb 2021 generation loss)",
+    "detail": "Demand: ERCOT hourly demand, 2023, US Central time. 36 of 52 Monday-to-Sunday weeks are calm (no data gaps, mean within 5% and peak within 8% of the season, generation within 5% of demand, no hourly jump over 12%, no federal holiday). Each week is divided by its mean, then averaged: 168 multipliers, mean 1. Plant loss: ERCOT net generation, Feb 15-18, 2021, below its mean of Feb 14 (61.2 GW). The loss peaks at 19.5 GW (2021-02-17 01:00) and is scaled so the peak = one whole plant. No demand surge is applied.",
+    "url": "https://www.eia.gov/electricity/gridmonitor/"
+   },
+   "without": {
+    "deaths": {
+     "mean": 281493,
+     "lo": 264633,
+     "hi": 298354
+    },
+    "trips": {
+     "mean": 220.9,
+     "lo": 204.6,
+     "hi": 237.2
+    },
+    "darkMh": {
+     "mean": 1617.29,
+     "lo": 1554.53,
+     "hi": 1680.04
+    },
+    "stableShare": 0,
+    "endDay": {
+     "mean": 120,
+     "lo": 120,
+     "hi": 120
+    },
+    "warnedPct": 0
+   },
+   "with": {
+    "deaths": {
+     "mean": 8,
+     "lo": 0,
+     "hi": 22
+    },
+    "trips": {
+     "mean": 1.8,
+     "lo": 0,
+     "hi": 3.9
+    },
+    "darkMh": {
+     "mean": 4.97,
+     "lo": 0,
+     "hi": 10.4
+    },
+    "stableShare": 1,
+    "endDay": {
+     "mean": 24.2,
+     "lo": 21.3,
+     "hi": 27.1
+    },
+    "warnedPct": 49
+   },
+   "livesSaved": {
+    "mean": 281486,
+    "lo": 264632,
+    "hi": 298339
+   },
+   "daily": [
+    {
+     "day": 1,
+     "withoutDeaths": 0,
+     "withDeaths": 0,
+     "withoutDarkSections": 50.8,
+     "withDarkSections": 91.2
+    },
+    {
+     "day": 2,
+     "withoutDeaths": 93,
+     "withDeaths": 8,
+     "withoutDarkSections": 121.4,
+     "withDarkSections": 68.6
+    },
+    {
+     "day": 3,
+     "withoutDeaths": 128,
+     "withDeaths": 8,
+     "withoutDarkSections": 136.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 4,
+     "withoutDeaths": 886,
+     "withDeaths": 8,
+     "withoutDarkSections": 206.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 5,
+     "withoutDeaths": 2190,
+     "withDeaths": 8,
+     "withoutDarkSections": 172.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 6,
+     "withoutDeaths": 3608,
+     "withDeaths": 8,
+     "withoutDarkSections": 198.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 7,
+     "withoutDeaths": 5016,
+     "withDeaths": 8,
+     "withoutDarkSections": 213.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 8,
+     "withoutDeaths": 5449,
+     "withDeaths": 8,
+     "withoutDarkSections": 221.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 9,
+     "withoutDeaths": 6552,
+     "withDeaths": 8,
+     "withoutDarkSections": 186,
+     "withDarkSections": 0
+    },
+    {
+     "day": 10,
+     "withoutDeaths": 7445,
+     "withDeaths": 8,
+     "withoutDarkSections": 236.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 11,
+     "withoutDeaths": 8656,
+     "withDeaths": 8,
+     "withoutDarkSections": 155.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 12,
+     "withoutDeaths": 9943,
+     "withDeaths": 8,
+     "withoutDarkSections": 173.2,
+     "withDarkSections": 43.2
+    },
+    {
+     "day": 13,
+     "withoutDeaths": 11062,
+     "withDeaths": 8,
+     "withoutDarkSections": 109.6,
+     "withDarkSections": 0.6
+    },
+    {
+     "day": 14,
+     "withoutDeaths": 11406,
+     "withDeaths": 8,
+     "withoutDarkSections": 170,
+     "withDarkSections": 0
+    },
+    {
+     "day": 15,
+     "withoutDeaths": 12778,
+     "withDeaths": 8,
+     "withoutDarkSections": 233,
+     "withDarkSections": 0
+    },
+    {
+     "day": 16,
+     "withoutDeaths": 15705,
+     "withDeaths": 8,
+     "withoutDarkSections": 155.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 17,
+     "withoutDeaths": 17717,
+     "withDeaths": 8,
+     "withoutDarkSections": 206,
+     "withDarkSections": 0
+    },
+    {
+     "day": 18,
+     "withoutDeaths": 19919,
+     "withDeaths": 8,
+     "withoutDarkSections": 240.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 19,
+     "withoutDeaths": 21415,
+     "withDeaths": 8,
+     "withoutDarkSections": 192.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 20,
+     "withoutDeaths": 23015,
+     "withDeaths": 8,
+     "withoutDarkSections": 160.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 21,
+     "withoutDeaths": 24145,
+     "withDeaths": 8,
+     "withoutDarkSections": 250.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 22,
+     "withoutDeaths": 25213,
+     "withDeaths": 8,
+     "withoutDarkSections": 291.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 23,
+     "withoutDeaths": 28167,
+     "withDeaths": 8,
+     "withoutDarkSections": 277.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 24,
+     "withoutDeaths": 30332,
+     "withDeaths": 8,
+     "withoutDarkSections": 279.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 25,
+     "withoutDeaths": 32216,
+     "withDeaths": 8,
+     "withoutDarkSections": 245,
+     "withDarkSections": 0
+    },
+    {
+     "day": 26,
+     "withoutDeaths": 35305,
+     "withDeaths": 8,
+     "withoutDarkSections": 264.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 27,
+     "withoutDeaths": 37024,
+     "withDeaths": 8,
+     "withoutDarkSections": 271.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 28,
+     "withoutDeaths": 38066,
+     "withDeaths": 8,
+     "withoutDarkSections": 235.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 29,
+     "withoutDeaths": 39686,
+     "withDeaths": 8,
+     "withoutDarkSections": 318.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 30,
+     "withoutDeaths": 42828,
+     "withDeaths": 8,
+     "withoutDarkSections": 265.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 31,
+     "withoutDeaths": 44570,
+     "withDeaths": 8,
+     "withoutDarkSections": 141,
+     "withDarkSections": 0
+    },
+    {
+     "day": 32,
+     "withoutDeaths": 45020,
+     "withDeaths": 8,
+     "withoutDarkSections": 178.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 33,
+     "withoutDeaths": 46283,
+     "withDeaths": 8,
+     "withoutDarkSections": 152.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 34,
+     "withoutDeaths": 47753,
+     "withDeaths": 8,
+     "withoutDarkSections": 256.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 35,
+     "withoutDeaths": 48736,
+     "withDeaths": 8,
+     "withoutDarkSections": 188.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 36,
+     "withoutDeaths": 49507,
+     "withDeaths": 8,
+     "withoutDarkSections": 188.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 37,
+     "withoutDeaths": 50568,
+     "withDeaths": 8,
+     "withoutDarkSections": 247.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 38,
+     "withoutDeaths": 51857,
+     "withDeaths": 8,
+     "withoutDarkSections": 206.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 39,
+     "withoutDeaths": 52637,
+     "withDeaths": 8,
+     "withoutDarkSections": 260,
+     "withDarkSections": 0
+    },
+    {
+     "day": 40,
+     "withoutDeaths": 54766,
+     "withDeaths": 8,
+     "withoutDarkSections": 274.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 41,
+     "withoutDeaths": 58122,
+     "withDeaths": 8,
+     "withoutDarkSections": 272.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 42,
+     "withoutDeaths": 61476,
+     "withDeaths": 8,
+     "withoutDarkSections": 225.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 43,
+     "withoutDeaths": 63922,
+     "withDeaths": 8,
+     "withoutDarkSections": 265.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 44,
+     "withoutDeaths": 66931,
+     "withDeaths": 8,
+     "withoutDarkSections": 224,
+     "withDarkSections": 0
+    },
+    {
+     "day": 45,
+     "withoutDeaths": 70190,
+     "withDeaths": 8,
+     "withoutDarkSections": 264.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 46,
+     "withoutDeaths": 73608,
+     "withDeaths": 8,
+     "withoutDarkSections": 228.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 47,
+     "withoutDeaths": 76710,
+     "withDeaths": 8,
+     "withoutDarkSections": 187.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 48,
+     "withoutDeaths": 78831,
+     "withDeaths": 8,
+     "withoutDarkSections": 320.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 49,
+     "withoutDeaths": 82190,
+     "withDeaths": 8,
+     "withoutDarkSections": 309.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 50,
+     "withoutDeaths": 86939,
+     "withDeaths": 8,
+     "withoutDarkSections": 280.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 51,
+     "withoutDeaths": 90396,
+     "withDeaths": 8,
+     "withoutDarkSections": 238.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 52,
+     "withoutDeaths": 93073,
+     "withDeaths": 8,
+     "withoutDarkSections": 278.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 53,
+     "withoutDeaths": 96005,
+     "withDeaths": 8,
+     "withoutDarkSections": 285.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 54,
+     "withoutDeaths": 99266,
+     "withDeaths": 8,
+     "withoutDarkSections": 274.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 55,
+     "withoutDeaths": 100661,
+     "withDeaths": 8,
+     "withoutDarkSections": 265.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 56,
+     "withoutDeaths": 102682,
+     "withDeaths": 8,
+     "withoutDarkSections": 217.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 57,
+     "withoutDeaths": 103836,
+     "withDeaths": 8,
+     "withoutDarkSections": 198.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 58,
+     "withoutDeaths": 105467,
+     "withDeaths": 8,
+     "withoutDarkSections": 236.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 59,
+     "withoutDeaths": 107815,
+     "withDeaths": 8,
+     "withoutDarkSections": 273.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 60,
+     "withoutDeaths": 110831,
+     "withDeaths": 8,
+     "withoutDarkSections": 278.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 61,
+     "withoutDeaths": 115608,
+     "withDeaths": 8,
+     "withoutDarkSections": 302.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 62,
+     "withoutDeaths": 118115,
+     "withDeaths": 8,
+     "withoutDarkSections": 227,
+     "withDarkSections": 0
+    },
+    {
+     "day": 63,
+     "withoutDeaths": 119456,
+     "withDeaths": 8,
+     "withoutDarkSections": 223.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 64,
+     "withoutDeaths": 120900,
+     "withDeaths": 8,
+     "withoutDarkSections": 254.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 65,
+     "withoutDeaths": 123225,
+     "withDeaths": 8,
+     "withoutDarkSections": 258,
+     "withDarkSections": 0
+    },
+    {
+     "day": 66,
+     "withoutDeaths": 125867,
+     "withDeaths": 8,
+     "withoutDarkSections": 243.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 67,
+     "withoutDeaths": 129195,
+     "withDeaths": 8,
+     "withoutDarkSections": 274.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 68,
+     "withoutDeaths": 131826,
+     "withDeaths": 8,
+     "withoutDarkSections": 219.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 69,
+     "withoutDeaths": 133259,
+     "withDeaths": 8,
+     "withoutDarkSections": 201.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 70,
+     "withoutDeaths": 134942,
+     "withDeaths": 8,
+     "withoutDarkSections": 173.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 71,
+     "withoutDeaths": 137260,
+     "withDeaths": 8,
+     "withoutDarkSections": 217,
+     "withDarkSections": 0
+    },
+    {
+     "day": 72,
+     "withoutDeaths": 140083,
+     "withDeaths": 8,
+     "withoutDarkSections": 186,
+     "withDarkSections": 0
+    },
+    {
+     "day": 73,
+     "withoutDeaths": 141534,
+     "withDeaths": 8,
+     "withoutDarkSections": 159.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 74,
+     "withoutDeaths": 143091,
+     "withDeaths": 8,
+     "withoutDarkSections": 228.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 75,
+     "withoutDeaths": 146301,
+     "withDeaths": 8,
+     "withoutDarkSections": 274.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 76,
+     "withoutDeaths": 148550,
+     "withDeaths": 8,
+     "withoutDarkSections": 229.1,
+     "withDarkSections": 0
+    },
+    {
+     "day": 77,
+     "withoutDeaths": 151457,
+     "withDeaths": 8,
+     "withoutDarkSections": 190.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 78,
+     "withoutDeaths": 153521,
+     "withDeaths": 8,
+     "withoutDarkSections": 214.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 79,
+     "withoutDeaths": 154677,
+     "withDeaths": 8,
+     "withoutDarkSections": 224.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 80,
+     "withoutDeaths": 156900,
+     "withDeaths": 8,
+     "withoutDarkSections": 185.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 81,
+     "withoutDeaths": 158827,
+     "withDeaths": 8,
+     "withoutDarkSections": 242.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 82,
+     "withoutDeaths": 161446,
+     "withDeaths": 8,
+     "withoutDarkSections": 242.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 83,
+     "withoutDeaths": 163573,
+     "withDeaths": 8,
+     "withoutDarkSections": 316.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 84,
+     "withoutDeaths": 166377,
+     "withDeaths": 8,
+     "withoutDarkSections": 256.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 85,
+     "withoutDeaths": 169080,
+     "withDeaths": 8,
+     "withoutDarkSections": 314.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 86,
+     "withoutDeaths": 173147,
+     "withDeaths": 8,
+     "withoutDarkSections": 254.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 87,
+     "withoutDeaths": 176568,
+     "withDeaths": 8,
+     "withoutDarkSections": 237.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 88,
+     "withoutDeaths": 179285,
+     "withDeaths": 8,
+     "withoutDarkSections": 198.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 89,
+     "withoutDeaths": 181806,
+     "withDeaths": 8,
+     "withoutDarkSections": 239,
+     "withDarkSections": 0
+    },
+    {
+     "day": 90,
+     "withoutDeaths": 184770,
+     "withDeaths": 8,
+     "withoutDarkSections": 271.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 91,
+     "withoutDeaths": 186780,
+     "withDeaths": 8,
+     "withoutDarkSections": 195.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 92,
+     "withoutDeaths": 188073,
+     "withDeaths": 8,
+     "withoutDarkSections": 230,
+     "withDarkSections": 0
+    },
+    {
+     "day": 93,
+     "withoutDeaths": 191047,
+     "withDeaths": 8,
+     "withoutDarkSections": 331.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 94,
+     "withoutDeaths": 196360,
+     "withDeaths": 8,
+     "withoutDarkSections": 313.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 95,
+     "withoutDeaths": 201679,
+     "withDeaths": 8,
+     "withoutDarkSections": 314,
+     "withDarkSections": 0
+    },
+    {
+     "day": 96,
+     "withoutDeaths": 206418,
+     "withDeaths": 8,
+     "withoutDarkSections": 384.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 97,
+     "withoutDeaths": 211316,
+     "withDeaths": 8,
+     "withoutDarkSections": 248.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 98,
+     "withoutDeaths": 214002,
+     "withDeaths": 8,
+     "withoutDarkSections": 215.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 99,
+     "withoutDeaths": 216350,
+     "withDeaths": 8,
+     "withoutDarkSections": 268.6,
+     "withDarkSections": 0
+    },
+    {
+     "day": 100,
+     "withoutDeaths": 217976,
+     "withDeaths": 8,
+     "withoutDarkSections": 260.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 101,
+     "withoutDeaths": 220320,
+     "withDeaths": 8,
+     "withoutDarkSections": 276.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 102,
+     "withoutDeaths": 223948,
+     "withDeaths": 8,
+     "withoutDarkSections": 253.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 103,
+     "withoutDeaths": 227299,
+     "withDeaths": 8,
+     "withoutDarkSections": 200.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 104,
+     "withoutDeaths": 230246,
+     "withDeaths": 8,
+     "withoutDarkSections": 252.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 105,
+     "withoutDeaths": 232833,
+     "withDeaths": 8,
+     "withoutDarkSections": 245.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 106,
+     "withoutDeaths": 235903,
+     "withDeaths": 8,
+     "withoutDarkSections": 272.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 107,
+     "withoutDeaths": 238367,
+     "withDeaths": 8,
+     "withoutDarkSections": 239.2,
+     "withDarkSections": 0
+    },
+    {
+     "day": 108,
+     "withoutDeaths": 241637,
+     "withDeaths": 8,
+     "withoutDarkSections": 332.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 109,
+     "withoutDeaths": 246913,
+     "withDeaths": 8,
+     "withoutDarkSections": 277.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 110,
+     "withoutDeaths": 250677,
+     "withDeaths": 8,
+     "withoutDarkSections": 230.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 111,
+     "withoutDeaths": 253701,
+     "withDeaths": 8,
+     "withoutDarkSections": 312.8,
+     "withDarkSections": 0
+    },
+    {
+     "day": 112,
+     "withoutDeaths": 256555,
+     "withDeaths": 8,
+     "withoutDarkSections": 261.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 113,
+     "withoutDeaths": 258909,
+     "withDeaths": 8,
+     "withoutDarkSections": 325.7,
+     "withDarkSections": 0
+    },
+    {
+     "day": 114,
+     "withoutDeaths": 262004,
+     "withDeaths": 8,
+     "withoutDarkSections": 350.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 115,
+     "withoutDeaths": 265719,
+     "withDeaths": 8,
+     "withoutDarkSections": 337.5,
+     "withDarkSections": 0
+    },
+    {
+     "day": 116,
+     "withoutDeaths": 268845,
+     "withDeaths": 8,
+     "withoutDarkSections": 244.9,
+     "withDarkSections": 0
+    },
+    {
+     "day": 117,
+     "withoutDeaths": 272019,
+     "withDeaths": 8,
+     "withoutDarkSections": 298.3,
+     "withDarkSections": 0
+    },
+    {
+     "day": 118,
+     "withoutDeaths": 275592,
+     "withDeaths": 8,
+     "withoutDarkSections": 270.4,
+     "withDarkSections": 0
+    },
+    {
+     "day": 119,
+     "withoutDeaths": 279142,
+     "withDeaths": 8,
+     "withoutDarkSections": 232,
+     "withDarkSections": 0
+    },
+    {
+     "day": 120,
+     "withoutDeaths": 281493,
+     "withDeaths": 8,
+     "withoutDarkSections": 267,
+     "withDarkSections": 0
+    }
+   ],
+   "perSeed": [
+    {
+     "seed": 11,
+     "withoutDeaths": 287172,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 12,
+     "withoutDeaths": 299832,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 13,
+     "withoutDeaths": 296721,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 14,
+     "withoutDeaths": 274883,
+     "withDeaths": 12,
+     "withStable": true
+    },
+    {
+     "seed": 15,
+     "withoutDeaths": 301435,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 16,
+     "withoutDeaths": 260725,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 17,
+     "withoutDeaths": 270387,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 18,
+     "withoutDeaths": 270261,
+     "withDeaths": 0,
+     "withStable": true
+    },
+    {
+     "seed": 19,
+     "withoutDeaths": 316966,
+     "withDeaths": 65,
+     "withStable": true
+    },
+    {
+     "seed": 20,
+     "withoutDeaths": 236553,
+     "withDeaths": 0,
+     "withStable": true
+    }
+   ]
+  }
+ ]
+}

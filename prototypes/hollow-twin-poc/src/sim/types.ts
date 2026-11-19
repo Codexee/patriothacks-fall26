@@ -185,6 +185,8 @@ export type Action =
   | { type: 'build'; kind: Exclude<StructureKind, 'plant'>; level: number; col: number }
   | { type: 'remove'; level: number; col: number; kind: Exclude<StructureKind, 'plant'> };
 
+export interface PlantLoss { plant: number; startHour: number; loss: number[] }
+
 export interface Scenario {
   id: string;
   name: string; // e.g. "Texas, Feb 2021"
@@ -196,8 +198,11 @@ export interface Scenario {
   demand: number[];
   source: Source;
   // --- Real-data scenario options (spec: .plans/hollow-real-data-spec.md). All optional; absent = old behavior. ---
-  /** One plant loses part of its capacity: loss[t] (0..1) is the share lost t hours after startHour. */
-  plantLoss?: { plant: number; startHour: number; loss: number[] };
+  /**
+   * One plant (or several) loses part of its capacity: loss[t] (0..1) is the share lost t hours after startHour.
+   * An array applies each loss; losses on the same plant multiply.
+   */
+  plantLoss?: PlantLoss | PlantLoss[];
   /** Health lost per day by every plant (overrides the guess 0.002). */
   agingPerDay?: number;
   /**

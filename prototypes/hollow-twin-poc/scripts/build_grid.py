@@ -34,6 +34,21 @@ cascadeLoss: the hourly shape of ERCOT net generation lost during the rotating o
     (Feb 15-18) and in which ERCOT shed firm load. After Feb 18, net generation stays low because warm weather
     lowered demand, not because plants were lost, so it is not counted.
   - loss[t] = max(0, reference - netgen[t]) / max(loss). Peak = 1. No demand surge is applied anywhere.
+
+lossShapes: 3 more plant-loss shapes from other real grid failures, each from ONE fuel of ONE balancing authority
+(BA). During these events demand rose, so a BA's total net generation did not fall (it imported more and ran every
+other plant). The plant loss shows in the fuel that should have run at full output and did not:
+  - elliottTva:  TVA coal, Winter Storm Elliott. Reference: mean of Dec 22, 2022 (00:00-23:00 Central). Loss window
+                 Dec 23 00:00 - Dec 27 00:00 Central (96 h). TVA set a demand record on Dec 23 and shed firm load
+                 on Dec 23-24, so its coal units had every reason to run at full output.
+  - elliottCple: Duke Energy Progress East (CPLE) coal, same event, same reference day and window, on the same
+                 Central clock as TVA (so the two losses keep their real timing). CPLE shed firm load on Dec 24.
+  - sppWind:     Southwest Power Pool (SWPP) wind, Feb 2021: a slow, multi-day loss (frozen turbines in a long cold
+                 spell). Reference: mean of Jan 8 - Feb 4, 2021 (28 days, Central). Loss window Feb 6 00:00 -
+                 Feb 20 00:00 (14 days). Hourly wind output is noisy, so the series is first smoothed with a centered
+                 24-hour mean.
+  Each: loss[t] = max(0, reference - output[t]) / max(loss), peak = 1 (one whole plant at the worst hour), the same
+  rule as cascadeLoss. No demand surge is applied.
 """
 from __future__ import annotations
 
@@ -76,6 +91,72 @@ def local_clock(e: pd.DataFrame) -> pd.DataFrame:
     g[["demand", "netgen"]] = g[["demand", "netgen"]].interpolate(limit=1)
     g["imputed"] = g["imputed"].fillna(False).astype(bool)
     return g
+
+
+FUEL = "Net Generation (MW) from {}"
+
+
+def load_fuel(folder: Path, name: str, ba: str, fuel: str, tz: str) -> pd.Series:
+    """Hourly output of one fuel of one BA on a naive local clock (same DST handling as local_clock)."""
+    col = FUEL.format(fuel)
+    df = pd.read_csv(folder / name, usecols=["Balancing Authority", "UTC Time at End of Hour", col, col + " (Imputed)"],
+                     thousands=",", low_memory=False)
+    df = df[df["Balancing Authority"] == ba]
+    utc = pd.to_datetime(df["UTC Time at End of Hour"], format="%m/%d/%Y %I:%M:%S %p") - pd.Timedelta(hours=1)
+    loc = utc.dt.tz_localize("UTC").dt.tz_convert(tz).dt.tz_localize(None)
+    g = df.assign(loc=loc).groupby("loc").agg(mw=(col, "mean"), imp=(col + " (Imputed)", lambda x: x.notna().any()))
+    full = pd.date_range(g.index.min(), g.index.max(), freq="h")
+    g = g.reindex(full)
+    g["mw"] = g["mw"].interpolate(limit=1)
+    g.attrs["imputed"] = g["imp"].fillna(False).astype(bool)
+    return g
+
+
+LOSS_EVENTS = {
+    "elliottTva": dict(file="EIA930_BALANCE_2022_Jul_Dec.csv", ba="TVA", fuel="Coal", tz="America/Chicago",
+                       ref=("2022-12-22 00:00", "2022-12-22 23:00"), win=("2022-12-23 00:00", "2022-12-26 23:00"), smooth=None,
+                       name="Tennessee Valley Authority (TVA) coal, Winter Storm Elliott"),
+    "elliottCple": dict(file="EIA930_BALANCE_2022_Jul_Dec.csv", ba="CPLE", fuel="Coal", tz="America/Chicago",
+                        ref=("2022-12-22 00:00", "2022-12-22 23:00"), win=("2022-12-23 00:00", "2022-12-26 23:00"), smooth=None,
+                        name="Duke Energy Progress East (CPLE) coal, Winter Storm Elliott"),
+    "sppWind": dict(file="EIA930_BALANCE_2021_Jan_Jun.csv", ba="SWPP", fuel="Wind", tz="America/Chicago",
+                    ref=("2021-01-08 00:00", "2021-02-04 23:00"), win=("2021-02-06 00:00", "2021-02-19 23:00"), smooth=24,
+                    name="Southwest Power Pool (SWPP) wind, February 2021 cold spell"),
+}
+
+
+def fuel_loss(folder: Path, key: str):
+    ev = LOSS_EVENTS[key]
+    g = load_fuel(folder, ev["file"], ev["ba"], ev["fuel"], ev["tz"])
+    mw = g["mw"]
+    if ev["smooth"]:
+        mw = mw.rolling(ev["smooth"], center=True, min_periods=ev["smooth"] // 2).mean()
+    ref = float(g["mw"].loc[ev["ref"][0]:ev["ref"][1]].mean())
+    event = mw.loc[ev["win"][0]:ev["win"][1]]
+    lost = (ref - event).clip(lower=0)
+    peak = float(lost.max())
+    shape = [round(float(v), 4) for v in lost / peak]
+    imputed = int(g.attrs["imputed"].loc[ev["ref"][0]:ev["win"][1]].sum())
+    stats = {
+        "ba": ev["ba"], "fuel": ev["fuel"], "refMW": round(ref), "peakLossMW": round(peak),
+        "peakLossShare": round(peak / ref, 3), "peakAt": str(lost.idxmax())[:16],
+        "minMW": round(float(event.min())), "hours": len(shape),
+        "hoursAboveHalf": int((lost / peak >= 0.5).sum()), "meanLossMW": round(float(lost.mean())),
+        "start": ev["win"][0], "end": ev["win"][1], "imputedHours": imputed,
+    }
+    sm = f" smoothed with a centered {ev['smooth']}-hour mean," if ev["smooth"] else ""
+    source = {
+        "label": f"EIA-930 hourly grid data: {ev['name']}",
+        "detail": (
+            f"{ev['ba']} {ev['fuel'].lower()} net generation, {ev['win'][0][:10]} to {ev['win'][1][:10]} (US Central time),{sm} "
+            f"below its mean of {ev['ref'][0][:10]}"
+            + (f" to {ev['ref'][1][:10]}" if ev["ref"][0][:10] != ev["ref"][1][:10] else "")
+            + f" ({ref / 1000:.2f} GW). The loss peaks at {peak / 1000:.2f} GW ({peak / ref:.0%} of that level) at "
+            f"{stats['peakAt']} and is scaled so the peak = one whole plant. Only the shape is used: no storm, no demand surge."
+        ),
+        "url": URL,
+    }
+    return {"loss": shape, "stats": stats, "source": source}
 
 
 def demand_week(folder: Path):
@@ -139,6 +220,7 @@ def main() -> None:
     folder = Path(sys.argv[1])
     week, calm, dropped, filled = demand_week(folder)
     loss, st = cascade_loss(folder)
+    shapes = {k: fuel_loss(folder, k) for k in LOSS_EVENTS}
 
     print(f"Calm weeks (Monday start), {len(calm)} of 52: {', '.join(calm)}")
     for s, why in dropped:
@@ -146,6 +228,8 @@ def main() -> None:
     print(f"Local DST gaps filled: {filled}")
     print(f"demandWeek: min {min(week):.3f}, max {max(week):.3f}")
     print(f"cascade: {json.dumps(st)}")
+    for k, v in shapes.items():
+        print(f"{k}: {json.dumps(v['stats'])}")
 
     source = {
         "label": "EIA-930 hourly grid data, ERCOT (2023 calm weeks; Feb 2021 generation loss)",
@@ -163,11 +247,15 @@ def main() -> None:
         "// Generated by scripts/build_grid.py from EIA-930 BALANCE files. Do not edit by hand.\n"
         f"// Calm 2023 weeks (Monday start): {', '.join(calm)}\n"
         f"// Cascade: {json.dumps(st)}\n"
+        + "".join(f"// {k}: {json.dumps(v['stats'])}\n" for k, v in shapes.items()) +
         "import type { GridData } from './index.ts';\n\n"
         "export const grid: GridData | null = {\n"
         f"  demandWeek: {json.dumps(week)},\n"
         f"  cascadeLoss: {json.dumps(loss)},\n"
         f"  source: {json.dumps(source, ensure_ascii=False)},\n"
+        "  lossShapes: {\n"
+        + "".join(f"    {k}: {json.dumps(v, ensure_ascii=False)},\n" for k, v in shapes.items())
+        + "  },\n"
         "};\n"
     )
     OUT.write_text(body)
