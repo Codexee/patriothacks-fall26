@@ -16,3 +16,16 @@ export function hourlyFromDaily(daily: number[], diurnal = 0): number[] {
   }
   return out;
 }
+
+/** Days of driving data for the real-data scenarios: the whole run (the engine's MAX_DAYS), so the week keeps repeating. */
+export const RUN_DAYS = 120;
+
+/** Repeat a 168-hour week (Monday 00:00 first) for `days` days. */
+export function repeatWeek(week: number[], days = RUN_DAYS): number[] {
+  return Array.from({ length: days * 24 }, (_, h) => week[h % week.length]);
+}
+
+/** Constant value for `days` days, hourly. */
+export function flat(value: number, days = RUN_DAYS): number[] {
+  return new Array(days * 24).fill(value);
+}
