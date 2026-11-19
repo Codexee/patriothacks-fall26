@@ -94,3 +94,23 @@ export async function fetchMetrics(): Promise<MetricsV2 | null> {
     return null;
   }
 }
+
+// Plain names for the inputs of warn_grid.
+export const FEATURE_LABEL: Record<string, string> = {
+  month: 'month of the year',
+  hod: 'hour of the day',
+  import_share: 'share of demand met by power from other areas',
+  fc_err: 'demand against its forecast, this hour',
+  fc_err_max_24h: 'largest gap between demand and its forecast in the last 24 hours',
+  gas_share: 'gas share of generation',
+  gas_chg_6h: 'change in gas generation in 6 hours',
+  netgen_chg_6h: 'change in net generation in 6 hours',
+  demand_vs_30d_peak: 'demand against its 30-day peak',
+  demand_vs_record: "demand against the area's highest demand on record",
+  demand_vs_month_record: "demand against this month's record",
+  fc12_vs_record: "the next 12 hours' demand forecast against the area's record",
+  fc12_vs_365d_peak: "the next 12 hours' demand forecast against the 365-day peak",
+  fc12_vs_30d_peak: "the next 12 hours' demand forecast against the 30-day peak",
+  fc12_vs_month_record: "tomorrow's demand forecast against this month's record",
+  fc12_vs_month_record_max_72h: "highest value in 72 hours of tomorrow's forecast against this month's record",
+};

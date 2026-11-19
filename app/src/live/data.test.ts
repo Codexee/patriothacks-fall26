@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import type { ModelFile } from '../contracts.ts';
+import type { BaRecords, ModelFile } from '../contracts.ts';
 import fixture from '../model/fixtures/fixture_binary.json';
 import parity from '../model/fixtures/features_parity.json';
 import { featuresAt } from '../model/features.ts';
 import { nowIndex, scoreSeries, toAllRows, toHourRows, type EiaPayload } from './data.ts';
 import sample from './sample/eia-ERCO.json';
+import baRecords from '../../public/data/v1/ba_records.json';
+import { RECORD_FEATURES } from '../model/features.ts';
 
 describe('live data', () => {
   const rows = toHourRows(sample as EiaPayload);
@@ -65,5 +67,18 @@ describe('live data', () => {
     expect(f.fc12_vs_30d_peak).toBeCloseTo(1.2, 12); // max forecast of the next 12 h / 30-day peak
     expect(f.fc12_vs_record).toBeNull();             // needs long history
     expect(scoreSeries(fixture as ModelFile, all, 168).length).toBe(1);
+  });
+
+  it('computes every record feature for the sample with the saved ERCO records', () => {
+    const all = toAllRows(sample as EiaPayload);
+    // The sample ends at its last demand hour with no later forecast, so score 13 hours earlier:
+    // the fc12 inputs need the forecast for the next 12 hours.
+    const i = nowIndex(all) - 13;
+    const f = featuresAt(all, i, { records: (baRecords as unknown as BaRecords).ERCO });
+    for (const k of RECORD_FEATURES) {
+      expect(f[k], k).not.toBeNull();
+      expect(Number.isFinite(f[k] as number), k).toBe(true);
+    }
+    expect(f.demand_vs_record as number).toBeLessThanOrEqual(1);
   });
 });

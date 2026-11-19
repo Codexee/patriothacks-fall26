@@ -1,7 +1,7 @@
 // Evidence: #/evidence. Every event in the library as one row, the model results, and the downloads.
 import { Fragment, memo, useEffect, useMemo, useState } from 'react';
 import { dataUrl, type County, type EventLibrary, type EventRow, type Metrics } from '../contracts.ts';
-import { MODEL_LABEL, type DarkResult, type MetricsV2, type ModelResult, type Period } from './metrics.ts';
+import { FEATURE_LABEL, MODEL_LABEL, type DarkResult, type MetricsV2, type ModelResult, type Period } from './metrics.ts';
 import { EventDetail, GoodAt, MoreNumbers } from './parts.tsx';
 import { MatchedSentence, Tradeoff } from './Tradeoff.tsx';
 import { PageNav, fmtDay, fmtHours, fmtInt, fmtShare, parseUtc, useJson } from '../brief/shared.tsx';
@@ -16,25 +16,6 @@ const pct = (h: number) => `${(h / SPAN_H) * 100}%`;
 const NO_FORECAST = ['warn_grid', 'warn_full'];
 const WITH_FORECAST = 'warn_fcst';
 
-// Plain names for the inputs of warn_grid.
-const FEATURE_LABEL: Record<string, string> = {
-  month: 'month of the year',
-  hod: 'hour of the day',
-  import_share: 'share of demand met by power from other areas',
-  fc_err: 'demand against its forecast, this hour',
-  fc_err_max_24h: 'largest gap between demand and its forecast in the last 24 hours',
-  gas_share: 'gas share of generation',
-  gas_chg_6h: 'change in gas generation in 6 hours',
-  netgen_chg_6h: 'change in net generation in 6 hours',
-  demand_vs_30d_peak: 'demand against its 30-day peak',
-  demand_vs_record: "demand against the area's highest demand on record",
-  demand_vs_month_record: "demand against this month's record",
-  fc12_vs_record: "the next 12 hours' demand forecast against the area's record",
-  fc12_vs_365d_peak: "the next 12 hours' demand forecast against the 365-day peak",
-  fc12_vs_30d_peak: "the next 12 hours' demand forecast against the 30-day peak",
-  fc12_vs_month_record: "tomorrow's demand forecast against this month's record",
-  fc12_vs_month_record_max_72h: "highest value in 72 hours of tomorrow's forecast against this month's record",
-};
 
 type SetName = 'train' | 'dev' | 'test';
 const SET_LABEL: Record<SetName, string> = { train: 'train', dev: 'dev', test: 'final test' };
