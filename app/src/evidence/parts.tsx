@@ -72,33 +72,44 @@ export function GoodAt({ metrics, lib }: { metrics: MetricsV2; lib: EventLibrary
 
         <article className="card weak">
           <p className="verdict-tag">Weak</p>
-          <h3>Storms, without a weather forecast</h3>
+          <h3>Without a weather forecast: weak ({pct0(Math.max(grid?.recall12h ?? 0, full?.recall12h ?? 0))})</h3>
           <table className="mini">
+            <thead><tr><th>Model</th><th className="num">Warned 12 h ahead</th><th className="num">False alarms per area per year</th></tr></thead>
             <tbody>
-              {[['warn_grid', grid], ['warn_full', full]].map(([k, m]) =>
-                m ? (
-                  <tr key={k as string}>
-                    <td>{MODEL_LABEL[k as string]}</td>
-                    <td className="num"><strong>{pct0((m as ModelResult).recall12h)}</strong></td>
-                  </tr>
-                ) : null,
-              )}
-              {fcst && (
-                <tr>
-                  <td>{MODEL_LABEL.warn_fcst} (upper bound: tested with the weather that happened)</td>
-                  <td className="num"><strong>{pct0(fcst.recall12h)}</strong></td>
-                </tr>
-              )}
-              {real && (
-                <tr>
-                  <td>{real.label}{real.years && <> ({real.years[0] === real.years[1] ? real.years[0] : `${real.years[0]} to ${real.years[1]}`})</>}</td>
-                  <td className="num"><strong>{pct0(real.r.recall12h)}</strong></td>
-                </tr>
-              )}
+              {grid && <tr><td>Grid data only</td><td className="num"><strong>{pct0(grid.recall12h)}</strong></td><td className="num">{grid.falseAlarmsPerBaYear.toFixed(1)}</td></tr>}
+              {full && <tr><td>Grid, weather now and outages already reported</td><td className="num"><strong>{pct0(full.recall12h)}</strong></td><td className="num">{full.falseAlarmsPerBaYear.toFixed(1)}</td></tr>}
             </tbody>
           </table>
-          <p className="dim small">Share of events warned 12 h or more ahead. Most events are storms that break local lines; grid data shows little before that.{real?.note && ` ${real.note}`}</p>
+          <p className="dim small">Most events are storms that break local lines. Grid data shows little before that.</p>
         </article>
+
+        {fcst && (
+          <article className="card fcst">
+            <p className="verdict-tag">With a weather forecast</p>
+            <h3>
+              With a weather forecast: {pct0(fcst.recall12h)} of events
+              {real?.r.falseAlarmsPerBaYear != null && <>, about {Math.round(real.r.falseAlarmsPerBaYear)} false alarms per area per year with real 2024 forecasts</>}
+            </h3>
+            <table className="mini">
+              <thead><tr><th>Tested with</th><th className="num">Warned 12 h ahead</th><th className="num">False alarms per area per year</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>The weather that happened, {t0} to {t1} (upper bound)</td>
+                  <td className="num"><strong>{pct0(fcst.recall12h)}</strong></td>
+                  <td className="num">{fcst.falseAlarmsPerBaYear.toFixed(1)}</td>
+                </tr>
+                {real && (
+                  <tr>
+                    <td>Real archived weather forecasts{real.years && <>, {real.years[0] === real.years[1] ? real.years[0] : `${real.years[0]} to ${real.years[1]}`}</>}</td>
+                    <td className="num"><strong>{pct0(real.r.recall12h)}</strong></td>
+                    <td className="num">{real.r.falseAlarmsPerBaYear?.toFixed(1)}</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+            <p className="dim small">Same model and alert threshold, fixed before the test. Nothing was refitted for 2024.</p>
+          </article>
+        )}
       </div>
     </section>
   );
@@ -159,7 +170,7 @@ function GroupTable({ name, g, period }: { name: string; g: GroupResult; period:
   const fa = ms.some(([, m]) => m.falseAlarmsPerBaYear != null);
   return (
     <div className="more-table">
-      <h4>{period}: {g.label ?? GROUP_LABEL[name] ?? name}</h4>
+      <h4>{period}: {GROUP_LABEL[name] ?? g.label ?? name}</h4>
       <div className="scroll">
         <table>
           <thead>
@@ -195,6 +206,8 @@ function GroupTable({ name, g, period }: { name: string; g: GroupResult; period:
 export function MoreNumbers({ metrics, warnNote }: { metrics: MetricsV2; warnNote?: string }) {
   const periods: [string, Period][] = [[`Final test, ${metrics.testYears[0]} to ${metrics.testYears[1]}`, metrics]];
   if (metrics.dev) periods.push([`Dev, ${metrics.dev.testYears[0]} to ${metrics.dev.testYears[1]}`, metrics.dev]);
+  const rfm = metrics.realForecast?.models;
+  if (rfm) periods.push(['2024 only, real weather forecasts against the weather that happened', { trainYears: metrics.trainYears, testYears: [2024, 2024], models: rfm, dark: null }]);
   const missing: string[] = [];
   if (!metrics.seasons) missing.push('results by season');
   if (!metrics.groups) missing.push('results by event group (demand-record or storm-like)');
@@ -202,7 +215,7 @@ export function MoreNumbers({ metrics, warnNote }: { metrics: MetricsV2; warnNot
   if (!Object.values(metrics.models).some((m) => m.warned6h != null)) missing.push('warned 6 h and 24 h ahead');
   return (
     <details className="more">
-      <summary>More numbers: every method, final test and dev</summary>
+      <summary>More numbers: every method, final test, dev and the 2024 real-forecast test</summary>
       {periods.map(([title, p]) => (
         <div key={title}>
           <OverallTable p={p} title={title} />

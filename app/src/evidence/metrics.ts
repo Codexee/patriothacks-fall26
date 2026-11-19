@@ -61,6 +61,9 @@ export const MODEL_LABEL: Record<string, string> = {
   rule_forecast_error: 'Rule: demand above its forecast',
   rule_hand: 'Rule: our earlier hand rule',
   rule_record: "Rule: tomorrow's forecast above this month's record",
+  warn_fcst_real: 'Model with real 2024 weather forecasts',
+  warn_fcst_observed: 'Model with the weather that happened (same 2024 hours)',
+  warn_fcst_real2024: 'Model with real 2024 weather forecasts',
 };
 
 export const GROUP_LABEL: Record<string, string> = {
@@ -77,7 +80,7 @@ export function realForecastResult(m: MetricsV2): { r: Partial<ModelResult>; lab
   if (!rf) return null;
   const r = rf.warned12h != null ? rf : rf.models ? Object.values(rf.models)[0] : null;
   if (!r || r.warned12h == null) return null;
-  return { r, label: rf.label ?? 'Model with a real archived weather forecast', years: rf.testYears, note: rf.note };
+  return { r, label: 'Model with real archived weather forecasts', years: rf.testYears, note: rf.note };
 }
 
 export const pct1 = (x: number | null | undefined) => (x == null ? '' : `${(x * 100).toFixed(1)}%`);

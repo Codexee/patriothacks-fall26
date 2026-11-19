@@ -3,6 +3,7 @@ import { Fragment, memo, useEffect, useMemo, useState } from 'react';
 import { dataUrl, type County, type EventLibrary, type EventRow, type Metrics } from '../contracts.ts';
 import { MODEL_LABEL, type DarkResult, type MetricsV2, type ModelResult, type Period } from './metrics.ts';
 import { EventDetail, GoodAt, MoreNumbers } from './parts.tsx';
+import { MatchedSentence, Tradeoff } from './Tradeoff.tsx';
 import { PageNav, fmtDay, fmtHours, fmtInt, fmtShare, parseUtc, useJson } from '../brief/shared.tsx';
 import './evidence.css';
 
@@ -393,7 +394,16 @@ export default function Page() {
 
         {lib && (
           <>
-            {metrics && !lib.stub && <GoodAt metrics={metrics} lib={lib} />}
+            {metrics && !lib.stub && (
+              <>
+                <GoodAt metrics={metrics} lib={lib} />
+                <section className="equal-rate" aria-labelledby="equal-h">
+                  <h2 id="equal-h">Comparison at equal false-alarm rates</h2>
+                  <MatchedSentence metrics={metrics} />
+                  <Tradeoff metrics={metrics} />
+                </section>
+              </>
+            )}
             <Summary lib={lib} metrics={metrics} rows={rows} />
 
             <section>
