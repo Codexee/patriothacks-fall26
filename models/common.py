@@ -17,7 +17,7 @@ SPLIT = os.environ.get("BDA_SPLIT", "2021-01-01")
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent
 MAIN = Path(os.environ.get("BDA_MAIN", "/Users/neil/Documents/patriothacks-fall26"))
-SHARED = MAIN / "data" / "raw" / "derived"          # BDA_SHARED
+SHARED = Path(os.environ.get("BDA_SHARED", MAIN / "data" / "raw" / "derived"))
 DATA_OUT = MAIN / "data" / "out"
 RAW = MAIN / "data" / "raw"
 ART = HERE / "artifacts"                             # boosters and tables (git-ignored)
@@ -88,18 +88,33 @@ def load_features() -> pd.DataFrame:
         FROM '{SHARED}/ba_hour_features.parquet' ORDER BY ba, hour""").df()
     df["h"] = to_h(df.hour)
     ev = load_events()
-    mapped = set(duckdb.sql(f"SELECT DISTINCT ba FROM '{SHARED}/ba_hour_out.parquet'").df().ba)
-    end_h = data_end_h()
+    coverage = duckdb.sql(f"""
+        SELECT ba, year(hour) AS year, min(hour) AS first_hour, max(hour) AS last_hour
+        FROM '{SHARED}/ba_hour_out.parquet' GROUP BY ba, year(hour)""").df()
+    mapped = set(coverage.ba)
+    # EAGLE-I lists positive outages only. Avoid treating absent BA-years and gaps
+    # between annual observation windows as confirmed negatives.
+    covered = np.zeros(len(df), bool)
     y = np.zeros(len(df), bool)
     ine = np.zeros(len(df), bool)
     ba_codes, ba_names = pd.factorize(df.ba)
     bounds = np.r_[0, np.flatnonzero(np.diff(ba_codes)) + 1, len(df)]
     for i in range(len(bounds) - 1):
         a, b = bounds[i], bounds[i + 1]
-        e = ev[ev.ba == ba_names[ba_codes[a]]]
+        ba = ba_names[ba_codes[a]]
+        h = df.h.values[a:b]
+        spans = coverage[coverage.ba == ba].sort_values("year")
+        windows = []
+        for lo, hi in zip(to_h(spans.first_hour), to_h(spans.last_hour)):
+            if windows and lo <= windows[-1][1] + 1:
+                windows[-1][1] = hi
+            else:
+                windows.append([lo, hi])
+        for lo, hi in windows:
+            covered[a:b] |= (h >= lo) & (h + HORIZON_H <= hi)
+        e = ev[ev.ba == ba]
         if e.empty:
             continue
-        h = df.h.values[a:b]
         st = e.start_h.values
         j = np.searchsorted(st, h, side="right")                    # first start > h
         y[a:b] = (j < len(st)) & (st[np.minimum(j, len(st) - 1)] <= h + HORIZON_H)
@@ -109,7 +124,9 @@ def load_features() -> pd.DataFrame:
     df["y48"] = y
     df["in_event"] = ine
     df["mapped"] = df.ba.isin(mapped).values
-    df["scored"] = df.mapped.values & ~ine & (df.h.values <= end_h - HORIZON_H)
+    if (y != df.y48_table.values).any() or (ine != df.in_event_table.values).any():
+        raise ValueError("BA-hour labels and the event library disagree. Rebuild the feature table.")
+    df["scored"] = covered & ~ine
     return df
 
 
@@ -135,7 +152,7 @@ class Panel:
         """score is aligned to self.rows. all_starts: every event start per BA (for the false-alarm test)."""
         leads = np.full(len(self.events), np.nan)
         ep_month, ep_false = [], []
-        ev_by_ba = {b: g for b, g in self.events.groupby("ba")}
+        ev_by_ba = self.events.groupby("ba").indices
         for b, (a, z) in self.groups.items():
             s = score[a:z]
             ah = self.h[a:z][s >= thr]                           # NaN scores never alert
@@ -147,12 +164,12 @@ class Panel:
                 hit = (i < len(st)) & (st[np.minimum(i, max(len(st) - 1, 0))] <= ee + HORIZON_H) if len(st) else np.zeros(len(es), bool)
                 ep_false.append(~hit)
                 ep_month.append(es.astype("datetime64[h]").astype("datetime64[M]").astype(np.int64) % 12 + 1)
-            g = ev_by_ba.get(b)
-            if g is not None and len(ah):
-                s0 = g.start_h.values
+            indices = ev_by_ba.get(b)
+            if indices is not None and len(ah):
+                s0 = self.events.start_h.values[indices]
                 i = np.searchsorted(ah, s0 - LOOKBACK_H, side="left")
                 ok = (i < len(ah)) & (ah[np.minimum(i, len(ah) - 1)] < s0)
-                leads[g.index.values[ok]] = (s0 - ah[np.minimum(i, len(ah) - 1)])[ok]
+                leads[indices[ok]] = (s0 - ah[np.minimum(i, len(ah) - 1)])[ok]
         ep_false = np.concatenate(ep_false) if ep_false else np.zeros(0, bool)
         ep_month = np.concatenate(ep_month) if ep_month else np.zeros(0, int)
         return {"leads": leads, "ep_false": ep_false, "ep_month": ep_month}
@@ -192,17 +209,18 @@ class Panel:
         return out
 
 
-def pick_threshold(panel: Panel, score: np.ndarray, all_starts, limit: float = FA_LIMIT) -> float:
+def pick_threshold(panel: Panel, score: np.ndarray, all_starts, train_panel, train_score) -> float:
     """Lowest threshold (most alerts) with false alarms per BA-year <= limit, scanning from the top.
 
     The scan stops at the first threshold above the limit, so every higher threshold also passes.
     """
     s = score[~np.isnan(score)]
     qs = 1.0 - np.logspace(-5, np.log10(0.5), 120)             # top 0.001% down to the median
-    cands = np.unique(np.quantile(s, qs))[::-1]
-    best = float(cands[0]) if len(cands) else float("inf")
+    cands = np.unique(np.r_[np.quantile(s, qs), np.nanmax(train_score), s.max()])[::-1]
+    best = float(np.nextafter(cands[0], np.inf))
     for t in cands:
-        if panel.false_alarm_rate(score, float(t), all_starts) > limit:
+        if (panel.false_alarm_rate(score, float(t), all_starts) > FA_LIMIT
+                or train_panel.false_alarm_rate(train_score, float(t), all_starts) > FA_LIMIT):
             break
         best = float(t)
     return best
