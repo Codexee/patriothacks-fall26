@@ -232,3 +232,58 @@ button.primary:hover:not(:disabled) { background: #fff; }
 @media (prefers-reduced-motion: reduce) {
   .bar > div { transition: none; }
 }
+
+/* ---------- Depth and character (round 2: "not boring") ---------- */
+.world-col {
+  background:
+    radial-gradient(900px 420px at 50% -120px, rgba(196, 122, 72, 0.22), transparent 70%),
+    radial-gradient(700px 600px at 50% 110%, rgba(40, 70, 120, 0.18), transparent 70%),
+    var(--bg);
+}
+.flat-world { border-radius: 10px; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 18px 50px rgba(0, 0, 0, 0.55); }
+.wh-top h1 { font-size: 30px; }
+.wh-status { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; font-size: 16px; }
+.wh-status::before {
+  content: ''; width: 9px; height: 9px; border-radius: 50%; background: currentColor; flex: none; align-self: center;
+  box-shadow: 0 0 10px currentColor;
+}
+.wh-status.bad::before { animation: beat 1.4s ease-in-out infinite; }
+@keyframes beat { 50% { opacity: 0.35; } }
+
+.product {
+  background:
+    radial-gradient(500px 260px at 30% -60px, rgba(108, 182, 255, 0.16), transparent 70%),
+    linear-gradient(180deg, #17202b 0, var(--panel) 320px);
+}
+.pv-head h1 { font-size: 26px; text-shadow: 0 0 22px rgba(108, 182, 255, 0.45); }
+.phone {
+  background: linear-gradient(180deg, #121c28, #0d131b);
+  box-shadow: inset 0 0 0 1.5px var(--system), 0 0 30px rgba(108, 182, 255, 0.16), 0 14px 32px rgba(0, 0, 0, 0.45);
+}
+.alert { box-shadow: 0 0 18px rgba(245, 176, 65, 0.08); }
+.alert.prepare { box-shadow: 0 0 18px rgba(240, 101, 79, 0.12); }
+.big-line.bad { text-shadow: 0 0 16px rgba(240, 101, 79, 0.35); }
+.big-line.good { text-shadow: 0 0 16px rgba(79, 209, 161, 0.3); }
+
+.panel {
+  background:
+    radial-gradient(420px 220px at 80% -40px, rgba(242, 212, 146, 0.12), transparent 70%),
+    linear-gradient(180deg, #1c1b1d 0, var(--bg) 300px);
+}
+.p-head h1 { font-size: 26px; }
+button.primary {
+  background: linear-gradient(180deg, #ffe2a3, #e9b864); color: #2a1a04; border-color: #f2c77a;
+  box-shadow: 0 0 18px rgba(242, 190, 100, 0.35);
+}
+button.primary:hover:not(:disabled) { background: linear-gradient(180deg, #fff0c8, #f2c77a); }
+.stats > div { background: linear-gradient(180deg, #222a34, #1a2028); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05); }
+.stats > div:has(.v.bad) { background: linear-gradient(180deg, #3a1d19, #2a1714); }
+.stats > div:has(.v.bad) .v { text-shadow: 0 0 14px rgba(240, 101, 79, 0.4); }
+.bar.good > div { box-shadow: 0 0 10px rgba(79, 209, 161, 0.6); }
+.banner.stable { box-shadow: 0 0 24px rgba(79, 209, 161, 0.18); }
+.banner.lost { box-shadow: 0 0 24px rgba(240, 101, 79, 0.18); }
+.run-col { background: linear-gradient(180deg, #222a34, #1a2028); }
+
+@media (prefers-reduced-motion: reduce) {
+  .wh-status.bad::before { animation: none; }
+}

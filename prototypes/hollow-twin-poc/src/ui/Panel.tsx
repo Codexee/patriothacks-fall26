@@ -132,8 +132,8 @@ export function Panel(p: PanelProps) {
           <div className="stats">
             <div><span className="k">Day</span><span className="v">{state.day}{p.playing && ` · ${String(frame.hour).padStart(2, '0')}:00`}</span></div>
             <div><span className="k">Alive</span><span className="v">{fmt(t.population)}</span></div>
-            <div><span className="k">Deaths</span><span className="v bad">{fmt(t.deaths)}</span></div>
-            <div><span className="k" title="Deaths from bad air while the fans were off">from bad air</span><span className="v bad">{fmt(t.airDeaths)}</span></div>
+            <div><span className="k">Deaths</span><span className={`v ${t.deaths > 0 ? "bad" : ""}`}>{fmt(t.deaths)}</span></div>
+            <div><span className="k" title="Deaths from bad air while the fans were off">from bad air</span><span className={`v ${t.airDeaths > 0 ? "bad" : ""}`}>{fmt(t.airDeaths)}</span></div>
             <div><span className="k">Plants online</span><span className="v">{frame.plantsOnline}/{frame.plantsTotal}</span></div>
             <div><span className="k" title="Sections whose life support (air, fans) has less than half its power right now. Saving non-essential power does not count.">Dark sections</span><span className={`v ${darkNow ? 'bad' : ''}`}>{darkNow}</span></div>
           </div>

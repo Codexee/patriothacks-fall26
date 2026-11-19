@@ -1,33 +1,18 @@
-// UI branch: a flat, readable cutaway of the Hollow (replaces the pixel-art PixiJS scene in App; that scene is still in
-// world/index.tsx). One canvas, drawn at device resolution. Each room is one rectangle whose color says its state:
-// lamp-lit, dimmed (saving power), blackout (air and fans off), bad air, or empty. A red rule marks the blackout line.
+// UI branch: an illustrated cutaway of the Hollow, drawn smooth at device resolution (the old pixel-art PixiJS scene is
+// still in world/index.tsx; ?pixel shows it). Rock strata, a dusk surface with the machines' lights, a lift shaft,
+// pipes, and rooms with lamps, people, fans and geothermal plants. The light tells the state: warm lamp light = power,
+// dimmer = saving power, black = blackout (no air or fans), pulsing red = blackout and the air is unsafe.
 import { useEffect, useRef } from 'react';
 import { LEVELS, SECTIONS_PER_LEVEL, SECTION_COUNT, type Frame, type WorldProps } from '../sim/types.ts';
 
-export const FLAT = {
-  rock: '#1d232b',
-  rockDeep: '#141920',
-  label: '#7d8794',
-  labelStrong: '#c9d0d8',
-  lit: [242, 212, 146] as const, // a lamp at full power
-  dim: [150, 132, 92] as const, // a lamp when the section saves power
-  dark: '#07090c',
-  badAir: '#5c1b1f',
-  blackout: '#f0654f',
-  empty: '#2c323a',
-  emptyHatch: '#3b424c',
-  plant: '#e7ecf2',
-  home: '#6cb6ff',
-  hover: '#ffffff',
-  surface: '#2b2724',
-  skyline: '#3a332e',
-};
-
-const GUTTER_L = 34, GUTTER_R = 10, SURFACE = 44, CRUST = 10, ROW = 18, GAP_X = 3, GAP_Y = 3;
+const GUTTER_L = 44, GUTTER_R = 10, SURFACE = 78, CRUST = 14, ROW = 22, GAP_X = 4, GAP_Y = 4;
+const SHAFT_X = 28, SHAFT_W = 10;
 const BLACKOUT = 0.5, AIR_BAD = 5000;
+const ROOM_H = ROW - GAP_Y;
 
+type Sec = Frame['sections'][number];
 type RoomState = 'lit' | 'dark' | 'empty';
-const stateOf = (s: Frame['sections'][number]): RoomState => (s.lost ? 'empty' : s.lifeSupport < BLACKOUT ? 'dark' : 'lit');
+const stateOf = (s: Sec): RoomState => (s.lost ? 'empty' : s.lifeSupport < BLACKOUT ? 'dark' : 'lit');
 
 /** Levels from the top that still have air and fans (a level is dark when at least half its rooms are). */
 export function blackoutLine(frame: Frame): { line: number; darkLevels: number } {
@@ -44,17 +29,84 @@ export function blackoutLine(frame: Frame): { line: number; darkLevels: number }
 }
 
 function geometry(width: number) {
-  const roomW = Math.max(12, (width - GUTTER_L - GUTTER_R - GAP_X * (SECTIONS_PER_LEVEL - 1)) / SECTIONS_PER_LEVEL);
+  const roomW = Math.max(14, (width - GUTTER_L - GUTTER_R - GAP_X * (SECTIONS_PER_LEVEL - 1)) / SECTIONS_PER_LEVEL);
   const top = SURFACE + CRUST;
   return {
-    roomW, top, height: top + LEVELS * ROW + 12,
+    roomW, top, height: top + LEVELS * ROW + 16,
     x: (col: number) => GUTTER_L + col * (roomW + GAP_X),
     y: (level: number) => top + (level - 1) * ROW,
   };
 }
 
-const mix = (a: readonly number[], b: readonly number[], t: number) =>
-  `rgb(${Math.round(a[0] + (b[0] - a[0]) * t)},${Math.round(a[1] + (b[1] - a[1]) * t)},${Math.round(a[2] + (b[2] - a[2]) * t)})`;
+const hash = (a: number, b: number) => { const s = Math.sin(a * 127.1 + b * 311.7) * 43758.5453; return s - Math.floor(s); };
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+const rgb = (a: number[], b: number[], t: number, alpha = 1) =>
+  `rgba(${Math.round(lerp(a[0], b[0], t))},${Math.round(lerp(a[1], b[1], t))},${Math.round(lerp(a[2], b[2], t))},${alpha})`;
+
+const ROCK_TOP = [74, 60, 52], ROCK_MID = [44, 42, 48], ROCK_DEEP = [22, 25, 33];
+const LAMP_HOT = [255, 226, 160], LAMP_WARM = [214, 160, 92], LAMP_DIM = [140, 112, 74];
+
+/** Everything that does not change between frames: sky, ruins, rock strata, shaft, pipes, carved recesses. */
+function paintStatic(width: number, height: number, dpr: number): HTMLCanvasElement {
+  const g = geometry(width);
+  const cv = document.createElement('canvas');
+  cv.width = Math.round(width * dpr); cv.height = Math.round(height * dpr);
+  const c = cv.getContext('2d')!;
+  c.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  // Dusk sky over the dead cities.
+  const sky = c.createLinearGradient(0, 0, 0, SURFACE);
+  sky.addColorStop(0, '#2b2733'); sky.addColorStop(0.55, '#6b4a48'); sky.addColorStop(1, '#c47a48');
+  c.fillStyle = sky; c.fillRect(0, 0, width, SURFACE);
+  const sun = c.createRadialGradient(width * 0.72, SURFACE - 6, 2, width * 0.72, SURFACE - 6, 70);
+  sun.addColorStop(0, 'rgba(255,200,140,0.75)'); sun.addColorStop(1, 'rgba(255,170,110,0)');
+  c.fillStyle = sun; c.fillRect(0, 0, width, SURFACE);
+  for (const [layer, color, maxH] of [[0, '#4a3a40', 40], [1, '#271e24', 28]] as const) {
+    c.fillStyle = color;
+    for (let x = -10, k = 0; x < width + 20; k++) {
+      const w = 12 + hash(k, layer + 3) * 26, h = 10 + hash(k, layer + 9) * maxH;
+      c.fillRect(x, SURFACE - h, w, h);
+      if (hash(k, layer + 5) > 0.6) c.fillRect(x + w * 0.3, SURFACE - h - 8, 2, 8); // antenna
+      if (layer === 0 && hash(k, 21) > 0.55) { // broken top
+        c.beginPath(); c.moveTo(x, SURFACE - h); c.lineTo(x + w * 0.5, SURFACE - h - 6); c.lineTo(x + w, SURFACE - h); c.fill();
+      }
+      x += w + (layer ? 3 : 6) + hash(k, layer + 11) * 10;
+    }
+  }
+
+  // Rock strata, warm near the surface and cold and blue with depth.
+  const bands = 14;
+  for (let k = 0; k <= bands; k++) {
+    const t = k / bands;
+    const col = t < 0.5 ? rgb(ROCK_TOP, ROCK_MID, t * 2) : rgb(ROCK_MID, ROCK_DEEP, (t - 0.5) * 2);
+    const y0 = SURFACE + (height - SURFACE) * (k / (bands + 1));
+    c.fillStyle = col; c.beginPath(); c.moveTo(0, height);
+    for (let x = 0; x <= width; x += 6) c.lineTo(x, y0 + 7 * Math.sin(x / 61 + k * 1.7) + 3 * Math.sin(x / 19 + k * 3.1));
+    c.lineTo(width, height); c.closePath(); c.fill();
+  }
+  for (let i = 0; i < 2200; i++) { // grit
+    const x = hash(i, 1) * width, y = SURFACE + hash(i, 2) * (height - SURFACE);
+    c.fillStyle = hash(i, 3) > 0.5 ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.18)';
+    c.fillRect(x, y, 1 + hash(i, 4) * 1.5, 1);
+  }
+  c.fillStyle = 'rgba(0,0,0,0.35)'; c.fillRect(0, SURFACE, width, 3); // the crust line
+
+  // The lift shaft, with rails.
+  c.fillStyle = '#0c0f14'; c.fillRect(SHAFT_X, g.top - 6, SHAFT_W, LEVELS * ROW + 10);
+  c.fillStyle = '#2a3039'; c.fillRect(SHAFT_X + 1, g.top - 6, 1, LEVELS * ROW + 10); c.fillRect(SHAFT_X + SHAFT_W - 2, g.top - 6, 1, LEVELS * ROW + 10);
+
+  // Carved recesses for every room, and a pipe along each floor.
+  for (let level = 1; level <= LEVELS; level++) {
+    const y = g.y(level);
+    c.fillStyle = 'rgba(0,0,0,0.45)';
+    for (let col = 0; col < SECTIONS_PER_LEVEL; col++) {
+      c.beginPath(); c.roundRect(g.x(col) - 1.5, y - 1.5, g.roomW + 3, ROOM_H + 3, 5); c.fill();
+    }
+    c.fillStyle = '#3a414b'; c.fillRect(GUTTER_L - 6, y + ROOM_H + 1.5, width - GUTTER_L - GUTTER_R + 8, 1.2);
+    c.fillStyle = 'rgba(255,255,255,0.08)'; c.fillRect(GUTTER_L - 6, y + ROOM_H + 1.5, width - GUTTER_L - GUTTER_R + 8, 0.5);
+  }
+  return cv;
+}
 
 export function FlatWorld(props: WorldProps) {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -63,82 +115,148 @@ export function FlatWorld(props: WorldProps) {
   propsRef.current = props;
   const hoverRef = useRef<{ level: number; col: number } | null>(null);
   const shown = useRef(new Float32Array(SECTION_COUNT).fill(1)); // brightness drawn now, eased toward the frame
-  const raf = useRef(0);
+  const kickRef = useRef<() => void>(() => {});
 
   useEffect(() => {
     const host = hostRef.current!, cv = canvasRef.current!;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let last = performance.now();
+    let staticCv: HTMLCanvasElement | null = null, staticKey = '';
+    let raf = 0, last = performance.now(), lastDraw = 0, peopleMax = 1;
+    const t0 = performance.now();
 
     const draw = (now: number) => {
+      raf = 0;
       const width = host.clientWidth;
       const g = geometry(width);
-      const dpr = window.devicePixelRatio || 1;
-      if (cv.width !== Math.round(width * dpr) || cv.height !== Math.round(g.height * dpr)) {
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      const key = `${width}x${dpr}`;
+      if (key !== staticKey) {
+        staticKey = key; staticCv = paintStatic(width, g.height, dpr);
         cv.width = Math.round(width * dpr); cv.height = Math.round(g.height * dpr);
         cv.style.width = `${width}px`; cv.style.height = `${g.height}px`;
       }
       const ctx = cv.getContext('2d')!;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.drawImage(staticCv!, 0, 0);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const t = reduce ? 0 : (now - t0) / 1000;
       const { frame, selected } = propsRef.current;
+      for (const s of frame.sections) if (s.people > peopleMax) peopleMax = s.people;
 
-      // Rock, darker with depth; the surface band with a ruined skyline.
-      const grad = ctx.createLinearGradient(0, g.top, 0, g.height);
-      grad.addColorStop(0, FLAT.rock); grad.addColorStop(1, FLAT.rockDeep);
-      ctx.fillStyle = grad; ctx.fillRect(0, 0, width, g.height);
-      ctx.fillStyle = FLAT.surface; ctx.fillRect(0, 0, width, SURFACE);
-      ctx.fillStyle = FLAT.skyline;
-      for (let x = 0, k = 0; x < width; k++) {
-        const w = 14 + ((k * 37) % 23), h = 8 + ((k * 53) % 26);
-        ctx.fillRect(x, SURFACE - h, w, h); x += w + 4 + ((k * 11) % 9);
-      }
-      ctx.fillStyle = FLAT.labelStrong; ctx.font = '600 12px "Barlow Semi Condensed", system-ui, sans-serif';
-      ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
-      ctx.fillText('Surface: closed for 30 years', GUTTER_L, 13);
-
-      // Ease each room's brightness toward its target.
+      // Ease brightness toward the frame (1 = full power, 0.6 = saving power, 0 = blackout).
       const dt = Math.min(0.1, (now - last) / 1000); last = now;
-      const k = reduce ? 1 : 1 - Math.exp(-dt / 0.12);
-      let moving = false;
+      const k = reduce ? 1 : 1 - Math.exp(-dt / 0.15);
       for (let i = 0; i < SECTION_COUNT; i++) {
         const s = frame.sections[i];
         const target = !s || s.lost ? 0 : s.lifeSupport < BLACKOUT ? 0 : 0.6 + 0.4 * Math.max(0, Math.min(1, s.power));
         const v = shown.current[i] + (target - shown.current[i]) * k;
-        if (Math.abs(target - v) > 0.004) moving = true;
-        shown.current[i] = Math.abs(target - v) < 0.004 ? target : v;
+        shown.current[i] = Math.abs(target - v) < 0.003 ? target : v;
       }
+
+      // Machine lights on the surface.
+      for (let j = 0; j < 7; j++) {
+        const x = (0.08 + j * 0.13 + hash(j, 40) * 0.05) * width, y = SURFACE - 18 - hash(j, 41) * 26;
+        const a = 0.35 + 0.65 * Math.max(0, Math.sin(t * (1.2 + hash(j, 42)) + j * 2));
+        ctx.fillStyle = `rgba(255,80,60,${a})`; ctx.beginPath(); ctx.arc(x, y, 1.6, 0, 7); ctx.fill();
+      }
+      ctx.font = '600 12px "Barlow Semi Condensed", system-ui, sans-serif';
+      ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+      ctx.fillStyle = 'rgba(255,236,220,0.85)';
+      ctx.fillText('The surface: closed for 30 years, held by the machines', GUTTER_L, 14);
+
+      // The lift, going up and down the shaft.
+      const liftY = g.top + ((Math.sin(t / 7) + 1) / 2) * (LEVELS * ROW - 14);
+      ctx.fillStyle = '#c9a46a'; ctx.fillRect(SHAFT_X + 2, liftY, SHAFT_W - 4, 12);
+      ctx.fillStyle = 'rgba(255,220,150,0.9)'; ctx.fillRect(SHAFT_X + 3, liftY + 2, SHAFT_W - 6, 3);
+
+      // Light spilling out of lit rooms onto the rock.
+      ctx.globalCompositeOperation = 'lighter';
+      for (let i = 0; i < SECTION_COUNT; i++) {
+        const b = shown.current[i];
+        if (b < 0.1) continue;
+        const level = Math.floor(i / SECTIONS_PER_LEVEL) + 1, col = i % SECTIONS_PER_LEVEL;
+        const cx = g.x(col) + g.roomW / 2, cy = g.y(level) + ROOM_H / 2, r = g.roomW * 0.75;
+        const gl = ctx.createRadialGradient(cx, cy, 2, cx, cy, r);
+        gl.addColorStop(0, `rgba(255,180,90,${0.13 * b})`); gl.addColorStop(1, 'rgba(255,180,90,0)');
+        ctx.fillStyle = gl; ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
+      }
+      ctx.globalCompositeOperation = 'source-over';
 
       // Rooms.
       ctx.font = '500 10px "Barlow Semi Condensed", system-ui, sans-serif';
-      ctx.textAlign = 'right';
       for (let level = 1; level <= LEVELS; level++) {
-        const y = g.y(level), h = ROW - GAP_Y;
-        ctx.fillStyle = level % 5 === 0 || level === 1 ? FLAT.labelStrong : FLAT.label;
-        ctx.fillText(String(level), GUTTER_L - 8, y + h / 2 + 0.5);
+        const y = g.y(level), h = ROOM_H;
+        ctx.textAlign = 'right';
+        ctx.fillStyle = level % 5 === 0 || level === 1 ? '#d5dbe2' : '#7d8794';
+        ctx.fillText(String(level), SHAFT_X - 5, y + h / 2 + 0.5);
         for (let col = 0; col < SECTIONS_PER_LEVEL; col++) {
           const i = (level - 1) * SECTIONS_PER_LEVEL + col;
           const s = frame.sections[i];
           if (!s) continue;
-          const x = g.x(col), w = g.roomW, st = stateOf(s), b = shown.current[i];
+          const x = g.x(col), w = g.roomW, st = stateOf(s);
+          // A light that is losing power flickers on its way out.
+          let b = shown.current[i];
+          if (b > 0.04 && b < 0.58 && !reduce) b *= 0.55 + 0.45 * Math.abs(Math.sin(t * 31 + i * 3.7));
+          ctx.save();
+          ctx.beginPath(); ctx.roundRect(x, y, w, h, 4); ctx.clip();
+
           if (st === 'empty') {
-            ctx.fillStyle = FLAT.empty; ctx.fillRect(x, y, w, h);
-            ctx.save(); ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
-            ctx.strokeStyle = FLAT.emptyHatch; ctx.lineWidth = 1; ctx.beginPath();
+            ctx.fillStyle = '#2b3037'; ctx.fillRect(x, y, w, h);
+            ctx.strokeStyle = '#3c434d'; ctx.lineWidth = 1; ctx.beginPath();
             for (let d = -h; d < w; d += 5) { ctx.moveTo(x + d, y + h); ctx.lineTo(x + d + h, y); }
-            ctx.stroke(); ctx.restore();
-          } else if (st === 'dark' && b < 0.05) {
-            ctx.fillStyle = s.co2 >= AIR_BAD ? FLAT.badAir : FLAT.dark; ctx.fillRect(x, y, w, h);
-            ctx.fillStyle = 'rgba(255,255,255,0.04)'; ctx.fillRect(x, y, w, 1); // keep the room's shape readable
+            ctx.stroke();
           } else {
-            // 0.6 = dimmed (saving power), 1 = full lamp; below 0.6 only while fading into a blackout.
-            const t = Math.max(0, Math.min(1, (b - 0.6) / 0.4));
-            const lampTop = b >= 0.6 ? mix(FLAT.dim, FLAT.lit, t) : mix([7, 9, 12], FLAT.dim, b / 0.6);
-            ctx.fillStyle = lampTop; ctx.fillRect(x, y, w, h);
-            ctx.fillStyle = 'rgba(20,14,4,0.22)'; ctx.fillRect(x, y + 3, w, h - 3); // lamp at the ceiling, floor in shade
+            const bad = st === 'dark' && s.co2 >= AIR_BAD;
+            // Back wall: lamp-lit warm, or dark blue-black; dark red when the air has gone bad.
+            const lit = Math.max(0, Math.min(1, b));
+            const warm = lit >= 0.6 ? (lit - 0.6) / 0.4 : 0;
+            const top = lit >= 0.6 ? rgb(LAMP_DIM, LAMP_HOT, warm) : rgb(bad ? [40, 12, 14] : [11, 14, 20], LAMP_DIM, lit / 0.6);
+            const bottom = lit >= 0.6 ? rgb([88, 64, 38], LAMP_WARM, warm) : rgb(bad ? [26, 8, 10] : [8, 10, 15], [88, 64, 38], lit / 0.6);
+            const wall = ctx.createLinearGradient(0, y, 0, y + h);
+            wall.addColorStop(0, top); wall.addColorStop(1, bottom);
+            ctx.fillStyle = wall; ctx.fillRect(x, y, w, h);
+            if (lit > 0.05) { // the lamp and its cone of light
+              ctx.fillStyle = `rgba(255,246,220,${lit})`; ctx.fillRect(x + w * 0.42, y + 1, w * 0.16, 1.5);
+              ctx.fillStyle = `rgba(255,235,190,${0.16 * lit})`;
+              ctx.beginPath(); ctx.moveTo(x + w * 0.42, y + 2.5); ctx.lineTo(x + w * 0.58, y + 2.5);
+              ctx.lineTo(x + w * 0.85, y + h); ctx.lineTo(x + w * 0.15, y + h); ctx.fill();
+            }
+            if (bad) { // emergency strip and a red haze
+              const p = reduce ? 0.8 : 0.45 + 0.55 * Math.max(0, Math.sin(t * 3.2 + i));
+              ctx.fillStyle = `rgba(255,70,55,${0.9 * p})`; ctx.fillRect(x, y, w, 1.5);
+              ctx.fillStyle = `rgba(200,40,40,${0.22 * p})`; ctx.fillRect(x, y, w, h);
+            }
+            // People: more figures in more crowded rooms.
+            const n = Math.max(1, Math.min(6, Math.round((s.people / peopleMax) * 6)));
+            const figure = lit > 0.3 ? 'rgba(52,34,18,0.9)' : bad ? 'rgba(255,140,130,0.28)' : 'rgba(140,165,200,0.22)';
+            ctx.fillStyle = figure;
+            for (let p = 0; p < n && w > 18; p++) {
+              const fx = x + 6 + hash(i, p) * (w - 22), fh = 6 + hash(i, p + 9) * 2.5;
+              ctx.beginPath(); ctx.arc(fx + 1.5, y + h - fh - 2.2, 1.7, 0, 7); ctx.fill();
+              ctx.beginPath(); ctx.roundRect(fx, y + h - fh, 3, fh, 1.2); ctx.fill();
+            }
+            if (s.structures.includes('fan')) { // a fan that turns with the power
+              const cx = x + 6, cy = y + 6, a = t * 10 * (st === 'lit' ? lit : 0) + i;
+              ctx.strokeStyle = lit > 0.3 ? 'rgba(60,40,20,0.8)' : 'rgba(150,170,200,0.3)'; ctx.lineWidth = 1;
+              ctx.beginPath(); ctx.arc(cx, cy, 4, 0, 7); ctx.stroke();
+              for (let bl = 0; bl < 3; bl++) {
+                const ang = a + (bl * Math.PI * 2) / 3;
+                ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(ang) * 3.4, cy + Math.sin(ang) * 3.4); ctx.stroke();
+              }
+            }
           }
-          if (s.structures.includes('plant') && !s.lost) { // a power plant: a small light square at the right
-            ctx.fillStyle = FLAT.plant; ctx.fillRect(x + w - 8, y + 3, 5, h - 6);
-            ctx.fillStyle = st === 'dark' ? FLAT.dark : '#3b3326'; ctx.fillRect(x + w - 7, y + 4, 3, h - 8);
+          ctx.restore();
+
+          if (s.structures.includes('plant') && !s.lost) { // a geothermal plant: a glowing core fed from below
+            const cx = x + w - 8, cy = y + h / 2 + 1;
+            const pulse = reduce ? 1 : 0.75 + 0.25 * Math.sin(t * 2.4 + i);
+            const on = st === 'lit' ? 1 : 0.35;
+            ctx.fillStyle = '#20262e'; ctx.fillRect(cx - 1, cy, 2, y + ROW + 2 - cy);
+            const core = ctx.createRadialGradient(cx, cy, 0.5, cx, cy, 9);
+            core.addColorStop(0, `rgba(255,250,220,${on * pulse})`); core.addColorStop(0.35, `rgba(255,150,60,${0.85 * on * pulse})`);
+            core.addColorStop(1, 'rgba(255,120,40,0)');
+            ctx.fillStyle = core; ctx.beginPath(); ctx.arc(cx, cy, 9, 0, 7); ctx.fill();
+            ctx.strokeStyle = 'rgba(30,24,20,0.9)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(cx, cy, 4.2, 0, 7); ctx.stroke();
           }
         }
       }
@@ -147,30 +265,40 @@ export function FlatWorld(props: WorldProps) {
       const { line, darkLevels } = blackoutLine(frame);
       if (darkLevels > 0) {
         const most = darkLevels >= 0.9 * LEVELS;
-        const yy = most ? g.top - 3 : g.y(line + 1) - GAP_Y / 2 - 0.5;
-        ctx.strokeStyle = FLAT.blackout; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.moveTo(GUTTER_L - 4, yy); ctx.lineTo(width - GUTTER_R + 4, yy); ctx.stroke();
+        const yy = most ? g.top - 7 : g.y(line + 1) - GAP_Y / 2;
+        const glow = ctx.createLinearGradient(0, yy - 8, 0, yy + 8);
+        glow.addColorStop(0, 'rgba(240,101,79,0)'); glow.addColorStop(0.5, 'rgba(240,101,79,0.35)'); glow.addColorStop(1, 'rgba(240,101,79,0)');
+        ctx.fillStyle = glow; ctx.fillRect(GUTTER_L - 6, yy - 8, width - GUTTER_L - GUTTER_R + 12, 16);
+        ctx.strokeStyle = '#ff7a63'; ctx.lineWidth = 2; ctx.setLineDash([8, 5]); ctx.lineDashOffset = -t * 12;
+        ctx.beginPath(); ctx.moveTo(GUTTER_L - 6, yy); ctx.lineTo(width - GUTTER_R + 6, yy); ctx.stroke(); ctx.setLineDash([]);
         const text = most ? 'Almost the whole Hollow is dark' : `Blackout below level ${line}: no air or fans`;
-        ctx.font = '600 11px "Barlow Semi Condensed", system-ui, sans-serif';
-        const tw = ctx.measureText(text).width;
-        const bx = width - GUTTER_R - tw - 12, by = yy - 9;
-        ctx.fillStyle = FLAT.blackout; ctx.beginPath(); ctx.roundRect(bx, by, tw + 12, 18, 3); ctx.fill();
-        ctx.fillStyle = '#1a0806'; ctx.textAlign = 'left'; ctx.fillText(text, bx + 6, by + 9.5);
+        ctx.font = '700 11.5px "Barlow Semi Condensed", system-ui, sans-serif';
+        const tw = ctx.measureText(text).width, bx = width - GUTTER_R - tw - 14, by = yy - 10;
+        ctx.fillStyle = '#ff6b55'; ctx.beginPath(); ctx.roundRect(bx, by, tw + 14, 20, 10); ctx.fill();
+        ctx.fillStyle = '#2a0904'; ctx.textAlign = 'left'; ctx.fillText(text, bx + 7, by + 10.5);
       }
 
-      // Your home (blue) and the hovered room (white).
-      const box = (t: { level: number; col: number } | null | undefined, color: string, lw: number) => {
-        if (!t || t.level < 1 || t.level > LEVELS) return;
+      // Your home (blue, with a tag) and the hovered room (white).
+      const box = (tt: { level: number; col: number } | null | undefined, color: string, lw: number) => {
+        if (!tt || tt.level < 1 || tt.level > LEVELS) return;
         ctx.strokeStyle = color; ctx.lineWidth = lw;
-        ctx.strokeRect(g.x(t.col) - 1.5, g.y(t.level) - 1.5, g.roomW + 3, ROW - GAP_Y + 3);
+        ctx.beginPath(); ctx.roundRect(g.x(tt.col) - 2, g.y(tt.level) - 2, g.roomW + 4, ROOM_H + 4, 6); ctx.stroke();
       };
-      box(hoverRef.current, FLAT.hover, 1.5);
-      box(selected, FLAT.home, 2);
+      box(hoverRef.current, 'rgba(255,255,255,0.9)', 1.5);
+      if (selected) {
+        box(selected, '#6cb6ff', 2.5);
+        const hx = g.x(selected.col), hy = g.y(selected.level) - 2;
+        ctx.font = '700 10px "Barlow Semi Condensed", system-ui, sans-serif';
+        ctx.fillStyle = '#6cb6ff'; ctx.beginPath(); ctx.roundRect(hx, hy - 12, 34, 12, 6); ctx.fill();
+        ctx.fillStyle = '#06121f'; ctx.textAlign = 'left'; ctx.fillText('Home', hx + 6, hy - 5.5);
+      }
 
-      raf.current = moving ? requestAnimationFrame(draw) : 0;
+      if (!reduce) schedule();
     };
-    const kick = () => { if (!raf.current) { last = performance.now(); raf.current = requestAnimationFrame(draw); } };
-    (host as HTMLDivElement & { __kick?: () => void }).__kick = kick;
+    // ~30 frames a second is enough for lamps, fans and the lift.
+    const loop = (now: number) => { raf = 0; if (now - lastDraw >= 32) { lastDraw = now; draw(now); } else schedule(); };
+    const schedule = () => { if (!raf) raf = requestAnimationFrame(loop); };
+    kickRef.current = () => { if (reduce) { if (!raf) raf = requestAnimationFrame(draw); } else schedule(); };
 
     const hit = (e: PointerEvent) => {
       const r = cv.getBoundingClientRect();
@@ -183,24 +311,24 @@ export function FlatWorld(props: WorldProps) {
     };
     let lastKey = '';
     const onMove = (e: PointerEvent) => {
-      const t = hit(e);
-      const key = t ? `${t.level}:${t.col}` : '';
+      const tt = hit(e);
+      const key = tt ? `${tt.level}:${tt.col}` : '';
       if (key === lastKey) return;
-      lastKey = key; hoverRef.current = t; propsRef.current.onHover(t); kick();
+      lastKey = key; hoverRef.current = tt; propsRef.current.onHover(tt); kickRef.current();
     };
-    const onLeave = () => { lastKey = ''; hoverRef.current = null; propsRef.current.onHover(null); kick(); };
+    const onLeave = () => { lastKey = ''; hoverRef.current = null; propsRef.current.onHover(null); kickRef.current(); };
     cv.addEventListener('pointermove', onMove);
     cv.addEventListener('pointerleave', onLeave);
-    const ro = new ResizeObserver(kick); ro.observe(host);
-    document.fonts?.ready.then(kick);
-    kick();
+    const ro = new ResizeObserver(() => kickRef.current()); ro.observe(host);
+    document.fonts?.ready.then(() => kickRef.current());
+    kickRef.current();
     return () => {
-      cancelAnimationFrame(raf.current); raf.current = 0;
+      cancelAnimationFrame(raf); raf = 0; kickRef.current = () => {};
       cv.removeEventListener('pointermove', onMove); cv.removeEventListener('pointerleave', onLeave); ro.disconnect();
     };
   }, []);
 
-  useEffect(() => { (hostRef.current as (HTMLDivElement & { __kick?: () => void }) | null)?.__kick?.(); }, [props.frame, props.selected]);
+  useEffect(() => { kickRef.current(); }, [props.frame, props.selected]);
 
   return (
     <div ref={hostRef} className="flat-world">
