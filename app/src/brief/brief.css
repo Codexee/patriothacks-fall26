@@ -58,7 +58,7 @@
 .brief-foot p { max-width: 100ch; margin-bottom: 6px; overflow-wrap: anywhere; }
 .brief-foot strong { color: var(--text); }
 
-@media (max-width: 760px) {
+@media screen and (max-width: 760px) {
   .brief-head, .check { grid-template-columns: 1fr; gap: 20px; }
   .brief-head h1 { font-size: 32px; }
   .facts { grid-template-columns: 1fr 1fr; }
@@ -68,7 +68,7 @@
 }
 
 /* Print: one page, black on white. */
-@page { size: letter portrait; margin: 11mm 13mm; }
+@page { size: letter portrait; margin: 9mm 12mm; }
 @media print {
   .pnav, .no-print { display: none !important; }
   .print-only { display: inline; }
@@ -77,28 +77,32 @@
     max-width: none; padding: 0; font-size: 9.5pt; line-height: 1.35; color: #000;
   }
   .brief-page a { color: #000; text-decoration: none; }
-  .brief section { margin-top: 14pt; break-inside: avoid; }
+  .brief section { margin-top: 8pt; }
+  .brief-page { font-size: 9pt; }
+  .facts > div { break-inside: avoid; }
   .brief h2 { font-size: 11pt; margin-bottom: 4pt; }
   .brief .small, .brief-foot, .facts dt, .facts dd.sub, .pg th { font-size: 8pt; }
   .brief-head { grid-template-columns: 1.6fr 1fr; gap: 18pt; }
-  .brief-head h1 { font-size: 26pt; }
+  .brief-head h1 { font-size: 22pt; }
   .brief-head .hollow-line { font-size: 12pt; margin: 2pt 0 6pt; }
   .risk { padding: 7pt 9pt 2pt; border-color: #000; }
   .risk-none { font-size: 13pt; }
   .risk-value { font-size: 22pt; }
-  .facts { margin-top: 12pt; border-top-color: #000; }
-  .facts > div { padding-top: 6pt; padding-bottom: 6pt; }
-  .facts dt { min-height: 2.6em; }
-  .facts dd { font-size: 15pt; }
+  .facts { margin-top: 8pt; border-top-color: #000; }
+  .facts > div { padding-top: 4pt; padding-bottom: 4pt; }
+  .facts dt { min-height: 0; }
+  .facts dd { font-size: 13pt; }
   .levels-cells { height: 12pt; }
   .levels-cells span { height: 5pt; background: #bbb; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   .levels-cells span.here { height: 12pt; background: #000; }
   .check { gap: 18pt; }
   .check tr.me td { background: none; font-weight: 700; box-shadow: none; }
-  .pg td { padding: 2.5pt 8pt 2.5pt 0; }
+  .pg td { padding: 1.5pt 8pt 1.5pt 0; }
   .pg th { padding: 2pt 8pt 2pt 0; }
   .pg p { margin-bottom: 4pt; }
   .outages tr.print-hide { display: none; }
-  .brief-foot { margin-top: 12pt; padding-top: 6pt; border-top-color: #000; }
+  .outages td:nth-child(2) { white-space: nowrap; }
+  .outages td:nth-child(6), .outages td:nth-child(7) { white-space: normal; }
+  .brief-foot { margin-top: 8pt; padding-top: 4pt; border-top-color: #000; }
   .brief-foot p { margin-bottom: 2pt; }
 }

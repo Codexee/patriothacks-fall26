@@ -6,7 +6,7 @@ import { getLiveRisk, type LiveRisk } from '../live/data.ts';
 import { PageNav, fetchJson, fmtDay, fmtHours, fmtInt, fmtShare, fmtTime, ordinal, parseUtc, useJson } from './shared.tsx';
 import './brief.css';
 
-const PRINT_ROWS = 8; // past outages that fit on the printed page
+const PRINT_ROWS = 6; // past outages that fit on the printed page
 
 export function Names({ county }: { county: County }) {
   return (
