@@ -2,6 +2,14 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-19 (20): Handoff to Adarsh; real-forecast result; cross-section; deploy prep
+
+- **Adarsh: start with `docs/handoffs/2026-11-19-earth-product.md`.** It says what works, what is not verified, the numbers to use and the next steps. Neil is offline until later on Thursday.
+- **Models:** tested on real archived weather forecasts for 2024: 51% of events warned 12 h ahead, about 11 false alarms per area per year. A comparison at equal false-alarm rates is in `models/RESULTS.md` and on the evidence page.
+- **App:** Hollow cross-section (`#/hollow`), Without/With the warning, live counters, detailed evidence and brief pages, live page with record features. App data trimmed to 14 MB.
+- **Deploy:** not done. Steps are in `docs/deploy.md`; it needs a Vercel account and a free EIA key.
+- **Action for everyone:** `git pull`, read the handoff and `TODO.md`, claim an item in `TODO.md` by writing your name after it.
+
 ## 2026-11-18 (19): First full build: data, models v2, map, story, brief, evidence
 
 - **Data:** `data/` builds 1,477 real outage events (2015–2024) from EAGLE-I and EIA-930. Set up: `brew install uv libomp`, then `cd data && uv sync`. Raw files (about 12 GB) stay in `data/raw/`, which git ignores; see `data/README.md` to fetch them.

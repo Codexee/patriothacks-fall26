@@ -21,8 +21,8 @@ We are a 4-person team competing in **Patriot HackFest Fall 2026** (George Mason
 ## Where we are (update this section after every milestone)
 
 - **Phase:** Wed Nov 18, late night. **Earth is the product.** Locked spec: `.plans/before-during-after-spec.md` (project unnamed). Contracts: `contracts/README.md`.
-- **Done:** data pipeline (`data/`): 1,477 real US outage events, 2015–2024 (gate G1 passed). Models v2 (`models/RESULTS.md`): on the untouched 2023–2024 test, 13% of events warned 12 h ahead without a weather forecast, 51% with one (upper bound: the backtest uses observed weather); the check-first ranking beats its baseline. App (`app/`, run `npm run dev`, routes `#/`, `#/event/<id>`, `#/?story=texas2021`, `#/brief/<fips>`, `#/evidence`, `#/live`). **Read the top entry of `CHANGELOG.md`.**
-- **Next:** the real-archived-forecast test for 2024 (running), deploy to Vercel with `EIA_API_KEY`, trim `app/public/data` (33 MB), then the ladder (heat first) and the pitch.
+- **Done:** data pipeline (`data/`): 1,477 real US outage events, 2015–2024 (gate G1 passed). Models v2 (`models/RESULTS.md`): on the untouched 2023–2024 test, 13% of events warned 12 h ahead without a weather forecast, 51% with one (confirmed with real archived forecasts for 2024, at about 11 false alarms per area per year); the check-first ranking beats its baseline. App (`app/`, run `npm run dev`, routes `#/`, `#/event/<id>`, `#/?story=texas2021`, `#/brief/<fips>`, `#/evidence`, `#/live`). **Read the top entry of `CHANGELOG.md`.**
+- **Next:** see `TODO.md` and the newest file in `docs/handoffs/`. In short: deploy to Vercel with `EIA_API_KEY` (`docs/deploy.md`), pick the project name, decide the lead claims, then the pitch. The heat step only after those.
 - **Blockers:** the judging criteria and the video length are not published. The warning model does not beat every simple rule without a weather forecast: the pitch must say so (see `models/RESULTS.md`).
 
 ## Start of every session (all AIs)
