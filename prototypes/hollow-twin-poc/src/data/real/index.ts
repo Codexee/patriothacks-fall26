@@ -15,6 +15,22 @@ export interface GridData {
   /** Hourly share (0..1) of one plant's capacity that is lost, from the real generation loss. Peak = 1. */
   cascadeLoss: number[];
   source: Source;
+  /**
+   * More plant-loss shapes from other real grid failures (one fuel of one balancing authority each), keyed by id:
+   * elliottTva, elliottCple (Winter Storm Elliott, Dec 2022), sppWind (SPP wind, Feb 2021). Optional: absent in
+   * older generated files, and then the scenarios use guessed shapes.
+   */
+  lossShapes?: Record<string, LossShape>;
+}
+
+/** One real plant-loss shape. loss: hourly share (0..1) of one plant's capacity lost, peak = 1. */
+export interface LossShape {
+  loss: number[];
+  stats: {
+    ba: string; fuel: string; refMW: number; peakLossMW: number; peakLossShare: number; peakAt: string; minMW: number;
+    hours: number; hoursAboveHalf: number; meanLossMW: number; start: string; end: string; imputedHours: number;
+  };
+  source: Source;
 }
 
 /** Workstream 2 (EAGLE-I). Written by scripts/build_outages.py. */
