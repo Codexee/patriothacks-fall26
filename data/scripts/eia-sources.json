@@ -1,0 +1,42 @@
+{
+  "eia-ercot-2021.json": {
+    "url": "https://api.eia.gov/v2/electricity/rto/region-data/data/",
+    "license": "Public domain (US government)",
+    "license_url": "https://www.eia.gov/about/copyrights_reuse.php",
+    "retrieved_date": "2026-11-19",
+    "retrieved_at": [
+      "2026-11-19T01:21:55.534962+00:00"
+    ],
+    "query": {
+      "respondent": "ERCO",
+      "frequency": "hourly",
+      "start": "2021-02-08T00",
+      "end": "2021-02-22T23",
+      "types": [
+        "D",
+        "DF",
+        "NG"
+      ],
+      "length": 5000,
+      "offsets": [
+        0
+      ]
+    },
+    "notes": "Source: U.S. Energy Information Administration. Historical revised values; not archived publication vintages. UTC hour ending. Null values retained. API length<=5000 with offset pagination."
+  },
+  "eia-ercot-2021-fuels.json": {
+    "url": "https://api.eia.gov/v2/electricity/rto/fuel-type-data/data/",
+    "license": "Public domain (US government)",
+    "license_url": "https://www.eia.gov/about/copyrights_reuse.php",
+    "retrieved_date": "2026-11-19",
+    "query": {
+      "respondent": "ERCO",
+      "frequency": "hourly",
+      "start": "2021-02-08T00",
+      "end": "2021-02-22T23",
+      "fueltypes": "all (no fuel facet)",
+      "length": 5000
+    },
+    "notes": "All returned fuel types; missing values remain null. Fuel groups are not individual plant telemetry."
+  }
+}

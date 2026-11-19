@@ -1,0 +1,31 @@
+[
+  {
+    "file": "data/flint-samples.json",
+    "url": "https://flintwaterstudy.org/wp-content/uploads/2015/12/Flint-Samples-FINAL.xlsx",
+    "license": "No explicit reuse license stated in the source workbook or download page; public research data, attribution retained.",
+    "retrieved": "2026-11-19",
+    "raw_sha256": "96b00f626011b97193ed24d8b97f51a22643c05e95d79dafd50900e7af0c81fb",
+    "notes": "Virginia Tech FlintWaterStudy team and Flint residents. 271 included rows from 'Samples from Flint Water homes'; excluded-sample/comparison worksheets and names omitted. Zip is text; duplicate SampleIDs retained. Pb1/2/3 are ppb at first draw/45-second flush/2-minute flush. Values below 1 ppb are below the stated detection limit; do not treat them as precise measurements. Numeric XML cache binary artifacts rounded to 12 decimals. No per-sample dates are supplied; no admission-date comparison is inferred."
+  },
+  {
+    "file": "data/hubei-cases.json",
+    "url": "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv",
+    "license": "CC BY 4.0",
+    "license_url": "https://github.com/CSSEGISandData/COVID-19#terms-of-use",
+    "retrieved": "2026-11-19",
+    "raw_sha256": "e6234a59eec4359d2577358b5220e1a7e3da74c162913cdb7d882db1413f98c2",
+    "notes": "COVID-19 Data Repository by the Center for Systems Science and Engineering (CSSE) at Johns Hopkins University (https://github.com/CSSEGISandData/COVID-19). Hubei/China row only, all source dates preserved. Cumulative confirmed cases; source revisions/decreases retained. Cite Dong E, Du H, Gardner L, Lancet Infect Dis 20(5):533–534, doi:10.1016/S1473-3099(20)30120-1. This is the final revised historical series, not vintage data as known each day."
+  },
+  {
+    "file": "data/wuhan-early-points.json",
+    "url": [
+      "https://en.nhc.gov.cn/2020-04/06/c_78840_2.htm",
+      "https://www.who.int/emergencies/disease-outbreak-news/item/2020-DON233",
+      "https://www.imperial.ac.uk/mrc-global-infectious-disease-analysis/covid-19/report-1-case-estimates-of-covid-19/",
+      "https://www.imperial.ac.uk/earth-observation-network/publications/?_type=on&id=1154&imaxyear=&iminyear=&itypes=&keywords=&limit=10&page=208&resgrpMemberPubs=true&respub-action=search.html"
+    ],
+    "license": "Hand-entered factual numbers with citations; source text remains under each publisher's terms. No general dataset reuse license asserted for NHC, WHO or Imperial reports.",
+    "retrieved": "2026-11-19",
+    "notes": "Three distinct cited points: Wuhan MHC 59 unexplained-pneumonia cases Jan5 (verified via NHC retrospective timeline); WHO41 confirmed reported Jan11–12; Imperial Report1 published Jan17 estimates1723 symptom onsets byJan12 (95%CI427–4471). Case definitions, event dates, publication dates and geography are distinct. Imperial abstract verified on official publication listing; report landing page returned403 during retrieval."
+  }
+]

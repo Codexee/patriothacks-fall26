@@ -1,0 +1,21 @@
+{
+  "texas-county-outages.json": {
+    "url": "https://data.4tu.nl/ndownloader/items/fd2fd715-41eb-476a-a9b7-f50d886afb75/versions/1",
+    "doi": "10.4121/fd2fd715-41eb-476a-a9b7-f50d886afb75.v1",
+    "metadata_url": "https://data.4tu.nl/v2/articles/fd2fd715-41eb-476a-a9b7-f50d886afb75",
+    "member_url": "https://data.4tu.nl/file/fd2fd715-41eb-476a-a9b7-f50d886afb75/419c3298-260e-4ff9-838a-99716d5d00a0",
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "retrieved": "2026-11-19",
+    "notes": "Jikun Liu, 4TU.ResearchData, version 1. All 28,448 county/time records retained (254 counties, 112 three-hour timestamps, Feb 11-24 2021). Only county, time, outage_count and temp retained; numeric values preserved. Source DATASETS.md states timestamps are naive, with no timezone specified; do not label them UTC or align to EIA without verification. It calls outage_count outages/events, without confirming customers. Temperature is described only as degrees; Celsius/Fahrenheit is not specified. No unit conversion or imputation.",
+    "raw_sha256": "43c706f4e076796870ee8ee2816cdf06bf0916d371036a7c01379580653f0921"
+  },
+  "texas-counties.geojson": {
+    "url": "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_county_20m.zip",
+    "license": "Public domain (U.S. government work)",
+    "license_url": "https://www2.census.gov/foia/ds_policies/ds027.pdf",
+    "retrieved": "2026-11-19",
+    "notes": "U.S. Census Bureau cb_2020_us_county_20m, all 254 Texas counties (STATEFP 48). Source is already generalized to 1:20,000,000. Retained GEOID, NAME, STATEFP, and all polygon vertices, rounded to 4 decimal places; rings reversed to GeoJSON exterior orientation. NAD83 longitude/latitude treated as WGS84 at this display scale; no datum transform. Not for engineering measurements.",
+    "raw_sha256": "9394913edbd6f72791b06b84509e59ea2d275d10b73ae27ef87df3bdb061890c"
+  }
+}

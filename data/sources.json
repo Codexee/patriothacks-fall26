@@ -1,0 +1,89 @@
+{
+  "files": {
+    "eia-ercot-2021.json": {
+      "url": "https://api.eia.gov/v2/electricity/rto/region-data/data/",
+      "license": "Public domain (US government)",
+      "license_url": "https://www.eia.gov/about/copyrights_reuse.php",
+      "retrieved_date": "2026-11-19",
+      "retrieved_at": [
+        "2026-11-19T01:21:55.534962+00:00"
+      ],
+      "query": {
+        "respondent": "ERCO",
+        "frequency": "hourly",
+        "start": "2021-02-08T00",
+        "end": "2021-02-22T23",
+        "types": [
+          "D",
+          "DF",
+          "NG"
+        ],
+        "length": 5000,
+        "offsets": [
+          0
+        ]
+      },
+      "notes": "Source: U.S. Energy Information Administration. Historical revised values; not archived publication vintages. UTC hour ending. Null values retained. API length<=5000 with offset pagination."
+    },
+    "eia-ercot-2021-fuels.json": {
+      "url": "https://api.eia.gov/v2/electricity/rto/fuel-type-data/data/",
+      "license": "Public domain (US government)",
+      "license_url": "https://www.eia.gov/about/copyrights_reuse.php",
+      "retrieved_date": "2026-11-19",
+      "query": {
+        "respondent": "ERCO",
+        "frequency": "hourly",
+        "start": "2021-02-08T00",
+        "end": "2021-02-22T23",
+        "fueltypes": "all (no fuel facet)",
+        "length": 5000
+      },
+      "notes": "All returned fuel types; missing values remain null. Fuel groups are not individual plant telemetry."
+    },
+    "texas-county-outages.json": {
+      "url": "https://data.4tu.nl/ndownloader/items/fd2fd715-41eb-476a-a9b7-f50d886afb75/versions/1",
+      "doi": "10.4121/fd2fd715-41eb-476a-a9b7-f50d886afb75.v1",
+      "metadata_url": "https://data.4tu.nl/v2/articles/fd2fd715-41eb-476a-a9b7-f50d886afb75",
+      "member_url": "https://data.4tu.nl/file/fd2fd715-41eb-476a-a9b7-f50d886afb75/419c3298-260e-4ff9-838a-99716d5d00a0",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "notes": "Jikun Liu, 4TU.ResearchData, version 1. All 28,448 county/time records retained (254 counties, 112 three-hour timestamps, Feb 11-24 2021). Only county, time, outage_count and temp retained; numeric values preserved. Source DATASETS.md states timestamps are naive, with no timezone specified; do not label them UTC or align to EIA without verification. It calls outage_count outages/events, without confirming customers. Temperature is described only as degrees; Celsius/Fahrenheit is not specified. No unit conversion or imputation.",
+      "raw_sha256": "43c706f4e076796870ee8ee2816cdf06bf0916d371036a7c01379580653f0921",
+      "retrieved_date": "2026-11-19"
+    },
+    "texas-counties.geojson": {
+      "url": "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_county_20m.zip",
+      "license": "Public domain (U.S. government work)",
+      "license_url": "https://www2.census.gov/foia/ds_policies/ds027.pdf",
+      "notes": "U.S. Census Bureau cb_2020_us_county_20m, all 254 Texas counties (STATEFP 48). Source is already generalized to 1:20,000,000. Retained GEOID, NAME, STATEFP, and all polygon vertices, rounded to 4 decimal places; rings reversed to GeoJSON exterior orientation. NAD83 longitude/latitude treated as WGS84 at this display scale; no datum transform. Not for engineering measurements.",
+      "raw_sha256": "9394913edbd6f72791b06b84509e59ea2d275d10b73ae27ef87df3bdb061890c",
+      "retrieved_date": "2026-11-19"
+    },
+    "flint-samples.json": {
+      "url": "https://flintwaterstudy.org/wp-content/uploads/2015/12/Flint-Samples-FINAL.xlsx",
+      "license": "No explicit reuse license stated in the source workbook or download page; public research data, attribution retained.",
+      "raw_sha256": "96b00f626011b97193ed24d8b97f51a22643c05e95d79dafd50900e7af0c81fb",
+      "notes": "Virginia Tech FlintWaterStudy team and Flint residents. 271 included rows from 'Samples from Flint Water homes'; excluded-sample/comparison worksheets and names omitted. Zip is text; duplicate SampleIDs retained. Pb1/2/3 are ppb at first draw/45-second flush/2-minute flush. Values below 1 ppb are below the stated detection limit; do not treat them as precise measurements. Numeric XML cache binary artifacts rounded to 12 decimals. No per-sample dates are supplied; no admission-date comparison is inferred.",
+      "retrieved_date": "2026-11-19"
+    },
+    "hubei-cases.json": {
+      "url": "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv",
+      "license": "CC BY 4.0",
+      "license_url": "https://github.com/CSSEGISandData/COVID-19#terms-of-use",
+      "raw_sha256": "e6234a59eec4359d2577358b5220e1a7e3da74c162913cdb7d882db1413f98c2",
+      "notes": "COVID-19 Data Repository by the Center for Systems Science and Engineering (CSSE) at Johns Hopkins University (https://github.com/CSSEGISandData/COVID-19). Hubei/China row only, all source dates preserved. Cumulative confirmed cases; source revisions/decreases retained. Cite Dong E, Du H, Gardner L, Lancet Infect Dis 20(5):533\u2013534, doi:10.1016/S1473-3099(20)30120-1. This is the final revised historical series, not vintage data as known each day.",
+      "retrieved_date": "2026-11-19"
+    },
+    "wuhan-early-points.json": {
+      "url": [
+        "https://en.nhc.gov.cn/2020-04/06/c_78840_2.htm",
+        "https://www.who.int/emergencies/disease-outbreak-news/item/2020-DON233",
+        "https://www.imperial.ac.uk/mrc-global-infectious-disease-analysis/covid-19/report-1-case-estimates-of-covid-19/",
+        "https://www.imperial.ac.uk/earth-observation-network/publications/?_type=on&id=1154&imaxyear=&iminyear=&itypes=&keywords=&limit=10&page=208&resgrpMemberPubs=true&respub-action=search.html"
+      ],
+      "license": "Hand-entered factual numbers with citations; source text remains under each publisher's terms. No general dataset reuse license asserted for NHC, WHO or Imperial reports.",
+      "notes": "Three distinct cited points: Wuhan MHC 59 unexplained-pneumonia cases Jan5 (verified via NHC retrospective timeline); WHO41 confirmed reported Jan11\u201312; Imperial Report1 published Jan17 estimates1723 symptom onsets byJan12 (95%CI427\u20134471). Case definitions, event dates, publication dates and geography are distinct. Imperial abstract verified on official publication listing; report landing page returned403 during retrieval.",
+      "retrieved_date": "2026-11-19"
+    }
+  }
+}
