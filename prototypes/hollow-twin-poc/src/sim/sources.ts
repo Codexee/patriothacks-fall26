@@ -25,9 +25,9 @@ const fixed: Record<'co2' | 'infected' | 'wetBulb' | 'directorate' | 'water' | '
     url: 'https://doi.org/10.1152/japplphysiol.00738.2021',
   },
   directorate: {
-    label: "The Directorate's census (our assumption)",
+    label: "The Directorate's census",
     detail:
-      "The track brief says 2 billion people live in the Hollow and that the Directorate's public numbers don't match what people see. Here its census misses a share of residents that grows with depth: none on level 1, 30% on level 50 (families packed in beyond the registered count). The 30% is our assumption, not data. Population is shown at the Hollow's scale: each simulated person stands for about 1,250. The Residents' System receives only the census; the real count stays in the test world.",
+      "The track brief says 2 billion people live in the Hollow. It says the Directorate's public numbers don't match what people see, but only about the lung-sickness outbreak, not the population. So the census here is accurate. (WORLD.census in the engine can switch on an undercount of the deep levels; that is our assumption, not the brief.) Population is shown at the Hollow's scale: each simulated person stands for about 1,250.",
     url: 'https://www.census.gov/programs-surveys/decennial-census/about/coverage-measurement.html',
   },
   water: {

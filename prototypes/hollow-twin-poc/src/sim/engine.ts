@@ -34,7 +34,7 @@ export const WORLD = {
   network: false, // #7 the Directorate cuts the network
   families: false, // #8 families split across levels
   surface: false, // #13 the "surface has healed" rumor
-  census: true, // the Directorate's census undercounts the crowded deep levels (its numbers "don't match")
+  census: false, // off: the Directorate publishes an accurate census. (On: it undercounts the deep levels; our assumption, not in the brief.)
 };
 
 // The Directorate's census: the brief says 2 billion people live in the Hollow and that the Directorate's public
@@ -400,7 +400,7 @@ function makeBulletin(state: SimState, s: Internal): Bulletin {
   for (let i = 0; i < SECTION_COUNT; i++) { real += s.people[i]; counted += s.people[i] * censusShare(lvl(i)); }
   const bn = (x: number) => `${(x * scale / 1e9).toFixed(2)} billion`;
   directorate.push(`Census: ${bn(counted)} people`);
-  measured.push(`Population: ${bn(real)} (${Math.round((1 - counted / Math.max(1, real)) * 100)}% not counted)`);
+  measured.push(WORLD.census ? `Population: ${bn(real)} (${Math.round((1 - counted / Math.max(1, real)) * 100)}% not counted)` : `Population: ${bn(real)} (the census is accurate)`);
   let online = 0;
   for (const p of s.plants) if (s.hour >= p.offlineUntil) online++;
   measured.push(`Plants online ${online}/${s.plants.length}`);
