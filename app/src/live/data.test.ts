@@ -3,7 +3,7 @@ import type { ModelFile } from '../contracts.ts';
 import fixture from '../model/fixtures/fixture_binary.json';
 import parity from '../model/fixtures/features_parity.json';
 import { featuresAt } from '../model/features.ts';
-import { scoreSeries, toHourRows, type EiaPayload } from './data.ts';
+import { nowIndex, scoreSeries, toAllRows, toHourRows, type EiaPayload } from './data.ts';
 import sample from './sample/eia-ERCO.json';
 
 describe('live data', () => {
@@ -45,5 +45,25 @@ describe('live data', () => {
       fuel: [{ period: '2026-01-01T01', fueltype: 'NG', value: '40' }, { period: '2026-01-01T01', fueltype: 'WAT', value: '5' }],
     });
     expect(r).toEqual([{ t: Date.UTC(2026, 0, 1, 0), demand: 100, forecast: 90, netgen: null, interchange: null, gen_gas: 40, gen_coal: null, gen_nuclear: null, gen_wind: null, gen_solar: null }]);
+  });
+
+  it('keeps forecast-only hours after now for fc12, and scores only up to now', () => {
+    const p = {
+      region: [
+        { period: '2026-01-01T01', type: 'D', value: 100 },
+        { period: '2026-01-01T01', type: 'DF', value: 90 },
+        { period: '2026-01-01T02', type: 'DF', value: 120 },
+        { period: '2026-01-01T03', type: 'DF', value: 110 },
+      ],
+      fuel: [],
+    };
+    const all = toAllRows(p);
+    expect(all.length).toBe(3);
+    expect(nowIndex(all)).toBe(0);
+    expect(toHourRows(p).length).toBe(1);
+    const f = featuresAt(all, 0);
+    expect(f.fc12_vs_30d_peak).toBeCloseTo(1.2, 12); // max forecast of the next 12 h / 30-day peak
+    expect(f.fc12_vs_record).toBeNull();             // needs long history
+    expect(scoreSeries(fixture as ModelFile, all, 168).length).toBe(1);
   });
 });

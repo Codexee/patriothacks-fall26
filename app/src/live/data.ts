@@ -33,8 +33,23 @@ function num(v: string | number | null | undefined): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-/** One row per hour, sorted by time. A value EIA did not send stays null (the model reads it as missing). */
+/** One row per hour up to "now" (the latest hour with demand), sorted by time. A value EIA did not
+ *  send stays null (the model reads it as missing). */
 export function toHourRows(p: Pick<EiaPayload, 'region' | 'fuel'>): HourRow[] {
+  const rows = toAllRows(p);
+  return rows.slice(0, nowIndex(rows) + 1);
+}
+
+/** The index of "now": the latest row with demand. The rows after it hold only forecasts. */
+export function nowIndex(rows: HourRow[]): number {
+  let i = rows.length - 1;
+  while (i >= 0 && rows[i].demand == null) i--;
+  return i;
+}
+
+/** Like toHourRows, but keeps the later hours that have a day-ahead forecast (the model feature
+ *  fc12 reads the forecast for the next 12 hours). */
+export function toAllRows(p: Pick<EiaPayload, 'region' | 'fuel'>): HourRow[] {
   const byT = new Map<number, HourRow>();
   const row = (period: string): HourRow | null => {
     const t = periodStart(String(period));
@@ -57,8 +72,8 @@ export function toHourRows(p: Pick<EiaPayload, 'region' | 'fuel'>): HourRow[] {
     if (r && f) r[f] = num(x.value);
   }
   const rows = prepareRows([...byT.values()]);
-  // The newest hours often arrive without demand. "Now" is the latest hour that has it.
-  while (rows.length && rows[rows.length - 1].demand == null) rows.pop();
+  // Drop trailing hours that have neither demand nor a forecast.
+  while (rows.length && rows[rows.length - 1].demand == null && rows[rows.length - 1].forecast == null) rows.pop();
   return rows;
 }
 
@@ -109,10 +124,12 @@ export interface RiskPoint {
   p: number;       // model probability that an event starts within 48 h
 }
 
-/** Model output for each of the last `hours` rows. */
+/** Model output for each of the last `hours` rows up to "now". `rows` may continue past now with
+ *  forecast-only hours (from toAllRows); those are read as the coming forecast, not scored. */
 export function scoreSeries(model: ModelFile, rows: HourRow[], hours = 168): RiskPoint[] {
   const out: RiskPoint[] = [];
-  for (let i = Math.max(0, rows.length - hours); i < rows.length; i++) {
+  const end = nowIndex(rows);
+  for (let i = Math.max(0, end + 1 - hours); i <= end; i++) {
     out.push({ t: rows[i].t, p: predict(model, featureVector(model.features, featuresAt(rows, i))) });
   }
   return out;
@@ -127,7 +144,7 @@ export async function getLiveRisk(ba: string): Promise<LiveRisk> {
   try {
     const [payload, model] = await Promise.all([fetchLive(ba), loadWarnModel()]);
     if (!model) return { kind: 'none', reason: 'The warning model file is not available yet.' };
-    const rows = toHourRows(payload);
+    const rows = toAllRows(payload);
     const last = scoreSeries(model, rows, 1)[0];
     if (!last) return { kind: 'none', reason: `EIA has no recent data for ${ba}.` };
     return { kind: 'live', ba, p: last.p, threshold: model.threshold, t: last.t, fetchedAt: payload.fetchedAt };
