@@ -183,6 +183,8 @@ def main() -> None:
     # Events whose whole 72 h warning window lies inside the forecast period.
     ev = d.ev[(d.ev.start_h >= p0 + C.LOOKBACK_H) & (d.ev.start_h < p1)]
     panel = C.Panel(df, rows, ev)
+    # Saved for matched.py (equal false-alarm comparison): rows, real scores, period bounds.
+    np.savez(C.ART / "real_forecast_scores.npz", rows=rows, real=real[rows], p0=p0, p1=p1)
     res = {"period": [str(C.from_h(p0)), str(C.from_h(p1 - 1))], "eventsWindowFrom": str(C.from_h(p0 + C.LOOKBACK_H)),
            "scoredHours": int(len(rows)), "events": int(len(ev)), "bas": int(fx.ba.nunique()),
            "leadRule": "valid hour t+k uses previous_day ceil((k+6)/24): k 1-18 day1, 19-42 day2, 43-48 day3; "

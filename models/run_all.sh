@@ -10,6 +10,7 @@ uv run python export.py            # app/public/models/*.json with parity rows
 uv run python final_test.py        # FINAL TEST, once, frozen models
 python3 ../data/fetch/forecast_archive.py   # archived forecasts for 2024 (cached; a rerun makes no calls)
 uv run python real_forecast.py     # warn_fcst on real archived forecasts (2024), frozen model and threshold
+uv run python matched.py           # equal false-alarm comparison and curves (operating points read from the test period)
 uv run python metrics.py           # app/public/models/metrics.json
 uv run python make_results.py      # RESULTS.md
 uv run python publish.py           # verify and copy the three shared files to BDA_SHARED

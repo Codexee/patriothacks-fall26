@@ -23,13 +23,57 @@ The v2 `warn_fcst` was trained with observed future weather standing in for a fo
 | (d) rule_record | 212 | 3 | 3 | 4.5 | 44 | 1.19 | 0.0250 |
 
 **How much of the upper bound survives:** with real forecasts, warn_fcst warned 108 events at least 12 h ahead against 105 with observed weather (102.9% survives), 92 against 98 at 24 h (93.9%), people recall 73.7% against 73.3% (100.5%), and PR-AUC 0.2301 against 0.3137 (73.3%). False alarms: 10.88 per BA-year with real forecasts against 7.49 with observed weather. warn_full warned 30 at 5.45.
-In plain words: the events warned survive in full, but precision does not; false alarms rise by 45% and PR-AUC keeps 73.3% of the upper bound. With real forecasts, warn_fcst beats 0 of 3 rules at the same or fewer false alarms.
+In plain words: the events warned survive in full, but precision does not; false alarms rise by 45% and PR-AUC keeps 73.3% of the upper bound. Pre-registered (frozen threshold): with real forecasts, warn_fcst warns more events than every rule but with more false alarms, so it beats 0 of 3 rules at the same or fewer false alarms. Matched rate (operating points read from the test period, see the next section): with real forecasts it has more events warned ≥ 12 h than 3 of 3 rules at each rule's own false-alarm rate (`rule_forecast_error` rate 5.30: 74 vs 20 events; `rule_hand` rate 7.56: 93 vs 27 events; `rule_record` rate 1.19: 41 vs 3 events).
 
 Forecast skill on the scored hours (forecast-based against observed fx_ features): fx_wind_max_48h r = 0.71, fx_temp_min_48h r = 0.97, fx_temp_max_48h r = 0.98, fx_precip_48h r = 0.65, fx_temp_min_48h_z r = 0.84, fx_temp_max_48h_z r = 0.88, fx_wind_max_48h_z r = 0.63, fx_temp_min_48h_above_record r = 0.98, fx_slp_min_48h r = 0.94, fx_wind_max_24h r = 0.73, fx_temp_min_24h r = 0.97, fx_temp_max_24h r = 0.98, fx_precip_24h r = 0.58.
 
 Forecast hourly precipitation runs about 50% higher than the station records (mean 0.26 against 0.17 mm per hour, March-November 2024), which is one likely reason for the extra false alarms.
 
 Limits: one forecast model (best match), one year, and the frozen threshold was set for observed weather, so the false-alarm rate can move. Per-event leads: `models/out/real_forecast_events.csv`.
+
+## Comparison at equal false-alarm rates
+
+**Operating points read from the test period, shown to compare methods at equal false-alarm rates; the frozen threshold result above is the pre-registered one.**
+
+For each target rate, the threshold is the lowest one (most alerts) whose false alarms per BA-year stay at or below the target, scanning down from the top. The rules are shown at their frozen thresholds. The full curves are in `metrics.json` (`curves`).
+
+### FINAL TEST 2023-2024
+
+| Method | At the false-alarm rate of | False alarms per BA-year | Warned ≥ 12 h | Recall 12 h (%) | People recall 12 h (%) | Median lead (h) |
+|---|---|---|---|---|---|---|
+| rule_forecast_error (frozen threshold) | itself | 5.93 | 31 | 6.9 | 4.1 | 64 |
+| rule_hand (frozen threshold) | itself | 7.43 | 42 | 9.4 | 5.4 | 72 |
+| rule_record (frozen threshold) | itself | 1.28 | 13 | 2.9 | 5.2 | 38 |
+| warn_fcst | rule_forecast_error (5.93) | 5.92 | 202 | 45.2 | 62.0 | 45 |
+| warn_fcst | rule_hand (7.43) | 7.28 | 223 | 49.9 | 67.1 | 46 |
+| warn_fcst | rule_record (1.28) | 1.22 | 97 | 21.7 | 38.6 | 43 |
+| warn_fcst | 6.0 per BA-year | 5.92 | 202 | 45.2 | 62.0 | 45 |
+| warn_full | rule_forecast_error (5.93) | 5.68 | 57 | 12.8 | 17.4 | 8 |
+| warn_full | rule_hand (7.43) | 7.43 | 72 | 16.1 | 21.0 | 8 |
+| warn_full | rule_record (1.28) | 1.27 | 6 | 1.3 | 2.6 | 3 |
+| warn_full | 6.0 per BA-year | 5.96 | 57 | 12.8 | 17.4 | 8 |
+| warn_grid | rule_forecast_error (5.93) | 5.85 | 58 | 13.0 | 8.1 | 66 |
+| warn_grid | rule_hand (7.43) | 7.18 | 69 | 15.4 | 12.6 | 64 |
+| warn_grid | rule_record (1.28) | 1.28 | 33 | 7.4 | 4.5 | 64 |
+| warn_grid | 6.0 per BA-year | 5.85 | 58 | 13.0 | 8.1 | 66 |
+
+### 2024 real-forecast window (2024-01-19 to 2024-12-29)
+
+| Method | At the false-alarm rate of | False alarms per BA-year | Warned ≥ 12 h | Recall 12 h (%) | People recall 12 h (%) | Median lead (h) |
+|---|---|---|---|---|---|---|
+| rule_forecast_error (frozen threshold) | itself | 5.30 | 20 | 9.4 | 6.5 | 66 |
+| rule_hand (frozen threshold) | itself | 7.56 | 27 | 12.7 | 8.6 | 72 |
+| rule_record (frozen threshold) | itself | 1.19 | 3 | 1.4 | 4.5 | 44 |
+| warn_fcst_real | rule_forecast_error (5.30) | 5.26 | 74 | 34.9 | 55.7 | 44 |
+| warn_fcst_real | rule_hand (7.56) | 7.33 | 93 | 43.9 | 65.8 | 45 |
+| warn_fcst_real | rule_record (1.19) | 1.13 | 41 | 19.3 | 40.7 | 41 |
+| warn_fcst_real | 6.0 per BA-year | 5.89 | 76 | 35.8 | 55.7 | 44 |
+| warn_fcst_observed | rule_forecast_error (5.30) | 5.07 | 94 | 44.3 | 69.1 | 46 |
+| warn_fcst_observed | rule_hand (7.56) | 7.22 | 104 | 49.1 | 72.9 | 47 |
+| warn_fcst_observed | rule_record (1.19) | 1.15 | 51 | 24.1 | 53.7 | 43 |
+| warn_fcst_observed | 6.0 per BA-year | 5.97 | 94 | 44.3 | 69.1 | 46 |
+
+`warn_fcst_real` = warn_fcst fed real archived forecasts; `warn_fcst_observed` = the same model with observed weather on the same hours and events (upper bound).
 
 ## Plain answer (FINAL TEST, 2023-2024)
 
@@ -40,7 +84,7 @@ Does the model beat every baseline: more events warned at least 12 h ahead, with
   - against `rule_hand`: 59 vs 42 events warned ≥ 12 h; 6.18 vs 7.43 false alarms per BA-year → **beats it**
   - against `rule_record`: 59 vs 13 events warned ≥ 12 h; 6.18 vs 1.28 false alarms per BA-year → more events but MORE false alarms: **does not beat it at the same false-alarm rate**
 
-- **`warn_fcst`: NO**. It beats 0 of 3 baselines (more events warned at least 12 h ahead and the same or fewer false alarms).
+- **`warn_fcst`, two statements side by side.** Pre-registered (frozen threshold): it warns more events than every rule but with more false alarms, so it beats 0 of 3 rules at the same or fewer false alarms. Matched rate (operating points read from the test period, shown to compare methods at equal false-alarm rates): more events warned ≥ 12 h than 3 of 3 rules at each rule's own false-alarm rate (`rule_forecast_error` rate 5.93: 202 vs 31 events; `rule_hand` rate 7.43: 223 vs 42 events; `rule_record` rate 1.28: 97 vs 13 events).
   - against `rule_forecast_error`: 229 vs 31 events warned ≥ 12 h; 8.01 vs 5.93 false alarms per BA-year → more events but MORE false alarms: **does not beat it at the same false-alarm rate**
   - against `rule_hand`: 229 vs 42 events warned ≥ 12 h; 8.01 vs 7.43 false alarms per BA-year → more events but MORE false alarms: **does not beat it at the same false-alarm rate**
   - against `rule_record`: 229 vs 13 events warned ≥ 12 h; 8.01 vs 1.28 false alarms per BA-year → more events but MORE false alarms: **does not beat it at the same false-alarm rate**
