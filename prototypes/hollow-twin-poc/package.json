@@ -8,7 +8,8 @@
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
     "sim": "node --experimental-strip-types src/sim/cli.ts",
-    "gate": "node --experimental-strip-types src/sim/gate.ts"
+    "gate": "node --experimental-strip-types src/sim/gate.ts",
+    "results": "node --experimental-strip-types src/sim/results.ts"
   },
   "dependencies": {
     "pixi.js": "^8.6.6",
