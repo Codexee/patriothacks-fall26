@@ -40,7 +40,7 @@ export function App() {
   const skipRef = useRef(false);
   const [panelOpen, setPanelOpen] = useState(false); // the Test World panel starts minimized (demo-ready)
   const [compareOpen, setCompareOpen] = useState(false);
-  const [modsOpen, setModsOpen] = useState(true); // the Modules panel (one card per feature)
+  const [modsOpen, setModsOpen] = useState(false); // the Modules panel starts minimized (M opens it)
   const state = run.sim;
 
   const reset = useCallback((id: string, s: number, tools: ToolSet) => {
