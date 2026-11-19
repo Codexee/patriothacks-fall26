@@ -2,6 +2,15 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-19 (23): The Hollow is the product; real data in its test world
+
+- **Decision (Neil):** the Earth map (Before, During, After) is abandoned. Adarsh's Hollow on branch `hollow` is the project. `main` keeps the Earth work and the shared context.
+- **New locked spec on `hollow`:** `.plans/hollow-real-data-spec.md`. The test world now uses real data: ERCOT demand (EIA-930), plant repair times from 100 real outages (EAGLE-I), the 400 sections built from 3,133 US counties sorted by SVI, and a cited CO₂ limit. The Residents' System still reads only residents' reports.
+- **No storms:** Texas 2021 and Chicago 1995 are gone. Scenarios: Cascade (default: Plant 2 loss shaped like ERCOT Feb 2021), Baseline, Aging, Crowding.
+- **`npm run gate`** (in `prototypes/hollow-twin-poc`): tune seeds 1–5, check 6–10, test 11–20. Blackout Warning retuned: `safeLoad` 0.82, `assumedCompliance` 0.75. Test set, run once: 3,628 deaths and 87 trips, against 20,382 and 184 with the first guesses (12.3 M without the module).
+- **Adarsh's headline numbers changed** (Texas seed 1 is gone). New tables and limits: `prototypes/hollow-twin-poc/REBUILD.md`, Step 2.
+- **Action for everyone:** `git fetch`, `git switch hollow`, `git pull`, then read REBUILD.md Step 2.
+
 ## 2026-11-19 (22): Hollow work moves to branch `hollow`; old Hollow branches archived
 
 - **New branch: `hollow`** (Adarsh). It holds hollow-rebuild, the Residents' System prototype in `prototypes/hollow-twin-poc/` (Blackout Warning with the slow ease-off, the illustrated cutaway, the Modules panel). `main` and the Earth product do not change.

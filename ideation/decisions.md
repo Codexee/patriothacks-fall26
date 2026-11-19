@@ -65,3 +65,7 @@ Add one line per decision: date · decision · why · who. Newest last.
 - 2026-11-19 · Map drawn as one smooth surface (no county outlines; depth and color interpolated across borders; hover keeps exact county values) · Neil asked for it · Neil
 - 2026-11-19 · Protocol: Claude runs its own agents; Paradev only to run Codex when the rules send work there · Neil
 - 2026-11-19 · Hollow work lives on branch `hollow` (from hollow-rebuild); old prototype/hollow-twin-* branches archived as archive/hollow-twin-* tags and deleted · Adarsh
+- 2026-11-19 · Earth map abandoned; the Hollow on branch `hollow` is the project · Adarsh's product and plan · Neil
+- 2026-11-19 · Real data goes into the Hollow's hidden test world (EIA-930 demand, EAGLE-I repair times, counties by SVI, cited constants); the Residents' System stays on residents' data only · spec .plans/hollow-real-data-spec.md (on hollow) · Neil
+- 2026-11-19 · Storms removed; scenarios Cascade, Baseline, Aging, Crowding; Aging and Crowding play 4 real years in 120 days, labelled · the brief names no weather · Neil (compression: Claude default)
+- 2026-11-19 · Blackout Warning retuned through the gate: safeLoad 0.82, assumedCompliance 0.75 (test set 3,628 deaths vs 20,382) · tune/check/test method · Claude
