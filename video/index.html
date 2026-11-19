@@ -8,7 +8,7 @@
     <style>
       /* The results site's world: dark rock, chalk text. Ember = without Blackout Warning, blue = with it. */
       :root {
-        --rock: #171a1e;
+        --rock: #101116; /* the 3D footage background, so the video edge does not show */
         --chalk: #ebe6dc;
         --dust: #b0aa9e;
         --without: #f0654f;
@@ -19,32 +19,33 @@
       * { margin: 0; padding: 0; box-sizing: border-box; }
       html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: var(--rock); }
       #root { position: relative; width: 100%; height: 100%; color: var(--chalk); font-family: var(--text); font-variant-numeric: tabular-nums; }
-      #footage { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+      #footage { position: absolute; left: 160px; top: 180px; width: 1600px; height: 900px; object-fit: cover; }
       .band { position: absolute; left: 0; right: 0; pointer-events: none; }
-      #band-top { top: 0; height: 300px; background: linear-gradient(to bottom, rgba(23, 26, 30, 0.92), rgba(23, 26, 30, 0)); }
-      #band-bottom { bottom: 0; height: 320px; background: linear-gradient(to top, rgba(23, 26, 30, 0.94), rgba(23, 26, 30, 0)); }
+      #band-top { top: 0; height: 240px; background: linear-gradient(to bottom, rgba(16, 17, 22, 1) 70%, rgba(16, 17, 22, 0)); }
+      #band-bottom { bottom: 0; height: 150px; background: linear-gradient(to top, rgba(16, 17, 22, 0.96) 55%, rgba(16, 17, 22, 0)); }
 
-      #head { position: absolute; left: 192px; top: 108px; width: 1100px; }
-      #title { font-family: var(--display); font-weight: 600; font-size: 68px; line-height: 1.05; letter-spacing: 0.005em; }
-      #sub { margin-top: 14px; font-size: 32px; line-height: 1.35; color: var(--dust); }
-
-      #day { position: absolute; right: 192px; top: 116px; text-align: right; font-family: var(--display); }
-      #day .k { display: block; font-size: 30px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dust); }
-      #day .v { display: block; font-size: 84px; font-weight: 600; line-height: 1; }
-
-      .side { position: absolute; bottom: 118px; width: 640px; }
-      #side-wo { left: 192px; }
-      #side-wi { right: 192px; text-align: right; }
-      .side .label { font-family: var(--display); font-size: 34px; letter-spacing: 0.06em; text-transform: uppercase; }
+      /* Counters sit over their shafts (shaft centres at x ≈ 627 and 1293 in this frame). */
+      .side { position: absolute; top: 34px; width: 560px; text-align: center; }
+      #side-wo { left: 347px; }
+      #side-wi { left: 1013px; }
+      .side .label { font-family: var(--display); font-size: 32px; letter-spacing: 0.06em; text-transform: uppercase; }
       #side-wo .label { color: var(--without); }
       #side-wi .label { color: var(--with); }
-      .side .num { font-family: var(--display); font-weight: 600; font-size: 92px; line-height: 1.02; }
-      .side .unit { font-size: 30px; color: var(--dust); }
+      .side .num { font-family: var(--display); font-weight: 600; font-size: 84px; line-height: 1.04; }
+      .side .unit { font-size: 28px; color: var(--dust); margin-top: -4px; }
 
-      #event { position: absolute; left: 50%; bottom: 300px; width: 1180px; margin-left: -590px; text-align: center; }
-      #event p { display: inline-block; font-size: 38px; line-height: 1.35; padding: 14px 26px; border-radius: 6px; background: rgba(23, 26, 30, 0.82); border: 1px solid rgba(235, 230, 220, 0.18); }
+      #day { position: absolute; left: 860px; top: 44px; width: 200px; text-align: center; font-family: var(--display); }
+      #day .k { display: block; font-size: 28px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dust); }
+      #day .v { display: block; font-size: 72px; font-weight: 600; line-height: 1.04; }
 
-      #end { position: absolute; inset: 0; background: rgba(23, 26, 30, 0.9); }
+      #head { position: absolute; left: 160px; bottom: 34px; width: 800px; }
+      #title { font-family: var(--display); font-weight: 600; font-size: 46px; line-height: 1.1; }
+      #sub { margin-top: 4px; font-size: 28px; line-height: 1.3; color: var(--dust); }
+
+      #event { position: absolute; right: 160px; bottom: 40px; width: 800px; text-align: right; }
+      #event p { display: inline-block; font-size: 34px; line-height: 1.3; padding: 10px 20px; border-radius: 6px; background: rgba(16, 17, 22, 0.85); border: 1px solid rgba(235, 230, 220, 0.18); }
+
+      #end { position: absolute; inset: 0; background: rgba(16, 17, 22, 0.9); }
       #end-in { position: absolute; left: 192px; top: 300px; width: 1536px; }
       #end-nums { font-family: var(--display); font-weight: 600; font-size: 150px; line-height: 1; }
       #end-nums .wo { color: var(--without); }

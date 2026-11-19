@@ -13,3 +13,5 @@ __pycache__/
 data/raw/
 data/.venv/
 !data/build/
+video/.hyperframes/
+video/renders/
