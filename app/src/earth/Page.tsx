@@ -169,6 +169,12 @@ export default function Page() {
 
       {problem && <p className="em-problem" role="alert">{problem} <a href="#/">Back to the map</a></p>}
       {!scene && !problem && <p className="em-loading">Loading 3,142 counties</p>}
+      {!story && !section && scene && (
+        <p className="em-legend">
+          Depth = Hollow level (vulnerability){live ? ' + hours dark' : ''}. Brightness = electric customers{live ? '; dark = power out' : ''}.
+          {' '}Surface smoothed for display; hover for the exact county values.
+        </p>
+      )}
       <p className="em-credit">Basemap © OpenStreetMap contributors © CARTO</p>
 
       {!story && hover && scene && map && (

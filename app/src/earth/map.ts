@@ -1,20 +1,23 @@
 // The map: deck.gl draws the counties; MapLibre draws the basemap below them and the place names
 // above them. All per-frame work stays in this class. React does not render during a replay tick.
 //
-// Depth = vulnerability. Each county is a column that goes down from the surface (z = 0). The
-// depth grows with the Hollow level and, in a replay, with the hours the county has been dark.
+// Depth = vulnerability. The land is one smooth surface below the base plane (z = 0). A county is
+// deeper when its Hollow level is higher and, in a replay, when it has been dark for more hours.
+// The depth is smoothed for display (see surface.ts): no walls between counties, no county outlines. The numbers in the
+// hover card and the panels are the exact county values.
 //
 // The view from below: a camera below the surface that looks up is the mirror image of a camera
-// above the surface that looks down at columns that go up. So for "below" the columns are drawn
+// above the surface that looks down at land that goes up. So for "below" the surface is drawn
 // upward and the canvas is flipped top to bottom. No second camera type is necessary.
-import { Deck, MapView, LightingEffect, AmbientLight, DirectionalLight, WebMercatorViewport } from 'deck.gl';
-import { SolidPolygonLayer, PathLayer } from 'deck.gl';
+import { Deck, MapView, WebMercatorViewport, COORDINATE_SYSTEM } from 'deck.gl';
 import maplibregl from 'maplibre-gl';
 import type { StyleSpecification } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import type { Position } from 'geojson';
 import { earthName, hollowName } from '../contracts.ts';
-import type { Live, Part, Scene } from './data.ts';
+import type { Live, Scene } from './data.ts';
+import { blendAt, commonX, commonY } from './surface.ts';
+import type { Surface } from './surface.ts';
+import { SurfaceLayer, countyTextureSize } from './surface-layer.ts';
 
 export interface View { longitude: number; latitude: number; zoom: number; pitch: number; bearing: number }
 export const HOME: View = { longitude: -96.2, latitude: 37.2, zoom: 3.95, pitch: 44, bearing: 0 };
@@ -34,6 +37,9 @@ const BASE_DEPTH = 14_000;     // metres, level 1
 const LEVEL_DEPTH = 170_000;   // metres added at level 50
 const DARK_DEPTH = 650;        // metres added per dark hour
 const depthScale = (zoom: number) => 2 ** ((4 - zoom) * 0.8);
+const RELIEF_LIGHT = 0.5;      // how much the slope changes the light (1 = the true slope)
+const BELOW_DEPTH = 1.7;       // the view from below shows the depth this much larger, so the relief reads
+const BELOW_LIGHT = 0.8;
 
 export interface HoverInfo { ci: number; x: number; y: number }
 
@@ -51,10 +57,11 @@ export class EarthMap {
   private names: maplibregl.Map | null = null;
   private live: Live | null = null;
   private hour = 0;
-  private colorKey = 0;
-  private dataKey = 0;
-  private staticParts: Part[];
-  private liveParts: Part[] = [];
+  private surface: Surface;
+  private colors: Uint8Array;        // per vertex: the blended base color, and the kind of vertex
+  private relief: Float32Array;      // per vertex: depth and slope from the level only (fixed)
+  private countyData: Float32Array;  // per county, for the GPU: share out, alert, extra depth of the replay
+  private countyKey = 0;
   private lit: Uint8Array;        // rgb per county when it has power
   private depth0: Float32Array;   // depth from the level, per county
   private cDark: RGB; private cAlert: RGB; private cLit: RGB;
@@ -86,7 +93,24 @@ export class EarthMap {
       const level = c.level ?? 1;
       this.depth0[i] = BASE_DEPTH + LEVEL_DEPTH * ((level - 1) / 49) ** 1.35;
     }
-    this.staticParts = scene.parts;
+
+    // The calm surface: depth and base color of each vertex are a blend of the counties near it,
+    // so neither has a hard edge.
+    const s = this.surface = scene.surface;
+    this.relief = new Float32Array(s.count * 3);
+    this.colors = new Uint8Array(s.count * 4);
+    for (let v = 0; v < s.count; v++) {
+      let d = 0, dx = 0, dy = 0, r = 0, g = 0, b = 0;
+      for (let k = v * 4; k < v * 4 + 4; k++) {
+        const ci = s.blendId[k], w = s.blendW[k];
+        d += w * this.depth0[ci]; dx += s.blendX[k] * this.depth0[ci]; dy += s.blendY[k] * this.depth0[ci];
+        r += w * this.lit[ci * 3]; g += w * this.lit[ci * 3 + 1]; b += w * this.lit[ci * 3 + 2];
+      }
+      this.relief[v * 3] = d; this.relief[v * 3 + 1] = dx; this.relief[v * 3 + 2] = dy;
+      this.colors[v * 4] = r; this.colors[v * 4 + 1] = g; this.colors[v * 4 + 2] = b;
+      this.colors[v * 4 + 3] = s.kind[v] === 0 ? 0 : s.kind[v] === 1 ? 128 : 255;
+    }
+    this.countyData = new Float32Array(countyTextureSize(n));
 
     const mk = (cls: string) => {
       const el = document.createElement('div');
@@ -113,14 +137,9 @@ export class EarthMap {
       },
       onHover: (info) => {
         if (!this.interactive) return;
-        const o = info.object as Part | undefined;
-        this.onHover(o ? { ci: o.ci, x: info.x, y: info.y } : null);
+        this.onHover(info.index >= 0 ? { ci: info.index, x: info.x, y: info.y } : null);
       },
       getCursor: ({ isDragging }) => (isDragging ? 'grabbing' : 'default'),
-      effects: [new LightingEffect({
-        ambient: new AmbientLight({ color: [255, 255, 255], intensity: 1.9 }),
-        sun: new DirectionalLight({ color: [255, 226, 196], intensity: 0.85, direction: [-0.5, 0.9, -1.6] }),
-      })],
       layers: [],
       onAfterRender: () => this.placeLabels(),
     });
@@ -199,23 +218,35 @@ export class EarthMap {
   setLive(live: Live | null) {
     this.live = live;
     this.hour = 0;
-    this.dataKey++;
-    if (live) {
-      this.staticParts = this.scene.parts.filter((p) => live.slot[p.ci] < 0);
-      this.liveParts = this.scene.parts.filter((p) => live.slot[p.ci] >= 0);
-    } else {
-      this.staticParts = this.scene.parts;
-      this.liveParts = [];
-    }
-    this.colorKey++;
+    this.countyData.fill(0);
+    this.countyKey++;
+    this.updateLive();
     this.render();
   }
 
   setHour(hour: number) {
     if (!this.live || Math.abs(hour - this.hour) < 0.08) return;
     this.hour = hour;
-    this.colorKey++;
+    this.updateLive();
     this.render();
+  }
+
+  /** Writes the state of the replay at this.hour into the county values. No geometry is built here:
+   *  the GPU blends these values with the fixed weights of each vertex. */
+  private updateLive() {
+    const live = this.live;
+    if (!live) return;
+    const data = this.countyData;
+    const alertBa = this.alertOn() ? live.replay.ba : null;
+    const counties = this.scene.counties;
+    for (let k = 0; k < live.ci.length; k++) {
+      const ci = live.ci[k];
+      if (ci < 0) continue;
+      data[ci * 4] = Math.min(1, this.outNow(ci) / 100);
+      data[ci * 4 + 1] = alertBa && counties[ci].ba === alertBa ? 1 : 0;
+      data[ci * 4 + 2] = DARK_DEPTH * this.darkNow(ci);
+    }
+    this.countyKey++;
   }
 
   /** Percent of customers out now for a county; 0 for a county that is not in the replay. */
@@ -241,13 +272,24 @@ export class EarthMap {
     const f = this.hour - h0;
     return cum[h0] * (1 - f) + cum[h1] * f;
   }
-  private depth(ci: number) { return this.depth0[ci] + DARK_DEPTH * this.darkNow(ci); }
+  /** The depth of the smooth surface at the middle of a county, in metres. */
+  private surfaceDepth(ci: number) {
+    const x = commonX(this.scene.centroid[ci * 2]), y = commonY(this.scene.centroid[ci * 2 + 1]);
+    const b = this.blendScratch;
+    if (!blendAt(this.surface.grid, x, y, b, b.subarray(4), b.subarray(8), b.subarray(12), 0)) {
+      return this.depth0[ci] + DARK_DEPTH * this.darkNow(ci);
+    }
+    let d = 0;
+    for (let k = 0; k < 4; k++) d += b[4 + k] * (this.depth0[b[k]] + DARK_DEPTH * this.darkNow(b[k]));
+    return d;
+  }
+  private blendScratch = new Float32Array(16);
 
   /** false = the "Without" view: no alert state on the map. */
   setAssist(on: boolean) {
     if (on === this.assist) return;
     this.assist = on;
-    this.colorKey++;
+    this.updateLive();
     this.render();
   }
 
@@ -259,76 +301,27 @@ export class EarthMap {
     return p != null && p >= r.alertThreshold;
   }
 
+  /** Drawn height per metre of depth. Negative = down (the usual view). */
+  private zScale() { return depthScale(this.view.zoom) * (this.below ? BELOW_DEPTH : -1); }
+
   private render() {
     if (this.destroyed) return;
-    const es = depthScale(this.view.zoom) * (this.below ? 1 : -1);
-    const lit = this.lit;
-    const dark = this.cDark;
-    const alert = this.cAlert;
-    const material = { ambient: 0.42, diffuse: 0.55, shininess: 0, specularColor: [0, 0, 0] as RGB };
-    const alertBa = this.alertOn() ? this.live!.replay.ba : null;
-    const counties = this.scene.counties;
-    const lineAlpha = this.below ? 0.5 : 1;
-
+    const norm = (c: RGB): RGB => [c[0] / 255, c[1] / 255, c[2] / 255];
     this.deck.setProps({
       layers: [
-        new SolidPolygonLayer<Part>({
-          id: 'calm',
-          data: this.staticParts,
-          getPolygon: (d) => d.polygon as [number, number][][],
-          extruded: true,
-          getElevation: (d) => this.depth0[d.ci],
-          elevationScale: es,
-          getFillColor: (d) => [lit[d.ci * 3], lit[d.ci * 3 + 1], lit[d.ci * 3 + 2]],
-          material,
+        new SurfaceLayer({
+          id: 'surface',
+          coordinateSystem: COORDINATE_SYSTEM.CARTESIAN,
+          surface: this.surface,
+          colors: this.colors,
+          relief: this.relief,
+          countyData: this.countyData,
+          countyVersion: this.countyKey,
+          zScale: this.zScale(),
+          reliefLight: this.below ? BELOW_LIGHT : RELIEF_LIGHT,
+          dark: norm(this.cDark),
+          alert: norm(this.cAlert),
           pickable: true,
-          updateTriggers: { getElevation: this.dataKey, getFillColor: this.dataKey },
-        }),
-        new SolidPolygonLayer<Part>({
-          id: 'live',
-          data: this.liveParts,
-          getPolygon: (d) => d.polygon as [number, number][][],
-          extruded: true,
-          getElevation: (d) => this.depth(d.ci),
-          elevationScale: es,
-          getFillColor: (d) => {
-            const f = Math.min(1, this.outNow(d.ci) / 100) ** 0.55;
-            const i = d.ci * 3;
-            return [lit[i] + (dark[0] - lit[i]) * f, lit[i + 1] + (dark[1] - lit[i + 1]) * f, lit[i + 2] + (dark[2] - lit[i + 2]) * f];
-          },
-          material,
-          pickable: true,
-          updateTriggers: { getElevation: this.colorKey, getFillColor: this.colorKey },
-        }),
-        new PathLayer<Position[]>({
-          id: 'county-lines',
-          data: this.scene.countyLines,
-          getPath: (d) => d as [number, number][],
-          getColor: [10, 8, 6, 120 * lineAlpha],
-          getWidth: 1,
-          widthUnits: 'pixels',
-          visible: !this.below,
-        }),
-        new PathLayer<Part>({
-          id: 'alert-rings',
-          data: this.liveParts,
-          getPath: (d) => d.polygon[0] as [number, number][],
-          getColor: (d) => {
-            const f = Math.min(1, this.outNow(d.ci) / 100);
-            const a = Math.max(f < 0.02 ? 0 : 0.25 + 0.75 * f, alertBa && counties[d.ci].ba === alertBa ? 0.45 : 0);
-            return [alert[0], alert[1], alert[2], 255 * a];
-          },
-          getWidth: 1.6,
-          widthUnits: 'pixels',
-          updateTriggers: { getColor: this.colorKey },
-        }),
-        new PathLayer<Position[]>({
-          id: 'state-lines',
-          data: this.scene.stateLines,
-          getPath: (d) => d as [number, number][],
-          getColor: [255, 236, 205, 105 * lineAlpha],
-          getWidth: 1.2,
-          widthUnits: 'pixels',
         }),
       ],
     });
@@ -359,10 +352,10 @@ export class EarthMap {
     if (!this.labels.length || this.destroyed) return;
     const w = this.canvas.clientWidth, h = this.canvas.clientHeight;
     const vp = new WebMercatorViewport({ width: w, height: h, ...this.view, farZMultiplier: 2.5 });
-    const es = depthScale(this.view.zoom);
+    const es = Math.abs(this.zScale());
     const placed: { x: number; y: number }[] = [];
     const items = this.labels.map((l) => {
-      const z = this.below ? this.depth(l.ci) * es : 0;
+      const z = this.below ? this.surfaceDepth(l.ci) * es : 0;
       const [x, y0] = vp.project([this.scene.centroid[l.ci * 2], this.scene.centroid[l.ci * 2 + 1], z]);
       return { l, x, y: this.below ? h - y0 : y0 };
     }).sort((a, b) => a.y - b.y);
