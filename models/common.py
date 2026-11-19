@@ -1,7 +1,8 @@
-"""Shared paths, the train/test split constant, the feature lists and the event-level scoring.
+"""Shared paths, the three period constants, the feature lists and the event-level scoring.
 
-The split is ONE constant: SPLIT. Hours and events before it are training data; the rest is test.
-Override for a temporary run with the environment variable BDA_SPLIT (for example 2019-01-01).
+Periods (v2): TRAIN = hours before TRAIN_END; DEV = TRAIN_END to DEV_END; FINAL TEST = DEV_END to
+TEST_END. All fitting, hyperparameters and thresholds use TRAIN only. DEV chooses features and model
+design (v1 already showed these years). FINAL TEST is scored once, by final_test.py.
 """
 from __future__ import annotations
 
@@ -12,7 +13,10 @@ import duckdb
 import numpy as np
 import pandas as pd
 
-SPLIT = os.environ.get("BDA_SPLIT", "2021-01-01")
+TRAIN_END = "2021-01-01"
+DEV_END = "2023-01-01"
+TEST_END = "2025-01-01"
+SPLIT = TRAIN_END                                     # v1 name, kept for the scripts that use it
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent
@@ -36,10 +40,25 @@ HOURS_PER_YEAR = 8766.0
 # `doy` is left out: with 5 or 6 training years it would let the trees remember single storms.
 GRID = ["fc_err", "fc_err_max_24h", "demand_vs_30d_peak", "import_share", "gas_share",
         "netgen_chg_6h", "gas_chg_6h", "hod", "month"]
+# v2 adequacy: demand and the next-12-h day-ahead forecast against the BA's own past records.
+ADEQ = ["demand_vs_record", "demand_vs_month_record", "fc12_vs_record", "fc12_vs_365d_peak",
+        "fc12_vs_30d_peak", "fc12_vs_month_record"]
 WX = ["temp_c", "dew_c", "slp_min_hpa", "wind_max_ms", "precip_max_mm", "temp_anom_30d",
       "temp_min_24h", "temp_max_24h", "wind_max_24h", "precip_24h", "slp_chg_12h"]
-FX = ["fx_wind_max_24h", "fx_temp_min_24h", "fx_temp_max_24h", "fx_precip_24h"]
-VARIANTS = {"warn_grid": GRID, "warn_full": GRID + WX, "warn_full_fx": GRID + WX + FX}
+SWX = ["temp_z_month", "wind_z_month", "temp_above_record_low", "temp_below_record_high"]
+OUTS = ["out_own_lag1", "out_own_chg_6h", "out_nat_lag1", "out_nat_chg_12h"]   # not available live
+FX = ["fx_wind_max_48h", "fx_temp_min_48h", "fx_temp_max_48h", "fx_precip_48h", "fx_temp_min_48h_z",
+      "fx_temp_max_48h_z", "fx_wind_max_48h_z", "fx_temp_min_48h_above_record", "fx_slp_min_48h",
+      "fx_wind_max_24h", "fx_temp_min_24h", "fx_temp_max_24h", "fx_precip_24h"]
+# Trailing summaries computed in load_features (past only). Used only if DEV shows they help.
+TRAIL = ["fc12_vs_month_record_max_72h", "temp_z_month_min_72h", "wind_z_month_max_72h", "out_own_lag1_max_72h"]
+LOAD_COLS = GRID + ADEQ + WX + SWX + OUTS + FX
+VARIANTS = {"warn_grid": GRID + ADEQ, "warn_full": GRID + ADEQ + WX + SWX + OUTS,
+            "warn_fcst": GRID + ADEQ + WX + SWX + OUTS + FX}
+# Features where more must never lower the risk (monotone constraint +1), if DEV shows it helps.
+MONOTONE_UP = ["demand_vs_record", "demand_vs_month_record", "fc12_vs_record", "fc12_vs_365d_peak",
+               "fc12_vs_30d_peak", "fc12_vs_month_record", "fc12_vs_month_record_max_72h"]
+FCST_LABEL = ("with a weather forecast; backtest uses observed weather as the forecast, so it is an upper bound")
 
 SEASONS = {"winter": (12, 1, 2), "summer": (6, 7, 8), "other": (3, 4, 5, 9, 10, 11)}
 
@@ -60,12 +79,20 @@ def from_h(h) -> pd.Timestamp:
 
 
 SPLIT_H = int(to_h([SPLIT])[0])
+TRAIN_END_H, DEV_END_H, TEST_END_H = (int(to_h([t])[0]) for t in (TRAIN_END, DEV_END, TEST_END))
 
 
 def load_events() -> pd.DataFrame:
     ev = duckdb.sql(f"SELECT * FROM '{DATA_OUT}/events.parquet' ORDER BY ba, start").df()
     ev["start_h"] = to_h(ev.start)
     ev["stop_h"] = to_h(ev.stop)
+    # Customer-outage-hours inside the event window (sum of hourly customers out in the BA).
+    co = duckdb.sql(f"""
+        SELECT e.event_id, sum(o.out) AS cust_hours FROM '{DATA_OUT}/events.parquet' e
+        JOIN '{SHARED}/ba_hour_out.parquet' o ON o.ba = e.ba AND o.hour >= e.start AND o.hour <= e.stop
+        GROUP BY e.event_id""").df()
+    ev = ev.merge(co, on="event_id", how="left")
+    ev["cust_hours"] = ev.cust_hours.fillna(0.0)
     return ev
 
 
@@ -80,10 +107,11 @@ def load_features() -> pd.DataFrame:
     Recompute y48 and in_event from events.parquet to detect mismatched input versions.
     Scored hours have a complete label horizon in an observed BA window.
     """
-    cols = ", ".join(f'"{c}"' for c in GRID + WX + FX)
+    cols = ", ".join(f'"{c}"' for c in LOAD_COLS)
     df = duckdb.sql(f"""
         SELECT ba, hour, {cols}, y48 AS y48_table, in_event AS in_event_table
         FROM '{SHARED}/ba_hour_features.parquet' ORDER BY ba, hour""").df()
+    df[LOAD_COLS] = df[LOAD_COLS].astype(np.float32)          # halves memory; trees do not need float64
     df["h"] = to_h(df.hour)
     ev = load_events()
     coverage = duckdb.sql(f"""
@@ -93,6 +121,8 @@ def load_features() -> pd.DataFrame:
     # EAGLE-I lists positive outages only. Avoid treating absent BA-years and gaps
     # between annual observation windows as confirmed negatives.
     covered = np.zeros(len(df), bool)
+    y24 = np.zeros(len(df), bool)
+    next_peak = np.zeros(len(df))
     y = np.zeros(len(df), bool)
     ine = np.zeros(len(df), bool)
     ba_codes, ba_names = pd.factorize(df.ba)
@@ -116,15 +146,24 @@ def load_features() -> pd.DataFrame:
         st = e.start_h.values
         j = np.searchsorted(st, h, side="right")                    # first start > h
         y[a:b] = (j < len(st)) & (st[np.minimum(j, len(st) - 1)] <= h + HORIZON_H)
+        y24[a:b] = (j < len(st)) & (st[np.minimum(j, len(st) - 1)] <= h + 24)
+        next_peak[a:b] = np.where(y[a:b], e.peak_customers_out.values[np.minimum(j, len(st) - 1)], 0.0)
         k = j - 1                                                   # last start <= h
         stop_max = np.maximum.accumulate(e.stop_h.values)
         ine[a:b] = (k >= 0) & (h <= stop_max[np.maximum(k, 0)] + HORIZON_H)
     df["y48"] = y
+    df["y24"] = y24
+    df["next_peak"] = next_peak
     df["in_event"] = ine
     df["mapped"] = df.ba.isin(mapped).values
     if (y != df.y48_table.values).any() or (ine != df.in_event_table.values).any():
         raise ValueError("BA-hour labels and the event library disagree. Rebuild the feature table.")
     df["scored"] = covered & ~ine
+    # Trailing 72 h summaries per BA (past and present only; rows are sorted by ba, hour).
+    g = df.groupby("ba", sort=False)
+    for src, how in (("fc12_vs_month_record", "max"), ("temp_z_month", "min"), ("wind_z_month", "max"),
+                     ("out_own_lag1", "max")):
+        df[f"{src}_{how}_72h"] = getattr(g[src].rolling(72, min_periods=1), how)().reset_index(level=0, drop=True).values
     return df
 
 
@@ -188,21 +227,35 @@ class Panel:
         ev_season = season_of(pd.DatetimeIndex(pos.start).month.values)
         ep_season = season_of(r["ep_month"]) if len(r["ep_month"]) else np.zeros(0, str)
 
+        peak = pos.peak_customers_out.values.astype(float)
+        ch = pos.cust_hours.values.astype(float) if "cust_hours" in pos else np.zeros(n_all)
+
         def block(ev_mask, ep_mask, ba_years):
             l = lead_all[ev_mask]
             warned = ~np.isnan(l)
-            w12 = int((l >= MIN_LEAD_H).sum())
-            return {"testEvents": int(ev_mask.sum()), "warnedAny": int(warned.sum()), "warned12h": w12,
-                    "recall12h": (w12 / int(ev_mask.sum())) if ev_mask.sum() else None,
-                    "medianLeadHours": float(np.median(l[warned])) if warned.any() else None,
-                    "episodes": int(ep_mask.sum()),
-                    "falseEpisodes": int(r["ep_false"][ep_mask].sum()),
-                    "baYears": float(ba_years),
-                    "falseAlarmsPerBaYear": float(r["ep_false"][ep_mask].sum() / ba_years) if ba_years else None}
+            n = int(ev_mask.sum())
+            w12m = l >= MIN_LEAD_H
+            w12 = int(w12m.sum())
+            out = {"testEvents": n, "warnedAny": int(warned.sum()), "warned12h": w12,
+                   "warned6h": int((l >= 6).sum()), "warned24h": int((l >= 24).sum()),
+                   "recall12h": (w12 / n) if n else None,
+                   "recall6h": (int((l >= 6).sum()) / n) if n else None,
+                   "recall24h": (int((l >= 24).sum()) / n) if n else None,
+                   "peopleRecall12h": float(peak[ev_mask][w12m].sum() / peak[ev_mask].sum()) if peak[ev_mask].sum() else None,
+                   "custHoursRecall12h": float(ch[ev_mask][w12m].sum() / ch[ev_mask].sum()) if ch[ev_mask].sum() else None,
+                   "medianLeadHours": float(np.median(l[warned])) if warned.any() else None}
+            if ep_mask is not None:
+                out.update({"episodes": int(ep_mask.sum()),
+                            "falseEpisodes": int(r["ep_false"][ep_mask].sum()),
+                            "baYears": float(ba_years),
+                            "falseAlarmsPerBaYear": float(r["ep_false"][ep_mask].sum() / ba_years) if ba_years else None})
+            return out
 
         out = block(np.ones(n_all, bool), np.ones(len(r["ep_false"]), bool), self.ba_years)
         out["seasons"] = {s: block(ev_season == s, ep_season == s,
                                    (self.season_rows == s).sum() / HOURS_PER_YEAR) for s in SEASONS}
+        if "group" in pos:
+            out["groups"] = {g: block(pos.group.values == g, None, None) for g in ("demand_record", "other")}
         out["event_leads"] = dict(zip(pos.event_id, [None if np.isnan(x) else float(x) for x in lead_all]))
         return out
 
@@ -222,3 +275,18 @@ def pick_threshold(panel: Panel, score: np.ndarray, all_starts, train_panel, tra
             break
         best = float(t)
     return best
+
+
+def tag_event_groups(df: pd.DataFrame, ev: pd.DataFrame) -> pd.DataFrame:
+    """group = "demand_record" when fc12_vs_month_record >= 1.0 at any hour in the 24 h before the
+    start (the forecast says demand will reach the BA's record for that month); else "other"."""
+    ev = ev.copy()
+    hit = np.zeros(len(ev), bool)
+    pos = {b: (g.h.values, g.fc12_vs_month_record.values) for b, g in df[["ba", "h", "fc12_vs_month_record"]].groupby("ba")}
+    for i, (b, s0) in enumerate(zip(ev.ba.values, ev.start_h.values)):
+        if b in pos:
+            h, v = pos[b]
+            lo, hi = np.searchsorted(h, s0 - 24), np.searchsorted(h, s0)
+            hit[i] = bool(np.nanmax(v[lo:hi], initial=-np.inf) >= 1.0) if hi > lo else False
+    ev["group"] = np.where(hit, "demand_record", "other")
+    return ev

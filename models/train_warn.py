@@ -1,191 +1,113 @@
-"""Before model: will an outage event start in this balancing area within 48 h?
+"""Before model v2: will an outage event start in this balancing area within 48 h?
 
-Trains warn_grid, warn_full and warn_full_fx (the last one is only for the report), two rule
-baselines, picks every setting and threshold on the training years, then scores the test years.
+Fits warn_grid, warn_full and warn_fcst and the three rule baselines on TRAIN (< 2021), with every
+hyperparameter and alert threshold chosen on TRAIN. Scores TRAIN (out-of-fold) and DEV (2021-2022).
+It does not score events in the FINAL TEST years; final_test.py does that once.
 
-Writes: artifacts/<variant>.txt (boosters), out/warn_results.json, out/warn_events.csv,
-        BDA_SHARED/ba_hour_pred.parquet, BDA_SHARED/warn_threshold.json
+Writes: artifacts/<model>.txt, artifacts/warn_scores.parquet (raw scores, every row),
+        artifacts/ba_hour_pred.parquet, artifacts/warn_threshold.json (published by publish.py),
+        out/warn_results.json, out/warn_frozen.json, out/warn_events_dev.csv
 Run: uv run python train_warn.py
 """
 from __future__ import annotations
 
-import itertools
 import json
 import time
 
-import lightgbm as lgb
 import numpy as np
 import pandas as pd
-from sklearn.metrics import average_precision_score
 
 import common as C
+import warn_lib as W
 
-BASE = dict(objective="binary", learning_rate=0.05, feature_fraction=0.8, bagging_fraction=0.5,
-            bagging_freq=1, lambda_l2=10.0, max_bin=63, seed=C.SEED, deterministic=True,
-            force_row_wise=True, verbose=-1, num_threads=12)
-# Small grid. Trees and leaves are capped so each exported file stays under 3 MB.
-CONFIGS = [dict(num_leaves=nl, min_child_samples=mcs, scale_pos_weight=spw)
-           for (nl, mcs), spw in itertools.product([(7, 2000), (15, 500), (15, 5000)], [1.0, 10.0])]
-ROUNDS = [100, 200, 300]
+# Design chosen on DEV with dev_variants.py (see out/dev_variants.json and RESULTS.md).
+DESIGN = {"trail": True, "monotone": True}          # variant E in dev_variants.py
+CFGS = [dict(num_leaves=nl, min_child_samples=mcs, scale_pos_weight=spw)
+        for nl, mcs, spw in [(7, 2000, 1.0), (15, 500, 1.0), (15, 5000, 10.0), (31, 1000, 1.0)]]
+COLS = {"warn_grid": "p_grid", "warn_full": "p_full", "warn_fcst": "p_fcst"}
 
 
-def ap(y, s):
-    # A rule without a forecast cannot alert. Rank these hours last and
-    # retain their outcomes so every method faces the same population.
-    return float(average_precision_score(y, np.nan_to_num(s, nan=-1e300))) if y.any() else None
+def strip(b: dict) -> dict:
+    b = dict(b)
+    b.pop("event_leads", None)
+    return b
 
 
 def main() -> None:
     t0 = time.time()
-    C.ART.mkdir(exist_ok=True)
-    C.OUT.mkdir(exist_ok=True)
-    df = C.load_features()
-    ev = C.load_events()
-    end_h = C.data_end_h()
-    all_starts = {b: g.start_h.values for b, g in ev.groupby("ba")}
-    split_year = C.from_h(C.SPLIT_H).year
-    first_year = int(df.hour.dt.year.min())
-    val_years = list(range(first_year + 2, split_year))          # time-ordered folds
-    year = df.hour.dt.year.values
-    scored = df.scored.values
-    y = df.y48.values
-    tr = scored & (df.h.values + C.HORIZON_H < C.SPLIT_H)
-    te = scored & (df.h.values >= C.SPLIT_H)
-    mism = int(((df.y48_table.values != y) | (df.in_event_table.values != df.in_event.values))[df.mapped.values].sum())
-    print(f"rows {len(df):,}  train {tr.sum():,} (pos {y[tr].mean():.3%})  test {te.sum():,} (pos {y[te].mean():.3%})"
-          f"  label rows that differ from the table {mism:,}  folds {val_years}", flush=True)
-
-    ev_test = ev[(ev.start_h >= C.SPLIT_H) & (ev.start_h <= end_h)]
-    oof_rows = np.flatnonzero(tr & np.isin(year, val_years))
-    ev_oof = ev[(ev.start_h < C.SPLIT_H) & np.isin(ev.start.dt.year, val_years)]
-    p_oof = C.Panel(df, oof_rows, ev_oof)
-    p_test = C.Panel(df, np.flatnonzero(te), ev_test)
-    p_train = C.Panel(df, np.flatnonzero(tr), ev[ev.start_h < C.SPLIT_H])
-    train_starts = {b: g.start_h.values for b, g in p_train.all_events.groupby("ba")}
-
-    def evaluate(panel, scores, threshold, starts):
-        labels = y[panel.rows]
-        block = panel.summary(scores, threshold, starts)
-        block["aucPr"] = ap(labels, scores)
-        for season in C.SEASONS:
-            selected = panel.season_rows == season
-            block["seasons"][season]["aucPr"] = ap(labels[selected], scores[selected])
-        return block
-
-    results = {"split": C.SPLIT, "dataEnd": str(C.from_h(end_h)), "valYears": val_years,
-               "featureRows": len(df), "trainEvents": len(p_train.all_events),
-               "trainRows": int(tr.sum()), "testRows": int(te.sum()),
-               "trainPosShare": float(y[tr].mean()), "testPosShare": float(y[te].mean()) if te.any() else None,
-               "labelRowsDifferFromTable": mism, "trainEventsOof": len(ev_oof), "models": {}}
-    preds, oofs, thresholds = {}, {}, {}
-
-    for name, feats in C.VARIANTS.items():
-        X = df[feats].values
-        # Cross-validation: train on the years before each validation year.
-        cv = []
-        best = None
-        for cfg in CONFIGS:
-            fold_preds = {r: np.empty(len(oof_rows)) for r in ROUNDS}
-            aps = {r: [] for r in ROUNDS}
-            for vy in val_years:
-                fold_start = C.to_h([f"{vy}-01-01"])[0]
-                a = np.flatnonzero(tr & (df.h.values + C.HORIZON_H < fold_start))
-                positions = year[oof_rows] == vy
-                b = oof_rows[positions]
-                m = lgb.train({**BASE, **cfg}, lgb.Dataset(X[a], y[a].astype(int), feature_name=feats), max(ROUNDS))
-                for r in ROUNDS:
-                    fold_scores = m.predict(X[b], num_iteration=r, num_threads=BASE["num_threads"])
-                    fold_preds[r][positions] = fold_scores
-                    aps[r].append(ap(y[b], fold_scores))
-            for r in ROUNDS:
-                trial = {**cfg, "rounds": r, "ap_by_fold": aps[r], "ap": float(np.mean(aps[r]))}
-                cv.append(trial)
-                if best is None or trial["ap"] > best["ap"]:
-                    best = trial
-                    oof = fold_preds[r]
-            print(f"  {name} {cfg} " + " ".join(f"{r}:{np.mean(aps[r]):.4f}" for r in ROUNDS) + f"  [{time.time()-t0:.0f}s]", flush=True)
-        cfg = {k: best[k] for k in ("num_leaves", "min_child_samples", "scale_pos_weight")}
-        a = np.flatnonzero(tr)
-        model = lgb.train({**BASE, **cfg}, lgb.Dataset(X[a], y[a].astype(int), feature_name=feats), best["rounds"])
+    C.ART.mkdir(exist_ok=True); C.OUT.mkdir(exist_ok=True)
+    d = W.Data()
+    df = d.df
+    res = {"periods": {"train": ["2015-07-01", C.TRAIN_END], "dev": [C.TRAIN_END, C.DEV_END], "test": [C.DEV_END, C.TEST_END]},
+           "design": DESIGN, "valYears": d.val_years, "trainRows": int(d.tr.sum()), "devRows": int(d.dev.sum()),
+           "trainPosShare": float(d.y[d.tr].mean()), "devPosShare": float(d.y[d.dev].mean()),
+           "trainEvents": len(d.p_train.all_events), "devEvents": len(d.ev_dev), "named": d.named, "models": {}}
+    scores, frozen, leads = {}, {"design": DESIGN, "methods": {}}, {}
+    oofs = {}
+    for name in C.VARIANTS:
+        model, feats, best, cv, oof, p = W.fit(d, name, DESIGN, CFGS, log=lambda s: print(s, flush=True))
         model.save_model(str(C.ART / f"{name}.txt"))
-        p = np.full(len(df), np.nan)
-        valid = ~df.in_event.values
-        p[valid] = model.predict(X[valid], num_threads=BASE["num_threads"])
-        thr = C.pick_threshold(p_oof, oof, train_starts, p_train, p[p_train.rows])
-        if name != "warn_full_fx":
-            preds[name], oofs[name], thresholds[name] = p, oof, thr
-        imp = dict(sorted(zip(feats, (model.feature_importance("gain") / model.feature_importance("gain").sum()).round(4).tolist()),
-                          key=lambda kv: -kv[1]))
-        results["models"][name] = {
-            "kind": "lightgbm", "features": feats, "config": {**cfg, "rounds": best["rounds"]},
-            "cv": cv,
-            "threshold": thr, "gainShare": imp,
-            "trainFalseRate": p_train.false_alarm_rate(p[p_train.rows], thr, train_starts),
-            "train_oof": evaluate(p_oof, oof, thr, train_starts),
-            "test": evaluate(p_test, p[p_test.rows], thr, all_starts)}
-        t = results["models"][name]
-        print(f"{name}: cfg {t['config']} thr {thr:.4f} | OOF fa {t['train_oof']['falseAlarmsPerBaYear']:.2f} "
-              f"recall12 {t['train_oof']['recall12h']:.3f} | TEST events {t['test']['testEvents']} warned12 {t['test']['warned12h']} "
-              f"fa {t['test']['falseAlarmsPerBaYear']:.2f} ap {t['test']['aucPr']}", flush=True)
+        thr = d.threshold(oof, p[d.p_train.rows])
+        gain = model.feature_importance("gain")
+        imp = sorted(zip(feats, (gain / gain.sum()).tolist()), key=lambda kv: -kv[1])
+        dev = d.evaluate(d.p_dev, p[d.p_dev.rows], thr)
+        leads[name] = dev["event_leads"]
+        res["models"][name] = {"kind": "lightgbm", "features": feats, "config": {k: best[k] for k in (*CFGS[0], "rounds")},
+                               "cvAp": best["ap"], "cv": cv, "threshold": thr,
+                               "importance": [{"feature": f, "gain": float(g)} for f, g in imp[:10]],
+                               "trainFalseRate": d.p_train.false_alarm_rate(p[d.p_train.rows], thr, d.train_starts),
+                               "train_oof": strip(d.evaluate(d.p_oof, oof, thr, d.train_starts)), "dev": strip(dev)}
+        if name == "warn_fcst":
+            res["models"][name]["label"] = C.FCST_LABEL
+        scores[name], oofs[name] = p, oof
+        frozen["methods"][name] = {"threshold": thr, "features": feats}
+        r = res["models"][name]
+        print(f"{name}: {r['config']} thr {thr:.4f} | OOF w12 {r['train_oof']['warned12h']} fa {r['train_oof']['falseAlarmsPerBaYear']:.2f} "
+              f"| DEV w12 {r['dev']['warned12h']}/{r['dev']['testEvents']} fa {r['dev']['falseAlarmsPerBaYear']:.2f} "
+              f"ap {r['dev']['aucPr']:.4f}  [{time.time()-t0:.0f}s]", flush=True)
+    for name, (s, desc, cfg, thr) in W.rules(d).items():
+        dev = d.evaluate(d.p_dev, s[d.p_dev.rows], thr)
+        leads[name] = dev["event_leads"]
+        res["models"][name] = {"kind": "rule", "rule": desc, "config": cfg, "threshold": thr,
+                               "trainFalseRate": d.p_train.false_alarm_rate(s[d.p_train.rows], thr, d.train_starts),
+                               "train_oof": strip(d.evaluate(d.p_oof, s[d.oof_rows], thr, d.train_starts)), "dev": strip(dev)}
+        scores[name] = s
+        frozen["methods"][name] = {"threshold": thr, "config": cfg}
+        r = res["models"][name]["dev"]
+        print(f"{name}: DEV w12 {r['warned12h']} fa {r['falseAlarmsPerBaYear']:.2f}", flush=True)
 
-    # Baselines. Their settings are tuned on the same training years the model thresholds use.
-    fc = df.fc_err.values
-    hand_parts = (np.nan_to_num(np.clip(df.fc_err_max_24h.values, -1, 1), nan=0.0) / 0.1,
-                  np.nan_to_num(df.demand_vs_30d_peak.values, nan=0.0),
-                  np.nan_to_num(np.abs(df.temp_anom_30d.values), nan=0.0) / 10.0)
-    best_hand = None
-    for wd, wt in itertools.product([0.5, 1.0, 2.0, 4.0], repeat=2):
-        s = hand_parts[0] + wd * hand_parts[1] + wt * hand_parts[2]
-        thr = C.pick_threshold(p_oof, s[oof_rows], train_starts, p_train, s[p_train.rows])
-        w12 = p_oof.summary(s[oof_rows], thr, train_starts)["warned12h"]
-        if best_hand is None or w12 > best_hand[0]:
-            best_hand = (w12, wd, wt, thr, s)
-    _, wd, wt, hthr, hand = best_hand
-    rules = {"rule_forecast_error": (fc, "alert when (demand - forecast) / forecast >= threshold", {}),
-             "rule_hand": (hand, "alert when fc_err_max_24h/0.1 + wd*demand_vs_30d_peak + wt*|temp_anom_30d|/10 >= threshold",
-                           {"wd": wd, "wt": wt})}
-    for name, (s, desc, cfg) in rules.items():
-        thr = C.pick_threshold(p_oof, s[oof_rows], train_starts, p_train, s[p_train.rows])
-        results["models"][name] = {
-            "kind": "rule", "rule": desc, "config": cfg, "threshold": thr,
-            "trainFalseRate": p_train.false_alarm_rate(s[p_train.rows], thr, train_starts),
-            "train_oof": evaluate(p_oof, s[oof_rows], thr, train_starts),
-            "test": evaluate(p_test, s[p_test.rows], thr, all_starts)}
-        t = results["models"][name]
-        print(f"{name}: {cfg} thr {thr:.4f} | OOF fa {t['train_oof']['falseAlarmsPerBaYear']:.2f} recall12 {t['train_oof']['recall12h']:.3f} "
-              f"| TEST warned12 {t['test']['warned12h']}/{t['test']['testEvents']} fa {t['test']['falseAlarmsPerBaYear']:.2f}", flush=True)
+    # DEV per-event table and the named events (first alert time and lead for every method).
+    rows = d.ev_dev[["event_id", "ba", "start", "stop", "hours_above", "peak_frac", "peak_customers_out", "cust_hours", "group"]].copy()
+    for name in scores:
+        rows[f"lead_{name}"] = rows.event_id.map(leads[name])
+    rows.to_csv(C.OUT / "warn_events_dev.csv", index=False)
+    named = []
+    for eid in d.named:
+        r = rows[rows.event_id == eid].iloc[0]
+        e = {"event_id": eid, "ba": r.ba, "start": str(r.start), "peakCustomersOut": float(r.peak_customers_out),
+             "group": r.group, "methods": {}}
+        for name in scores:
+            l = leads[name].get(eid)
+            e["methods"][name] = {"leadHours": l, "firstAlert": None if l is None else str(r.start - pd.Timedelta(hours=l))}
+        named.append(e)
+    res["namedEvents"] = named
 
-    # Per-event table (test events), one lead column per model.
-    rows = ev_test[["event_id", "ba", "start", "stop", "hours_above", "peak_frac", "peak_customers_out"]].copy()
-    for name, m in results["models"].items():
-        rows[f"lead_{name}"] = rows.event_id.map(m["test"]["event_leads"])
-    scor = set(p_test.events.event_id)
-    rows["ba_has_features"] = rows.event_id.isin(scor)
-    # Events whose 72 h before the start hold no scored hour at least 12 h ahead cannot be warned in time.
-    can = []
-    for r in rows.itertuples():
-        g = p_test.groups.get(r.ba)
-        h = p_test.h[g[0]:g[1]] if g else np.empty(0)
-        s0 = C.to_h([r.start])[0]
-        can.append(bool(((h >= s0 - C.LOOKBACK_H) & (h <= s0 - C.MIN_LEAD_H)).any()))
-    rows["scorable_12h"] = can
-    rows.to_csv(C.OUT / "warn_events.csv", index=False)
-    results["testEventsScorable12h"] = int(sum(can))
-    for m in results["models"].values():
-        m["test"].pop("event_leads"); m["train_oof"].pop("event_leads")
-
-    # Shared outputs. p for training hours in the validation years is the out-of-fold value, so
-    # the evidence page uses out-of-fold predictions wherever available.
+    # Raw scores for final_test.py, and the shared outputs (out-of-fold values on TRAIN where they exist).
+    sc = pd.DataFrame({"ba": df.ba.values, "hour": df.hour.values})
+    for n, s in scores.items():
+        sc[n] = s
+    sc.to_parquet(C.ART / "warn_scores.parquet", index=False)
     out = pd.DataFrame({"ba": df.ba.values, "hour": df.hour.values})
-    for col, name in (("p_grid", "warn_grid"), ("p_full", "warn_full")):
-        p = preds[name].copy()
-        p[oof_rows] = oofs[name]
-        p[(df.h.values <= end_h) & ~scored] = np.nan
+    end_h = C.data_end_h()
+    for name, col in COLS.items():
+        p = scores[name].copy()
+        p[d.oof_rows] = oofs[name]
+        p[(df.h.values <= end_h) & ~df.scored.values] = np.nan
         out[col] = p
     out.to_parquet(C.ART / "ba_hour_pred.parquet", index=False)
-    (C.ART / "warn_threshold.json").write_text(json.dumps(
-        {"p_grid": thresholds["warn_grid"], "p_full": thresholds["warn_full"]}))
-    (C.OUT / "warn_results.json").write_text(json.dumps(results, indent=1))
+    (C.ART / "warn_threshold.json").write_text(json.dumps({col: frozen["methods"][n]["threshold"] for n, col in COLS.items()}))
+    (C.OUT / "warn_frozen.json").write_text(json.dumps(frozen, indent=1))
+    (C.OUT / "warn_results.json").write_text(json.dumps(res, indent=1, default=str))
     print(f"done in {time.time()-t0:.0f}s", flush=True)
 
 
