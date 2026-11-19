@@ -94,7 +94,6 @@ export function Timeline({ live, clock, bare = false, assist = true, official = 
     const alertIdx = firstAlertIndex(live);
     return { area, risk, thresholdY, startX: x(replay.eventStartIndex), alertIdx, alertX: alertIdx == null ? null : x(alertIdx) };
   }, [live, replay, last]);
-  const model = modelLabel(replay.warnModel);
 
   const scrub = (e: React.PointerEvent) => {
     const el = trackRef.current;
@@ -124,6 +123,13 @@ export function Timeline({ live, clock, bare = false, assist = true, official = 
         <div className="em-readout">
           <span className="em-time" ref={timeRef} />
           <span className="em-rel" ref={relRef} />
+            {!assist
+              ? <span className="em-chart-note">Share of customers out in these counties. No warning.</span>
+              : paths.risk
+              ? <span className="em-chart-note">{bare
+                  ? `${replay.ba} risk, ${modelLabel(replay.warnModel, true)}`
+                  : `Risk of an outage event in ${replay.ba}, ${modelLabel(replay.warnModel, true)}${paths.thresholdY != null ? '. Dashed line: alert level' : ''}`}</span>
+              : <span className="em-chart-note em-pending">Risk of an outage event in {replay.ba}: model output pending</span>}
         </div>
         <div
           className="em-track" ref={trackRef}
@@ -145,13 +151,6 @@ export function Timeline({ live, clock, bare = false, assist = true, official = 
           {official && (
             <span className="em-official-label" style={{ left: `${(official.index / last) * 100}%` }}>{official.label}</span>
           )}
-          {!assist
-            ? <span className="em-chart-note">Share of customers out in these counties. No warning.</span>
-            : paths.risk
-            ? <span className="em-chart-note">{bare
-                ? `${replay.ba} risk, ${modelLabel(replay.warnModel, true)}`
-                : `Risk of an outage event in ${replay.ba}, ${model}${paths.thresholdY != null ? '. Dashed line: alert level' : ''}`}</span>
-            : <span className="em-chart-note em-pending">Risk of an outage event in {replay.ba}: model output pending</span>}
           <div className="em-head" ref={headRef} />
         </div>
       </div>
@@ -166,28 +165,30 @@ export function CheckFirst({ scene, live, count = 4, onPoint }: {
 }) {
   const { rows, observed } = useMemo(() => checkFirst(scene, live), [scene, live]);
   const top = rows.slice(0, count);
-  const people = top.reduce((s, r) => s + (r.county.dme ?? 0), 0);
   return (
     <aside className="em-check" aria-label="Check first">
-      <h2>Check first</h2>
+      <h2>Check first <span className="em-check-basis">{observed ? 'observed rank' : 'predicted rank'}</span></h2>
       <p className="em-check-sub">
-        {observed ? 'Observed' : 'Predicted'} hours dark × people on powered medical equipment{observed ? ' (model output pending)' : ''}.
-        {' '}These {top.length} counties: {fmtInt(people)} people.
+        {observed
+          ? 'Ranked by observed hours dark × people on powered medical equipment (model output pending).'
+          : 'Ranked by predicted hours dark × people on powered medical equipment. Observed hours dark are the check.'}
       </p>
+      <div className="em-check-cols" aria-hidden="true"><span>County</span><span>On medical equipment</span></div>
       <ol>
-        {top.map((r) => (
+        {top.map((r, i) => (
           <li key={r.county.fips}>
             <a
               href={`#/brief/${r.county.fips}`}
               onMouseEnter={() => onPoint?.(r.county.fips)} onMouseLeave={() => onPoint?.(null)}
               onFocus={() => onPoint?.(r.county.fips)} onBlur={() => onPoint?.(null)}
             >
+              <span className="em-rank">{i + 1}</span>
               <span className="em-names-2">
                 <span className="em-earth">{earthName(r.county)}</span>
                 <span className="em-hollow">
-                  {hollowName(r.county)}, {observed
-                    ? `${Math.round(r.hours)} h dark (observed)`
-                    : `${fmtHours(r.hours)} h predicted, ${Math.round(r.observedHours)} h observed`}
+                  {hollowName(r.county)} · {observed
+                    ? `observed ${Math.round(r.hours)} h`
+                    : <>observed <b className="em-obs">{Math.round(r.observedHours)} h</b> · predicted {fmtHours(r.hours)} h</>}
                 </span>
               </span>
               <span className="em-dme">{fmtInt(r.county.dme)}</span>

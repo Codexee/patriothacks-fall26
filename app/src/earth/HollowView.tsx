@@ -58,7 +58,7 @@ export function HollowView({ scene, live, clock, highlight, showFair, bare = fal
         const r = cellRefs.current[g];
         if (!r) return;
         if (r[0]) r[0].textContent = fmtPeople(s.people);
-        if (r[1]) r[1].textContent = `${fmtPeople(s.hollowPeople)} at Hollow scale`;
+        if (r[1]) r[1].textContent = fmtPeople(s.hollowPeople);
         if (r[2]) r[2].textContent = live ? `${s.pctOut < 1 && s.pctOut > 0 ? s.pctOut.toFixed(1) : Math.round(s.pctOut)}%` : '–';
         if (r[3]) r[3].textContent = live ? fmtH(s.hoursPerPerson) : '–';
         if (r[4]) r[4].textContent = live ? fmtInt(s.dmeDark) : '–';
@@ -83,7 +83,7 @@ export function HollowView({ scene, live, clock, highlight, showFair, bare = fal
     <div className={`hv${bare ? ' hv-bare' : ''}${live ? '' : ' hv-calm'}`}>
       {!bare && (fair || aside) && (
         <div className="hv-top">
-          <div className="hv-aside">{aside}</div>
+          {aside}
           {fair && <FairNote fair={fair} />}
         </div>
       )}
@@ -110,11 +110,11 @@ export function HollowView({ scene, live, clock, highlight, showFair, bare = fal
       {!bare && geo && (
         <div className="hv-table">
           <div className="hv-head" style={{ height: geo.top }}>
-            <span>People</span>
-            <span>Customers out now</span>
-            <span>Hours without power per person</span>
-            <span>On medical equipment, in dark counties</span>
-            {fair && <span className="hv-fair-h">Whole event in {fair.ba}: actual / fair rotation</span>}
+            <span title="People in these 5 levels (real), and the same share of 2 billion people (Hollow scale; a scaling, not a count)">People<small>real · Hollow scale</small></span>
+            <span title="Percent of electric customers out now, in these levels">Out now<small>customers</small></span>
+            <span title="Hours without power per person so far (sum of the share of customers out, hour by hour)">Hours dark<small>per person</small></span>
+            <span title="People on powered medical equipment in counties with 10% or more of customers out now">Medical<small>dark counties</small></span>
+            {fair && <span className="hv-fair-h" title={`Whole event, counties of ${fair.ba} only: hours without power per person, actual against fair rotation (the same shortage, spread evenly; a simple what-if, not a grid simulation)`}>Actual · even<small>whole event, {fair.ba}</small></span>}
           </div>
           {Array.from({ length: GROUPS }, (_, g) => (
             <div key={g} className="hv-row" style={{ top: rowTop(g), height: rowH }}>
@@ -127,7 +127,7 @@ export function HollowView({ scene, live, clock, highlight, showFair, bare = fal
               <span ref={(el) => { (cellRefs.current[g] ??= [])[4] = el; }} />
               {fair && (
                 <span className="hv-fair">
-                  {fair.actual[g] == null ? '–' : `${fmtH(fair.actual[g]!)} / ${fmtH(fair.fair)}`}
+                  {fair.actual[g] == null ? '–' : `${fmtH(fair.actual[g]!)} · ${fmtH(fair.fair)}`}
                 </span>
               )}
             </div>
@@ -138,29 +138,43 @@ export function HollowView({ scene, live, clock, highlight, showFair, bare = fal
       </div>
 
       {!bare && (
-        <p className="hv-note">
-          Cell width = people. Level = CDC vulnerability (50 = most vulnerable).
-          {' '}{live ? `The ${fmtInt(sec.cis.length)} US counties in this replay` : `All ${fmtInt(sec.cis.length)} US counties`} stand for the Hollow.
-          {' '}Hollow scale = a level's share of these {fmtPeople(sec.totalPop)} people × 2 billion: a scaling, not a count.
+        <p className="hv-note" title="Hollow scale = a level's share of the people shown × 2 billion: a scaling, not a count.">
+          Cell width = people. Level = CDC vulnerability, 50 = most vulnerable.
+          {' '}{live ? `The ${fmtInt(sec.cis.length)} counties of this replay` : `All ${fmtInt(sec.cis.length)} US counties`} stand for the Hollow.
+          {' '}Hollow scale = share of these {fmtPeople(sec.totalPop)} people × 2 billion (a scaling, not a count).
         </p>
       )}
     </div>
   );
 }
 
+/** The fair-rotation what-if in one plain sentence; the method opens under "Details". */
+export function fairSentence(fair: FairRotation): string {
+  const s = fair.spared, f1 = (h: number) => h.toFixed(1);
+  const nums = `(${f1(fair.deepActual)} h against ${f1(fair.fair)} h per person)`;
+  if (Math.abs(s) < 0.5) return `In this event the deepest 10 levels were dark about as long as an even spread would give ${nums}.`;
+  if (s < 0) {
+    const how = -s < fair.fair * 0.25 ? 'slightly less' : 'less';
+    return `In this event the deepest 10 levels were dark ${how} than an even spread would give ${nums}.`;
+  }
+  return `In this event the deepest 10 levels were dark ${f1(s)} h longer than an even spread would give ${nums}.`;
+}
+
 function FairNote({ fair }: { fair: FairRotation }) {
-  const s = fair.spared;
-  const f1 = (h: number) => h.toFixed(1);
   return (
-    <aside className="hv-fairnote" aria-label="The Directorate's rule against fair rotation">
-      <h3>The Directorate's rule vs fair rotation</h3>
-      <p>
-        Deepest 10 levels in {fair.ba}: <b>{f1(fair.deepActual)} h</b> without power per person. Fair rotation: <b>{f1(fair.fair)} h</b>.
-        {' '}{Math.abs(s) < 0.5
-          ? 'About the same.'
-          : s > 0 ? <>Fair rotation would have spared them <b>{f1(s)} h</b>.</> : <>Fair rotation would have given them <b>{f1(-s)} h</b> more.</>}
-      </p>
-      <p className="hv-fair-label">the same shortage, spread evenly; a simple what-if, not a grid simulation</p>
-    </aside>
+    <details className="hv-fairnote">
+      <summary>
+        <span><b>Fair rotation, a what-if.</b> {fairSentence(fair)}</span>
+        <span className="em-more">Details</span>
+      </summary>
+      <div className="hv-fair-body">
+        <p className="hv-fair-label">the same shortage, spread evenly; a simple what-if, not a grid simulation</p>
+        <p>
+          Actual: what happened in the {fair.counties} counties of {fair.ba}. Fair rotation: in each hour, the same customers
+          out in {fair.ba}, spread evenly over all its counties. Hours without power per person = the sum of the share of
+          customers out, hour by hour. The last column of the table gives both numbers for each group of levels.
+        </p>
+      </div>
+    </details>
   );
 }

@@ -171,7 +171,9 @@ function useTopTen(): TopTen | null {
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-export function ModelCard({ scene, live, compact = false }: { scene: Scene; live: Live; compact?: boolean }) {
+/** The warning in one line; the caveat, the inputs at the first alert and the measured advantage
+ *  open under "Details". `bar` = the thin full-width form used above the cross-section. */
+export function ModelCard({ scene, live, bar = false }: { scene: Scene; live: Live; bar?: boolean }) {
   const inputs = useMemo(() => topInputs(live), [live]);
   const lead = useMemo(() => leadText(live), [live]);
   const topTen = useTopTen();
@@ -179,35 +181,40 @@ export function ModelCard({ scene, live, compact = false }: { scene: Scene; live
   const month = fa ? MONTHS[new Date(parseUtc(fa)).getUTCMonth()] : null;
   const noForecast = live.row?.leadHoursNoForecast;
   return (
-    <aside className={`em-model${compact ? ' em-model-compact' : ''}`} aria-label="The warning">
-      <p className="em-lead">
-        {lead
-          ? <>Warned <b>{lead}</b>.</>
-          : noForecast != null
-            ? <>Warned <b>{Math.round(noForecast)} h</b> before, without a weather forecast.</>
-            : <>The model did not warn this one.</>}
-      </p>
-      {lead && <p className="em-caveat">{scene.library.warnNote ?? 'Model with a weather forecast; lead times are an upper bound.'}</p>}
-      {inputs.length > 0 && fa && (
-        <>
-          <h3>Inputs at the first alert, {fmtHour(parseUtc(fa))}</h3>
-          <dl>
-            {inputs.map((i) => (
-              <div key={i.feature}>
-                <dt>{i.label}</dt>
-                <dd>{formatInput(i, month)}</dd>
-              </div>
-            ))}
-          </dl>
-        </>
-      )}
-      {topTen && !compact && (
-        <p className="em-advantage">
-          Check-first list, 2023–2024 test: its top 10 held {Math.round(topTen.model * 100)}% of the 10 counties that stayed dark
-          longest; past outages alone: {Math.round(topTen.history * 100)}%; chance: {Math.round(topTen.chance * 100)}%.
-        </p>
-      )}
-    </aside>
+    <details className={`em-model${bar ? ' em-model-bar' : ''}`}>
+      <summary>
+        <span className="em-lead">
+          {lead
+            ? <>Warned <b>{lead}</b>{bar ? '. With a weather forecast.' : '.'}</>
+            : noForecast != null
+              ? <>Warned <b>{Math.round(noForecast)} h</b> before, without a weather forecast.</>
+              : <>The model did not warn this one.</>}
+        </span>
+        <span className="em-more">Details</span>
+      </summary>
+      <div className="em-model-body">
+        {lead && <p className="em-caveat">{scene.library.warnNote ?? 'Model with a weather forecast; lead times are an upper bound.'}</p>}
+        {inputs.length > 0 && fa && (
+          <>
+            <h3>Inputs at the first alert, {fmtHour(parseUtc(fa))}</h3>
+            <dl>
+              {inputs.map((i) => (
+                <div key={i.feature}>
+                  <dt>{i.label}</dt>
+                  <dd>{formatInput(i, month)}</dd>
+                </div>
+              ))}
+            </dl>
+          </>
+        )}
+        {topTen && (
+          <p className="em-advantage">
+            Check-first list, 2023–2024 test: its top 10 held {Math.round(topTen.model * 100)}% of the 10 counties that stayed dark
+            longest; past outages alone: {Math.round(topTen.history * 100)}%; chance: {Math.round(topTen.chance * 100)}%.
+          </p>
+        )}
+      </div>
+    </details>
   );
 }
 
