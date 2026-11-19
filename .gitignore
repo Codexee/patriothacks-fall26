@@ -12,3 +12,4 @@ __pycache__/
 .claude/settings.local.json
 data/raw/
 data/.venv/
+!data/build/
