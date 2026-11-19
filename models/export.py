@@ -50,16 +50,19 @@ def walk(trees: list, x: list, objective: str) -> float:
     return 1.0 / (1.0 + math.exp(-s)) if objective == "binary" else s
 
 
-def export(name: str, objective: str, feats: list[str], threshold: float | None, X: np.ndarray, version: str) -> dict:
+def export(name: str, objective: str, feats: list[str], threshold: float | None, X: np.ndarray, version: str,
+           extra: dict | None = None) -> dict:
     booster = lgb.Booster(model_file=str(C.ART / f"{name}.txt"))
     assert booster.feature_name() == feats, (booster.feature_name(), feats)
     trees = booster.dump_model()["tree_info"]
-    p = booster.predict(X)
+    # "regression" files hold the raw sum of leaves. For the dark model that sum is log(hours) when
+    # it was trained with a count objective; `output` in the file says how to turn it into hours.
+    p = booster.predict(X, raw_score=(objective == "regression"))
     parity = [{"x": [None if np.isnan(v) else float(v) for v in row], "p": float(pi)} for row, pi in zip(X, p)]
     worst = max(abs(walk(trees, r["x"], objective) - r["p"]) for r in parity)
     assert worst < 1e-9, f"{name}: tree walk differs from LightGBM by {worst}"
     doc = {"name": name, "version": version, "objective": objective, "features": feats,
-           "threshold": threshold, "trees": trees, "parity": parity}
+           "threshold": threshold, "trees": trees, "parity": parity, **(extra or {})}
     path = C.APP_MODELS / f"{name}.json"
     payload = json.dumps(doc, separators=(",", ":"), allow_nan=False).encode()
     size = len(payload)
@@ -76,28 +79,31 @@ def main() -> None:
     warn = json.loads((C.OUT / "warn_results.json").read_text())
     rng = np.random.default_rng(C.SEED)
     df = C.load_features()
-    pool = np.flatnonzero(df.scored.values & (df.h.values >= C.SPLIT_H))
+    pool = np.flatnonzero(df.scored.values & (df.h.values >= C.TRAIN_END_H) & (df.h.values < C.DEV_END_H))
     if len(pool) < N_PARITY:
         pool = np.flatnonzero(df.scored.values)
     info = {}
-    for name in ("warn_grid", "warn_full"):
-        feats = C.VARIANTS[name]
+    for name in ("warn_grid", "warn_full", "warn_fcst"):
+        feats = warn["models"][name]["features"]
         # Half random test rows, half rows with a missing value, so both paths are tested.
         miss = pool[np.isnan(df[feats].values[pool]).any(1)]
         missing_rows = rng.choice(miss, min(N_PARITY // 2, len(miss)), replace=False)
         other_rows = rng.choice(np.setdiff1d(pool, missing_rows), N_PARITY - len(missing_rows), replace=False)
         rows = np.r_[other_rows, missing_rows]
+        extra = {"label": C.FCST_LABEL} if name == "warn_fcst" else None
         info[name] = export(name, "binary", feats, warn["models"][name]["threshold"],
-                            df[feats].values[rows].astype(float), version)
+                            df[feats].values[rows].astype(float), version, extra)
     dark = json.loads((C.OUT / "dark_results.json").read_text())
     ce = pd.read_parquet(C.ART / "county_event.parquet")
     feats = dark["features"]
-    pool = np.flatnonzero(ce.start_h.values >= C.SPLIT_H)
+    pool = np.flatnonzero((ce.start_h.values >= C.TRAIN_END_H) & (ce.start_h.values < C.DEV_END_H))
     if len(pool) < N_PARITY:
         pool = np.arange(len(ce))
     rows = rng.choice(pool, N_PARITY, replace=False)
+    out = {"l2": "hours", "log1p": "log1p_hours", "poisson": "log_hours", "tweedie": "log_hours"}[dark["objective"]]
     info["dark"] = export("dark", "regression", feats, None,
-                          ce.iloc[rows][feats].to_numpy(dtype=float, na_value=np.nan), version)
+                          ce.iloc[rows][feats].to_numpy(dtype=float, na_value=np.nan), version,
+                          {"output": out, "trainedObjective": dark["objective"]})
     (C.OUT / "export_info.json").write_text(json.dumps({"version": version, **info}, indent=1))
 
 

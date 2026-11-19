@@ -1,198 +1,223 @@
-"""Generate the evaluation report from the same results used by the browser."""
-import json
+"""Write models/RESULTS.md (v2) from out/*.json. Every number comes from those files.
 
-import pandas as pd
+Run: uv run python make_results.py   (after final_test.py)
+"""
+from __future__ import annotations
+
+import json
 
 import common as C
 
-ORDER = ["warn_grid", "warn_full", "rule_forecast_error", "rule_hand", "warn_full_fx"]
+MODELS = ["warn_grid", "warn_full", "warn_fcst"]
+RULES = ["rule_forecast_error", "rule_hand", "rule_record"]
+ORDER = MODELS + RULES
+LABEL = {"warn_grid": "warn_grid", "warn_full": "warn_full", "warn_fcst": "warn_fcst *",
+         "rule_forecast_error": "rule_forecast_error", "rule_hand": "rule_hand", "rule_record": "rule_record"}
 
 
-def number(value, digits=2):
-    return "—" if pd.isna(value) else f"{value:.{digits}f}"
+def f(x, d=2):
+    if x is None or (isinstance(x, float) and x != x):
+        return "–"
+    return f"{x:.{d}f}" if isinstance(x, float) else str(x)
 
 
-def table(headers, rows):
-    def line(items):
-        return "| " + " | ".join(map(str, items)) + " |"
-    return "\n".join([line(headers), line(["---"] * len(headers)), *[line(row) for row in rows]])
+def pct(x):
+    return "–" if x is None else f"{100 * x:.1f}"
 
 
-def score_table(models, period, season=None):
-    rows = []
-    for name in ORDER:
-        result = models[name][period]
-        if season:
-            result = result["seasons"][season]
-        rows.append([name, result["testEvents"], result["warnedAny"], result["warned12h"],
-                     number(100 * result["recall12h"], 1), number(result["medianLeadHours"], 1),
-                     result["falseEpisodes"], number(result["falseAlarmsPerBaYear"]), number(result["aucPr"], 4)])
-    return table(["Method", "Events", "Any lead", "≥12 h", "Recall ≥12 h (%)", "Median lead (h)",
-                  "False episodes", "False / BA-year", "PR-AUC"], rows)
+def table(blocks: dict, fa=True) -> list[str]:
+    head = ["Method", "Events", "Warned ≥ 6 h", "Warned ≥ 12 h", "Warned ≥ 24 h", "Recall 12 h (%)",
+            "People recall 12 h (%)", "Customer-hours recall 12 h (%)", "Median lead (h)"]
+    if fa:
+        head += ["False alarms per BA-year", "PR-AUC"]
+    out = ["| " + " | ".join(head) + " |", "|" + "---|" * len(head)]
+    for n, b in blocks.items():
+        r = [LABEL.get(n, n), b["testEvents"], b["warned6h"], b["warned12h"], b["warned24h"], pct(b["recall12h"]),
+             pct(b["peopleRecall12h"]), pct(b["custHoursRecall12h"]), f(b["medianLeadHours"], 0)]
+        if fa:
+            r += [f(b.get("falseAlarmsPerBaYear")), f(b.get("aucPr"), 4)]
+        out.append("| " + " | ".join(str(v) for v in r) + " |")
+    return out
 
 
-def main():
-    warn = json.loads((C.OUT / "warn_results.json").read_text())
-    dark = json.loads((C.OUT / "dark_results.json").read_text())
-    exports = json.loads((C.OUT / "export_info.json").read_text())
-    events = pd.read_csv(C.OUT / "warn_events.csv", parse_dates=["start"])
-    models = warn["models"]
-    full = models["warn_full"]["test"]
-    rule_names = ["rule_forecast_error", "rule_hand"]
-    wins = []
-    details = []
-    for name in rule_names:
-        rule = models[name]["test"]
-        wins.append(full["warned12h"] > rule["warned12h"] and
-                    full["falseAlarmsPerBaYear"] <= rule["falseAlarmsPerBaYear"])
-        details.append(f"`{name}` warned {rule['warned12h']} with {rule['falseAlarmsPerBaYear']:.2f} false alarms per BA-year.")
-    gate = "passed" if all(wins) else "failed"
-    parts = [
-        "# Outage model results",
-        f"**The warning model {gate} the two-baseline test.** On {len(events):,} held-out events, "
-        f"`warn_full` warned {full['warned12h']} at least 12 hours ahead ({full['recall12h']:.1%}). "
-        f"It produced {full['falseAlarmsPerBaYear']:.2f} false alarms per balancing area (BA) per year. "
-        + " ".join(details),
-        "The project requires more events warned at least 12 hours ahead at the same or fewer false alarms than each baseline. "
-        "All methods used thresholds chosen before the test period.",
-        "## Warning performance",
-        f"Training used {warn['trainRows']:,} BA-hours before {C.SPLIT} UTC ({warn['trainPosShare']:.2%} positive). "
-        f"The event library contains {warn['trainEvents']:,} earlier events. The test period runs from {C.SPLIT} "
-        f"through {warn['dataEnd']} UTC and contains {warn['testRows']:,} eligible hours ({warn['testPosShare']:.2%} positive). "
-        f"Of {len(events):,} test events, {warn['testEventsScorable12h']} had an eligible observation 12–72 hours before onset.",
-        "The `warn_full_fx` row uses observed future weather and appears only as a retrospective comparison.",
-        score_table(models, "test"),
-        "Median lead uses the earliest alert among events with any warning. PR-AUC is hourly average precision. "
-        "It ranks warnings across all thresholds. A missing baseline score ranks below every available score.",
-    ]
-    for season, title in (("winter", "Winter (December–February)"), ("summer", "Summer (June–August)"),
-                          ("other", "March–May and September–November")):
-        parts.extend([f"### {title}", score_table(models, "test", season)])
-    parts += [
-        "### Texas and Winter Storm Elliott",
-        "Each cell gives hours from the earliest eligible warning to the event start. A dash means the method missed the event. "
-        "The Elliott rows include every BA event starting December 23–25, 2022 UTC. The dates alone do not establish storm attribution.",
-    ]
-    names = []
-    primary_replays = []
-    for e in events.sort_values(["start", "ba"]).itertuples():
-        if e.ba == "ERCO" and e.start.strftime("%Y-%m") == "2021-02":
-            storm = "Texas freeze (Uri)"
-        elif pd.Timestamp("2022-12-23") <= e.start < pd.Timestamp("2022-12-26"):
-            storm = "Winter Storm Elliott period"
-        else:
-            continue
-        if storm.startswith("Texas") or (e.ba == "TVA" and storm.startswith("Winter")):
-            outcome = ("issued no warning" if pd.isna(e.lead_warn_full)
-                       else f"warned {e.lead_warn_full:g} hours before onset")
-            primary_replays.append(f"For {e.ba} on {e.start:%B %d, %Y}, `warn_full` {outcome}.")
-        names.append([storm, e.event_id, e.start.strftime("%Y-%m-%d %H:%M"),
-                      *[number(getattr(e, f"lead_{n}"), 0) for n in ORDER]])
-    if primary_replays:
-        parts.append(" ".join(primary_replays))
-    parts += [table(["Event", "BA event ID", "Start (UTC)", *ORDER], names),
-              "The full event ledger includes every held-out event, including misses. [Per-event results](out/warn_events.csv)",
-              "### Training and alert rules",
-              "A positive hour precedes an event start by up to 48 hours. An event begins when at least 1% of BA customers "
-              "have lost power for four consecutive hours. The library merges qualifying runs separated by up to 12 hours. "
-              "Scoring excludes the event, the next 48 hours and hours without a complete label horizon. "
-              "Coverage uses each BA’s first and last reported outage in each year and joins adjacent windows. "
-              "The training features start in July 2015. The label check against the event library found "
-              f"{warn['labelRowsDifferFromTable']} disagreements.",
-              f"LightGBM used expanding annual validation folds in {', '.join(map(str, warn['valYears']))}. "
-              "Each fit dropped the last 48 training hours before the next period. Mean validation average precision selected "
-              "among 100, 200 and 300 trees and positive-class weights of 1 and 10. The candidates paired 7 leaves with a "
-              "minimum of 2,000 rows per leaf, or 15 leaves with a minimum of 500 or 5,000. The learning rate was 0.05. "
-              "The warning models omit BA identity. The grid inputs are demand error, recent peaks, interchange, "
-              "fuel and generation changes, hour and month. The full model adds station weather and trailing summaries.",
-              "Starting at high training-score quantiles, threshold selection lowered the threshold until either the validation "
-              "predictions or the final fit on training hours exceeded six false episodes per BA-year. It retained the last passing "
-              "threshold. An alert episode joins alerts less than 24 hours apart. It counts as false if none of its alerts has an "
-              "event start in the next 48 hours. An event counts as warned when any alert falls in the preceding 72 hours. "
-              "These windows differ by design. One BA-year equals 8,766 eligible hours. Seasonal rates use eligible hours in that "
-              "season, the month of event onset and the month of the episode’s first alert.",
-              "The forecast-error rule uses (demand − forecast) / forecast. The hand rule adds maximum 24-hour forecast error "
-              "(clipped to ±1 and divided by 0.1), demand divided by its trailing 30-day peak, and absolute temperature anomaly "
-              "divided by 10. Missing hand-rule components contribute zero. Training event recall selected the two weights.",
-              table(["Method", "Selected settings", "Threshold", "Validation false / BA-year", "Fitted training false / BA-year"],
-                    [[n, ", ".join(f"{k}={v}" for k, v in models[n]["config"].items()) or "threshold only",
-                      f"{models[n]['threshold']:.8g}", number(models[n]["train_oof"]["falseAlarmsPerBaYear"]),
-                      number(models[n]["trainFalseRate"])] for n in ORDER]),
-              "#### Predictions from training-year validation folds", score_table(models, "train_oof")]
-    fx = models["warn_full_fx"]["test"]
-    parts += ["### Future weather experiment",
-              f"The report-only variant uses the next 24 hours of observed weather as a stand-in for a forecast. It warned "
-              f"{fx['warned12h']} events at 12 hours, a change of {fx['warned12h'] - full['warned12h']:+d}. PR-AUC changed by "
-              f"{fx['aucPr'] - full['aucPr']:+.4f} and false alarms by "
-              f"{fx['falseAlarmsPerBaYear'] - full['falseAlarmsPerBaYear']:+.3f} per BA-year. "
-              "Only past and current observations enter the exported warning models.",
-              "## County dark hours",
-              f"The county model predicts the number of event hours with at least 10% of county customers reported out. "
-              f"The pipeline generated {dark['countyEventRows']:,} county-event rows. "
-              f"The outage files support targets for {dark['observedRows']:,} rows across {dark['observedEvents']:,} "
-              f"of {dark['allEvents']:,} library events.",
-              "Each county belongs to its primary BA in the shared crosswalk. The eight historic Connecticut counties belong to ISO New England. "
-              "Some BAs have no primary counties. EAGLE-I’s modeled customer counts define the 10% threshold. The target includes both "
-              "ends of the event and counts distinct hours. A county needs a denominator and an outage record in each endpoint year to "
-              "contribute to evaluation. A missing county-hour within that coverage counts as zero reported outages.",
-              "At onset, the model uses the last completed grid and weather hour, the preceding six hours of reported county outages, "
-              "the start month and hour, BA identity, and BA and county histories from completed events. An EIA hour is timestamped "
-              "at its beginning, so the row ending at onset carries the previous hour’s timestamp. Earlier held-out outcomes can enter "
-              "the history for a later event after the earlier event ends. History requires a county outage report by the earlier event’s end.",
-              "County population, the Social Vulnerability Index (SVI) and its four theme ranks use the 2010 CDC county file. "
-              "The model treats SVI ranks as missing before April 2015, following the date of the CDC documentation. "
-              "Utility count uses distinct utilities reporting service in 2012. The county customer estimate divides each utility’s state "
-              "total evenly across its reported counties. These historical estimates keep later county characteristics out of the model. "
-              "A missing match remains missing. The committed county reference makes training repeatable offline. "
-              "[CDC county data](https://svi.cdc.gov/Documents/Data/2010/csv/states_counties/SVI_2010_US_county.csv) · "
-              "[CDC methodology](https://svi.cdc.gov/map25/data/docs/SVI-2010-Documentation-H.pdf) · "
-              "[EIA 2012 archive](https://www.eia.gov/electricity/data/eia861/archive/zip/f8612012.zip)",
-              "Expanding training-year folds selected regression settings by mean absolute error (MAE). Candidates used 7 or 15 leaves, "
-              "minimum leaf sizes of 50 or 200, and 100, 200 or 300 trees. The learning rate was 0.05. "
-              f"The selected settings were {', '.join(f'{k}={v}' for k,v in dark['config'].items())}. "
-              "The history baseline uses the county’s mean observed dark hours in earlier events, with zero for a first event. "
-              "The evaluator and replay files floor negative estimates at zero. The exported regression trees return the raw sum of leaves.",
-              table(["Period", "County-events", "Events", "Model MAE (h)", "History MAE (h)", "Zero MAE (h)",
-                     "Model Spearman", "History Spearman", "Model within-event Spearman", "History within-event Spearman"],
-                    [[title, b["countyEvents"], b["events"], number(b["maeHours"]), number(b["baselineMaeHours"]),
-                      number(b["zeroMaeHours"]), number(b["spearman"], 3), number(b["baselineSpearman"], 3),
-                      number(b["withinEventSpearman"], 3), number(b["baselineWithinEventSpearman"], 3)]
-                     for title, b in (("Test", dark["test"]), ("Training validation", dark["train_oof"]))]),
-              "Spearman correlation measures rank agreement. The within-event column averages correlations across BA events "
-              "with at least five counties and variation in both rankings."]
-    t = dark["test"]
-    parts.append(f"On the test years the model’s MAE was {abs(t['maeHours'] - t['baselineMaeHours']):.2f} hours "
-                 f"{'higher' if t['maeHours'] > t['baselineMaeHours'] else 'lower'} than the history baseline.")
-    equity = dark["equity"]
-    delta, paired = equity["q4MinusQ1"], equity["withinEventQ4MinusQ1"]
-    parts += ["## Observed dark hours by vulnerability",
-              f"The equity comparison covers all years. It groups {equity['countyEvents']:,} observed county-events across "
-              f"{equity['events']:,} BA events with a 2022 SVI rank. Quartile 4 contains counties above the 75th national "
-              "percentile. Each county-event has equal weight. The 95% intervals use 2,000 bootstrap samples of whole BA events.",
-              table(["National SVI quartile", "County-events", "Mean dark hours", "95% interval (h)"],
-                    [[q["quartile"], q["countyEvents"], number(q["meanDarkHours"]), f"{q['lo']:.2f}–{q['hi']:.2f}"]
-                     for q in equity["quartiles"]]),
-              f"The most vulnerable quartile averaged {delta['mean']:+.2f} hours relative to the least vulnerable quartile "
-              f"(95% interval {delta['lo']:.2f} to {delta['hi']:.2f}). Within the {paired['events']} BA events containing "
-              f"both quartiles, the equal-event mean difference was {paired['mean']:+.2f} hours "
-              f"({paired['lo']:.2f} to {paired['hi']:.2f}). These are observed differences. Storm location, event length and "
-              "reporting coverage can affect them. A single storm can also cause several BA events.",
-              "## Reproduction and limits",
-              "Run `models/run_all.sh` with the shared data mounted. Each browser model includes 200 Python predictions for "
-              "comparison with the browser evaluator. The model files store LightGBM’s numeric split trees unchanged.",
-              table(["Browser model", "Trees", "Bytes", "Maximum tree-walk difference"],
-                    [[n, exports[n]["trees"], exports[n]["bytes"], f"{exports[n]['parityMaxDiff']:.2g}"]
-                     for n in ("warn_grid", "warn_full", "dark")]),
-              f"The shared BA prediction file contains {warn['featureRows']:,} rows. Masked hours have null scores in the "
-              "labelled period. Post-coverage estimates have no measured outcomes. Eligible training validation rows use "
-              "out-of-fold predictions. Other training predictions can be in-sample. Held-out rows use the final training fit.",
-              "The grid and weather archives may include revisions and reporting delays. EAGLE-I records positive outage reports, "
-              "so a silent hour can mean either no outage or incomplete reporting. BA boundaries use the 2024 crosswalk across all years. "
-              "Event attribution uses weighted county shares, while the county model uses only primary assignments. Dark hours end "
-              "at the BA event boundary. These tests measure retrospective performance and do not establish a live warning service’s reliability.",
-              "Machine-readable results include every candidate setting, unrounded scores and additional regression diagnostics. "
-              "[Warning results](out/warn_results.json) · [County results](out/dark_results.json) · [Export checks](out/export_info.json)"]
-    (C.HERE / "RESULTS.md").write_text("\n\n".join(parts) + "\n")
+def verdict(name: str, T: dict) -> str:
+    m = T[name]
+    lines, wins = [], 0
+    for r in RULES:
+        b = T[r]
+        more = m["warned12h"] > b["warned12h"]
+        fewer = m["falseAlarmsPerBaYear"] <= b["falseAlarmsPerBaYear"]
+        ok = more and fewer
+        wins += ok
+        lines.append(f"  - against `{r}`: {m['warned12h']} vs {b['warned12h']} events warned ≥ 12 h; "
+                     f"{f(m['falseAlarmsPerBaYear'])} vs {f(b['falseAlarmsPerBaYear'])} false alarms per BA-year → "
+                     + ("**beats it**" if ok else ("more events but MORE false alarms: **does not beat it at the same false-alarm rate**"
+                                                   if more else "**does not beat it**")))
+    head = (f"- **`{name}`: {'YES' if wins == len(RULES) else 'NO'}**. It beats {wins} of {len(RULES)} baselines "
+            "(more events warned at least 12 h ahead and the same or fewer false alarms).")
+    return "\n".join([head] + lines)
+
+
+def main() -> None:
+    w = json.loads((C.OUT / "warn_results.json").read_text())
+    fin = json.loads((C.OUT / "warn_final.json").read_text())
+    dv = json.loads((C.OUT / "dev_variants.json").read_text())
+    d = json.loads((C.OUT / "dark_results.json").read_text())
+    dfin = json.loads((C.OUT / "dark_final.json").read_text())
+    ex = json.loads((C.OUT / "export_info.json").read_text())
+    M = w["models"]
+    T = {n: fin["models"][n]["test"] for n in ORDER}
+    D = {n: M[n]["dev"] for n in ORDER}
+
+    L = ["# Model results (v2)\n",
+         "Generated by `models/run_all.sh`. Periods (constants in `models/common.py`): **TRAIN** 2015-07 to 2020-12, "
+         "**DEV** 2021-2022, **FINAL TEST** 2023-2024. All fitting, hyperparameters and alert thresholds use TRAIN only "
+         f"(at most {C.FA_LIMIT:g} false alarms per BA-year on TRAIN). v1 had already shown results for 2021-2024, so DEV was "
+         "used openly to choose features and model design. The FINAL TEST was scored once, by `final_test.py`, with the frozen "
+         f"models and thresholds (run at {fin['ranAt']}, frozen file hash `{fin['frozenSha256']}`).\n",
+         "\\* `warn_fcst` = " + C.FCST_LABEL + ".\n",
+         "## Plain answer (FINAL TEST, 2023-2024)\n",
+         "Does the model beat every baseline: more events warned at least 12 h ahead, with the same or fewer false alarms per BA-year?\n",
+         verdict("warn_full", T), "", verdict("warn_fcst", T), "", verdict("warn_grid", T), "",
+         f"FINAL TEST: {fin['testEvents']} events, {fin['testRows']:,} scored BA-hours ({fin['testPosShare']:.2%} positive).\n",
+         "## FINAL TEST results\n"]
+    L += table(T)
+    L.append("\nPeople recall = share of the summed peak customers out that is in events warned ≥ 12 h ahead. "
+             "Customer-hours recall = the same share of summed customer-outage-hours (BA customers out, summed over the event window).\n")
+    for s, title in (("winter", "Winter (Dec–Feb)"), ("summer", "Summer (Jun–Aug)"), ("other", "Other months")):
+        L.append(f"### FINAL TEST, {title}\n")
+        L += table({n: T[n]["seasons"][s] for n in ORDER})
+        L.append("")
+    for g, title in (("demand_record", "Demand-record events (fc12_vs_month_record ≥ 1.0 at any hour in the 24 h before the start)"),
+                     ("other", "Other (storm-like) events")):
+        L.append(f"### FINAL TEST, {title}\n")
+        L += table({n: T[n]["groups"][g] for n in ORDER}, fa=False)
+        L.append("")
+    L.append("False alarms are not split by group, because an alert does not belong to an event group until an event happens.\n")
+
+    L += ["## DEV results (2021-2022; used to choose the design)\n"]
+    L += table(D)
+    L.append("")
+    for g, title in (("demand_record", "Demand-record events"), ("other", "Other (storm-like) events")):
+        L.append(f"### DEV, {title}\n")
+        L += table({n: D[n]["groups"][g] for n in ORDER}, fa=False)
+        L.append("")
+    for s, title in (("winter", "Winter (Dec–Feb)"), ("summer", "Summer (Jun–Aug)"), ("other", "Other months")):
+        L.append(f"### DEV, {title}\n")
+        L += table({n: D[n]["seasons"][s] for n in ORDER})
+        L.append("")
+    L.append("### Named events (DEV)\n")
+    L.append("Texas, Feb 2021 (Winter Storm Uri) and every BA event that starts Dec 23-25, 2022 (Winter Storm Elliott). "
+             "Each cell: lead hours (first alert time, UTC). – = no alert in the 72 h before the start.\n")
+    L.append("| Event | Start (UTC) | Peak customers out | Group | " + " | ".join(LABEL[n] for n in ORDER) + " |")
+    L.append("|" + "---|" * (4 + len(ORDER)))
+    for e in w["namedEvents"]:
+        cells = []
+        for n in ORDER:
+            m = e["methods"][n]
+            cells.append("–" if m["leadHours"] is None else f"{m['leadHours']:.0f} ({m['firstAlert'][5:16]})")
+        L.append(f"| `{e['event_id']}` | {e['start'][:16]} | {e['peakCustomersOut']:,.0f} | {e['group']} | " + " | ".join(cells) + " |")
+    L.append("")
+
+    L += ["### Design study on DEV (`dev_variants.py`, warn_full, one fixed configuration)\n",
+          "| Variant | CV PR-AUC (train) | Threshold | DEV warned ≥ 12 h | DEV false alarms / BA-year | DEV PR-AUC | DEV people recall 12 h (%) |",
+          "|---|---|---|---|---|---|---|"]
+    for n, v in dv["variants"].items():
+        r = v["dev"]
+        L.append(f"| {n} | {v['cvAp']:.4f} | {v['threshold']:.4f} | {r['warned12h']}/{r['testEvents']} | {f(r['falseAlarmsPerBaYear'])} | "
+                 f"{f(r['aucPr'], 4)} | {pct(r['peopleRecall12h'])} |")
+    L.append(f"\nChosen: **{w['design']}** (variant E: 72 h trailing summaries + monotone record features). It warned the most "
+             "events at 12 h on DEV, gave lead on Texas 2021 and on more Elliott events, and the monotone constraint keeps the record "
+             "features explainable (a higher forecast against the record never lowers the risk). Variant F (24 h target) was close. "
+             "The final hyperparameters were then chosen again on TRAIN folds for each model. For warn_full this picked smaller "
+             "trees than the fixed configuration of the study, and fewer DEV hits than variant E. We kept the TRAIN choice. "
+             "As a result the exported warn_full does NOT warn Texas 2021 (variant E did, 72 h ahead); see the named-event table.\n")
+
+    L += ["### Model settings (all chosen on TRAIN)\n", "| Model | Features | Configuration | Threshold |", "|---|---|---|---|"]
+    for n in MODELS:
+        L.append(f"| {n} | {len(M[n]['features'])} | {M[n]['config']} | {M[n]['threshold']:.4f} |")
+    for n in RULES:
+        L.append(f"| {n} | rule: {M[n]['rule']} | {M[n]['config']} | {M[n]['threshold']:.4f} |")
+    L.append("")
+    L.append("### Top 10 features (share of gain)\n")
+    for n in MODELS:
+        L.append(f"- `{n}`: " + ", ".join(f"{i['feature']} {100 * i['gain']:.1f}%" for i in M[n]["importance"]))
+    L.append("- `dark`: " + ", ".join(f"{i['feature']} {100 * i['gain']:.1f}%" for i in d["importance"]))
+    L.append("")
+
+    L += ["## During model: which counties stay dark longest\n",
+          "Target: hours from event start to stop with at least 10% of the county's customers out. One row per event × county of "
+          "the event's primary BA. Features are known at the event start. Baseline: the county's mean dark hours in its past events.\n",
+          f"v2 change: the product is a ranked check-first list, so the objective was chosen by ranking on DEV. Chosen: **{d['objective']}** "
+          f"(configuration {d['config']}, chosen on TRAIN folds by within-event Spearman).\n",
+          "### Objective study (DEV)\n",
+          "| Objective | DEV MAE (h) | History MAE (h) | Within-event Spearman | History | Top-10 overlap | History | Chance |",
+          "|---|---|---|---|---|---|---|---|"]
+    for o, s in d["objectives"].items():
+        b = s["dev"]
+        L.append(f"| {o} | {f(b['maeHours'])} | {f(b['baselineMaeHours'])} | {f(b['withinEventSpearman'], 3)} | "
+                 f"{f(b['baselineWithinEventSpearman'], 3)} | {f(b['top10Overlap'], 3)} | {f(b['baselineTop10Overlap'], 3)} | {f(b['top10Chance'], 3)} |")
+    L += ["\n### Ranking and error (chosen model)\n",
+          "| Period | County-events | Events | Within-event Spearman | History | Top-10 overlap | History | Chance | Events scored for top-10 | MAE (h) | History MAE (h) | Predict-0 MAE (h) | Spearman | History Spearman |",
+          "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
+    for name, b in (("DEV", d["dev"]), ("FINAL TEST", dfin)):
+        L.append(f"| {name} | {b['countyEvents']:,} | {b['events']} | {f(b['withinEventSpearman'], 3)} | {f(b['baselineWithinEventSpearman'], 3)} | "
+                 f"{f(b['top10Overlap'], 3)} | {f(b['baselineTop10Overlap'], 3)} | {f(b['top10Chance'], 3)} | {b['top10Events']} | "
+                 f"{f(b['maeHours'])} | {f(b['baselineMaeHours'])} | {f(b['zeroMaeHours'])} | {f(b['spearman'], 3)} | {f(b['baselineSpearman'], 3)} |")
+    L.append("\nTop-10 overlap: in each event with ≥ 10 counties and ≥ 1 dark county, k = min(10, dark counties); the share of the k "
+             "counties with the most actual dark hours that are also in the model's top k. Chance = mean k / counties. "
+             "Predicting 0 everywhere gives a low MAE because most county-events have no dark hour. MAE is kept for honesty; "
+             "ranking is the product metric.\n")
+    e = d["equity"]
+    L += ["## Equity: observed dark hours by SVI quartile (all events; data, not a model)\n",
+          f"{e['events']} events, {e['countyEvents']:,} county-events. Quartile of the county's 2022 national SVI percentile "
+          "(4 = most vulnerable). 95% intervals: 2,000 bootstrap resamples of events.\n",
+          "| SVI quartile | County-events | Mean dark hours | 95% interval |", "|---|---|---|---|"]
+    L += [f"| {q['quartile']} | {q['countyEvents']:,} | {f(q['meanDarkHours'])} | {f(q['lo'])} – {f(q['hi'])} |" for q in e["quartiles"]]
+    lg = e["events24hOrLonger"]
+    within_zero = lambda x: x["lo"] <= 0 <= x["hi"]
+    L += ["", "| Q4 − Q1 difference | Events | Mean (h) | 95% interval |", "|---|---|---|---|",
+          f"| All events | {e['events']} | {f(e['q4MinusQ1']['mean'])} | {f(e['q4MinusQ1']['lo'])} – {f(e['q4MinusQ1']['hi'])} |",
+          f"| All events, inside the same event | {e['withinEventQ4MinusQ1']['events']} | {f(e['withinEventQ4MinusQ1']['mean'])} | "
+          f"{f(e['withinEventQ4MinusQ1']['lo'])} – {f(e['withinEventQ4MinusQ1']['hi'])} |",
+          f"| Events of 24 h or longer | {lg['events']} | {f(lg['q4MinusQ1']['mean'])} | {f(lg['q4MinusQ1']['lo'])} – {f(lg['q4MinusQ1']['hi'])} |",
+          f"| Events of 24 h or longer, inside the same event | {lg['withinEventQ4MinusQ1']['events']} | {f(lg['withinEventQ4MinusQ1']['mean'])} | "
+          f"{f(lg['withinEventQ4MinusQ1']['lo'])} – {f(lg['withinEventQ4MinusQ1']['hi'])} |",
+          "\nThe gap across all events is clear, and larger for events of 24 h or longer. "
+          + ("Inside the same event the interval includes 0 (for all events and for long events): most of the gap comes from where "
+             "and how long the storms are, not from slower restoration of vulnerable counties in the same storm."
+             if within_zero(e["withinEventQ4MinusQ1"]) and within_zero(lg["withinEventQ4MinusQ1"]) else
+             "Inside the same event the gap is smaller; see the intervals above.")
+          + " Event length is measured from start to stop.\n"]
+
+    L += ["## v1 (for the record)\n",
+          "v1 used train < 2021 and test 2021-2024 (818 events), with v1 features. `warn_full` warned 114 events at least 12 h ahead "
+          "(13.9%) at 6.34 false alarms per BA-year; `rule_forecast_error` warned 60 at 6.09 and `rule_hand` 76 at 6.92. So v1 warn_full "
+          "did not beat both baselines at the same false-alarm rate. It missed Texas 2021 and TVA Elliott. The v1 dark model "
+          "(L2 on hours) had test MAE 3.91 h against 3.78 h for the history baseline (worse), and within-event Spearman 0.313 against 0.216.\n"]
+
+    L += ["## Exported files\n"]
+    for n in ("warn_grid", "warn_full", "warn_fcst", "dark"):
+        i = ex[n]
+        L.append(f"- `app/public/models/{n}.json`: {i['trees']} trees, {i['bytes'] / 1e6:.2f} MB, 200 parity rows (from DEV); "
+                 f"the Python tree walk matches LightGBM within {i['parityMaxDiff']:.1e}.")
+    L += ["- `dark.json` holds the raw sum of leaves, which is **log1p(hours)** for the chosen objective: hours = exp(value) − 1, "
+          "floored at 0. The file says so in `output`. `county_event_pred.parquet` is already in hours.",
+          "- `warn_fcst.json` carries a `label` field with the upper-bound statement.",
+          "- `app/public/models/metrics.json`: `models` and `dark` = FINAL TEST; `dev` = DEV; plus `importance`, `split`, `labels`.",
+          "- `BDA_SHARED/ba_hour_pred.parquet` (`ba, hour, p_grid, p_full, p_fcst`; out-of-fold on TRAIN validation years), "
+          "`BDA_SHARED/county_event_pred.parquet`, `BDA_SHARED/warn_threshold.json` (`p_grid, p_full, p_fcst`).\n",
+          "## Limits\n",
+          "- Recall at 12 h stays low. Most outage events are distribution-level storm damage that does not show in BA demand data.",
+          "- On DEV, every method went above the 6 false alarms per BA-year it was held to on TRAIN. Positive hours are more "
+          "common in later years, so a threshold chosen on TRAIN alerts more often later.",
+          "- `warn_fcst` uses observed future weather as its forecast. A real forecast has errors, so its numbers are an upper bound.",
+          "- `warn_full` uses outages already reported (lagged 1 h); the live page cannot compute these. `warn_grid` uses the BA's "
+          "own demand records, which the live page needs a long history to compute.",
+          "- The 72 h trailing summaries use the last 72 rows of each BA. That equals 72 h only where the hourly table has no gaps.",
+          "- DEV was used to choose the design after v1 had shown it. Only the FINAL TEST is a clean hold-out.",
+          "- SVI is the 2022 release for the equity table. Events are defined by a share-of-BA-customers rule on EAGLE-I data.\n"]
+    (C.HERE / "RESULTS.md").write_text("\n".join(L))
     print("RESULTS.md written")
 
 
