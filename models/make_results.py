@@ -55,6 +55,13 @@ def verdict(name: str, T: dict) -> str:
                                                    if more else "**does not beat it**")))
     head = (f"- **`{name}`: {'YES' if wins == len(RULES) else 'NO'}**. It beats {wins} of {len(RULES)} baselines "
             "(more events warned at least 12 h ahead and the same or fewer false alarms).")
+    mp = C.OUT / "matched.json"
+    if name == "warn_fcst" and mp.exists():
+        mt = json.loads(mp.read_text())
+        head = (f"- **`{name}`, two statements side by side.** Pre-registered (frozen threshold): it warns more events than "
+                f"every rule but with more false alarms, so it beats {wins} of {len(RULES)} rules at the same or fewer false "
+                f"alarms. Matched rate ({mt['label'].split(';')[0]}): "
+                + matched_statement(mt["final"][name], mt["final"]["rules"]) + ".")
     return "\n".join([head] + lines)
 
 
@@ -102,8 +109,13 @@ def real_forecast_section() -> list[str]:
           f"{f(M['warn_full']['falseAlarmsPerBaYear'])}.",
           f"In plain words: the events warned survive in full, but precision does not; false alarms rise by "
           f"{100 * (rl['falseAlarmsPerBaYear'] / ob['falseAlarmsPerBaYear'] - 1):.0f}% and PR-AUC keeps {pct(sv['aucPr'])}% of the upper bound. "
-          f"With real forecasts, warn_fcst beats {len(beats)} of 3 rules at the same or fewer false alarms"
-          + (f" ({', '.join(beats)})." if beats else "."),
+          f"Pre-registered (frozen threshold): with real forecasts, warn_fcst warns more events than every rule but with more "
+          f"false alarms, so it beats {len(beats)} of 3 rules at the same or fewer false alarms"
+          + (f" ({', '.join(beats)})." if beats else ".")
+          + (" Matched rate (operating points read from the test period, see the next section): with real forecasts it has "
+             + matched_statement(json.loads((C.OUT / "matched.json").read_text())["real2024"]["warn_fcst_real"],
+                                 json.loads((C.OUT / "matched.json").read_text())["real2024"]["rules"]) + "."
+             if (C.OUT / "matched.json").exists() else ""),
           "",
           "Forecast skill on the scored hours (forecast-based against observed fx_ features): "
           + ", ".join(f"{c} r = {v['corr']:.2f}" for c, v in rf["featureAgreement"].items()) + ".\n",
@@ -111,6 +123,55 @@ def real_forecast_section() -> list[str]:
           "March-November 2024), which is one likely reason for the extra false alarms.\n",
           "Limits: one forecast model (best match), one year, and the frozen threshold was set for observed weather, so the "
           "false-alarm rate can move. Per-event leads: `models/out/real_forecast_events.csv`.\n"]
+    return L
+
+
+def matched_statement(rows: dict, rules: dict) -> str:
+    """'At each rule's own false-alarm rate, warn_fcst warns X vs Y ...' from out/matched.json rows."""
+    parts, wins = [], 0
+    for r in RULES:
+        m = rows.get(r)
+        if m is None:
+            parts.append(f"`{r}`: no threshold reaches {f(rules[r]['falsePerBaYear'])}")
+            continue
+        win = m["warned12h"] > rules[r]["warned12h"]
+        wins += win
+        parts.append(f"`{r}` rate {f(rules[r]['falsePerBaYear'])}: {m['warned12h']} vs {rules[r]['warned12h']} events")
+    return f"more events warned ≥ 12 h than {wins} of 3 rules at each rule's own false-alarm rate (" + "; ".join(parts) + ")"
+
+
+def matched_section() -> list[str]:
+    p = C.OUT / "matched.json"
+    if not p.exists():
+        return []
+    mt = json.loads(p.read_text())
+    head = ["Method", "At the false-alarm rate of", "False alarms per BA-year", "Warned ≥ 12 h", "Recall 12 h (%)",
+            "People recall 12 h (%)", "Median lead (h)"]
+    L = ["## Comparison at equal false-alarm rates\n",
+         f"**{mt['label'][0].upper() + mt['label'][1:]}.**\n",
+         "For each target rate, the threshold is the lowest one (most alerts) whose false alarms per BA-year stay at or below "
+         "the target, scanning down from the top. The rules are shown at their frozen thresholds. The full curves are in "
+         "`metrics.json` (`curves`).\n"]
+    for per, title, models in (("final", "FINAL TEST 2023-2024", ["warn_fcst", "warn_full", "warn_grid"]),
+                               ("real2024", f"2024 real-forecast window ({mt['periods']['real2024'][0][:10]} to "
+                                            f"{mt['periods']['real2024'][1][:10]})", ["warn_fcst_real", "warn_fcst_observed"])):
+        rules = mt[per]["rules"]
+        L += [f"### {title}\n", "| " + " | ".join(head) + " |", "|" + "---|" * len(head)]
+        for r in RULES:
+            b = rules[r]
+            L.append(f"| {r} (frozen threshold) | itself | {f(b['falsePerBaYear'])} | {b['warned12h']} | {pct(b['recall12h'])} | "
+                     f"{pct(b['peopleRecall12h'])} | {f(b['medianLeadHours'], 0)} |")
+        for n in models:
+            for k, pt in mt[per][n].items():
+                target = "6.0 per BA-year" if k == "fixed_6" else f"{k} ({f(rules[k]['falsePerBaYear'])})"
+                if pt is None:
+                    L.append(f"| {n} | {target} | – | – | – | – | – |")
+                    continue
+                L.append(f"| {n} | {target} | {f(pt['falsePerBaYear'])} | {pt['warned12h']} | {pct(pt['recall12h'])} | "
+                         f"{pct(pt['peopleRecall12h'])} | {f(pt['medianLeadHours'], 0)} |")
+        L.append("")
+    L.append("`warn_fcst_real` = warn_fcst fed real archived forecasts; `warn_fcst_observed` = the same model with observed "
+             "weather on the same hours and events (upper bound).\n")
     return L
 
 
@@ -131,7 +192,7 @@ def main() -> None:
          f"(at most {C.FA_LIMIT:g} false alarms per BA-year on TRAIN). v1 had already shown results for 2021-2024, so DEV was "
          "used openly to choose features and model design. The FINAL TEST was scored once, by `final_test.py`, with the frozen "
          f"models and thresholds (run at {fin['ranAt']}, frozen file hash `{fin['frozenSha256']}`).\n",
-         "\\* `warn_fcst` = " + C.FCST_LABEL + ".\n"] + real_forecast_section() + [
+         "\\* `warn_fcst` = " + C.FCST_LABEL + ".\n"] + real_forecast_section() + matched_section() + [
          "## Plain answer (FINAL TEST, 2023-2024)\n",
          "Does the model beat every baseline: more events warned at least 12 h ahead, with the same or fewer false alarms per BA-year?\n",
          verdict("warn_full", T), "", verdict("warn_fcst", T), "", verdict("warn_grid", T), "",

@@ -1,0 +1,731 @@
+{
+ "label": "operating points read from the test period, shown to compare methods at equal false-alarm rates; the frozen threshold result above is the pre-registered one",
+ "periods": {
+  "final": [
+   "2023-01-01",
+   "2025-01-01"
+  ],
+  "real2024": [
+   "2024-01-19 17:00:00",
+   "2024-12-29 23:00:00"
+  ]
+ },
+ "final": {
+  "warn_fcst": {
+   "rule_forecast_error": {
+    "threshold": 0.13566797534455569,
+    "falsePerBaYear": 5.918364974469493,
+    "warned12h": 202,
+    "recall12h": 0.4519015659955257,
+    "peopleRecall12h": 0.6196483779887202,
+    "medianLeadHours": 45.0,
+    "testEvents": 447
+   },
+   "rule_hand": {
+    "threshold": 0.10817823325686879,
+    "falsePerBaYear": 7.280372807998069,
+    "warned12h": 223,
+    "recall12h": 0.4988814317673378,
+    "peopleRecall12h": 0.6711178322709659,
+    "medianLeadHours": 46.0,
+    "testEvents": 447
+   },
+   "rule_record": {
+    "threshold": 0.39457785232962295,
+    "falsePerBaYear": 1.215028570917578,
+    "warned12h": 97,
+    "recall12h": 0.21700223713646533,
+    "peopleRecall12h": 0.38588750731478055,
+    "medianLeadHours": 43.0,
+    "testEvents": 447
+   },
+   "fixed_6": {
+    "threshold": 0.13566797534455569,
+    "falsePerBaYear": 5.918364974469493,
+    "warned12h": 202,
+    "recall12h": 0.4519015659955257,
+    "peopleRecall12h": 0.6196483779887202,
+    "medianLeadHours": 45.0,
+    "testEvents": 447
+   }
+  },
+  "warn_full": {
+   "rule_forecast_error": {
+    "threshold": 0.11479105174119372,
+    "falsePerBaYear": 5.6831981542918975,
+    "warned12h": 57,
+    "recall12h": 0.12751677852348994,
+    "peopleRecall12h": 0.17398600713907827,
+    "medianLeadHours": 8.0,
+    "testEvents": 447
+   },
+   "rule_hand": {
+    "threshold": 0.10068856696363743,
+    "falsePerBaYear": 7.427352070609066,
+    "warned12h": 72,
+    "recall12h": 0.1610738255033557,
+    "peopleRecall12h": 0.21031774455477795,
+    "medianLeadHours": 8.0,
+    "testEvents": 447
+   },
+   "rule_record": {
+    "threshold": 0.22315282833641728,
+    "falsePerBaYear": 1.273820275961977,
+    "warned12h": 6,
+    "recall12h": 0.013422818791946308,
+    "peopleRecall12h": 0.02572460553681165,
+    "medianLeadHours": 3.0,
+    "testEvents": 447
+   },
+   "fixed_6": {
+    "threshold": 0.11247844315196688,
+    "falsePerBaYear": 5.9575594444990925,
+    "warned12h": 57,
+    "recall12h": 0.12751677852348994,
+    "peopleRecall12h": 0.17398600713907827,
+    "medianLeadHours": 8.0,
+    "testEvents": 447
+   }
+  },
+  "warn_grid": {
+   "rule_forecast_error": {
+    "threshold": 0.023125753730322742,
+    "falsePerBaYear": 5.849774651917695,
+    "warned12h": 58,
+    "recall12h": 0.1297539149888143,
+    "peopleRecall12h": 0.08069274022307588,
+    "medianLeadHours": 66.0,
+    "testEvents": 447
+   },
+   "rule_hand": {
+    "threshold": 0.022150184116378535,
+    "falsePerBaYear": 7.182386632924071,
+    "warned12h": 69,
+    "recall12h": 0.15436241610738255,
+    "peopleRecall12h": 0.12563910072890203,
+    "medianLeadHours": 63.5,
+    "testEvents": 447
+   },
+   "rule_record": {
+    "threshold": 0.029877245917345682,
+    "falsePerBaYear": 1.2836188934693769,
+    "warned12h": 33,
+    "recall12h": 0.0738255033557047,
+    "peopleRecall12h": 0.04545345942864169,
+    "medianLeadHours": 64.0,
+    "testEvents": 447
+   },
+   "fixed_6": {
+    "threshold": 0.023125753730322742,
+    "falsePerBaYear": 5.849774651917695,
+    "warned12h": 58,
+    "recall12h": 0.1297539149888143,
+    "peopleRecall12h": 0.08069274022307588,
+    "medianLeadHours": 66.0,
+    "testEvents": 447
+   }
+  },
+  "rules": {
+   "rule_forecast_error": {
+    "threshold": 0.3297078330054624,
+    "falsePerBaYear": 5.928163591976893,
+    "warned12h": 31,
+    "recall12h": 0.06935123042505593,
+    "peopleRecall12h": 0.04121371112675294,
+    "medianLeadHours": 63.5,
+    "testEvents": 447
+   },
+   "rule_hand": {
+    "threshold": 3.9784981759461964,
+    "falsePerBaYear": 7.427352070609066,
+    "warned12h": 42,
+    "recall12h": 0.09395973154362416,
+    "peopleRecall12h": 0.05402093844777002,
+    "medianLeadHours": 72.0,
+    "testEvents": 447
+   },
+   "rule_record": {
+    "threshold": 1.0201294422149658,
+    "falsePerBaYear": 1.2836188934693769,
+    "warned12h": 13,
+    "recall12h": 0.029082774049217,
+    "peopleRecall12h": 0.051996418165359444,
+    "medianLeadHours": 38.5,
+    "testEvents": 447
+   }
+  }
+ },
+ "real2024": {
+  "warn_fcst_real": {
+   "rule_forecast_error": {
+    "threshold": 0.22700266804674327,
+    "falsePerBaYear": 5.260376531773738,
+    "warned12h": 74,
+    "recall12h": 0.3490566037735849,
+    "peopleRecall12h": 0.5567500615473742,
+    "medianLeadHours": 44.0,
+    "testEvents": 212
+   },
+   "rule_hand": {
+    "threshold": 0.15449711963031906,
+    "falsePerBaYear": 7.326953026399135,
+    "warned12h": 93,
+    "recall12h": 0.4386792452830189,
+    "peopleRecall12h": 0.657707963455827,
+    "medianLeadHours": 45.0,
+    "testEvents": 212
+   },
+   "rule_record": {
+    "threshold": 0.5278761677065006,
+    "falsePerBaYear": 1.127223542522944,
+    "warned12h": 41,
+    "recall12h": 0.19339622641509435,
+    "peopleRecall12h": 0.4074404194643151,
+    "medianLeadHours": 41.0,
+    "testEvents": 212
+   },
+   "fixed_6": {
+    "threshold": 0.20168648801765962,
+    "falsePerBaYear": 5.886611833175373,
+    "warned12h": 76,
+    "recall12h": 0.3584905660377358,
+    "peopleRecall12h": 0.5573221219785216,
+    "medianLeadHours": 44.0,
+    "testEvents": 212
+   }
+  },
+  "warn_fcst_observed": {
+   "rule_forecast_error": {
+    "threshold": 0.145292138560503,
+    "falsePerBaYear": 5.072505941353247,
+    "warned12h": 94,
+    "recall12h": 0.44339622641509435,
+    "peopleRecall12h": 0.6913218632973392,
+    "medianLeadHours": 46.0,
+    "testEvents": 212
+   },
+   "rule_hand": {
+    "threshold": 0.10145493535478345,
+    "falsePerBaYear": 7.222580476165529,
+    "warned12h": 104,
+    "recall12h": 0.49056603773584906,
+    "peopleRecall12h": 0.7291457119135614,
+    "medianLeadHours": 47.0,
+    "testEvents": 212
+   },
+   "rule_record": {
+    "threshold": 0.4002757314870894,
+    "falsePerBaYear": 1.1480980525696651,
+    "warned12h": 51,
+    "recall12h": 0.24056603773584906,
+    "peopleRecall12h": 0.5371292882865848,
+    "medianLeadHours": 43.0,
+    "testEvents": 212
+   },
+   "fixed_6": {
+    "threshold": 0.1272468762079983,
+    "falsePerBaYear": 5.970109873362259,
+    "warned12h": 94,
+    "recall12h": 0.44339622641509435,
+    "peopleRecall12h": 0.6913218632973392,
+    "medianLeadHours": 46.0,
+    "testEvents": 212
+   }
+  },
+  "rules": {
+   "rule_forecast_error": {
+    "threshold": 0.3297078330054624,
+    "falsePerBaYear": 5.302125551867181,
+    "warned12h": 20,
+    "recall12h": 0.09433962264150944,
+    "peopleRecall12h": 0.06521694526398414,
+    "medianLeadHours": 66.0,
+    "testEvents": 212
+   },
+   "rule_hand": {
+    "threshold": 3.9784981759461964,
+    "falsePerBaYear": 7.556572636913068,
+    "warned12h": 27,
+    "recall12h": 0.12735849056603774,
+    "peopleRecall12h": 0.08566895491437664,
+    "medianLeadHours": 72.0,
+    "testEvents": 212
+   },
+   "rule_record": {
+    "threshold": 1.0201294422149658,
+    "falsePerBaYear": 1.1898470726631074,
+    "warned12h": 3,
+    "recall12h": 0.014150943396226415,
+    "peopleRecall12h": 0.044517239895177474,
+    "medianLeadHours": 44.0,
+    "testEvents": 212
+   }
+  }
+ },
+ "curves": {
+  "warn_fcst": [
+   {
+    "falsePerBaYear": 0.48013225786259134,
+    "recall12h": 0.14093959731543623,
+    "peopleRecall12h": 0.3032792238565006,
+    "medianLeadHours": 42.5,
+    "threshold": 0.5483540136379069
+   },
+   {
+    "falsePerBaYear": 0.999458985754782,
+    "recall12h": 0.19686800894854586,
+    "peopleRecall12h": 0.36650887080100336,
+    "medianLeadHours": 42.0,
+    "threshold": 0.4330874812727586
+   },
+   {
+    "falsePerBaYear": 1.499188478632173,
+    "recall12h": 0.24384787472035793,
+    "peopleRecall12h": 0.41146518825365797,
+    "medianLeadHours": 43.0,
+    "threshold": 0.3579537499713504
+   },
+   {
+    "falsePerBaYear": 1.9793207364947643,
+    "recall12h": 0.27293064876957496,
+    "peopleRecall12h": 0.4282069950798495,
+    "medianLeadHours": 44.0,
+    "threshold": 0.3117721091338987
+   },
+   {
+    "falsePerBaYear": 2.900390782190348,
+    "recall12h": 0.3378076062639821,
+    "peopleRecall12h": 0.5198592418732679,
+    "medianLeadHours": 44.0,
+    "threshold": 0.24350575407473043
+   },
+   {
+    "falsePerBaYear": 3.9292456204673294,
+    "recall12h": 0.3870246085011186,
+    "peopleRecall12h": 0.5639977915099456,
+    "medianLeadHours": 44.0,
+    "threshold": 0.19825808307831794
+   },
+   {
+    "falsePerBaYear": 4.938503223729511,
+    "recall12h": 0.42058165548098436,
+    "peopleRecall12h": 0.5983772717617898,
+    "medianLeadHours": 44.0,
+    "threshold": 0.16544904366882393
+   },
+   {
+    "falsePerBaYear": 5.918364974469493,
+    "recall12h": 0.4519015659955257,
+    "peopleRecall12h": 0.6196483779887202,
+    "medianLeadHours": 45.0,
+    "threshold": 0.13566797534455569
+   },
+   {
+    "falsePerBaYear": 6.927622577731675,
+    "recall12h": 0.48769574944071586,
+    "peopleRecall12h": 0.6566960309831635,
+    "medianLeadHours": 46.0,
+    "threshold": 0.11317967932848741
+   },
+   {
+    "falsePerBaYear": 7.878088475949458,
+    "recall12h": 0.5123042505592841,
+    "peopleRecall12h": 0.6830437675609331,
+    "medianLeadHours": 46.0,
+    "threshold": 0.09924657468089418
+   },
+   {
+    "falsePerBaYear": 9.769221654877624,
+    "recall12h": 0.5771812080536913,
+    "peopleRecall12h": 0.7187885412186816,
+    "medianLeadHours": 47.0,
+    "threshold": 0.0747907346982782
+   },
+   {
+    "falsePerBaYear": 11.601563128761391,
+    "recall12h": 0.6219239373601789,
+    "peopleRecall12h": 0.7379373840322064,
+    "medianLeadHours": 47.0,
+    "threshold": 0.05870947009970982
+   },
+   {
+    "falsePerBaYear": 14.648933173562735,
+    "recall12h": 0.6778523489932886,
+    "peopleRecall12h": 0.7607125291618814,
+    "medianLeadHours": 48.0,
+    "threshold": 0.04530963755893386
+   },
+   {
+    "falsePerBaYear": 19.930388010051242,
+    "recall12h": 0.7404921700223713,
+    "peopleRecall12h": 0.825146333696716,
+    "medianLeadHours": 49.0,
+    "threshold": 0.029825270718700163
+   },
+   {
+    "falsePerBaYear": 29.92497786759906,
+    "recall12h": 0.8366890380313199,
+    "peopleRecall12h": 0.9076929881561532,
+    "medianLeadHours": 52.0,
+    "threshold": 0.0159429366517916
+   }
+  ],
+  "warn_full": [
+   {
+    "falsePerBaYear": 0.499729492877391,
+    "recall12h": 0.006711409395973154,
+    "peopleRecall12h": 0.006491395363580902,
+    "medianLeadHours": 3.0,
+    "threshold": 0.28536502241149875
+   },
+   {
+    "falsePerBaYear": 0.9602645157251827,
+    "recall12h": 0.011185682326621925,
+    "peopleRecall12h": 0.022758244870406244,
+    "medianLeadHours": 3.0,
+    "threshold": 0.2413080413098148
+   },
+   {
+    "falsePerBaYear": 1.499188478632173,
+    "recall12h": 0.017897091722595078,
+    "peopleRecall12h": 0.025810383978479613,
+    "medianLeadHours": 3.0,
+    "threshold": 0.21168408377939701
+   },
+   {
+    "falsePerBaYear": 1.9009317964355656,
+    "recall12h": 0.04697986577181208,
+    "peopleRecall12h": 0.05700504693238048,
+    "medianLeadHours": 3.5,
+    "threshold": 0.1904159612918473
+   },
+   {
+    "falsePerBaYear": 2.9101893996977477,
+    "recall12h": 0.07158836689038031,
+    "peopleRecall12h": 0.08405052209718837,
+    "medianLeadHours": 5.0,
+    "threshold": 0.158999907809683
+   },
+   {
+    "falsePerBaYear": 3.89984976794513,
+    "recall12h": 0.09619686800894854,
+    "peopleRecall12h": 0.109941214144614,
+    "medianLeadHours": 6.0,
+    "threshold": 0.13902351258747395
+   },
+   {
+    "falsePerBaYear": 4.899308753699912,
+    "recall12h": 0.11185682326621924,
+    "peopleRecall12h": 0.13399501420493903,
+    "medianLeadHours": 7.0,
+    "threshold": 0.1229847066949471
+   },
+   {
+    "falsePerBaYear": 5.9575594444990925,
+    "recall12h": 0.12751677852348994,
+    "peopleRecall12h": 0.17398600713907827,
+    "medianLeadHours": 8.0,
+    "threshold": 0.11247844315196688
+   },
+   {
+    "falsePerBaYear": 6.9178239602242755,
+    "recall12h": 0.15212527964205816,
+    "peopleRecall12h": 0.18438005580211894,
+    "medianLeadHours": 8.0,
+    "threshold": 0.10454254326615933
+   },
+   {
+    "falsePerBaYear": 7.878088475949458,
+    "recall12h": 0.174496644295302,
+    "peopleRecall12h": 0.2235479288579951,
+    "medianLeadHours": 8.0,
+    "threshold": 0.09709053967297658
+   },
+   {
+    "falsePerBaYear": 9.661436862296226,
+    "recall12h": 0.2080536912751678,
+    "peopleRecall12h": 0.2330738241849849,
+    "medianLeadHours": 10.0,
+    "threshold": 0.08673166221422664
+   },
+   {
+    "falsePerBaYear": 11.983709211549984,
+    "recall12h": 0.27293064876957496,
+    "peopleRecall12h": 0.29991647133324645,
+    "medianLeadHours": 13.0,
+    "threshold": 0.07625942860147607
+   },
+   {
+    "falsePerBaYear": 14.923294463769931,
+    "recall12h": 0.34451901565995524,
+    "peopleRecall12h": 0.4078109285991493,
+    "medianLeadHours": 16.0,
+    "threshold": 0.06669575926480058
+   },
+   {
+    "falsePerBaYear": 19.35226957711465,
+    "recall12h": 0.41834451901565994,
+    "peopleRecall12h": 0.5561188702993582,
+    "medianLeadHours": 20.0,
+    "threshold": 0.05568476410419281
+   },
+   {
+    "falsePerBaYear": 29.523234549795667,
+    "recall12h": 0.5503355704697986,
+    "peopleRecall12h": 0.6539968102840805,
+    "medianLeadHours": 29.0,
+    "threshold": 0.040257411045296204
+   }
+  ],
+  "warn_grid": [
+   {
+    "falsePerBaYear": 0.44093778783299203,
+    "recall12h": 0.049217002237136466,
+    "peopleRecall12h": 0.00749035863294837,
+    "medianLeadHours": 72.0,
+    "threshold": 0.03537810984677194
+   },
+   {
+    "falsePerBaYear": 0.7446949305623866,
+    "recall12h": 0.058165548098434,
+    "peopleRecall12h": 0.022185303005186684,
+    "medianLeadHours": 65.0,
+    "threshold": 0.03275555316517368
+   },
+   {
+    "falsePerBaYear": 1.4893898611247731,
+    "recall12h": 0.087248322147651,
+    "peopleRecall12h": 0.04673985286393294,
+    "medianLeadHours": 61.0,
+    "threshold": 0.02840977538459819
+   },
+   {
+    "falsePerBaYear": 1.7833483863467678,
+    "recall12h": 0.0894854586129754,
+    "peopleRecall12h": 0.048406291235043496,
+    "medianLeadHours": 62.0,
+    "threshold": 0.027720430802015757
+   },
+   {
+    "falsePerBaYear": 2.8709949296681483,
+    "recall12h": 0.1029082774049217,
+    "peopleRecall12h": 0.06517904021527585,
+    "medianLeadHours": 65.0,
+    "threshold": 0.02566691478554031
+   },
+   {
+    "falsePerBaYear": 3.939044237974729,
+    "recall12h": 0.11409395973154363,
+    "peopleRecall12h": 0.06518915022695487,
+    "medianLeadHours": 68.5,
+    "threshold": 0.024687661798475428
+   },
+   {
+    "falsePerBaYear": 4.869912901177712,
+    "recall12h": 0.1185682326621924,
+    "peopleRecall12h": 0.07498669455289553,
+    "medianLeadHours": 68.0,
+    "threshold": 0.024091883113109613
+   },
+   {
+    "falsePerBaYear": 5.849774651917695,
+    "recall12h": 0.1297539149888143,
+    "peopleRecall12h": 0.08069274022307588,
+    "medianLeadHours": 66.0,
+    "threshold": 0.023125753730322742
+   },
+   {
+    "falsePerBaYear": 6.721851610076279,
+    "recall12h": 0.14988814317673377,
+    "peopleRecall12h": 0.12093897259119891,
+    "medianLeadHours": 63.0,
+    "threshold": 0.022325371108166788
+   },
+   {
+    "falsePerBaYear": 7.995671886038256,
+    "recall12h": 0.16554809843400448,
+    "peopleRecall12h": 0.14515585680125923,
+    "medianLeadHours": 66.0,
+    "threshold": 0.021788837332325384
+   },
+   {
+    "falsePerBaYear": 9.925999534996022,
+    "recall12h": 0.18791946308724833,
+    "peopleRecall12h": 0.1714558485964333,
+    "medianLeadHours": 66.0,
+    "threshold": 0.02087053232473074
+   },
+   {
+    "falsePerBaYear": 11.826931331431586,
+    "recall12h": 0.21476510067114093,
+    "peopleRecall12h": 0.23681712878073718,
+    "medianLeadHours": 67.5,
+    "threshold": 0.02022526423990464
+   },
+   {
+    "falsePerBaYear": 14.727322113621934,
+    "recall12h": 0.2550335570469799,
+    "peopleRecall12h": 0.2803633784763384,
+    "medianLeadHours": 67.0,
+    "threshold": 0.019454223394147766
+   },
+   {
+    "falsePerBaYear": 19.567839162277448,
+    "recall12h": 0.36017897091722595,
+    "peopleRecall12h": 0.4148666100410629,
+    "medianLeadHours": 69.0,
+    "threshold": 0.017875037858216022
+   },
+   {
+    "falsePerBaYear": 16.961406905309094,
+    "recall12h": 0.8590604026845637,
+    "peopleRecall12h": 0.958613699494855,
+    "medianLeadHours": 72.0,
+    "threshold": 0.01053704560678474
+   }
+  ],
+  "rule_forecast_error": [
+   {
+    "falsePerBaYear": 5.928163591976893,
+    "recall12h": 0.06935123042505593,
+    "peopleRecall12h": 0.04121371112675294,
+    "medianLeadHours": 63.5,
+    "threshold": 0.3297078330054624
+   }
+  ],
+  "rule_hand": [
+   {
+    "falsePerBaYear": 7.427352070609066,
+    "recall12h": 0.09395973154362416,
+    "peopleRecall12h": 0.05402093844777002,
+    "medianLeadHours": 72.0,
+    "threshold": 3.9784981759461964
+   }
+  ],
+  "rule_record": [
+   {
+    "falsePerBaYear": 1.2836188934693769,
+    "recall12h": 0.029082774049217,
+    "peopleRecall12h": 0.051996418165359444,
+    "medianLeadHours": 38.5,
+    "threshold": 1.0201294422149658
+   }
+  ],
+  "warn_fcst_real2024": [
+   {
+    "falsePerBaYear": 0.459239221027866,
+    "recall12h": 0.11320754716981132,
+    "peopleRecall12h": 0.33648337105429116,
+    "medianLeadHours": 43.0,
+    "threshold": 0.7229419011526212
+   },
+   {
+    "falsePerBaYear": 0.9602274621491744,
+    "recall12h": 0.19339622641509435,
+    "peopleRecall12h": 0.4074404194643151,
+    "medianLeadHours": 40.0,
+    "threshold": 0.5659301567451172
+   },
+   {
+    "falsePerBaYear": 1.4194666831770404,
+    "recall12h": 0.19339622641509435,
+    "peopleRecall12h": 0.4074404194643151,
+    "medianLeadHours": 42.0,
+    "threshold": 0.4988952650222451
+   },
+   {
+    "falsePerBaYear": 1.9204549242983489,
+    "recall12h": 0.20754716981132076,
+    "peopleRecall12h": 0.4094239091816598,
+    "medianLeadHours": 43.0,
+    "threshold": 0.4306813187075699
+   },
+   {
+    "falsePerBaYear": 2.9433059165876867,
+    "recall12h": 0.25,
+    "peopleRecall12h": 0.4339572350023467,
+    "medianLeadHours": 42.0,
+    "threshold": 0.35664249844175416
+   },
+   {
+    "falsePerBaYear": 3.966156908877025,
+    "recall12h": 0.29245283018867924,
+    "peopleRecall12h": 0.4803672256269585,
+    "medianLeadHours": 44.0,
+    "threshold": 0.2834281187733451
+   },
+   {
+    "falsePerBaYear": 4.9681333911196415,
+    "recall12h": 0.33962264150943394,
+    "peopleRecall12h": 0.5511350722197543,
+    "medianLeadHours": 44.0,
+    "threshold": 0.2359548930153249
+   },
+   {
+    "falsePerBaYear": 5.886611833175373,
+    "recall12h": 0.3584905660377358,
+    "peopleRecall12h": 0.5573221219785216,
+    "medianLeadHours": 44.0,
+    "threshold": 0.20168648801765962
+   },
+   {
+    "falsePerBaYear": 6.825964785277827,
+    "recall12h": 0.42452830188679247,
+    "peopleRecall12h": 0.6492327215929613,
+    "medianLeadHours": 43.5,
+    "threshold": 0.16898545274299798
+   },
+   {
+    "falsePerBaYear": 7.786192247427001,
+    "recall12h": 0.45754716981132076,
+    "peopleRecall12h": 0.7174581192563347,
+    "medianLeadHours": 45.0,
+    "threshold": 0.14863266693137062
+   },
+   {
+    "falsePerBaYear": 9.8527687420524,
+    "recall12h": 0.49528301886792453,
+    "peopleRecall12h": 0.729444272649538,
+    "medianLeadHours": 47.0,
+    "threshold": 0.11336232241444362
+   },
+   {
+    "falsePerBaYear": 11.981968766817959,
+    "recall12h": 0.5566037735849056,
+    "peopleRecall12h": 0.7907707404364496,
+    "medianLeadHours": 46.5,
+    "threshold": 0.08656754794016389
+   },
+   {
+    "falsePerBaYear": 14.382537422190895,
+    "recall12h": 0.6037735849056604,
+    "peopleRecall12h": 0.8059218226674572,
+    "medianLeadHours": 46.5,
+    "threshold": 0.06425410181431061
+   },
+   {
+    "falsePerBaYear": 19.475917873590863,
+    "recall12h": 0.6886792452830188,
+    "peopleRecall12h": 0.8520908365434046,
+    "medianLeadHours": 49.0,
+    "threshold": 0.03986455841689098
+   },
+   {
+    "falsePerBaYear": 29.767051326624408,
+    "recall12h": 0.8018867924528302,
+    "peopleRecall12h": 0.9203918720814633,
+    "medianLeadHours": 54.0,
+    "threshold": 0.018758330779605918
+   }
+  ]
+ },
+ "curvesPeriods": {
+  "warn_fcst": "final",
+  "warn_full": "final",
+  "warn_grid": "final",
+  "warn_fcst_real2024": "real2024",
+  "rule_forecast_error": "final (frozen threshold, single point)",
+  "rule_hand": "final (frozen threshold, single point)",
+  "rule_record": "final (frozen threshold, single point)"
+ }
+}
