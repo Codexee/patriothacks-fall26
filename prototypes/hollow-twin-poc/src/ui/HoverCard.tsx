@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { sim } from '../sim/index.ts';
 import { sectionIndex, type Frame, type MetricKey, type Source } from '../sim/types.ts';
 import { WORLD } from '../sim/engine.ts';
+import { sections as realSections, type SectionRow } from '../data/real/index.ts';
 
 export function SourceInfo({ source, label }: { source: Source; label?: string }) {
   const [open, setOpen] = useState(false);
@@ -21,6 +22,23 @@ export function SourceInfo({ source, label }: { source: Source; label?: string }
 }
 
 const pct = (x: number) => `${Math.round(x * 100)}%`;
+
+/** The real US counties behind one section (workstream 3). Hidden-world data: hover card only, never src/product/. */
+function RealCounties({ index }: { index: number }) {
+  const row = realSections?.rows[index] as (SectionRow & { countyCount?: number }) | undefined;
+  if (!realSections || !row || !row.counties.length) return null;
+  const n = row.countyCount ?? row.counties.length;
+  const c = row.counties[0];
+  const g = row.growthPerYear * 100;
+  return (
+    <p className="hc-real">
+      Built from {n} real {n === 1 ? 'county' : 'counties'}, e.g. {c.name}, {c.state} (SVI {c.svi.toFixed(2)})
+      {' · '}{row.dme.toLocaleString()} power-dependent residents (HHS emPOWER)
+      {' · '}growth {g >= 0 ? '+' : '−'}{Math.abs(g).toFixed(1)}%/yr (Census 2020–2024)
+      <SourceInfo source={realSections.source} label="Real counties" />
+    </p>
+  );
+}
 
 export function HoverCard({ frame, target }: { frame: Frame; target: { level: number; col: number } | null }) {
   if (!target) return <p className="muted">Hover over a section of the cutaway to see its values.</p>;
@@ -54,6 +72,7 @@ export function HoverCard({ frame, target }: { frame: Frame; target: { level: nu
           <dd>{s.structures.length ? s.structures.join(', ') : 'none'}</dd>
         </div>
       </dl>
+      <RealCounties index={sectionIndex(s.level, s.col)} />
     </div>
   );
 }
