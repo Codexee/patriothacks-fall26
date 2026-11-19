@@ -37,6 +37,7 @@ export interface SectionRow {
   dme: number; // power-dependent residents (HHS emPOWER), real count, unscaled
   growthPerYear: number; // real population growth per year, Census 2020–2024 (e.g. 0.012 = +1.2%)
   counties: { fips: string; name: string; state: string; svi: number; pop: number }[]; // largest first
+  countyCount?: number; // all counties (or parts of counties) in the section; `counties` keeps only the 5 largest
 }
 export interface SectionData {
   rows: SectionRow[];

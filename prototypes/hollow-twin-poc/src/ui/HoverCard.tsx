@@ -33,7 +33,7 @@ function RealCounties({ index }: { index: number }) {
   return (
     <p className="hc-real">
       Built from {n} real {n === 1 ? 'county' : 'counties'}, e.g. {c.name}, {c.state} (SVI {c.svi.toFixed(2)})
-      {' · '}{row.dme.toLocaleString()} power-dependent residents (HHS emPOWER)
+      {' · '}{row.dme.toLocaleString()} power-dependent residents in these counties (HHS emPOWER)
       {' · '}growth {g >= 0 ? '+' : '−'}{Math.abs(g).toFixed(1)}%/yr (Census 2020–2024)
       <SourceInfo source={realSections.source} label="Real counties" />
     </p>
