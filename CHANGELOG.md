@@ -2,6 +2,13 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-19 (21): Proposal: bring Neil's Earth work into hollow-rebuild
+
+- **New: `docs/integrateEarthIntoRebuild.md`** (Adarsh). It checks each part of Before, During, After against the track brief and says what fits in hollow-rebuild and what does not.
+- **Short version:** Neil's warning model does not fit, because residents have no weather or grid-operator data. His data (real counties shaping the levels) and his train / tune / test-once method do fit. The plan adds a "record line" warning and a "who to check first" list to Blackout Warning, each kept only if a regression gate shows no result gets worse.
+- **This is a proposal, not a decision.** It has 4 open decisions, including which screen leads the video.
+- **Action for everyone (Neil especially):** read it before the sync and give your view on the open decisions.
+
 ## 2026-11-19 (20): Handoff to Adarsh; real-forecast result; cross-section; deploy prep
 
 - **Adarsh: start with `docs/handoffs/2026-11-19-earth-product.md`.** It says what works, what is not verified, the numbers to use and the next steps. Neil is offline until later on Thursday.
