@@ -26,7 +26,7 @@ function BlackoutWarningCard({ run }: CardProps) {
         {bw.hollowDarkHours > 0 && <> The whole Hollow went dark for <b className="bad">{bw.hollowDarkHours} h</b> (plants tripped).</>}</p>
       {bw.supplyEstimate !== null && <p>So the plants made about <b>{fmt(bw.supplyEstimate)}</b> units at the worst hour, for a need of <b>{fmt(bw.demand)}</b>.</p>}
       {bw.shed > 0
-        ? <p className="warn-text">{bw.lineWorst === null && bw.hollowDarkHours === 0 ? 'Keeping the request (residents cannot see the plants, so a quiet day is no proof the power is back):' : 'Plants are running at their limit.'} Asked everyone to switch off {Math.round(bw.shed * 100)}% of non-essential load today.</p>
+        ? <p className="warn-text">{bw.eased ? `No blackouts for ${bw.quietDays} days in a row: eased the request by 5 points.` : bw.lineWorst === null && bw.hollowDarkHours === 0 ? `Quiet for ${bw.quietDays} day${bw.quietDays === 1 ? '' : 's'}: keeping the request (it eases by 5 points after every 5 quiet days in a row).` : 'Plants are running at their limit.'} Asked everyone to switch off {Math.round(bw.shed * 100)}% of non-essential load today.</p>
         : <p className="good">No blackouts yesterday: no power saving needed.</p>}
       <h4>Blackouts predicted (today)</h4>
       {bw.blackouts.length === 0 ? <p className="muted">None.</p> : (
@@ -48,7 +48,7 @@ function BlackoutWarningCard({ run }: CardProps) {
 const MODULE_CARDS: Partial<Record<ToolKey, { card: (p: CardProps) => ReactNode; about: string }>> = {
   earlyWarning: {
     card: BlackoutWarningCard,
-    about: "Power goes to the upper levels first, so the line where residents report blackouts shows how much power the plants make. Yesterday's line, and how it moved since the day before, predicts today's. Power needs come from residents' own head count. No plant meters, no forecast.",
+    about: "Power goes to the upper levels first, so the line where residents report blackouts shows how much power the plants make. Yesterday's line, and how it moved since the day before, predicts today's. Power needs come from residents' own head count. No plant meters, no forecast. The power-saving request keeps the plants under 88% of their output; after 5 quiet days in a row it eases by 5 points.",
   },
 };
 

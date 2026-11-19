@@ -106,6 +106,8 @@ The **warnings** reduce the deaths in the blackouts that still happen.
 - **The first blackout comes without warning.** The system learns from outage reports, and there are none before
   the first blackout.
 - **It warns for today only.** Without a forecast, it cannot see a sudden plant failure coming.
+- **Its power-saving request stays high for weeks after a storm.** It eases only after several quiet days in a row,
+  because residents cannot see the plants.
 - **Some numbers are our assumptions,** for example how many residents follow an alert, and how much a warning
   helps. They are listed in the app's info icons.
 - **This is one module of 15.** Heat, water, sickness, food, crowding, the network and the surface come next.

@@ -112,3 +112,21 @@ true numbers: Texas s1 1,260 deaths, stable day 21, 75% warned. The "numbers don
 
 Baseline, with Blackout Warning, seeds 1–10: warned 71, 69, 63, –, –, 71, –, 91, 70, 79% ("–" = no blackouts at all);
 deaths 0 to 2,028; stable on day 21–22 (seed 9: day 36). The seed sets which plant trips when and the report noise.
+
+### Step 1f: the power-saving request eases off slowly (Nov 19)
+
+Before, a quiet day always kept the request, so once it reached the 90% cap it stayed there forever (even on
+Baseline). Now, after 5 quiet days in a row, it drops by 5 points; it never goes below the request that was in effect
+the last time there was a blackout or trip, plus 5 points (that memory fades after 7 quiet days). Any blackout or
+trip sends it back up. Settings: `EASE` in `src/product/earlyWarning.ts`.
+
+Tested on 14 runs (Texas seeds 1, 2, 7; Chicago; Baseline seeds 1–10), each played to day 60:
+
+| Rule | Deaths by stable day | Deaths by day 60 | Average request | Request at day 60 |
+| --- | --- | --- | --- | --- |
+| Keep (before) | 27,250 | 30,542 | 76% | 90% in every run |
+| 5 points after 3 quiet days | 30,510 | 39,823 | 53% | 58% |
+| 3 points after 3 quiet days | 30,138 | 30,688 | 58% | 44% |
+| **5 points after 5 quiet days (now)** | **27,251** | **29,771** | **58%** | **44%** |
+
+The headline runs do not change (Texas s1: 1,260 deaths, stable day 21, 75% warned); checks pass.

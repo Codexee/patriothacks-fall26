@@ -24,8 +24,15 @@ const SAFE_LOAD = 0.88; // keep the plants below this share of their output
 const TRIP_ZONE = 0.95; // above this, plants are close to tripping
 const ASSUMED_COMPLIANCE = 0.85; // share of residents expected to follow a save-power request
 const MAX_TREND = 0.1; // the supply trend is capped at ±10% a day
-// With no blackouts yesterday the save-power request is KEPT: residents cannot see the plants, so a quiet day is
-// no evidence that the power has come back, and easing off was what made the plants trip again.
+// Easing off, carefully. Residents cannot see the plants, so one quiet day is no proof the power is back (easing
+// 15% a day made the plants trip again). The request comes down only after several quiet days in a row, a small
+// step at a time, and never to the level where trouble last started (that memory fades after a while).
+export const EASE = {
+  afterQuietDays: 5, // quiet days in a row before each step down (tested: 3 days caused extra trips)
+  step: 0.05, // how much each step lowers the request
+  floorMargin: 0.05, // stay this far above the request that was in effect the last time there was trouble
+  floorDays: 7, // forget that trouble level after this many quiet days
+};
 const TRIP_STEP = 0.15; // after a Hollow-wide blackout with no other clue, ask for this much more saving
 const HOURS = 24;
 
@@ -76,13 +83,20 @@ export function blackoutWarning(m: ProductMemory, day: number):
   const known = sToday.filter((v): v is number => v !== null);
   const sMin = known.length ? Math.min(...known) : null;
   let shed: number;
+  const quiet = sMin === null && hollowDarkHours === 0;
+  if (quiet) { m.quietDays = (m.quietDays ?? 0) + 1; m.troubleAge = (m.troubleAge ?? 0) + 1; }
+  else { m.quietDays = 0; m.troubleAge = 0; m.troubleShed = y.shed; } // the request that was in effect when trouble came
   if (sMin !== null) {
     shed = Math.max(0, Math.min(0.9, (D - SAFE_LOAD * sMin) / Math.max(1, D - C) / ASSUMED_COMPLIANCE));
     if (shed > 0) shed = Math.max(0.05, shed);
   } else if (hollowDarkHours > 0) {
     shed = Math.min(0.9, m.shed + TRIP_STEP); // the plants tripped: they were overloaded, by an unknown amount
   } else {
-    shed = m.shed; // no blackouts yesterday: keep the same request (see above)
+    shed = m.shed; // no blackouts yesterday: keep the request, and ease it only after several quiet days (see EASE)
+    if (EASE.afterQuietDays > 0 && m.quietDays > 0 && m.quietDays % EASE.afterQuietDays === 0) {
+      const floor = (m.troubleAge ?? 0) <= EASE.floorDays ? (m.troubleShed ?? 0) + EASE.floorMargin : 0;
+      shed = Math.min(m.shed, Math.max(floor, m.shed - EASE.step));
+    }
     if (shed < 0.03) shed = 0;
   }
 
@@ -158,7 +172,7 @@ export function blackoutWarning(m: ProductMemory, day: number):
   if (shed > 0) {
     outputs.push({
       kind: 'alert', id: `bw-shed-${day}`, module: 'earlyWarning', action: 'shed', from: 1, to: LEVELS, hours: 24, amount: shed,
-      text: `${sMin === null && hollowDarkHours === 0 ? 'No blackouts yesterday because everyone saved power. Keep it up' : 'The plants are running at their limit'}. Everyone: switch off ${Math.round(shed * 100)}% of non-essential load today, so the plants do not trip and black out the whole Hollow.`,
+      text: `${sMin === null && hollowDarkHours === 0 ? (shed < m.shed - 1e-9 ? `No blackouts for ${m.quietDays} days, so the request is a little smaller today` : 'No blackouts yesterday because everyone saved power. Keep it up') : 'The plants are running at their limit'}. Everyone: switch off ${Math.round(shed * 100)}% of non-essential load today, so the plants do not trip and black out the whole Hollow.`,
       evidence: sMin !== null
         ? [
           `From the blackout line, the plants made about ${fmt(sMin)} units at the worst hour; everyone together needs ${fmt(D)} (residents' own head count)`,
@@ -178,6 +192,7 @@ export function blackoutWarning(m: ProductMemory, day: number):
     log: {
       lineWorst: !y.hollowDark[worstH] && y.line[worstH] < LEVELS ? y.line[worstH] : null, lineWorstHour: worstH, trend: lineTrend,
       supplyEstimate: sMin, demand: D, hollowDarkHours, shed, blackouts, darkNow, tripRisk,
+      quietDays: m.quietDays ?? 0, eased: shed < m.shed - 1e-9,
       censusPeople: censusTotal, selfPeople: selfTotal, deepRatio: c50 > 0 ? r50 / c50 : 1,
     },
   };

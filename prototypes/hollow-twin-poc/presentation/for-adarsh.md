@@ -142,7 +142,7 @@ When the banner says **Stable Hollow on day 21**, press **Keep playing** to cont
 3. **Compares with the day before** to see if the line moves up (less power) or down (more).
 4. **Predicts today** and warns the levels that will go dark, with the time and length.
 5. **Asks for power saving** so the plants stay under 88% of their output and do not trip.
-6. **Keeps the request on quiet days,** because residents cannot see the plants.
+6. **Eases off slowly:** after 5 quiet days in a row, the request drops by 5 points. Any blackout sends it back up.
 
 ## 7. The numbers to remember
 
@@ -174,8 +174,9 @@ The brief does not give residents either one. The Directorate controls the plant
 deaths) and without them (1,260 deaths), and chose the honest version.
 
 **"What does 'Save power' cost people?"**
-Non-essential power: lights and devices, not air and fans. In the Texas run the request rises to 90% and stays. The
-simulation does not count that discomfort. This is a known limit.
+Non-essential power: lights and devices, not air and fans. In the Texas run the request rises to 90% during the
+storm, then eases by 5 points after every 5 quiet days (about 35% by day 60). The simulation does not count that
+discomfort. This is a known limit.
 
 **"Are these real numbers?"**
 The disaster shapes are approximate copies of real events (Texas 2021, Chicago 1995). The population and deaths are

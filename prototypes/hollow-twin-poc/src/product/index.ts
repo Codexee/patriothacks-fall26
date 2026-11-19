@@ -18,6 +18,9 @@ export function createMemory(): ProductMemory {
     outDark: new Array(LEVELS * SECTIONS_PER_LEVEL).fill(false),
     lines: [],
     shed: 0,
+    quietDays: 0,
+    troubleShed: 0,
+    troubleAge: 0,
     userReports: [],
   };
 }

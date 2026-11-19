@@ -146,8 +146,9 @@ problem #1 today. It stays in the app for later problems (crowding, #6).
    "Blackout coming" alert, with the time and length.
 5. **Ask everyone to save power.** The request is large enough to keep the plants under 88% of their output, so
    they do not overload and trip. A trip blacks out the whole Hollow.
-6. **Keep the request on quiet days.** Residents cannot see the plants. A day with no blackout is not proof that
-   the power is back.
+6. **Ease off slowly.** Residents cannot see the plants, so one quiet day is not proof that the power is back.
+   After 5 quiet days in a row, the request drops by 5 points, never below the level where trouble last started
+   (that memory fades after 7 quiet days). Any blackout or trip sends it straight back up.
 
 ## 6. The test world (the simulation)
 
@@ -199,8 +200,10 @@ do not match reality; residents have phones and a network that the Directorate c
 - Everyone uses the app and reports their head count honestly.
 - 50% + 50% × trust follow alerts; warned people avoid 60% of air deaths (`PREPARED_SAVE` in the engine).
 - Thresholds: 88% safe load, 95% trip zone, 85% expected compliance, +15% after a trip. These are first guesses.
-- The rule "keep the power-saving request on quiet days" was chosen **after** the first rule (ease off by 15% a day)
-  failed: about 90 trips, never stable, 29,190 deaths in Texas seed 1.
+- The easing rule was chosen **after** testing: easing 15% a day failed (about 90 trips, never stable, 29,190 deaths
+  in Texas seed 1); never easing kept 90% forever; easing 5 points after every 3 quiet days caused extra trips
+  (39,823 deaths by day 60 over 14 runs). 5 points after every 5 quiet days: 29,771 deaths by day 60 (vs 30,542
+  when never easing), and the request ends near 40% instead of 90%.
 
 ## 9. Known limits
 
@@ -211,8 +214,8 @@ do not match reality; residents have phones and a network that the Directorate c
 - **Warnings cover today only.** There is no forecast, so a sudden plant trip cannot be predicted.
 - **"Warned" counts hours under an active alert.** An alert sent at 00:00 for a blackout that started the day before
   still counts. The true "warned before it began" share is a little lower.
-- **The power-saving request only goes up.** In Texas seed 1 it reaches the 90% cap by day 7 and stays. The sim does
-  not count the cost of weeks with almost no non-essential power.
+- **The power-saving request is high for weeks.** It jumps to the 90% cap during the storm and eases only after
+  quiet weeks (to about 35% by day 60 in Texas seed 1). The sim does not count the cost of saving that much power.
 - **Without the module, the Hollow never stabilizes,** even in Baseline. The world is overloaded by design.
 
 ## 10. Code map

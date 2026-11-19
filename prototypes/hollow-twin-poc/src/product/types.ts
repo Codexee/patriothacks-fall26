@@ -17,6 +17,9 @@ export interface ProductMemory {
   outDark: boolean[]; // per section: dark at the end of the last day, from outage reports
   lines: DayLine[]; // the last 2 days, oldest first
   shed: number; // the power saving asked for most recently
+  quietDays?: number; // days in a row with no blackout and no plant trip
+  troubleShed?: number; // the request in effect the last time there was a blackout or trip
+  troubleAge?: number; // quiet days since then
   userReports: { day: number; level: number; col: number; text: string }[];
 }
 
@@ -44,6 +47,8 @@ export interface ProductLog {
     blackouts: PredictedBlackout[];
     darkNow: number[]; // levels still dark at the end of yesterday
     tripRisk: boolean; // a blackout of the whole Hollow is possible
+    quietDays: number; // days in a row with no blackout and no plant trip
+    eased: boolean; // the request was lowered today after enough quiet days
     censusPeople: number; // the Directorate's census total
     selfPeople: number; // residents' own count total
     deepRatio: number; // residents' count / census on the deepest level
