@@ -65,8 +65,15 @@ export const SCRIPT: Beat[] = [
 ];
 
 /** Facts about one hero event that are not in the data files. Each one has its source. The player
- *  shows `line` after the warning caption, and fills {h} with the hours from the first alert to `utc`. */
-export interface HeroFact { utc: string; line: string; source: string }
+ *  shows `line` after the warning caption, and fills {h} with the hours from the first alert to `utc`.
+ *  The replay shows `utc` as the first official action (the "Without" view). */
+export interface HeroFact {
+  utc: string;        // time of the first official action, UTC
+  action: string;     // what that action was, for the replay ("ERCOT load-shed order")
+  line: string;       // story caption line after the warning; {h} = hours from the first alert to utc
+  source: string;
+  loadShed: boolean;  // rotating outages were ordered: show "Directorate's rule vs fair rotation"
+}
 
 export const HERO_FACTS: Partial<Record<HeroSlug, HeroFact>> = {
   texas2021: {
@@ -74,6 +81,8 @@ export const HERO_FACTS: Partial<Record<HeroSlug, HeroFact>> = {
     // Source: ERCOT, "Review of February 2021 Extreme Cold Weather Event" (Feb 24, 2021), and the
     // FERC-NERC February 2021 Cold Weather Outages report (Nov 2021).
     utc: '2021-02-15 07:25:00',
+    action: 'ERCOT load-shed order',
+    loadShed: true,
     line: '{h} hours before the grid operator ordered blackouts.',
     source: 'ERCOT EEA3, Feb 15 2021 01:25 CST',
   },

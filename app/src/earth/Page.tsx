@@ -1,5 +1,7 @@
 // The main screen: the US county map that is also the Hollow.
-// Routes: #/ (calm map + event picker), #/event/<id> (replay), #/?story=<hero> (story mode).
+// Routes: #/ (calm map + event picker), #/event/<id> (replay), #/?story=<hero> (story mode),
+// #/hollow and #/hollow/<id> (the same, as a cross-section of the Hollow). The map, the clock and the
+// replay stay loaded when the view changes, so the event and the clock position are kept.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRoute } from '../shell/router.ts';
 import { Clock } from './clock.ts';
@@ -8,13 +10,17 @@ import type { Live, Scene } from './data.ts';
 import { EarthMap, HOME } from './map.ts';
 import type { HoverInfo, View } from './map.ts';
 import { CheckFirst, EventPicker, HoverCard, Timeline, useClockIndex } from './panels.tsx';
+import { HollowView } from './HollowView.tsx';
+import './hollow.css';
 import { Story } from '../story/Story.tsx';
+import { HERO_FACTS } from '../story/script.ts';
 import './earth.css';
 
 export default function Page() {
   const route = useRoute();
   const storySlug = route.query.get('story');
-  const routeEvent = route.parts[0] === 'event' ? route.parts[1] ?? null : null;
+  const section = route.parts[0] === 'hollow';
+  const routeEvent = route.parts[0] === 'event' || section ? route.parts[1] ?? null : null;
 
   const stageRef = useRef<HTMLDivElement>(null);
   const flight = useRef(0);
@@ -96,6 +102,8 @@ export default function Page() {
     return () => { on = false; cancelAnimationFrame(flight.current); };
   }, [scene, map, eventId, story, clock]);
 
+  const showFair = !!(live?.row?.hero && HERO_FACTS[live.row.hero]?.loadShed);
+
   const pointAt = (fips: string | null) => {
     if (!map || !scene) return;
     const ci = fips ? scene.index.get(fips) : undefined;
@@ -103,7 +111,7 @@ export default function Page() {
   };
 
   return (
-    <main className={`em-page${story ? ' em-story' : ''}`}>
+    <main className={`em-page${story ? ' em-story' : ''}${section && !story ? ' em-section' : ''}`}>
       <div
         className="em-stage" ref={stageRef}
         onPointerDown={() => cancelAnimationFrame(flight.current)}
@@ -115,16 +123,22 @@ export default function Page() {
         <header className="em-top">
           <a className="em-brand" href="#/">Before, During, After</a>
           {live && <span className="em-event-title">{live.row?.title ?? `${live.replay.ba} outage`}</span>}
+          <ViewToggle section={section} eventId={eventId} />
           <nav>
-            {live && <a href="#/">All outages</a>}
+            {live && <a href={section ? '#/hollow' : '#/'}>All outages</a>}
             <a href="#/evidence">Evidence</a>
             <a href="#/live">Live</a>
           </nav>
         </header>
       )}
 
-      {!story && scene && !live && !eventId && <EventPicker scene={scene} />}
-      {!story && scene && live && <CheckFirst scene={scene} live={live} onPoint={pointAt} />}
+      {!story && section && scene && (!eventId || live) && (
+        <div className={`em-hollow${live ? ' em-hollow-live' : ''}`}>
+          <HollowView key={live?.replay.id ?? 'calm'} scene={scene} live={live} clock={clock} onHover={setHover} showFair={showFair} />
+        </div>
+      )}
+      {!story && scene && !live && !eventId && <EventPicker scene={scene} base={section ? '#/hollow/' : '#/event/'} />}
+      {!story && !section && scene && live && <CheckFirst scene={scene} live={live} onPoint={pointAt} />}
       {!story && live && <Timeline live={live} clock={clock} />}
       {story && scene && map && live && <Story key={live.replay.id} scene={scene} live={live} map={map} clock={clock} />}
 
@@ -146,5 +160,16 @@ function Hover({ scene, map, hover, clock, live }: { scene: Scene; map: EarthMap
       county={scene.counties[hover.ci]} x={hover.x} y={hover.y}
       out={map.outNow(hover.ci)} inReplay={live != null && live.slot[hover.ci] >= 0}
     />
+  );
+}
+
+/** Surface map / Hollow cross-section. Links keep the event; the clock stays where it is. */
+function ViewToggle({ section, eventId }: { section: boolean; eventId: string | null }) {
+  const tail = eventId ? `/${eventId}` : '';
+  return (
+    <div className="em-toggle" role="group" aria-label="View">
+      <a href={eventId ? `#/event/${eventId}` : '#/'} aria-current={!section ? 'page' : undefined}>Surface map</a>
+      <a href={`#/hollow${tail}`} aria-current={section ? 'page' : undefined}>Hollow cross-section</a>
+    </div>
   );
 }

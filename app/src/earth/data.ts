@@ -95,6 +95,7 @@ export interface Live {
   ci: Int32Array;          // county index for each replay county (-1 = not on the map)
   slot: Int32Array;        // per scene county: position in replay.counties, or -1
   cumDark: Uint16Array[];  // per replay county: hours with >= 10% out, up to and including hour h
+  cumOut: Float32Array[];  // per replay county: hours without power per customer (sum of out/100), up to hour h
   share: Float32Array;     // per hour: percent of the customers in these counties who are out
   peakHour: number;
 }
@@ -104,6 +105,7 @@ export function prepareLive(scene: Scene, replay: EventReplay): Live {
   const ci = new Int32Array(n);
   const slot = new Int32Array(scene.counties.length).fill(-1);
   const cumDark: Uint16Array[] = [];
+  const cumOut: Float32Array[] = [];
   const share = new Float32Array(replay.hours);
   let customers = 0;
   replay.counties.forEach((rc, k) => {
@@ -111,16 +113,20 @@ export function prepareLive(scene: Scene, replay: EventReplay): Live {
     ci[k] = i;
     if (i >= 0) slot[i] = k;
     const cum = new Uint16Array(replay.hours);
-    let run = 0;
+    const co = new Float32Array(replay.hours);
+    let run = 0, acc = 0;
     const w = i >= 0 ? scene.counties[i].customers ?? 0 : 0;
     customers += w;
     for (let h = 0; h < replay.hours; h++) {
       const out = rc.out[h] ?? 0;
       if (out >= 10) run++;
       cum[h] = run;
+      acc += out / 100;
+      co[h] = acc;
       share[h] += out * w;
     }
     cumDark.push(cum);
+    cumOut.push(co);
   });
   let peakHour = 0;
   for (let h = 0; h < replay.hours; h++) {
@@ -128,7 +134,7 @@ export function prepareLive(scene: Scene, replay: EventReplay): Live {
     if (share[h] > share[peakHour]) peakHour = h;
   }
   const row = scene.library.events.find((e) => e.id === replay.id) ?? null;
-  return { replay, row, ci, slot, cumDark, share, peakHour };
+  return { replay, row, ci, slot, cumDark, cumOut, share, peakHour };
 }
 
 /** The main group of these counties: drops the few that are far from the others (the 10% farthest

@@ -186,7 +186,7 @@ export function CheckFirst({ scene, live, count = 4, onPoint }: {
 
 // ---------------------------------------------------------------- event picker (calm map)
 
-export function EventPicker({ scene }: { scene: Scene }) {
+export function EventPicker({ scene, base = '#/event/' }: { scene: Scene; base?: string }) {
   const { heroes, others } = useMemo(() => playable(scene.library), [scene]);
   const label = (e: EventRow) => e.title ?? `${e.ba}, ${fmtDay(e.start)}`;
   return (
@@ -198,7 +198,7 @@ export function EventPicker({ scene }: { scene: Scene }) {
       </p>
       <div className="em-heroes">
         {heroes.map((e) => (
-          <a key={e.id} className="em-hero" href={`#/event/${e.id}`}>
+          <a key={e.id} className="em-hero" href={`${base}${e.id}`}>
             <span className="em-hero-title">{label(e)}</span>
             <span className="em-hero-sub">{fmtInt(e.peakCustomersOut)} customers out at the peak</span>
           </a>
@@ -208,7 +208,7 @@ export function EventPicker({ scene }: { scene: Scene }) {
       {others.length > 0 && (
         <label className="em-more">
           <span className="em-sr">Other outages</span>
-          <select value="" onChange={(e) => { if (e.target.value) window.location.hash = `#/event/${e.target.value}`; }}>
+          <select value="" onChange={(e) => { if (e.target.value) window.location.hash = `${base}${e.target.value}`; }}>
             <option value="">{others.length} more outages</option>
             {others.map((e) => (
               <option key={e.id} value={e.id}>{fmtDay(e.start)}, {e.ba}, {fmtInt(e.peakCustomersOut)} out</option>
