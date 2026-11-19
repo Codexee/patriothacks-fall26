@@ -48,7 +48,7 @@ function BlackoutWarningCard({ run }: CardProps) {
 const MODULE_CARDS: Partial<Record<ToolKey, { card: (p: CardProps) => ReactNode; about: string }>> = {
   earlyWarning: {
     card: BlackoutWarningCard,
-    about: "Power goes to the upper levels first, so the line where residents report blackouts shows how much power the plants make. Yesterday's line, and how it moved since the day before, predicts today's. Power needs come from residents' own head count. No plant meters, no forecast. The power-saving request keeps the plants under 88% of their output; after 5 quiet days in a row it eases by 5 points.",
+    about: "Power goes to the upper levels first, so the line where residents report blackouts shows how much power the plants make. Yesterday's line, and how it moved since the day before, predicts today's. Power needs come from residents' own head count. No plant meters, no forecast. The power-saving request keeps the plants under 88% of their output; after 5 quiet days in a row it eases by 5 points. In the test world, air harm starts at 5,000 ppm CO₂, the OSHA and NIOSH workplace limit (NIOSH Pocket Guide). How many residents follow an alert, and how much a warning saves, are still first guesses: no study gives comparable numbers.",
   },
 };
 
