@@ -1088,11 +1088,14 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
     state.end = { kind: 'lost', day, reason: 'More than half of the population died' };
   } else if (lostLevels >= 10) {
     state.end = { kind: 'lost', day, reason: `${lostLevels} levels fully lost` };
-  } else if (s.stableStreak >= STABLE_DAYS) {
+  } else if (s.stableStreak >= STABLE_DAYS && !state.keepGoing) {
     state.end = { kind: 'stable', day };
+    state.stableDay = day;
   } else if (day >= MAX_DAYS) {
     // The contract has no "survived" end kind; the reason says the Hollow survived to the cap.
-    state.end = { kind: 'lost', day, reason: `Survived to the ${MAX_DAYS}-day cap without 14 stable days` };
+    state.end = state.keepGoing
+      ? { kind: 'stable', day } // played on after a stable end and reached the cap without being lost
+      : { kind: 'lost', day, reason: `Survived to the ${MAX_DAYS}-day cap without 14 stable days` };
   }
   if (state.end) {
     events.push(state.end.kind === 'stable' ? `Day ${day} · Stable Hollow` : `Day ${day} · Hollow lost: ${state.end.reason}`);

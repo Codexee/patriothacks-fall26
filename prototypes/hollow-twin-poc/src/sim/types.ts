@@ -212,6 +212,10 @@ export interface SimState {
   totals: Totals;
   bulletin: Bulletin;
   end: EndState | null;
+  /** UI branch: set when a person chose "Keep playing" after a stable end; stable then no longer ends the run. */
+  keepGoing?: boolean;
+  /** UI branch: the first day the Hollow became stable (kept when the person plays on). */
+  stableDay?: number;
   lastFrame: Frame;
   /** Free-form engine internals. Only sim/ may read or write this. */
   internal: unknown;

@@ -30,6 +30,8 @@ export interface PanelProps {
   onSkipToEnd: () => void;
   onCompare: () => void;
   onAttribution: () => void;
+  onMinimize: () => void;
+  onKeepPlaying: () => void;
 }
 
 function Section({ title, hint, children, extra }: { title: string; hint?: string; children: ReactNode; extra?: ReactNode }) {
@@ -80,7 +82,7 @@ export function Panel(p: PanelProps) {
       <div className="panel-body">
         <header className="p-head">
           <h1>Test world</h1>
-          <span className="muted">Hollow Twin</span>
+          <button className="ghost" onClick={p.onMinimize} title="Minimize to the demo bar (T)">Minimize</button>
         </header>
         <p className="muted small">A simulated Hollow that proves the Residents' System works. It knows the hidden truth; the system does not. Right now it has one problem: blackouts, and the air that goes bad when the fans stop.</p>
 
@@ -124,7 +126,8 @@ export function Panel(p: PanelProps) {
 
         {state.end && (
           <div className={`banner ${state.end.kind}`} role="status">
-            {state.end.kind === 'lost' ? `Hollow lost on day ${state.end.day}: ${state.end.reason}` : `Stable Hollow on day ${state.end.day}`}
+            {state.end.kind === 'lost' ? (state.end.reason.startsWith('Survived to the') ? `Never stabilized in ${state.end.day} days` : `Hollow lost on day ${state.end.day}: ${state.end.reason}`) : state.keepGoing ? `Still stable at the ${state.end.day}-day limit` : `Stable Hollow on day ${state.end.day}`}
+            {state.end.kind === 'stable' && !state.keepGoing && <button className="eb-inline" onClick={p.onKeepPlaying}>Keep playing</button>}
           </div>
         )}
 

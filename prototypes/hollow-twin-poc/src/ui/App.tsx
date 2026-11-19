@@ -8,6 +8,7 @@ import { World } from '../world/index.tsx';
 import { FlatWorld, blackoutLine } from '../world/FlatWorld.tsx';
 import { Panel } from './Panel.tsx';
 import { ProductView } from './ProductView.tsx';
+import { CompareCard, DemoBar, EndBanner } from './DemoBar.tsx';
 import { MAX_DAYS, attribution, compareRuns, type Attribution, type RunResult } from './compare.ts';
 import './styles.css';
 
@@ -33,6 +34,8 @@ export function App() {
   const [attr, setAttr] = useState<Attribution | null>(null);
   const [attrProgress, setAttrProgress] = useState<{ done: number; total: number } | null>(null);
   const skipRef = useRef(false);
+  const [panelOpen, setPanelOpen] = useState(false); // the Test World panel starts minimized (demo-ready)
+  const [compareOpen, setCompareOpen] = useState(false);
   const state = run.sim;
 
   const reset = useCallback((id: string, s: number, tools: ToolSet) => {
@@ -109,6 +112,32 @@ export function App() {
     setBusy(null);
   };
 
+  /** After a stable end: clear the end and keep simulating (stable no longer ends the run; lost and the cap still do). */
+  const keepPlaying = () => {
+    if (state.end?.kind !== 'stable') return;
+    setRun((r) => ({ ...r, sim: { ...r.sim, end: null, keepGoing: true } }));
+  };
+  const toggleSystem = () => setPendingTools((t) => ({ ...t, earlyWarning: !t.earlyWarning }));
+  const openCompare = () => { setCompareOpen(true); if (!compare) void runCompare(); };
+
+  // Keyboard shortcuts for presenting: Space next day, S system, R reset, T panel. Ignored while typing.
+  const keys = useRef({ nextDay, toggleSystem, reset: () => reset(scenarioId, seed, pendingTools), panel: () => setPanelOpen((v) => !v) });
+  keys.current = { nextDay, toggleSystem, reset: () => reset(scenarioId, seed, pendingTools), panel: () => setPanelOpen((v) => !v) };
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const el = e.target instanceof Element ? e.target : null;
+      if (e.ctrlKey || e.metaKey || e.altKey || el?.closest('input, textarea, select, [contenteditable="true"]')) return;
+      if (el?.closest('button') && e.key === ' ') return; // Space on a focused button presses that button
+      const k = e.key.toLowerCase();
+      if (k === ' ') { e.preventDefault(); void keys.current.nextDay(); }
+      else if (k === 's') keys.current.toggleSystem();
+      else if (k === 'r') keys.current.reset();
+      else if (k === 't') keys.current.panel();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
   const queueEvent = (event: WorldEvent) => setQueued((q) => [...q, { type: 'event', event }]);
   const queueReport = (level: number, col: number, text: string) => setQueued((q) => [...q, { type: 'report', level, col, text }]);
 
@@ -122,9 +151,19 @@ export function App() {
   useEffect(() => { document.title = `Day ${state.day} · Residents' System (rebuild)`; }, [state.day]);
 
   return (
-    <div className="app">
+    <div className={`app ${panelOpen ? 'panel-open' : 'panel-min'}`}>
       <main className="world-col">
         <WorldHeader frame={frame} day={state.day} playing={playing} scenario={state.scenario.name} />
+        <EndBanner state={state} onKeepPlaying={keepPlaying} onReset={() => reset(scenarioId, seed, pendingTools)} />
+        {compareOpen && <CompareCard result={compare} busy={busy} onClose={() => setCompareOpen(false)} />}
+        {!panelOpen && (
+          <DemoBar
+            state={state} hour={frame.hour} playing={playing} busy={busy}
+            systemOn={pendingTools.earlyWarning} systemNow={state.tools.earlyWarning}
+            onNextDay={() => void nextDay()} onSkipToEnd={skipToEnd} onToggleSystem={toggleSystem}
+            onReset={() => reset(scenarioId, seed, pendingTools)} onCompare={openCompare} onOpenPanel={() => setPanelOpen(true)}
+          />
+        )}
         {PIXEL
           ? <World frame={frame} onHover={onHover} selected={hover ?? phoneSection} />
           : <FlatWorld frame={frame} onHover={onHover} selected={phoneSection} />}
@@ -149,6 +188,8 @@ export function App() {
         onSkipToEnd={skipToEnd}
         onCompare={runCompare}
         onAttribution={runAttribution}
+        onMinimize={() => setPanelOpen(false)}
+        onKeepPlaying={keepPlaying}
       />
     </div>
   );
