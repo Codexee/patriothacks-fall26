@@ -1,6 +1,8 @@
 // Evidence: #/evidence. Every event in the library as one row, the model results, and the downloads.
-import { memo, useMemo, useState } from 'react';
-import { dataUrl, type EventLibrary, type EventRow, type Metrics } from '../contracts.ts';
+import { Fragment, memo, useEffect, useMemo, useState } from 'react';
+import { dataUrl, type County, type EventLibrary, type EventRow, type Metrics } from '../contracts.ts';
+import { MODEL_LABEL, type DarkResult, type MetricsV2, type ModelResult, type Period } from './metrics.ts';
+import { EventDetail, GoodAt, MoreNumbers } from './parts.tsx';
 import { PageNav, fmtDay, fmtHours, fmtInt, fmtShare, parseUtc, useJson } from '../brief/shared.tsx';
 import './evidence.css';
 
@@ -10,14 +12,6 @@ const AFTER_H = 168;
 const SPAN_H = BEFORE_H + AFTER_H;
 const pct = (h: number) => `${(h / SPAN_H) * 100}%`;
 
-const MODEL_LABEL: Record<string, string> = {
-  warn_grid: 'Model: grid data only',
-  warn_full: 'Model: grid, weather now, outages reported',
-  warn_fcst: 'Model: with a weather forecast',
-  rule_forecast_error: 'Rule: demand above its forecast',
-  rule_hand: 'Rule: our earlier hand rule',
-  rule_record: "Rule: tomorrow's forecast above this month's record",
-};
 const NO_FORECAST = ['warn_grid', 'warn_full'];
 const WITH_FORECAST = 'warn_fcst';
 
@@ -40,17 +34,6 @@ const FEATURE_LABEL: Record<string, string> = {
   fc12_vs_month_record: "tomorrow's demand forecast against this month's record",
   fc12_vs_month_record_max_72h: "highest value in 72 hours of tomorrow's forecast against this month's record",
 };
-
-// Metrics v2 keys that contracts.ts lists as optional extras (contracts/README.md, change log).
-type ModelResult = Metrics['models'][string] & { peopleRecall12h?: number | null };
-type DarkResult = NonNullable<Metrics['dark']> & { top10Overlap?: number; top10History?: number; top10Chance?: number };
-interface Period { trainYears: [number, number]; testYears: [number, number]; models: Record<string, ModelResult>; dark: DarkResult | null }
-interface MetricsV2 extends Metrics {
-  dev?: Period;
-  importance?: Record<string, { feature: string; gain: number }[]>;
-  split?: { train: [string, string]; dev: [string, string]; test: [string, string] };
-  labels?: Record<string, string>;
-}
 
 type SetName = 'train' | 'dev' | 'test';
 const SET_LABEL: Record<SetName, string> = { train: 'train', dev: 'dev', test: 'final test' };
@@ -79,10 +62,15 @@ const Strip = memo(function Strip({ e, stub }: { e: Row; stub: boolean }) {
   );
 });
 
-const EventLine = memo(function EventLine({ e, stub }: { e: Row; stub: boolean }) {
+const EventLine = memo(function EventLine({ e, stub, open, onToggle }: { e: Row; stub: boolean; open: boolean; onToggle: (id: string) => void }) {
   return (
-    <tr>
-      <td className="strip-cell"><Strip e={e} stub={stub} /></td>
+    <tr id={`ev-${e.id}`} className={open ? 'open' : undefined}>
+      <td className="strip-cell"><div className="sw">
+        <button type="button" className="expand" aria-expanded={open} aria-label={`Details for ${e.id}`} onClick={() => onToggle(e.id)}>
+          <span aria-hidden="true">{open ? '▾' : '▸'}</span>
+        </button>
+        <Strip e={e} stub={stub} />
+      </div></td>
       <td>{e.ba}</td>
       <td>
         {fmtDay(e.startMs)}
@@ -304,6 +292,7 @@ function Summary({ lib, metrics, rows }: { lib: EventLibrary; metrics: MetricsV2
         </div>
         {metrics.equity && metrics.equity.length > 0 && <EquityChart equity={metrics.equity} />}
       </div>
+      <MoreNumbers metrics={metrics} warnNote={lib.warnNote} />
       {counts}
       <p className="faint small">Results made {metrics.generated}. Full tables: models/RESULTS.md.</p>
     </section>
@@ -323,6 +312,17 @@ export default function Page() {
   const [warned, setWarned] = useState('');
   const [heroes, setHeroes] = useState(false);
   const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 }>({ key: 'start', dir: -1 });
+  const [openId, setOpenId] = useState<string | null>(() => new URLSearchParams(window.location.hash.split('?')[1] ?? '').get('open'));
+  const [everOpened, setEverOpened] = useState(openId != null);
+  const countiesState = useJson<County[]>(everOpened ? dataUrl('counties.json') : null);
+  const countyMap = useMemo(() => (countiesState.data ? new Map(countiesState.data.map((c) => [c.fips, c])) : null), [countiesState.data]);
+  const libLoaded = lib != null;
+  useEffect(() => {
+    // A link to #/evidence?open=<id> opens that row and scrolls to it once the table is there.
+    const id = new URLSearchParams(window.location.hash.split('?')[1] ?? '').get('open');
+    if (libLoaded && id) requestAnimationFrame(() => document.getElementById(`ev-${id}`)?.scrollIntoView({ block: 'center' }));
+  }, [libLoaded]);
+  const toggle = useMemo(() => (id: string) => { setEverOpened(true); setOpenId((cur) => (cur === id ? null : id)); }, []);
 
   const devStart = parseUtc(`${metrics?.split?.dev[0] ?? '2021-01-01'} 00:00:00`);
   const testStart = parseUtc(`${metrics?.split?.test[0] ?? '2023-01-01'} 00:00:00`);
@@ -393,6 +393,7 @@ export default function Page() {
 
         {lib && (
           <>
+            {metrics && !lib.stub && <GoodAt metrics={metrics} lib={lib} />}
             <Summary lib={lib} metrics={metrics} rows={rows} />
 
             <section>
@@ -473,7 +474,14 @@ export default function Page() {
                     </tr>
                   </thead>
                   <tbody>
-                    {shown.map((e) => <EventLine key={e.id} e={e} stub={stub} />)}
+                    {shown.map((e) => (
+                      <Fragment key={e.id}>
+                        <EventLine e={e} stub={stub} open={openId === e.id} onToggle={toggle} />
+                        {openId === e.id && (
+                          <tr className="detail-row"><td colSpan={10}><EventDetail e={e} warnNote={lib.warnNote} counties={countyMap} /></td></tr>
+                        )}
+                      </Fragment>
+                    ))}
                   </tbody>
                 </table>
                 {shown.length === 0 && <p className="dim empty">No event matches these filters.</p>}

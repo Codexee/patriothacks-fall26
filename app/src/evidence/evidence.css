@@ -85,3 +85,45 @@
 .evidence .eq-note { font-size: 13px; color: var(--text-dim); margin-top: 8px; }
 .tag.dev { color: var(--text); border-color: var(--text-faint); }
 .events tbody tr { content-visibility: auto; contain-intrinsic-size: auto 34px; }
+
+/* v3: good at / not good at */
+.goodat { margin: 8px 0 36px; }
+.goodat .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 12px; }
+.goodat .card { background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--ok); border-radius: 8px; padding: 14px 16px; }
+.goodat .card.weak { border-top-color: var(--alert); }
+.goodat .card h3 { font-size: 16px; margin: 2px 0 8px; }
+.goodat .card p { font-size: 14px; }
+.goodat .verdict-tag { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; margin: 0; color: var(--ok); font-weight: 600; }
+.goodat .card.weak .verdict-tag { color: var(--alert); }
+.evidence table.mini { width: 100%; font-size: 13.5px; margin-bottom: 8px; }
+.evidence table.mini td, .evidence table.mini th { padding: 4px 8px 4px 0; }
+
+/* v3: more numbers */
+.more { margin: 8px 0 20px; border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; }
+.more summary { cursor: pointer; font-weight: 600; }
+.more h4 { font-size: 14px; margin: 18px 0 6px; }
+.more .scroll { overflow-x: auto; }
+.more table { font-size: 13px; min-width: 720px; }
+.more th { white-space: normal; vertical-align: bottom; }
+
+/* v3: event detail */
+.events .sw { display: flex; align-items: center; gap: 6px; }
+.events .expand { all: unset; cursor: pointer; width: 16px; text-align: center; color: var(--text-dim); font-size: 14px; flex: none; }
+.events .expand:hover, .events tr.open .expand { color: var(--text); }
+.events .expand:focus-visible { outline: 2px solid var(--accent); border-radius: 3px; }
+.events .strip { flex: 1; }
+.events tr.open td { background: var(--panel); }
+.events tr.detail-row td { white-space: normal; background: var(--panel); padding: 4px 16px 16px; }
+.events tbody tr.detail-row { content-visibility: visible; }
+.detail-facts { display: flex; flex-wrap: wrap; gap: 8px 28px; margin: 6px 0 12px; }
+.detail-facts dt { font-size: 12px; color: var(--text-dim); }
+.detail-facts dd { margin: 0; font-size: 15px; }
+.detail-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; }
+.detail h4 { font-size: 14px; margin: 6px 0 6px; }
+.inputs-list { list-style: none; margin: 0 0 6px; padding: 0; font-size: 13.5px; }
+.inputs-list li { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; border-bottom: 1px solid var(--line); }
+.detail-links { display: flex; gap: 18px; margin: 10px 0 4px; }
+
+@media (max-width: 860px) {
+  .goodat .cards, .detail-grid { grid-template-columns: 1fr; }
+}
