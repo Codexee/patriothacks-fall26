@@ -22,7 +22,8 @@ We are a 4-person team competing in **Patriot HackFest Fall 2026** (George Mason
 
 - **Phase:** Fri Nov 20, early. `main` is the Hollow. **The product is the statistical models; the simulation is the demo.** Specs: `.plans/results-site-spec.md`, `.plans/hollow-real-data-spec.md`.
 - **Done:** Blackout Warning gated on 7 disasters (held-out seeds); residents-only check-first model tested on 2023–2024 (`models/RESULTS_RESIDENTS.md`); results site in `prototypes/hollow-twin-poc`. Competitor analysis: `docs/competitor-analysis.md`. **Read the top entry of `CHANGELOG.md`.**
-- **Next (in order):** deploy the site (Vercel account needed); a coverage-matrix page; label every number REAL DATA or SIMULATED; README with reproduce commands; video by 6 pm; Devpost text.
+- **Live site:** https://hollow-twin-poc.vercel.app (Vercel project `codexee/hollow-twin-poc`, deployed by hand: `cd prototypes/hollow-twin-poc && npx vercel deploy --prod`; it is not linked to GitHub yet).
+- **Next (in order):** a coverage-matrix page; label every number REAL DATA or SIMULATED; README with reproduce commands; video by 6 pm; Devpost text.
 - **Blockers:** judging criteria not published. One lost plant does not change the "with" results; only Two Plants tests the module.
 
 ## Start of every session (all AIs)

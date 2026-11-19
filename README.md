@@ -3,6 +3,8 @@
 Team repository for **Patriot HackFest Fall 2026** (GMU · virtual · Nov 14–20, 2026).
 Track: **Life underground** (the Hollow; 15 problems, see `context/track.md`). Deadline: Fri Nov 20, 11:00 pm. Prizes: $2,000 / $1,000 / $500.
 
+**Live results site: https://hollow-twin-poc.vercel.app** (results, the residents-only model, and the Hollow cutaway at `#/demo`).
+
 The repo holds both the project and the **shared AI context**. Every teammate's agent reads the same brief, calendar, constraints, ideas, and spec, so all four setups work from the same information.
 
 ## Quick start (teammates)

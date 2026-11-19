@@ -7,7 +7,7 @@ Newest first. Add an entry whenever you change shared context, skills, or the wo
 - **`main` now holds the Hollow** (merged from `hollow`, no force push). The old Earth main is tag `archive/earth-main`. `models/` and `data/` (code only; raw data stays local) came over. The shared context (this file, `ideation/`, `context/hollow-brief.md`, handoffs) was restored from the old main after the merge.
 - **The product is the models.** (1) Blackout Warning, gated: across 7 disasters and held-out seeds 11–20, deaths fall from 20,965,011 to 5,903 (sim scale), and 70 of 70 runs end stable. (2) A new residents-only check-first model (LightGBM, no weather or grid data), tested once on 2023–2024: top-10 overlap 0.459 (0.421–0.494) against 0.278 for history and 0.132 for chance; the weather model scores 0.460. See `models/RESULTS_RESIDENTS.md`.
 - **3 new disasters** shaped from real plant losses (EIA-930): TVA coal in Winter Storm Elliott 2022, TVA and CPLE together, SPP wind in Feb 2021. `npm run results` writes `public/results/scenarios.json`.
-- **Results site** (`prototypes/hollow-twin-poc`, `npm run dev`): `#/` results, `#/disaster/<id>`, `#/model`, `#/demo` (the cutaway).
+- **Results site, live at https://hollow-twin-poc.vercel.app** (Vercel project `codexee/hollow-twin-poc`; local: `prototypes/hollow-twin-poc`, `npm run dev`): `#/` results, `#/disaster/<id>`, `#/model`, `#/demo` (the cutaway).
 - **Read `docs/competitor-analysis.md`:** STRATUM is the team to beat. Our gaps are coverage, a live URL and the video.
 - **Action for everyone:** `git fetch --tags`, then `git switch main` and `git pull`. If git refuses because your local main has its own commits, ask before you reset.
 

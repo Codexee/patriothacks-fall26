@@ -38,7 +38,7 @@ The criteria are not published. We use the 2025 rubric as a stand-in (`context/e
 
 ## What we must do to win (Fri Nov 20, in order)
 
-1. **Deploy the results site** (needs a Vercel account; about 30 min). Judges grade links and a video. Without a URL we lose against 3 rivals that have one.
+1. ~~**Deploy the results site.**~~ Done Nov 19: https://hollow-twin-poc.vercel.app. Judges grade links and a video. Without a URL we lose against 3 rivals that have one.
 2. **Make Cascade show the model working.** With the model on, Cascade looks like Baseline, because the power-saving request already covers Plant 2's loss. The video needs a disaster where "with" visibly beats "without" and also beats doing nothing smart. Workstream A's new disasters may fix this; check it first thing.
 3. **A coverage matrix page,** honest like STRATUM's: *measured* (#1 Blackout Warning; #10 and #8 check-first model on real data), *prototype* (the 8 modules on tag `archive/hollow-twin-product`: #2, #3, #4, #7, #8, #9, #12, #13, with their old numbers labelled "earlier world, not gated"), *roadmap* (the rest). This closes most of the coverage gap without new code.
 4. **Label every number** REAL DATA (EIA-930, EAGLE-I, Census, SVI, emPOWER, held-out test) or SIMULATED (the Hollow test world). Add one "where we lose" disaster or seed to the site.
