@@ -1,5 +1,5 @@
 // REBUILD CLI: `npm run sim [scenario] [seed] [--checks] [-v]`.
-// Step 1: the same storm with and without Blackout Warning (problem #1).
+// Step 1: the same scenario with and without Blackout Warning (problem #1).
 import { NO_TOOLS, type ToolSet } from './types.ts';
 import { sim } from './index.ts';
 import { createRun, stepRun, type Run as ProductRun } from '../product/run.ts';
@@ -7,7 +7,7 @@ import { createRun, stepRun, type Run as ProductRun } from '../product/run.ts';
 // Node globals without @types/node (the project only ships browser types).
 const proc = (globalThis as unknown as { process: { argv: string[]; exit(code: number): never } }).process;
 
-const scenarioId = proc.argv[2] && !proc.argv[2].startsWith('-') ? proc.argv[2] : 'texas2021';
+const scenarioId = proc.argv[2] && !proc.argv[2].startsWith('-') ? proc.argv[2] : 'baseline';
 const seed = Number(proc.argv[3] && !proc.argv[3].startsWith('-') ? proc.argv[3] : 1);
 const verbose = proc.argv.includes('-v');
 
