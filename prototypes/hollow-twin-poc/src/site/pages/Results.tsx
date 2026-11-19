@@ -163,7 +163,10 @@ function Ci({ x }: { x: Interval }) {
 /** The hero chart: deaths without, stacked by disaster, over the same bar for deaths with, on one scale. */
 function Strata({ f }: { f: ScenariosFile }) {
   const n = f.seeds.length;
-  const parts = f.scenarios.map((s) => ({ id: s.id, name: shortName(s.name), wo: s.without.deaths.mean * n, wi: s.with.deaths.mean * n }));
+  // Exact per-seed sums when present (the JSON means are rounded), so the bar matches the headline total.
+  const sum = (s: ScenariosFile['scenarios'][number], k: 'withoutDeaths' | 'withDeaths', mean: number) =>
+    s.perSeed.length === n ? s.perSeed.reduce((a, r) => a + r[k], 0) : mean * n;
+  const parts = f.scenarios.map((s) => ({ id: s.id, name: shortName(s.name), wo: sum(s, 'withoutDeaths', s.without.deaths.mean), wi: sum(s, 'withDeaths', s.with.deaths.mean) }));
   const total = Math.max(1, parts.reduce((a, p) => a + p.wo, 0));
   const withTotal = parts.reduce((a, p) => a + p.wi, 0);
   return (
