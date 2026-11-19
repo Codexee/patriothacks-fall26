@@ -1,6 +1,6 @@
 // The results site: the product is the models and their measured results; the cutaway is the "Watch it run" page.
 // Spec: .plans/results-site-spec.md. Every number comes from public/results/*.json (or a marked sample fixture).
-import { useEffect, useRef } from 'react';
+import { Suspense, lazy, useEffect, useRef } from 'react';
 import { useRoute } from './router.ts';
 import { useSiteData } from './data.ts';
 import { Nav } from './Nav.tsx';
@@ -12,11 +12,17 @@ import { Demo } from './pages/Demo.tsx';
 import { href } from './router.ts';
 import './site.css';
 
+// The 3D twin and its film frame load three.js, so they are split into their own chunks.
+const Twin3D = lazy(() => import('../twin3d/Twin3D.tsx'));
+const Film = lazy(() => import('../twin3d/Film.tsx'));
+
 const TITLES: Record<string, string> = {
   results: 'Results',
   disaster: 'Disaster',
   model: 'Check-first model',
   demo: 'Watch it run',
+  demoClassic: 'Watch it run (2D cutaway)',
+  film: 'Film',
   missing: 'Page not found',
 };
 
@@ -42,7 +48,8 @@ export function Site() {
     document.title = `${name}: Residents’ System`;
   }, [route, data]);
 
-  if (route.page === 'demo') return <Demo data={data} scenario={route.scenario} />;
+  if (route.page === 'film') return <Suspense fallback={null}><Film id={route.id} /></Suspense>;
+  if (route.page === 'demoClassic') return <Demo data={data} scenario={route.scenario} />;
 
   return (
     <div className="site">
@@ -58,6 +65,11 @@ export function Site() {
             {route.page === 'results' && <Results data={data} />}
             {route.page === 'disaster' && <Disaster data={data} id={route.id} />}
             {route.page === 'model' && <Model data={data} />}
+            {route.page === 'demo' && (
+              <Suspense fallback={<p className="loading" role="status">Loading the 3D view…</p>}>
+                <Twin3D data={data} scenario={route.scenario} />
+              </Suspense>
+            )}
             {route.page === 'missing' && (
               <section className="block">
                 <h1 tabIndex={-1}>No page at “{route.hash}”</h1>

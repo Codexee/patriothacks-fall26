@@ -9,17 +9,23 @@
     "typecheck": "tsc --noEmit",
     "sim": "node --experimental-strip-types src/sim/cli.ts",
     "gate": "node --experimental-strip-types src/sim/gate.ts",
-    "results": "node --experimental-strip-types src/sim/results.ts"
+    "results": "node --experimental-strip-types src/sim/results.ts",
+    "films": "node scripts/capture-films.mjs"
   },
   "dependencies": {
+    "@react-three/drei": "^9.122.0",
+    "@react-three/fiber": "^8.18.0",
     "pixi.js": "^8.6.6",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "three": "^0.170.0"
   },
   "devDependencies": {
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
+    "@types/three": "^0.170.0",
     "@vitejs/plugin-react": "^4.3.4",
+    "playwright": "^1.65.1",
     "typescript": "^5.7.3",
     "vite": "^6.0.7"
   }

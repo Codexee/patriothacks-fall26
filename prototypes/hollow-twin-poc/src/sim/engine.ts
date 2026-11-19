@@ -1261,3 +1261,13 @@ export function score(state: SimState): Score {
     fairness: Math.round(fairness * 10) / 10,
   };
 }
+
+/**
+ * Read-only view of the plants for the 3D twin (src/twin3d/): per plant, its level, whether it is online now, and the
+ * share of its nominal capacity it can give now (health × scenario loss). It changes nothing in the world.
+ */
+export function plantStatus(state: SimState): { level: number; online: boolean; capacity: number }[] {
+  const s = state.internal as Internal;
+  const h = Math.max(0, s.hour - 1);
+  return s.plants.map((p, k) => ({ level: p.level, online: s.hour >= p.offlineUntil, capacity: p.health * lossF(state.scenario, k, h) }));
+}

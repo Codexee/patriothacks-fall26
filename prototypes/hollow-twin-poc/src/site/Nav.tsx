@@ -2,7 +2,7 @@
 import { href, type Route } from './router.ts';
 
 export function Nav({ route, compact = false }: { route: Route; compact?: boolean }) {
-  const cur = route.page === 'disaster' ? 'results' : route.page;
+  const cur = route.page === 'disaster' ? 'results' : route.page === 'demoClassic' ? 'demo' : route.page;
   const items: [string, string, string][] = [
     ['results', href.results, 'Results'],
     ['model', href.model, 'Model'],
