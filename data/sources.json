@@ -1,5 +1,122 @@
 {
   "files": {
+    "eia-ercot-2019-2020.json": {
+      "url": "https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/",
+      "license": "Public domain (US government)",
+      "license_url": "https://www.eia.gov/about/copyrights_reuse.php",
+      "retrieved_date": "2026-11-19",
+      "downloads": [
+        {
+          "url": "https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/EIA930_BALANCE_2018_Jul_Dec.csv",
+          "retrieved_at": "2026-11-19T01:27:05.606544+00:00",
+          "sha256": "fadc93f9b574c2460594bc98e7c39014c942233eb1447455cb62c9b0a1a63fc1",
+          "bytes": 44213835
+        },
+        {
+          "url": "https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/EIA930_BALANCE_2019_Jan_Jun.csv",
+          "retrieved_at": "2026-11-19T01:27:06.364180+00:00",
+          "sha256": "02548d6bc49f3cffba1e66eb83a42e1d40194b1301f0f872baf2945e615af1b0",
+          "bytes": 43369791
+        },
+        {
+          "url": "https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/EIA930_BALANCE_2019_Jul_Dec.csv",
+          "retrieved_at": "2026-11-19T01:27:01.690342+00:00",
+          "sha256": "5ec5c85be997c6c56bdcf42be3443a4bb6eb0851d704065c11c02eac0d3c48d1",
+          "bytes": 44134576
+        },
+        {
+          "url": "https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/EIA930_BALANCE_2020_Jan_Jun.csv",
+          "retrieved_at": "2026-11-19T01:27:14.410633+00:00",
+          "sha256": "fff83ed20365e69933bdd6ebde06afaa8083930c613363c438844b0fd52034cf",
+          "bytes": 42970027
+        },
+        {
+          "url": "https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/EIA930_BALANCE_2020_Jul_Dec.csv",
+          "retrieved_at": "2026-11-19T01:27:25.500514+00:00",
+          "sha256": "47788a718c26eae5a2453e3471c2b9e7d1a11062a0de70e2dca803163de5a754",
+          "bytes": 43635740
+        }
+      ],
+      "selection": {
+        "respondent": "ERCO",
+        "start": "2019-01-01T00:00:00Z",
+        "end": "2020-12-31T23:00:00Z",
+        "columns": {
+          "D": "Demand (MW)",
+          "DF": "Demand Forecast (MW)",
+          "NG": "Net Generation (MW)"
+        },
+        "hours": 17544,
+        "nulls": {
+          "D": 0,
+          "DF": 0,
+          "NG": 0
+        }
+      },
+      "notes": "Official EIA six-month CSV fallback after API DEMO_KEY rate limits. Not an API response. Uses raw reported columns, not imputed/adjusted values. UTC hour ending. Null values retained. Half-year files partition by BA local date; the prior half-year supplies UTC boundary hours. Historical revised values, not archived publication vintages."
+    },
+    "eia-elliott-tva-2022.json": {
+      "url": "https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/",
+      "license": "Public domain (US government)",
+      "license_url": "https://www.eia.gov/about/copyrights_reuse.php",
+      "retrieved_date": "2026-11-19",
+      "downloads": [
+        {
+          "url": "https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/EIA930_BALANCE_2022_Jul_Dec.csv",
+          "retrieved_at": "2026-11-19T01:27:22.329445+00:00",
+          "sha256": "267575c29ef40f386bcf3bc3993013b9ce13a3a154b89b702559a75dd742976d",
+          "bytes": 42909865
+        }
+      ],
+      "selection": {
+        "respondent": "TVA",
+        "start": "2022-12-20T00:00:00Z",
+        "end": "2022-12-27T23:00:00Z",
+        "columns": {
+          "D": "Demand (MW)",
+          "DF": "Demand Forecast (MW)",
+          "NG": "Net Generation (MW)"
+        },
+        "hours": 192,
+        "nulls": {
+          "D": 0,
+          "DF": 0,
+          "NG": 0
+        }
+      },
+      "notes": "Official EIA six-month CSV fallback after API DEMO_KEY rate limits. Not an API response. Uses raw reported columns, not imputed/adjusted values. UTC hour ending. Null values retained. Half-year files partition by BA local date; the prior half-year supplies UTC boundary hours. Historical revised values, not archived publication vintages."
+    },
+    "eia-elliott-duk-2022.json": {
+      "url": "https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/",
+      "license": "Public domain (US government)",
+      "license_url": "https://www.eia.gov/about/copyrights_reuse.php",
+      "retrieved_date": "2026-11-19",
+      "downloads": [
+        {
+          "url": "https://www.eia.gov/electricity/gridmonitor/sixMonthFiles/EIA930_BALANCE_2022_Jul_Dec.csv",
+          "retrieved_at": "2026-11-19T01:27:22.329445+00:00",
+          "sha256": "267575c29ef40f386bcf3bc3993013b9ce13a3a154b89b702559a75dd742976d",
+          "bytes": 42909865
+        }
+      ],
+      "selection": {
+        "respondent": "DUK",
+        "start": "2022-12-20T00:00:00Z",
+        "end": "2022-12-27T23:00:00Z",
+        "columns": {
+          "D": "Demand (MW)",
+          "DF": "Demand Forecast (MW)",
+          "NG": "Net Generation (MW)"
+        },
+        "hours": 192,
+        "nulls": {
+          "D": 0,
+          "DF": 0,
+          "NG": 0
+        }
+      },
+      "notes": "Official EIA six-month CSV fallback after API DEMO_KEY rate limits. Not an API response. Uses raw reported columns, not imputed/adjusted values. UTC hour ending. Null values retained. Half-year files partition by BA local date; the prior half-year supplies UTC boundary hours. Historical revised values, not archived publication vintages."
+    },
     "eia-ercot-2021.json": {
       "url": "https://api.eia.gov/v2/electricity/rto/region-data/data/",
       "license": "Public domain (US government)",
