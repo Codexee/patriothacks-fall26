@@ -1,0 +1,207 @@
+{
+ "countyEvents": 34877,
+ "events": 390,
+ "withinEventSpearman": {
+  "mean": 0.3163674090863206,
+  "lo": 0.28533837820253377,
+  "hi": 0.3473297741167325,
+  "events": 256
+ },
+ "historyWithinEventSpearman": {
+  "mean": 0.21970069780667223,
+  "lo": 0.1833746814273512,
+  "hi": 0.25374011015487097,
+  "events": 256
+ },
+ "withinEventSpearmanMinusHistory": {
+  "mean": 0.09666671127964838,
+  "lo": 0.06813356048924858,
+  "hi": 0.12500910377437388,
+  "events": 256
+ },
+ "top10Overlap": {
+  "mean": 0.45920567945884405,
+  "lo": 0.42139960484897193,
+  "hi": 0.4939781746031746,
+  "events": 237
+ },
+ "historyTop10Overlap": {
+  "mean": 0.27760196905766527,
+  "lo": 0.24305593228852723,
+  "hi": 0.3159353861094368,
+  "events": 237
+ },
+ "top10Chance": {
+  "mean": 0.13182064113097922,
+  "lo": 0.11478542576985307,
+  "hi": 0.15178754137825445,
+  "events": 237
+ },
+ "top10OverlapMinusHistory": {
+  "mean": 0.18160371040117876,
+  "lo": 0.14506555153707051,
+  "hi": 0.21862622228919693,
+  "events": 237
+ },
+ "maeHours": {
+  "mean": 2.2679319830150013,
+  "lo": 1.5738540404916934,
+  "hi": 3.252609406843928
+ },
+ "historyMaeHours": {
+  "mean": 3.5766075503548476,
+  "lo": 2.8633021226912976,
+  "hi": 4.5829953808668105
+ },
+ "zeroMaeHours": {
+  "mean": 2.000229377526737,
+  "lo": 1.3049058177084207,
+  "hi": 3.0661187399647902
+ },
+ "example": {
+  "event_id": "ERCO-2024070812",
+  "ba": "ERCO",
+  "start": "2024-07-08 12:00:00",
+  "stop": "2024-07-16 17:00:00",
+  "peakCustomersOut": 2417443,
+  "areas": 188,
+  "darkAreas": 49,
+  "top10Overlap": 0.7,
+  "historyTop10Overlap": 0.2,
+  "withinEventSpearman": 0.3840081701637024,
+  "topAreas": [
+   {
+    "fips": "48321",
+    "name": "Matagorda County, Texas",
+    "predictedHours": 13.4,
+    "actualHours": 86.0,
+    "historyHours": 5.6
+   },
+   {
+    "fips": "48057",
+    "name": "Calhoun County, Texas",
+    "predictedHours": 10.0,
+    "actualHours": 4.0,
+    "historyHours": 4.2
+   },
+   {
+    "fips": "48481",
+    "name": "Wharton County, Texas",
+    "predictedHours": 8.8,
+    "actualHours": 120.0,
+    "historyHours": 7.5
+   },
+   {
+    "fips": "48089",
+    "name": "Colorado County, Texas",
+    "predictedHours": 5.9,
+    "actualHours": 37.0,
+    "historyHours": 10.8
+   },
+   {
+    "fips": "48239",
+    "name": "Jackson County, Texas",
+    "predictedHours": 5.5,
+    "actualHours": 17.0,
+    "historyHours": 4.3
+   },
+   {
+    "fips": "48039",
+    "name": "Brazoria County, Texas",
+    "predictedHours": 4.1,
+    "actualHours": 165.0,
+    "historyHours": 6.3
+   },
+   {
+    "fips": "48167",
+    "name": "Galveston County, Texas",
+    "predictedHours": 4.0,
+    "actualHours": 151.0,
+    "historyHours": 5.1
+   },
+   {
+    "fips": "48291",
+    "name": "Liberty County, Texas",
+    "predictedHours": 2.6,
+    "actualHours": 143.0,
+    "historyHours": 7.2
+   },
+   {
+    "fips": "48071",
+    "name": "Chambers County, Texas",
+    "predictedHours": 1.9,
+    "actualHours": 104.0,
+    "historyHours": 11.1
+   },
+   {
+    "fips": "48473",
+    "name": "Waller County, Texas",
+    "predictedHours": 1.3,
+    "actualHours": 81.0,
+    "historyHours": 13.6
+   }
+  ],
+  "actualTopAreas": [
+   {
+    "fips": "48201",
+    "name": "Harris County, Texas",
+    "actualHours": 176.0,
+    "predictedHours": 0.0
+   },
+   {
+    "fips": "48039",
+    "name": "Brazoria County, Texas",
+    "actualHours": 165.0,
+    "predictedHours": 4.1
+   },
+   {
+    "fips": "48339",
+    "name": "Montgomery County, Texas",
+    "actualHours": 156.0,
+    "predictedHours": 0.7
+   },
+   {
+    "fips": "48167",
+    "name": "Galveston County, Texas",
+    "actualHours": 151.0,
+    "predictedHours": 4.0
+   },
+   {
+    "fips": "48291",
+    "name": "Liberty County, Texas",
+    "actualHours": 143.0,
+    "predictedHours": 2.6
+   },
+   {
+    "fips": "48455",
+    "name": "Trinity County, Texas",
+    "actualHours": 141.0,
+    "predictedHours": 0.6
+   },
+   {
+    "fips": "48481",
+    "name": "Wharton County, Texas",
+    "actualHours": 120.0,
+    "predictedHours": 8.8
+   },
+   {
+    "fips": "48071",
+    "name": "Chambers County, Texas",
+    "actualHours": 104.0,
+    "predictedHours": 1.9
+   },
+   {
+    "fips": "48321",
+    "name": "Matagorda County, Texas",
+    "actualHours": 86.0,
+    "predictedHours": 13.4
+   },
+   {
+    "fips": "48473",
+    "name": "Waller County, Texas",
+    "actualHours": 81.0,
+    "predictedHours": 1.3
+   }
+  ]
+ }
+}
