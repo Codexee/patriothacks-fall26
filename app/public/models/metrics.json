@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-19T02:22Z",
+ "generated": "2026-11-19T04:11Z",
  "trainYears": [
   2015,
   2020
@@ -342,5 +342,94 @@
  },
  "labels": {
   "warn_fcst": "with a weather forecast; backtest uses observed weather as the forecast, so it is an upper bound"
+ },
+ "realForecast": {
+  "period": [
+   "2024-01-19 17:00:00",
+   "2024-12-29 23:00:00"
+  ],
+  "eventsWindowFrom": "2024-01-22 17:00:00",
+  "events": 212,
+  "leadRule": "valid hour t+k uses previous_day ceil((k+6)/24): k 1-18 day1, 19-42 day2, 43-48 day3; every value predicted at least 6 h before t",
+  "source": "Open-Meteo Previous Runs API, best_match model, archive from about 2024-01-19",
+  "note": "One more look at 2024 with frozen v2 models and thresholds; nothing refitted or retuned.",
+  "models": {
+   "warn_fcst_real": {
+    "testEvents": 212,
+    "warned12h": 108,
+    "warned24h": 92,
+    "recall12h": 0.5094339622641509,
+    "peopleRecall12h": 0.7369942315846747,
+    "medianLeadHours": 47.0,
+    "falseAlarmsPerBaYear": 10.875619734341736,
+    "aucPr": 0.23009290047029443
+   },
+   "warn_fcst_observed": {
+    "testEvents": 212,
+    "warned12h": 105,
+    "warned24h": 98,
+    "recall12h": 0.49528301886792453,
+    "peopleRecall12h": 0.7330140722934158,
+    "medianLeadHours": 47.0,
+    "falseAlarmsPerBaYear": 7.493949106772905,
+    "aucPr": 0.3136942681061423
+   },
+   "warn_full": {
+    "testEvents": 212,
+    "warned12h": 30,
+    "warned24h": 18,
+    "recall12h": 0.14150943396226415,
+    "peopleRecall12h": 0.17472891013606687,
+    "medianLeadHours": 8.0,
+    "falseAlarmsPerBaYear": 5.448247122194229,
+    "aucPr": 0.0718702306659558
+   },
+   "warn_grid": {
+    "testEvents": 212,
+    "warned12h": 24,
+    "warned24h": 22,
+    "recall12h": 0.11320754716981132,
+    "peopleRecall12h": 0.07108902085535199,
+    "medianLeadHours": 56.0,
+    "falseAlarmsPerBaYear": 6.032733403502422,
+    "aucPr": 0.02845202273097115
+   },
+   "rule_forecast_error": {
+    "testEvents": 212,
+    "warned12h": 20,
+    "warned24h": 17,
+    "recall12h": 0.09433962264150944,
+    "peopleRecall12h": 0.06521694526398414,
+    "medianLeadHours": 66.0,
+    "falseAlarmsPerBaYear": 5.302125551867181,
+    "aucPr": 0.023900251612076782
+   },
+   "rule_hand": {
+    "testEvents": 212,
+    "warned12h": 27,
+    "warned24h": 26,
+    "recall12h": 0.12735849056603774,
+    "peopleRecall12h": 0.08566895491437664,
+    "medianLeadHours": 72.0,
+    "falseAlarmsPerBaYear": 7.556572636913068,
+    "aucPr": 0.022814788896451287
+   },
+   "rule_record": {
+    "testEvents": 212,
+    "warned12h": 3,
+    "warned24h": 3,
+    "recall12h": 0.014150943396226415,
+    "peopleRecall12h": 0.044517239895177474,
+    "medianLeadHours": 44.0,
+    "falseAlarmsPerBaYear": 1.1898470726631074,
+    "aucPr": 0.02496585151120794
+   }
+  },
+  "survives": {
+   "warned12h": 1.0285714285714285,
+   "warned24h": 0.9387755102040817,
+   "peopleRecall12h": 1.0054298538618858,
+   "aucPr": 0.733494117885634
+  }
  }
 }

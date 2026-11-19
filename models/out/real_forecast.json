@@ -1,0 +1,760 @@
+{
+ "period": [
+  "2024-01-19 17:00:00",
+  "2024-12-29 23:00:00"
+ ],
+ "eventsWindowFrom": "2024-01-22 17:00:00",
+ "scoredHours": 419938,
+ "events": 212,
+ "bas": 56,
+ "leadRule": "valid hour t+k uses previous_day ceil((k+6)/24): k 1-18 day1, 19-42 day2, 43-48 day3; every value predicted at least 6 h before t",
+ "source": "Open-Meteo Previous Runs API, best_match model, archive from about 2024-01-19",
+ "climatologyCheckMaxAbsDiff": {
+  "fx_temp_min_48h_z": 1.7053025658242404e-13,
+  "fx_wind_max_48h_z": 3.197442310920451e-14,
+  "fx_temp_min_48h_above_record": 0.0
+ },
+ "thresholds": {
+  "warn_fcst_real": 0.09843352224327048,
+  "warn_fcst_observed": 0.09843352224327048,
+  "warn_full": 0.11022380047238367,
+  "warn_grid": 0.02289615447369614,
+  "rule_forecast_error": 0.3297078330054624,
+  "rule_hand": 3.9784981759461964,
+  "rule_record": 1.0201294422149658
+ },
+ "models": {
+  "warn_fcst_real": {
+   "testEvents": 212,
+   "warned6h": 111,
+   "warned12h": 108,
+   "warned24h": 92,
+   "recall12h": 0.5094339622641509,
+   "peopleRecall12h": 0.7369942315846747,
+   "custHoursRecall12h": 0.8981702313817916,
+   "medianLeadHours": 47.0,
+   "falseAlarmsPerBaYear": 10.875619734341736,
+   "aucPr": 0.23009290047029443,
+   "groups": {
+    "demand_record": {
+     "testEvents": 5,
+     "warnedAny": 3,
+     "warned12h": 3,
+     "warned6h": 3,
+     "warned24h": 2,
+     "recall12h": 0.6,
+     "recall6h": 0.6,
+     "recall24h": 0.4,
+     "peopleRecall12h": 0.46166913571770046,
+     "custHoursRecall12h": 0.3877409671209766,
+     "medianLeadHours": 36.0
+    },
+    "other": {
+     "testEvents": 207,
+     "warnedAny": 112,
+     "warned12h": 105,
+     "warned6h": 108,
+     "warned24h": 90,
+     "recall12h": 0.5072463768115942,
+     "recall6h": 0.5217391304347826,
+     "recall24h": 0.43478260869565216,
+     "peopleRecall12h": 0.7577159012500855,
+     "custHoursRecall12h": 0.9222686343576375,
+     "medianLeadHours": 48.5
+    }
+   },
+   "seasons": {
+    "winter": {
+     "testEvents": 27,
+     "warnedAny": 10,
+     "warned12h": 8,
+     "warned6h": 9,
+     "warned24h": 7,
+     "recall12h": 0.2962962962962963,
+     "recall6h": 0.3333333333333333,
+     "recall24h": 0.25925925925925924,
+     "peopleRecall12h": 0.17511782315777555,
+     "custHoursRecall12h": 0.13639076110547188,
+     "medianLeadHours": 40.0,
+     "episodes": 64,
+     "falseEpisodes": 52,
+     "baYears": 9.723477070499658,
+     "falseAlarmsPerBaYear": 5.347881176967478,
+     "aucPr": 0.11651582456039773
+    },
+    "summer": {
+     "testEvents": 69,
+     "warnedAny": 43,
+     "warned12h": 41,
+     "warned6h": 42,
+     "warned24h": 35,
+     "recall12h": 0.5942028985507246,
+     "recall6h": 0.6086956521739131,
+     "recall24h": 0.5072463768115942,
+     "peopleRecall12h": 0.804040661695481,
+     "custHoursRecall12h": 0.9535789352878269,
+     "medianLeadHours": 45.0,
+     "episodes": 287,
+     "falseEpisodes": 247,
+     "baYears": 12.833561487565595,
+     "falseAlarmsPerBaYear": 19.246411079209594,
+     "aucPr": 0.1281946361063713
+    },
+    "other": {
+     "testEvents": 116,
+     "warnedAny": 62,
+     "warned12h": 59,
+     "warned6h": 60,
+     "warned24h": 50,
+     "recall12h": 0.5086206896551724,
+     "recall6h": 0.5172413793103449,
+     "recall24h": 0.43103448275862066,
+     "peopleRecall12h": 0.7804814164553092,
+     "custHoursRecall12h": 0.9084243526488223,
+     "medianLeadHours": 51.5,
+     "episodes": 277,
+     "falseEpisodes": 222,
+     "baYears": 25.34827743554643,
+     "falseAlarmsPerBaYear": 8.757991566270483,
+     "aucPr": 0.31042958824170724
+    }
+   }
+  },
+  "warn_fcst_observed": {
+   "testEvents": 212,
+   "warned6h": 108,
+   "warned12h": 105,
+   "warned24h": 98,
+   "recall12h": 0.49528301886792453,
+   "peopleRecall12h": 0.7330140722934158,
+   "custHoursRecall12h": 0.9170623691000513,
+   "medianLeadHours": 47.0,
+   "falseAlarmsPerBaYear": 7.493949106772905,
+   "aucPr": 0.3136942681061423,
+   "groups": {
+    "demand_record": {
+     "testEvents": 5,
+     "warnedAny": 5,
+     "warned12h": 5,
+     "warned6h": 5,
+     "warned24h": 4,
+     "recall12h": 1.0,
+     "recall6h": 1.0,
+     "recall24h": 0.8,
+     "peopleRecall12h": 1.0,
+     "custHoursRecall12h": 1.0,
+     "medianLeadHours": 50.0
+    },
+    "other": {
+     "testEvents": 207,
+     "warnedAny": 107,
+     "warned12h": 100,
+     "warned6h": 103,
+     "warned24h": 94,
+     "recall12h": 0.4830917874396135,
+     "recall6h": 0.4975845410628019,
+     "recall24h": 0.45410628019323673,
+     "peopleRecall12h": 0.7129200297150298,
+     "custHoursRecall12h": 0.9131467149806051,
+     "medianLeadHours": 47.0
+    }
+   },
+   "seasons": {
+    "winter": {
+     "testEvents": 27,
+     "warnedAny": 11,
+     "warned12h": 11,
+     "warned6h": 11,
+     "warned24h": 11,
+     "recall12h": 0.4074074074074074,
+     "recall6h": 0.4074074074074074,
+     "recall24h": 0.4074074074074074,
+     "peopleRecall12h": 0.3002502461400267,
+     "custHoursRecall12h": 0.20625833692700846,
+     "medianLeadHours": 47.0,
+     "episodes": 77,
+     "falseEpisodes": 64,
+     "baYears": 9.723477070499658,
+     "falseAlarmsPerBaYear": 6.582007602421512,
+     "aucPr": 0.16833172100169216
+    },
+    "summer": {
+     "testEvents": 69,
+     "warnedAny": 34,
+     "warned12h": 32,
+     "warned6h": 33,
+     "warned24h": 28,
+     "recall12h": 0.463768115942029,
+     "recall6h": 0.4782608695652174,
+     "recall24h": 0.4057971014492754,
+     "peopleRecall12h": 0.6200734816596675,
+     "custHoursRecall12h": 0.8771742579311367,
+     "medianLeadHours": 46.0,
+     "episodes": 147,
+     "falseEpisodes": 115,
+     "baYears": 12.833561487565595,
+     "falseAlarmsPerBaYear": 8.960879652263575,
+     "aucPr": 0.2327961643935783
+    },
+    "other": {
+     "testEvents": 116,
+     "warnedAny": 67,
+     "warned12h": 62,
+     "warned6h": 64,
+     "warned24h": 59,
+     "recall12h": 0.5344827586206896,
+     "recall6h": 0.5517241379310345,
+     "recall24h": 0.5086206896551724,
+     "peopleRecall12h": 0.8464817942493732,
+     "custHoursRecall12h": 0.9590250603025396,
+     "medianLeadHours": 47.0,
+     "episodes": 247,
+     "falseEpisodes": 180,
+     "baYears": 25.34827743554643,
+     "falseAlarmsPerBaYear": 7.101074242922013,
+     "aucPr": 0.3842953858942855
+    }
+   }
+  },
+  "warn_full": {
+   "testEvents": 212,
+   "warned6h": 51,
+   "warned12h": 30,
+   "warned24h": 18,
+   "recall12h": 0.14150943396226415,
+   "peopleRecall12h": 0.17472891013606687,
+   "custHoursRecall12h": 0.1323605158072098,
+   "medianLeadHours": 8.0,
+   "falseAlarmsPerBaYear": 5.448247122194229,
+   "aucPr": 0.0718702306659558,
+   "groups": {
+    "demand_record": {
+     "testEvents": 5,
+     "warnedAny": 3,
+     "warned12h": 2,
+     "warned6h": 2,
+     "warned24h": 1,
+     "recall12h": 0.4,
+     "recall6h": 0.4,
+     "recall24h": 0.2,
+     "peopleRecall12h": 0.7914085622067493,
+     "custHoursRecall12h": 0.834655259510869,
+     "medianLeadHours": 15.0
+    },
+    "other": {
+     "testEvents": 207,
+     "warnedAny": 74,
+     "warned12h": 28,
+     "warned6h": 49,
+     "warned24h": 17,
+     "recall12h": 0.13526570048309178,
+     "recall6h": 0.23671497584541062,
+     "recall24h": 0.0821256038647343,
+     "peopleRecall12h": 0.12831602503617986,
+     "custHoursRecall12h": 0.09920375359433337,
+     "medianLeadHours": 8.0
+    }
+   },
+   "seasons": {
+    "winter": {
+     "testEvents": 27,
+     "warnedAny": 11,
+     "warned12h": 3,
+     "warned6h": 6,
+     "warned24h": 1,
+     "recall12h": 0.1111111111111111,
+     "recall6h": 0.2222222222222222,
+     "recall24h": 0.037037037037037035,
+     "peopleRecall12h": 0.09959184832818455,
+     "custHoursRecall12h": 0.04365931548900032,
+     "medianLeadHours": 6.0,
+     "episodes": 64,
+     "falseEpisodes": 53,
+     "baYears": 9.723477070499658,
+     "falseAlarmsPerBaYear": 5.4507250457553145,
+     "aucPr": 0.05669520532924043
+    },
+    "summer": {
+     "testEvents": 69,
+     "warnedAny": 18,
+     "warned12h": 11,
+     "warned6h": 11,
+     "warned24h": 7,
+     "recall12h": 0.15942028985507245,
+     "recall6h": 0.15942028985507245,
+     "recall24h": 0.10144927536231885,
+     "peopleRecall12h": 0.2096688066568213,
+     "custHoursRecall12h": 0.07813001892293005,
+     "medianLeadHours": 16.0,
+     "episodes": 64,
+     "falseEpisodes": 47,
+     "baYears": 12.833561487565595,
+     "falseAlarmsPerBaYear": 3.662272553533809,
+     "aucPr": 0.08590732555045053
+    },
+    "other": {
+     "testEvents": 116,
+     "warnedAny": 48,
+     "warned12h": 16,
+     "warned6h": 34,
+     "warned24h": 10,
+     "recall12h": 0.13793103448275862,
+     "recall6h": 0.29310344827586204,
+     "recall24h": 0.08620689655172414,
+     "peopleRecall12h": 0.1679228482157341,
+     "custHoursRecall12h": 0.1550176045375919,
+     "medianLeadHours": 8.0,
+     "episodes": 204,
+     "falseEpisodes": 161,
+     "baYears": 25.34827743554643,
+     "falseAlarmsPerBaYear": 6.351516406169134,
+     "aucPr": 0.07271836098020987
+    }
+   }
+  },
+  "warn_grid": {
+   "testEvents": 212,
+   "warned6h": 25,
+   "warned12h": 24,
+   "warned24h": 22,
+   "recall12h": 0.11320754716981132,
+   "peopleRecall12h": 0.07108902085535199,
+   "custHoursRecall12h": 0.031187998941330602,
+   "medianLeadHours": 56.0,
+   "falseAlarmsPerBaYear": 6.032733403502422,
+   "aucPr": 0.02845202273097115,
+   "groups": {
+    "demand_record": {
+     "testEvents": 5,
+     "warnedAny": 2,
+     "warned12h": 2,
+     "warned6h": 2,
+     "warned24h": 1,
+     "recall12h": 0.4,
+     "recall6h": 0.4,
+     "recall24h": 0.2,
+     "peopleRecall12h": 0.44878150673450456,
+     "custHoursRecall12h": 0.38526742567822325,
+     "medianLeadHours": 34.0
+    },
+    "other": {
+     "testEvents": 207,
+     "warnedAny": 24,
+     "warned12h": 22,
+     "warned6h": 23,
+     "warned24h": 21,
+     "recall12h": 0.10628019323671498,
+     "recall6h": 0.1111111111111111,
+     "recall24h": 0.10144927536231885,
+     "peopleRecall12h": 0.04266292005676337,
+     "custHoursRecall12h": 0.014471189564581762,
+     "medianLeadHours": 61.5
+    }
+   },
+   "seasons": {
+    "winter": {
+     "testEvents": 27,
+     "warnedAny": 6,
+     "warned12h": 5,
+     "warned6h": 6,
+     "warned24h": 4,
+     "recall12h": 0.18518518518518517,
+     "recall6h": 0.2222222222222222,
+     "recall24h": 0.14814814814814814,
+     "peopleRecall12h": 0.051102879669022466,
+     "custHoursRecall12h": 0.03829304538952706,
+     "medianLeadHours": 52.0,
+     "episodes": 92,
+     "falseEpisodes": 85,
+     "baYears": 9.723477070499658,
+     "falseAlarmsPerBaYear": 8.74172884696607,
+     "aucPr": 0.02275665275826584
+    },
+    "summer": {
+     "testEvents": 69,
+     "warnedAny": 10,
+     "warned12h": 9,
+     "warned6h": 9,
+     "warned24h": 8,
+     "recall12h": 0.13043478260869565,
+     "recall6h": 0.13043478260869565,
+     "recall24h": 0.11594202898550725,
+     "peopleRecall12h": 0.1704452322126215,
+     "custHoursRecall12h": 0.08787389559983876,
+     "medianLeadHours": 56.0,
+     "episodes": 44,
+     "falseEpisodes": 33,
+     "baYears": 12.833561487565595,
+     "falseAlarmsPerBaYear": 2.5713828567365042,
+     "aucPr": 0.04241806732830408
+    },
+    "other": {
+     "testEvents": 116,
+     "warnedAny": 10,
+     "warned12h": 10,
+     "warned6h": 10,
+     "warned24h": 10,
+     "recall12h": 0.08620689655172414,
+     "recall6h": 0.08620689655172414,
+     "recall24h": 0.08620689655172414,
+     "peopleRecall12h": 0.025515320790155747,
+     "custHoursRecall12h": 0.01085996684903015,
+     "medianLeadHours": 61.0,
+     "episodes": 178,
+     "falseEpisodes": 171,
+     "baYears": 25.34827743554643,
+     "falseAlarmsPerBaYear": 6.746020530775913,
+     "aucPr": 0.026664090730078048
+    }
+   }
+  },
+  "rule_forecast_error": {
+   "testEvents": 212,
+   "warned6h": 21,
+   "warned12h": 20,
+   "warned24h": 17,
+   "recall12h": 0.09433962264150944,
+   "peopleRecall12h": 0.06521694526398414,
+   "custHoursRecall12h": 0.06466408100337441,
+   "medianLeadHours": 66.0,
+   "falseAlarmsPerBaYear": 5.302125551867181,
+   "aucPr": 0.023900251612076782,
+   "groups": {
+    "demand_record": {
+     "testEvents": 5,
+     "warnedAny": 0,
+     "warned12h": 0,
+     "warned6h": 0,
+     "warned24h": 0,
+     "recall12h": 0.0,
+     "recall6h": 0.0,
+     "recall24h": 0.0,
+     "peopleRecall12h": 0.0,
+     "custHoursRecall12h": 0.0,
+     "medianLeadHours": null
+    },
+    "other": {
+     "testEvents": 207,
+     "warnedAny": 21,
+     "warned12h": 20,
+     "warned6h": 21,
+     "warned24h": 17,
+     "recall12h": 0.0966183574879227,
+     "recall6h": 0.10144927536231885,
+     "recall24h": 0.0821256038647343,
+     "peopleRecall12h": 0.07012533907418882,
+     "custHoursRecall12h": 0.067717003692552,
+     "medianLeadHours": 66.0
+    }
+   },
+   "seasons": {
+    "winter": {
+     "testEvents": 27,
+     "warnedAny": 3,
+     "warned12h": 3,
+     "warned6h": 3,
+     "warned24h": 2,
+     "recall12h": 0.1111111111111111,
+     "recall6h": 0.1111111111111111,
+     "recall24h": 0.07407407407407407,
+     "peopleRecall12h": 0.05910027972103432,
+     "custHoursRecall12h": 0.03932156320578662,
+     "medianLeadHours": 66.0,
+     "episodes": 48,
+     "falseEpisodes": 45,
+     "baYears": 9.723477070499658,
+     "falseAlarmsPerBaYear": 4.627974095452625,
+     "aucPr": 0.01744499337805929
+    },
+    "summer": {
+     "testEvents": 69,
+     "warnedAny": 5,
+     "warned12h": 5,
+     "warned6h": 5,
+     "warned24h": 4,
+     "recall12h": 0.07246376811594203,
+     "recall6h": 0.07246376811594203,
+     "recall24h": 0.057971014492753624,
+     "peopleRecall12h": 0.024864529600257496,
+     "custHoursRecall12h": 0.015175206044883508,
+     "medianLeadHours": 52.0,
+     "episodes": 81,
+     "falseEpisodes": 78,
+     "baYears": 12.833561487565595,
+     "falseAlarmsPerBaYear": 6.077814025013556,
+     "aucPr": 0.024449699129945202
+    },
+    "other": {
+     "testEvents": 116,
+     "warnedAny": 13,
+     "warned12h": 12,
+     "warned6h": 13,
+     "warned24h": 11,
+     "recall12h": 0.10344827586206896,
+     "recall6h": 0.11206896551724138,
+     "recall24h": 0.09482758620689655,
+     "peopleRecall12h": 0.08565316124655976,
+     "custHoursRecall12h": 0.08316122648334089,
+     "medianLeadHours": 67.0,
+     "episodes": 145,
+     "falseEpisodes": 131,
+     "baYears": 25.34827743554643,
+     "falseAlarmsPerBaYear": 5.168004032348798,
+     "aucPr": 0.026762183954870348
+    }
+   }
+  },
+  "rule_hand": {
+   "testEvents": 212,
+   "warned6h": 28,
+   "warned12h": 27,
+   "warned24h": 26,
+   "recall12h": 0.12735849056603774,
+   "peopleRecall12h": 0.08566895491437664,
+   "custHoursRecall12h": 0.07273277100679744,
+   "medianLeadHours": 72.0,
+   "falseAlarmsPerBaYear": 7.556572636913068,
+   "aucPr": 0.022814788896451287,
+   "groups": {
+    "demand_record": {
+     "testEvents": 5,
+     "warnedAny": 0,
+     "warned12h": 0,
+     "warned6h": 0,
+     "warned24h": 0,
+     "recall12h": 0.0,
+     "recall6h": 0.0,
+     "recall24h": 0.0,
+     "peopleRecall12h": 0.0,
+     "custHoursRecall12h": 0.0,
+     "medianLeadHours": null
+    },
+    "other": {
+     "testEvents": 207,
+     "warnedAny": 28,
+     "warned12h": 27,
+     "warned6h": 28,
+     "warned24h": 26,
+     "recall12h": 0.13043478260869565,
+     "recall6h": 0.13526570048309178,
+     "recall24h": 0.12560386473429952,
+     "peopleRecall12h": 0.09211661918822983,
+     "custHoursRecall12h": 0.07616663295005807,
+     "medianLeadHours": 72.0
+    }
+   },
+   "seasons": {
+    "winter": {
+     "testEvents": 27,
+     "warnedAny": 4,
+     "warned12h": 4,
+     "warned6h": 4,
+     "warned24h": 4,
+     "recall12h": 0.14814814814814814,
+     "recall6h": 0.14814814814814814,
+     "recall24h": 0.14814814814814814,
+     "peopleRecall12h": 0.17395899101845141,
+     "custHoursRecall12h": 0.09921564849276475,
+     "medianLeadHours": 72.0,
+     "episodes": 73,
+     "falseEpisodes": 70,
+     "baYears": 9.723477070499658,
+     "falseAlarmsPerBaYear": 7.199070815148528,
+     "aucPr": 0.016137897172653896
+    },
+    "summer": {
+     "testEvents": 69,
+     "warnedAny": 6,
+     "warned12h": 6,
+     "warned6h": 6,
+     "warned24h": 5,
+     "recall12h": 0.08695652173913043,
+     "recall6h": 0.08695652173913043,
+     "recall24h": 0.07246376811594203,
+     "peopleRecall12h": 0.0260692168490709,
+     "custHoursRecall12h": 0.01586841165079976,
+     "medianLeadHours": 62.0,
+     "episodes": 87,
+     "falseEpisodes": 82,
+     "baYears": 12.833561487565595,
+     "falseAlarmsPerBaYear": 6.389496795527071,
+     "aucPr": 0.024323092276014233
+    },
+    "other": {
+     "testEvents": 116,
+     "warnedAny": 18,
+     "warned12h": 17,
+     "warned6h": 18,
+     "warned24h": 17,
+     "recall12h": 0.14655172413793102,
+     "recall6h": 0.15517241379310345,
+     "recall24h": 0.14655172413793102,
+     "peopleRecall12h": 0.1026771443753275,
+     "custHoursRecall12h": 0.0918077087708745,
+     "medianLeadHours": 72.0,
+     "episodes": 227,
+     "falseEpisodes": 210,
+     "baYears": 25.34827743554643,
+     "falseAlarmsPerBaYear": 8.284586616742349,
+     "aucPr": 0.02529315584176421
+    }
+   }
+  },
+  "rule_record": {
+   "testEvents": 212,
+   "warned6h": 3,
+   "warned12h": 3,
+   "warned24h": 3,
+   "recall12h": 0.014150943396226415,
+   "peopleRecall12h": 0.044517239895177474,
+   "custHoursRecall12h": 0.03118523182785624,
+   "medianLeadHours": 44.0,
+   "falseAlarmsPerBaYear": 1.1898470726631074,
+   "aucPr": 0.02496585151120794,
+   "groups": {
+    "demand_record": {
+     "testEvents": 5,
+     "warnedAny": 1,
+     "warned12h": 1,
+     "warned6h": 1,
+     "warned24h": 1,
+     "recall12h": 0.2,
+     "recall6h": 0.2,
+     "recall24h": 0.2,
+     "peopleRecall12h": 0.5335301798811464,
+     "custHoursRecall12h": 0.6114748064030413,
+     "medianLeadHours": 72.0
+    },
+    "other": {
+     "testEvents": 207,
+     "warnedAny": 2,
+     "warned12h": 2,
+     "warned6h": 2,
+     "warned24h": 2,
+     "recall12h": 0.00966183574879227,
+     "recall6h": 0.00966183574879227,
+     "recall24h": 0.00966183574879227,
+     "peopleRecall12h": 0.007712877500996738,
+     "custHoursRecall12h": 0.0037885816161049948,
+     "medianLeadHours": 42.0
+    }
+   },
+   "seasons": {
+    "winter": {
+     "testEvents": 27,
+     "warnedAny": 0,
+     "warned12h": 0,
+     "warned6h": 0,
+     "warned24h": 0,
+     "recall12h": 0.0,
+     "recall6h": 0.0,
+     "recall24h": 0.0,
+     "peopleRecall12h": 0.0,
+     "custHoursRecall12h": 0.0,
+     "medianLeadHours": null,
+     "episodes": 7,
+     "falseEpisodes": 7,
+     "baYears": 9.723477070499658,
+     "falseAlarmsPerBaYear": 0.7199070815148528,
+     "aucPr": 0.016713366460731204
+    },
+    "summer": {
+     "testEvents": 69,
+     "warnedAny": 2,
+     "warned12h": 2,
+     "warned6h": 2,
+     "warned24h": 2,
+     "recall12h": 0.028985507246376812,
+     "recall6h": 0.028985507246376812,
+     "recall24h": 0.028985507246376812,
+     "peopleRecall12h": 0.023933094333078088,
+     "custHoursRecall12h": 0.014247087014518444,
+     "medianLeadHours": 42.0,
+     "episodes": 27,
+     "falseEpisodes": 25,
+     "baYears": 12.833561487565595,
+     "falseAlarmsPerBaYear": 1.948017315709473,
+     "aucPr": 0.02929798625080388
+    },
+    "other": {
+     "testEvents": 116,
+     "warnedAny": 1,
+     "warned12h": 1,
+     "warned6h": 1,
+     "warned24h": 1,
+     "recall12h": 0.008620689655172414,
+     "recall6h": 0.008620689655172414,
+     "recall24h": 0.008620689655172414,
+     "peopleRecall12h": 0.06054626036077566,
+     "custHoursRecall12h": 0.03839825624123047,
+     "medianLeadHours": 72.0,
+     "episodes": 26,
+     "falseEpisodes": 25,
+     "baYears": 25.34827743554643,
+     "falseAlarmsPerBaYear": 0.9862603115169463,
+     "aucPr": 0.025735252490329937
+    }
+   }
+  }
+ },
+ "featureAgreement": {
+  "fx_wind_max_48h": {
+   "corr": 0.7120696257360507,
+   "meanAbsDiff": 1.690050114955011
+  },
+  "fx_temp_min_48h": {
+   "corr": 0.9694277624076179,
+   "meanAbsDiff": 1.5452868677627294
+  },
+  "fx_temp_max_48h": {
+   "corr": 0.9814741014728857,
+   "meanAbsDiff": 1.3909450529552647
+  },
+  "fx_precip_48h": {
+   "corr": 0.6518751602294012,
+   "meanAbsDiff": 7.23022931394349
+  },
+  "fx_temp_min_48h_z": {
+   "corr": 0.8408987512278825,
+   "meanAbsDiff": 0.2939158525385891
+  },
+  "fx_temp_max_48h_z": {
+   "corr": 0.8768810885983049,
+   "meanAbsDiff": 0.2767994226024141
+  },
+  "fx_wind_max_48h_z": {
+   "corr": 0.6348895051940407,
+   "meanAbsDiff": 0.7701564463843596
+  },
+  "fx_temp_min_48h_above_record": {
+   "corr": 0.9781781374964617,
+   "meanAbsDiff": 1.5452868656108403
+  },
+  "fx_slp_min_48h": {
+   "corr": 0.9355361843904807,
+   "meanAbsDiff": 1.8581349691813034
+  },
+  "fx_wind_max_24h": {
+   "corr": 0.7293149212101184,
+   "meanAbsDiff": 1.5012560812530704
+  },
+  "fx_temp_min_24h": {
+   "corr": 0.9718062413283939,
+   "meanAbsDiff": 1.4690470894521817
+  },
+  "fx_temp_max_24h": {
+   "corr": 0.9811976787653776,
+   "meanAbsDiff": 1.3853654819437589
+  },
+  "fx_precip_24h": {
+   "corr": 0.5768596645402296,
+   "meanAbsDiff": 4.6067016884544545
+  }
+ },
+ "survives": {
+  "warned12h": 1.0285714285714285,
+  "warned24h": 0.9387755102040817,
+  "peopleRecall12h": 1.0054298538618858,
+  "aucPr": 0.733494117885634
+ }
+}
