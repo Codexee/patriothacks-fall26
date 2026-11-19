@@ -80,6 +80,16 @@ export interface Metrics {
   equity: { quartile: 1 | 2 | 3 | 4; meanDarkHours: number; lo: number; hi: number }[] | null; // by SVI quartile
 }
 
+// data/v1/ba_records.json: demand records (MW) per balancing area, from EIA-930 history up to asOf.
+// The live page uses them for the record features; demand after asOf in the live window raises them.
+export type BaRecords = Record<string, {
+  asOf: string;
+  record: number | null;          // all-time maximum hourly demand
+  peak365: number | null;         // maximum in the 365 days before asOf
+  peak30: number | null;          // maximum in the 30 days before asOf
+  monthRecord: (number | null)[]; // index 0 = January: maximum hourly demand in that month, all years
+}>;
+
 export interface ModelFile {
   name: string;
   version: string;

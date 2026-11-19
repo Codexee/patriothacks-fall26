@@ -9,7 +9,7 @@
 Model outputs are optional. If <shared>/ba_hour_pred.parquet or county_event_pred.parquet (written
 by models/) are missing, the risk and prediction fields are null and "stub": true is set.
 
-Run: uv run python build/export_app.py [--replays N]   (default: top 40 events by customers out + heroes)
+Run: uv run python build/export_app.py [--replays N]   (default: top 18 events by customers out + heroes)
 """
 from __future__ import annotations
 
@@ -102,10 +102,12 @@ def nn(v):
 
 
 def main() -> None:
-    n_replays = int(sys.argv[sys.argv.index("--replays") + 1]) if "--replays" in sys.argv else 40
+    n_replays = int(sys.argv[sys.argv.index("--replays") + 1]) if "--replays" in sys.argv else 18
     con = duckdb.connect()
     APP.mkdir(parents=True, exist_ok=True)
     (APP / "events").mkdir(exist_ok=True)
+    for old in (APP / "events").glob("*.json"):   # drop replays from earlier exports
+        old.unlink()
 
     c = counties(con)
     (APP / "counties.json").write_text(json.dumps(
@@ -195,6 +197,26 @@ def main() -> None:
             "risk": risk, "alertThreshold": thr.get(WARN_COL), "warnModel": WARN_MODEL,
             "firstAlertIndex": (idx.get(pd.Timestamp(first_alert)) if first_alert else None), "alertInputs": reasons, "counties": cl,
             "stub": not (have_pred and have_dark)}, separators=(",", ":")))
+
+    # Per-area demand records, so the live page can compute the record features from a 7-day window.
+    rec = con.execute(f"""
+        WITH d AS (SELECT ba, hour, demand FROM '{DERIVED}/ba_hour_features.parquet' WHERE demand IS NOT NULL),
+             last AS (SELECT ba, max(hour) AS asof FROM d GROUP BY ba)
+        SELECT d.ba, last.asof, max(d.demand) AS record,
+               max(d.demand) FILTER (WHERE d.hour >= last.asof - INTERVAL 365 DAY) AS peak365,
+               max(d.demand) FILTER (WHERE d.hour >= last.asof - INTERVAL 30 DAY) AS peak30,
+               list(struct_pack(m := month(d.hour), v := d.demand)) AS dm
+        FROM d JOIN last USING (ba) GROUP BY d.ba, last.asof ORDER BY d.ba""").df()
+    records = {}
+    for r in rec.itertuples():
+        by_month = [None] * 12
+        for x in r.dm:
+            m = int(x["m"]) - 1
+            if by_month[m] is None or x["v"] > by_month[m]:
+                by_month[m] = x["v"]
+        records[r.ba] = {"asOf": str(r.asof), "record": nn(r.record), "peak365": nn(r.peak365),
+                         "peak30": nn(r.peak30), "monthRecord": [nn(v) for v in by_month]}
+    (APP / "ba_records.json").write_text(json.dumps(records, separators=(",", ":")))
 
     meta = json.loads((OUT / "events.json").read_text())
     (APP / "events.json").write_text(json.dumps({

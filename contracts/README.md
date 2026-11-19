@@ -115,3 +115,6 @@ Use `hollowName(county)` from `app/src/contracts.ts`.
   inputs at the first alert hour: label, unit, value; these are observed input values, not SHAP).
   New route `#/hollow` and `#/hollow/<event id>` → `app/src/earth/Page.tsx` (workstream 3 owns the
   cross-section view inside `app/src/earth/`).
+- **Nov 19, 1:00 am.** New file `data/v1/ba_records.json` (`BaRecords` in `app/src/contracts.ts`): each
+  area's demand records, so the live page can compute `demand_vs_record`, `demand_vs_month_record` and
+  the `fc12_vs_*` features from a 7-day window. Deploy: Vercel project root = `app/` (see `app/vercel.json`).
