@@ -1,13 +1,13 @@
 # To do
 
-Last updated: Thu Nov 19, 2026, 12:15 am. Deadline: **Fri Nov 20, 11:00 pm** (we submit by 6:00 pm).
+Last updated: Thu Nov 19, 2026, 12:45 am. Deadline: **Fri Nov 20, 11:00 pm** (we submit by 6:00 pm).
 Spec: `.plans/before-during-after-spec.md`. Who owns which folders: `contracts/README.md`. Model results: `models/RESULTS.md`.
 
 To take an item: write your name after it, commit, push. Tick it when it is merged to `main`.
 
-## Running now (AI workers in Paradev; do not edit these folders until they merge)
+## Running now
 
-- [ ] **Evidence page: comparison at equal false-alarm rates** (`app/src/evidence`, branch `ws/bda-brief`): a chart from `metrics.json` `curves`, and a clearer third card.
+No AI worker is running. The three Paradev workspaces (`bda-models`, `bda-map`, `bda-brief`) are idle and merged.
 
 ## Next (Thu morning)
 
@@ -54,4 +54,5 @@ To take an item: write your name after it, commit, push. Tick it when it is merg
 - [x] Models v1 and v2, with a final test on 2023–2024 run once.
 - [x] App: county map, event replay, story mode, county brief, evidence page, live page, browser model with parity tests.
 - [x] Real archived forecast test (2024), Hollow cross-section (`#/hollow`), Without/With comparison, live counters, detailed evidence and brief pages.
+- [x] Evidence page: comparison at equal false-alarm rates (chart), cards filled from data.
 - [x] Contracts and an app shell so parallel work does not collide.
