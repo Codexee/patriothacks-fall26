@@ -6,3 +6,5 @@ uv run python train_warn.py
 uv run python train_dark.py
 uv run python export.py
 uv run python metrics.py
+uv run python make_results.py
+uv run python publish.py
