@@ -1,0 +1,77 @@
+{
+ "generated": "2026-11-19T01:54Z",
+ "trainYears": [
+  2015,
+  2020
+ ],
+ "testYears": [
+  2021,
+  2024
+ ],
+ "models": {
+  "warn_grid": {
+   "testEvents": 818,
+   "warned12h": 60,
+   "recall12h": 0.07334963325183375,
+   "medianLeadHours": 72.0,
+   "falseAlarmsPerBaYear": 3.6919158409139907,
+   "aucPr": 0.02763719460509572
+  },
+  "warn_full": {
+   "testEvents": 818,
+   "warned12h": 114,
+   "recall12h": 0.1393643031784841,
+   "medianLeadHours": 11.0,
+   "falseAlarmsPerBaYear": 6.343649044110151,
+   "aucPr": 0.05816464556839633
+  },
+  "rule_forecast_error": {
+   "testEvents": 818,
+   "warned12h": 60,
+   "recall12h": 0.07334963325183375,
+   "medianLeadHours": 67.0,
+   "falseAlarmsPerBaYear": 6.089707742883263,
+   "aucPr": 0.020435131144174112
+  },
+  "rule_hand": {
+   "testEvents": 818,
+   "warned12h": 76,
+   "recall12h": 0.09290953545232274,
+   "medianLeadHours": 72.0,
+   "falseAlarmsPerBaYear": 6.92478394499476,
+   "aucPr": 0.019710713714323896
+  }
+ },
+ "dark": {
+  "testCountyEvents": 54585,
+  "maeHours": 3.9110829278811017,
+  "baselineMaeHours": 3.775133055317014,
+  "spearman": 0.2981288474575841
+ },
+ "equity": [
+  {
+   "quartile": 1,
+   "meanDarkHours": 1.2691233691920347,
+   "lo": 0.9706927212474779,
+   "hi": 1.5884138381884694
+  },
+  {
+   "quartile": 2,
+   "meanDarkHours": 2.046655424395728,
+   "lo": 1.6900155792142795,
+   "hi": 2.460477022657052
+  },
+  {
+   "quartile": 3,
+   "meanDarkHours": 2.4875334311103443,
+   "lo": 1.9945173890931482,
+   "hi": 3.1243685483173795
+  },
+  {
+   "quartile": 4,
+   "meanDarkHours": 3.378894691035683,
+   "lo": 2.391669607626624,
+   "hi": 4.643775377127979
+  }
+ ]
+}
