@@ -34,7 +34,15 @@ export const WORLD = {
   network: false, // #7 the Directorate cuts the network
   families: false, // #8 families split across levels
   surface: false, // #13 the "surface has healed" rumor
+  census: true, // the Directorate's census undercounts the crowded deep levels (its numbers "don't match")
 };
+
+// The Directorate's census: the brief says 2 billion people live in the Hollow and that the Directorate's public
+// numbers don't match what people see. Its census misses a share of residents that grows with depth (families
+// packed in beyond the registered count). ASSUMPTION: 0% missed on level 1, 30% on level 50.
+const CENSUS_MISSED_DEEP = 0.3;
+const HOLLOW_POPULATION = 2_000_000_000; // the brief's figure; the sim's ~1.6 million stand in for it
+const censusShare = (level: number) => (WORLD.census ? 1 - CENSUS_MISSED_DEEP * (level - 1) / (LEVELS - 1) : 1);
 
 // Air (#1): CO2 above AIR_DANGER ppm starts to kill; a warned, prepared resident is much safer.
 const AIR_DANGER = 5000;
@@ -377,6 +385,13 @@ function makeBulletin(state: SimState, s: Internal): Bulletin {
   const directorate = state.lies.filter((l) => l.active).map((l) => l.bulletin);
   directorate.push('All levels nominal');
   const measured: string[] = [];
+  // Population at the Hollow's scale (the brief's 2 billion): what the census says vs who is really there.
+  const scale = HOLLOW_POPULATION / Math.max(1, state.totals.startPopulation);
+  let real = 0, counted = 0;
+  for (let i = 0; i < SECTION_COUNT; i++) { real += s.people[i]; counted += s.people[i] * censusShare(lvl(i)); }
+  const bn = (x: number) => `${(x * scale / 1e9).toFixed(2)} billion`;
+  directorate.push(`Census: ${bn(counted)} people`);
+  measured.push(`Population: ${bn(real)} (${Math.round((1 - counted / Math.max(1, real)) * 100)}% not counted)`);
   let online = 0;
   for (const p of s.plants) if (s.hour >= p.offlineUntil) online++;
   measured.push(`Plants online ${online}/${s.plants.length}`);
@@ -1125,12 +1140,14 @@ function dailyObservations(
         obs.push({ kind: 'checkins', level, col, day, expected: expected[i], received: Math.max(0, Math.round(known[i] * (1 + 0.03 * gauss(s)))) });
       }
     }
-    // Section council census (people rounded; power asked for, with ±3% noise).
+    // The Directorate's census (people rounded; the power ration it sets from that count, with ±3% noise). It
+    // counts only registered residents, so on deep levels it misses people and the power they need.
+    const counted = censusShare(level);
     obs.push({
       kind: 'census', level, col, day,
-      people: Math.round(n / 10) * 10,
-      demand: Math.round((fullC[i] + fullN[i]) * (1 + 0.03 * gauss(s))),
-      critical: Math.round(fullC[i] * (1 + 0.03 * gauss(s))),
+      people: Math.round((n * counted) / 10) * 10,
+      demand: Math.round((fullC[i] + fullN[i]) * counted * (1 + 0.03 * gauss(s))),
+      critical: Math.round(fullC[i] * counted * (1 + 0.03 * gauss(s))),
       facilities: s.structures[i].slice(),
       food: Math.round(s.food[i] * (1 + 0.03 * gauss(s)) * 10) / 10,
     });

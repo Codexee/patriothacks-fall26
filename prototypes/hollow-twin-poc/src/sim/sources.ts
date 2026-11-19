@@ -25,10 +25,10 @@ const fixed: Record<'co2' | 'infected' | 'wetBulb' | 'directorate' | 'water' | '
     url: 'https://doi.org/10.1152/japplphysiol.00738.2021',
   },
   directorate: {
-    label: 'Cost of a late response (Lai et al. 2020)',
+    label: "The Directorate's census (our assumption)",
     detail:
-      'While a lie is told and residents have no Truth Check, their protective response (conserve power, isolate the sick, boil water) starts 14 days late. Lai et al. estimate that acting 1, 2 or 3 weeks earlier in Wuhan would have cut cases by 66%, 86% and 95%. With Truth Check, the delay ends when the Ledger publishes a finding that the evidence supports, however long that takes; each exposed lie lowers trust by 0.15.',
-    url: 'https://doi.org/10.1038/s41586-020-2293-x',
+      "The track brief says 2 billion people live in the Hollow and that the Directorate's public numbers don't match what people see. Here its census misses a share of residents that grows with depth: none on level 1, 30% on level 50 (families packed in beyond the registered count). The 30% is our assumption, not data. Population is shown at the Hollow's scale: each simulated person stands for about 1,250. The Residents' System receives only the census; the real count stays in the test world.",
+    url: 'https://www.census.gov/programs-surveys/decennial-census/about/coverage-measurement.html',
   },
   water: {
     label: 'Water recyclers (illustrative model)',
