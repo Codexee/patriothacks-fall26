@@ -60,6 +60,7 @@ def main():
         f"The event library contains {warn['trainEvents']:,} earlier events. The test period runs from {C.SPLIT} "
         f"through {warn['dataEnd']} UTC and contains {warn['testRows']:,} eligible hours ({warn['testPosShare']:.2%} positive). "
         f"Of {len(events):,} test events, {warn['testEventsScorable12h']} had an eligible observation 12–72 hours before onset.",
+        "The `warn_full_fx` row uses observed future weather and appears only as a retrospective comparison.",
         score_table(models, "test"),
         "Median lead uses the earliest alert among events with any warning. PR-AUC is hourly average precision. "
         "It ranks warnings across all thresholds. A missing baseline score ranks below every available score.",

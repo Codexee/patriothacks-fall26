@@ -3,12 +3,9 @@
  "features": [
   "month",
   "hod",
-  "ba_customers",
-  "ba_n_counties",
   "ba_past_events",
   "ba_past_mean_hours",
   "ba_hours_since_last",
-  "ba_frac_prev1h",
   "ev_fc_err",
   "ev_fc_err_max_24h",
   "ev_demand_vs_30d_peak",
@@ -34,15 +31,59 @@
   "svi_t2",
   "svi_t3",
   "svi_t4",
-  "n_ba",
-  "primary_share",
-  "cust_share_of_ba",
+  "utilities",
   "past_events",
   "past_dark_mean",
   "past_dark_max",
   "past_dark_share",
-  "out_frac_prev1h",
-  "out_frac_max_prev6h"
+  "out_prev1h",
+  "out_max_prev6h",
+  "ba_is_AECI",
+  "ba_is_AVA",
+  "ba_is_AZPS",
+  "ba_is_BANC",
+  "ba_is_BPAT",
+  "ba_is_CHPD",
+  "ba_is_CISO",
+  "ba_is_CPLE",
+  "ba_is_DOPD",
+  "ba_is_DUK",
+  "ba_is_EPE",
+  "ba_is_ERCO",
+  "ba_is_FMPP",
+  "ba_is_FPC",
+  "ba_is_FPL",
+  "ba_is_IPCO",
+  "ba_is_ISNE",
+  "ba_is_JEA",
+  "ba_is_LDWP",
+  "ba_is_LGEE",
+  "ba_is_MISO",
+  "ba_is_NEVP",
+  "ba_is_NWMT",
+  "ba_is_NYIS",
+  "ba_is_PACE",
+  "ba_is_PACW",
+  "ba_is_PGE",
+  "ba_is_PJM",
+  "ba_is_PNM",
+  "ba_is_PSCO",
+  "ba_is_PSEI",
+  "ba_is_SC",
+  "ba_is_SCEG",
+  "ba_is_SCL",
+  "ba_is_SEC",
+  "ba_is_SOCO",
+  "ba_is_SRP",
+  "ba_is_SWPP",
+  "ba_is_TAL",
+  "ba_is_TEC",
+  "ba_is_TEPC",
+  "ba_is_TPWR",
+  "ba_is_TVA",
+  "ba_is_WACM",
+  "ba_is_WALC",
+  "ba_is_WAUW"
  ],
  "config": {
   "num_leaves": 7,
@@ -54,73 +95,73 @@
    "num_leaves": 7,
    "min_child_samples": 50,
    "rounds": 100,
-   "mae": 4.705391193543978
+   "mae": 4.613778198287968
   },
   {
    "num_leaves": 7,
    "min_child_samples": 50,
    "rounds": 200,
-   "mae": 4.783901742019861
+   "mae": 4.703753133882862
   },
   {
    "num_leaves": 7,
    "min_child_samples": 50,
    "rounds": 300,
-   "mae": 4.816997731482189
+   "mae": 4.760862036876244
   },
   {
    "num_leaves": 7,
    "min_child_samples": 200,
    "rounds": 100,
-   "mae": 5.0680543842954355
+   "mae": 4.787602464958763
   },
   {
    "num_leaves": 7,
    "min_child_samples": 200,
    "rounds": 200,
-   "mae": 5.191697933465388
+   "mae": 4.705941766403464
   },
   {
    "num_leaves": 7,
    "min_child_samples": 200,
    "rounds": 300,
-   "mae": 5.206883816585088
+   "mae": 4.769224369407964
   },
   {
    "num_leaves": 15,
    "min_child_samples": 50,
    "rounds": 100,
-   "mae": 5.083100000020834
+   "mae": 4.73888057289382
   },
   {
    "num_leaves": 15,
    "min_child_samples": 50,
    "rounds": 200,
-   "mae": 5.207373615918406
+   "mae": 4.814896318716024
   },
   {
    "num_leaves": 15,
    "min_child_samples": 50,
    "rounds": 300,
-   "mae": 5.241428027056774
+   "mae": 4.898272880734282
   },
   {
    "num_leaves": 15,
    "min_child_samples": 200,
    "rounds": 100,
-   "mae": 5.0669664362015405
+   "mae": 4.7240408345039375
   },
   {
    "num_leaves": 15,
    "min_child_samples": 200,
    "rounds": 200,
-   "mae": 5.12741321850008
+   "mae": 4.781455364725663
   },
   {
    "num_leaves": 15,
    "min_child_samples": 200,
    "rounds": 300,
-   "mae": 5.111683390081494
+   "mae": 4.7750365290319765
   }
  ],
  "valYears": [
@@ -131,97 +172,101 @@
  ],
  "years": [
   2015,
-  2021
+  2024
  ],
+ "countyEventRows": 95789,
+ "observedRows": 91558,
+ "observedEvents": 1244,
+ "allEvents": 1477,
  "gainShare": {
-  "ev_dew_c": 0.1488,
-  "out_frac_prev1h": 0.1191,
-  "month": 0.1019,
-  "ev_fc_err": 0.0883,
-  "ev_fc_err_max_24h": 0.073,
-  "out_frac_max_prev6h": 0.0447,
-  "ev_precip_max_mm": 0.0376,
-  "ev_demand_vs_30d_peak": 0.0318,
-  "ev_wind_max_24h": 0.0301,
-  "ev_import_share": 0.0283,
-  "ev_temp_min_24h": 0.0277,
-  "ev_temp_c": 0.0276
+  "ev_dew_c": 0.1781,
+  "out_prev1h": 0.1027,
+  "ev_fc_err": 0.0983,
+  "ev_wind_max_ms": 0.0652,
+  "month": 0.0648,
+  "ev_temp_min_24h": 0.0644,
+  "ev_import_share": 0.0449,
+  "ev_slp_chg_12h": 0.0415,
+  "ev_gas_chg_6h": 0.0369,
+  "ev_fc_err_max_24h": 0.0345,
+  "past_dark_share": 0.0263,
+  "out_max_prev6h": 0.0248
  },
  "train_oof": {
   "countyEvents": 31011,
   "events": 425,
   "meanDarkHours": 2.721840637193254,
-  "maeHours": 4.705391193543978,
-  "baselineMaeHours": 4.137180048514033,
+  "maeHours": 4.613778198287968,
+  "baselineMaeHours": 4.154596754173087,
   "zeroMaeHours": 2.721840637193254,
   "trainMeanMaeHours": 4.698112712123529,
-  "rmseHours": 13.018806422332663,
-  "baselineRmseHours": 13.582589806127167,
-  "spearman": 0.2490786006052594,
-  "baselineSpearman": 0.20601898465373097,
-  "withinEventSpearman": 0.31090801109224137,
-  "baselineWithinEventSpearman": 0.18149947639520894,
+  "rmseHours": 12.894835052343758,
+  "baselineRmseHours": 13.607126512942129,
+  "spearman": 0.25911551767423924,
+  "baselineSpearman": 0.20609328020194845,
+  "withinEventSpearman": 0.28172466309748184,
+  "baselineWithinEventSpearman": 0.1827038299849707,
   "withinEventSpearmanEvents": 290
  },
  "test": {
-  "countyEvents": 10635,
-  "events": 139,
-  "meanDarkHours": 2.9950164551010814,
-  "maeHours": 4.323780224423408,
-  "baselineMaeHours": 4.618064388625299,
-  "zeroMaeHours": 2.9950164551010814,
-  "trainMeanMaeHours": 4.919657675709455,
-  "rmseHours": 14.290742835216797,
-  "baselineRmseHours": 15.897327118534509,
-  "spearman": 0.3345145385702195,
-  "baselineSpearman": 0.11797882877093828,
-  "withinEventSpearman": 0.3813228966589642,
-  "baselineWithinEventSpearman": 0.2131953653375014,
-  "withinEventSpearmanEvents": 75
+  "countyEvents": 54585,
+  "events": 699,
+  "meanDarkHours": 2.1071173399285517,
+  "maeHours": 3.9110829278811017,
+  "baselineMaeHours": 3.775133055317014,
+  "zeroMaeHours": 2.1071173399285517,
+  "trainMeanMaeHours": 4.146928469827217,
+  "rmseHours": 12.834352534617816,
+  "baselineRmseHours": 13.526411951195605,
+  "spearman": 0.2981288474575841,
+  "baselineSpearman": 0.17964980132971048,
+  "withinEventSpearman": 0.3126721947802128,
+  "baselineWithinEventSpearman": 0.21566848510234485,
+  "withinEventSpearmanEvents": 434
  },
  "equity": {
   "quartiles": [
    {
     "quartile": 1,
-    "meanDarkHours": 1.511326014985189,
-    "lo": 1.0753477157941467,
-    "hi": 2.0514315213426726,
-    "countyEvents": 11478
+    "meanDarkHours": 1.2691233691920347,
+    "lo": 0.9706927212474779,
+    "hi": 1.5884138381884694,
+    "countyEvents": 21845
    },
    {
     "quartile": 2,
-    "meanDarkHours": 2.34776581865623,
-    "lo": 1.8484854689368913,
-    "hi": 2.964458626747064,
-    "countyEvents": 12264
+    "meanDarkHours": 2.046655424395728,
+    "lo": 1.6900155792142795,
+    "hi": 2.460477022657052,
+    "countyEvents": 23127
    },
    {
     "quartile": 3,
-    "meanDarkHours": 2.763265647196457,
-    "lo": 2.0648943869393253,
-    "hi": 3.667514765197205,
-    "countyEvents": 11967
+    "meanDarkHours": 2.4875334311103443,
+    "lo": 1.9945173890931482,
+    "hi": 3.1243685483173795,
+    "countyEvents": 23182
    },
    {
     "quartile": 4,
-    "meanDarkHours": 4.14020139426801,
-    "lo": 2.7711411985955006,
-    "hi": 5.733602076935725,
-    "countyEvents": 11619
+    "meanDarkHours": 3.378894691035683,
+    "lo": 2.391669607626624,
+    "hi": 4.643775377127979,
+    "countyEvents": 22980
    }
   ],
-  "events": 684,
-  "countyEvents": 47328,
+  "events": 1244,
+  "countyEvents": 91134,
   "q4MinusQ1": {
-   "mean": 2.6288753792828206,
-   "lo": 1.2170924422553147,
-   "hi": 4.237827522043119
+   "mean": 2.1097713218436485,
+   "lo": 1.14889540166009,
+   "hi": 3.287898115218768
   },
   "withinEventQ4MinusQ1": {
-   "events": 394,
-   "mean": -0.07690438952254887,
-   "lo": -1.3507870386583727,
-   "hi": 1.4242414562837356
+   "events": 712,
+   "mean": 0.1138678528147887,
+   "lo": -0.7460635506629382,
+   "hi": 1.0729701079833065
   }
  }
 }
