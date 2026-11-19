@@ -147,7 +147,7 @@ export default function Page() {
         <div className={`em-xsec${live ? ' em-xsec-live' : ''}`}>
           <HollowView
             key={live?.replay.id ?? 'calm'} scene={scene} live={live} clock={clock} onHover={setHover} showFair={showFair}
-            highlight={checkCis} aside={live && withTool ? <ModelCard scene={scene} live={live} compact /> : null}
+            highlight={checkCis} aside={live && withTool ? <ModelCard scene={scene} live={live} bar /> : null}
           />
         </div>
       )}

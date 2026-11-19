@@ -46,6 +46,11 @@
 .em-check li { border-top: 1px solid var(--line); }
 .em-check li a { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 0; color: var(--text); }
 .em-check li a:hover .em-earth { color: var(--lit); }
+.em-check-basis { margin-left: 8px; padding: 2px 7px; border: 1px solid var(--line); border-radius: 3px; font-size: 12px; font-weight: 500; color: var(--text-dim); letter-spacing: 0.02em; vertical-align: 3px; }
+.em-check-cols { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--text-faint); padding: 0 0 4px 30px; }
+.em-rank { flex: none; width: 18px; font-size: 15px; font-weight: 600; color: var(--text-faint); font-variant-numeric: tabular-nums; }
+.em-check li a .em-names-2 { flex: 1; }
+.em-obs { font-weight: 600; color: var(--text); }
 .em-names-2 { display: grid; min-width: 0; }
 .em-earth { font-size: 18px; font-weight: 600; letter-spacing: -0.005em; }
 .em-hollow { font-size: 13.5px; color: var(--text-dim); }
@@ -70,7 +75,9 @@
 .em-play svg { width: 18px; height: 18px; fill: currentColor; }
 .em-speed select { padding: 5px 6px; font-size: 13px; }
 .em-chart { flex: 1; min-width: 0; display: grid; gap: 6px; }
-.em-readout { display: flex; align-items: baseline; gap: 16px; }
+.em-readout { display: flex; align-items: baseline; gap: 16px; min-width: 0; }
+.em-time, .em-rel { flex: none; white-space: nowrap; }
+.em-rel { min-width: 20ch; }
 .em-time { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
 .em-rel { color: var(--text-dim); font-variant-numeric: tabular-nums; }
 .em-track { position: relative; height: 84px; cursor: ew-resize; touch-action: none; border-bottom: 1px solid var(--line); }
@@ -83,8 +90,8 @@
 .em-official { stroke: var(--text); stroke-width: 1.5; stroke-dasharray: 3 3; vector-effect: non-scaling-stroke; }
 .em-official-label { position: absolute; bottom: 2px; margin-left: 6px; font-size: 13px; color: var(--text); white-space: nowrap; }
 .em-alert-label { position: absolute; top: 14px; margin-right: 6px; font-size: 13px; color: var(--alert); white-space: nowrap; }
-.em-start-label { position: absolute; top: -2px; margin-left: 8px; font-size: 13px; color: var(--text-dim); }
-.em-chart-note { position: absolute; right: 0; top: -2px; font-size: 13px; color: var(--text-dim); }
+.em-start-label { position: absolute; top: -2px; margin-left: 4px; padding: 0 4px; background: rgba(13, 16, 22, 0.9); border-radius: 2px; font-size: 13px; color: var(--text-dim); }
+.em-chart-note { margin-left: auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; color: var(--text-dim); }
 .em-pending { color: var(--text-faint); font-style: italic; }
 .em-head { position: absolute; top: -6px; bottom: -1px; width: 2px; margin-left: -1px; background: var(--text); box-shadow: 0 0 10px rgba(232, 236, 242, 0.6); pointer-events: none; }
 .em-head::before { content: ''; position: absolute; left: -4px; top: -4px; width: 10px; height: 10px; border-radius: 50%; background: var(--text); }
