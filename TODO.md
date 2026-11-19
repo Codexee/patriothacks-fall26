@@ -5,16 +5,14 @@ Spec: `.plans/before-during-after-spec.md`. Who owns which folders: `contracts/R
 
 To take an item: write your name after it, commit, push. Tick it when it is merged to `main`.
 
-## Running now
+## Running now (AI worker in Paradev; do not edit these folders until it merges)
 
-No AI worker is running. The three Paradev workspaces (`bda-models`, `bda-map`, `bda-brief`) are idle and merged.
+- [ ] **Live page record features and a check of the Vercel function** (`app/src/live`, `app/src/model`, `app/api`, branch `ws/bda-brief`).
 
 ## Next (Thu morning)
 
 - [ ] **Get an EIA API key** (free, 2 minutes): https://www.eia.gov/opendata/register.php. Put it in `.env.local` as `EIA_API_KEY` and in the Vercel project settings. — needs a person
-- [ ] **Deploy to Vercel.** Public URL that works in a private window and on a phone. Check `#/live` with the key.
-- [ ] **Trim the app data.** `app/public/data/v1` is 33 MB. Shorten the replay windows or keep fewer replays; target under 10 MB.
-- [ ] **Live page with record features.** The warning model needs each area's demand records, which a 7-day window cannot give. Export the records per area as a small JSON so the live page can compute them.
+- [ ] **Deploy to Vercel.** Steps and the after-deploy checklist are in `docs/deploy.md`. Needs a person with a Vercel account and the EIA key.
 - [ ] **Pick the project name.** "Hollow Twin" is taken by another team. Working name: "Before, During, After".
 - [ ] **Ask at the Thu check-in** (JC Room C, 10:00 am–1:30 pm): the judging criteria, the video length, what the submission form needs.
 
@@ -55,4 +53,5 @@ No AI worker is running. The three Paradev workspaces (`bda-models`, `bda-map`, 
 - [x] App: county map, event replay, story mode, county brief, evidence page, live page, browser model with parity tests.
 - [x] Real archived forecast test (2024), Hollow cross-section (`#/hollow`), Without/With comparison, live counters, detailed evidence and brief pages.
 - [x] Evidence page: comparison at equal false-alarm rates (chart), cards filled from data.
+- [x] App data trimmed to 14 MB (19 replays); per-area demand records exported; Vercel config and `docs/deploy.md`.
 - [x] Contracts and an app shell so parallel work does not collide.
