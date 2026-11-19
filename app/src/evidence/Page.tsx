@@ -11,20 +11,60 @@ const SPAN_H = BEFORE_H + AFTER_H;
 const pct = (h: number) => `${(h / SPAN_H) * 100}%`;
 
 const MODEL_LABEL: Record<string, string> = {
-  warn_full: 'Model: grid and weather',
   warn_grid: 'Model: grid data only',
-  rule_forecast_error: 'Rule: demand above forecast',
+  warn_full: 'Model: grid, weather now, outages reported',
+  warn_fcst: 'Model: with a weather forecast',
+  rule_forecast_error: 'Rule: demand above its forecast',
   rule_hand: 'Rule: our earlier hand rule',
+  rule_record: "Rule: tomorrow's forecast above this month's record",
 };
-const MODEL_ORDER = ['warn_full', 'warn_grid', 'rule_forecast_error', 'rule_hand'];
+const NO_FORECAST = ['warn_grid', 'warn_full'];
+const WITH_FORECAST = 'warn_fcst';
+
+// Plain names for the inputs of warn_grid.
+const FEATURE_LABEL: Record<string, string> = {
+  month: 'month of the year',
+  hod: 'hour of the day',
+  import_share: 'share of demand met by power from other areas',
+  fc_err: 'demand against its forecast, this hour',
+  fc_err_max_24h: 'largest gap between demand and its forecast in the last 24 hours',
+  gas_share: 'gas share of generation',
+  gas_chg_6h: 'change in gas generation in 6 hours',
+  netgen_chg_6h: 'change in net generation in 6 hours',
+  demand_vs_30d_peak: 'demand against its 30-day peak',
+  demand_vs_record: "demand against the area's highest demand on record",
+  demand_vs_month_record: "demand against this month's record",
+  fc12_vs_record: "the next 12 hours' demand forecast against the area's record",
+  fc12_vs_365d_peak: "the next 12 hours' demand forecast against the 365-day peak",
+  fc12_vs_30d_peak: "the next 12 hours' demand forecast against the 30-day peak",
+  fc12_vs_month_record: "tomorrow's demand forecast against this month's record",
+  fc12_vs_month_record_max_72h: "highest value in 72 hours of tomorrow's forecast against this month's record",
+};
+
+// Metrics v2 keys that contracts.ts lists as optional extras (contracts/README.md, change log).
+type ModelResult = Metrics['models'][string] & { peopleRecall12h?: number | null };
+type DarkResult = NonNullable<Metrics['dark']> & { top10Overlap?: number; top10History?: number; top10Chance?: number };
+interface Period { trainYears: [number, number]; testYears: [number, number]; models: Record<string, ModelResult>; dark: DarkResult | null }
+interface MetricsV2 extends Metrics {
+  dev?: Period;
+  importance?: Record<string, { feature: string; gain: number }[]>;
+  split?: { train: [string, string]; dev: [string, string]; test: [string, string] };
+  labels?: Record<string, string>;
+}
+
+type SetName = 'train' | 'dev' | 'test';
+const SET_LABEL: Record<SetName, string> = { train: 'train', dev: 'dev', test: 'final test' };
 
 interface Row extends EventRow {
   startMs: number;
   lengthH: number; // first hour to last hour of the event
   year: number;
+  set: SetName;
 }
 
-type SortKey = 'start' | 'ba' | 'peakCustomersOut' | 'peakFrac' | 'lengthH' | 'leadHours';
+type SortKey = 'start' | 'ba' | 'peakCustomersOut' | 'peakFrac' | 'lengthH' | 'leadHours' | 'leadHoursNoForecast';
+
+const lead = (h: number | null | undefined) => (h == null ? 'not warned' : `${Math.round(h)} h`);
 
 const Strip = memo(function Strip({ e, stub }: { e: Row; stub: boolean }) {
   const shown = Math.min(e.lengthH, AFTER_H);
@@ -51,9 +91,10 @@ const EventLine = memo(function EventLine({ e, stub }: { e: Row; stub: boolean }
       <td className="num">{fmtInt(e.peakCustomersOut)}</td>
       <td className="num">{fmtShare(e.peakFrac)}</td>
       <td className="num">{fmtHours(e.lengthH)}</td>
-      <td><span className={`tag ${e.split}`}>{e.split}</span></td>
-      <td className={!stub && e.leadHours == null ? 'missed' : ''}>
-        {stub ? <span className="faint">pending</span> : e.leadHours != null ? `${Math.round(e.leadHours)} h` : 'not warned'}
+      <td><span className={`tag ${e.set}`}>{SET_LABEL[e.set]}</span></td>
+      <td className={!stub && e.leadHours == null ? 'missed' : ''}>{stub ? <span className="faint">pending</span> : lead(e.leadHours)}</td>
+      <td className="dim num">
+        {stub || e.leadHoursNoForecast === undefined ? '' : e.leadHoursNoForecast == null ? <span aria-label="not warned">–</span> : `${Math.round(e.leadHoursNoForecast)} h`}
       </td>
       <td>{e.hasReplay && <a href={`#/event/${e.id}`}>Replay</a>}</td>
     </tr>
@@ -65,9 +106,11 @@ function EquityChart({ equity }: { equity: NonNullable<Metrics['equity']> }) {
   const W = 420, H = 150, left = 150, right = 60, rowH = 30;
   const x = (v: number) => left + (v / max) * (W - left - right);
   const names = ['Least vulnerable quarter', 'Second quarter', 'Third quarter', 'Most vulnerable quarter'];
+  const q1 = equity.find((q) => q.quartile === 1);
+  const q4 = equity.find((q) => q.quartile === 4);
   return (
     <figure className="equity">
-      <figcaption>Mean dark hours for each county in an event, by vulnerability (CDC SVI quarter). The thin line is the interval.</figcaption>
+      <figcaption>Mean dark hours for each county in an event, by vulnerability (CDC SVI quarter). The thin line is the 95% interval. All events; this is data, not a model.</figcaption>
       <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={equity.map((q) => `${names[q.quartile - 1]}: ${q.meanDarkHours.toFixed(1)} hours`).join('. ')}>
         {equity.map((q, i) => {
           const y = 12 + i * rowH;
@@ -83,18 +126,142 @@ function EquityChart({ equity }: { equity: NonNullable<Metrics['equity']> }) {
           );
         })}
       </svg>
+      {q1 && q4 && (
+        <p className="eq-note">
+          Across events, the most vulnerable quarter of counties is dark longer ({q4.meanDarkHours.toFixed(1)} h against {q1.meanDarkHours.toFixed(1)} h per event).
+          Inside the same event the difference is close to zero, and its interval includes zero. So the gap comes from where long outages happen, not from slower repair
+          of vulnerable counties in the same storm.
+        </p>
+      )}
     </figure>
   );
 }
 
-function Summary({ lib, metrics }: { lib: EventLibrary; metrics: Metrics | null }) {
-  const train = lib.events.filter((e) => e.split === 'train').length;
-  const test = lib.events.length - train;
+/** The rules that `m` beats: more events warned 12 h ahead and the same or fewer false alarms. */
+function beats(m: ModelResult, rules: [string, ModelResult][]) {
+  return rules.filter(([, r]) => m.warned12h > r.warned12h && m.falseAlarmsPerBaYear <= r.falseAlarmsPerBaYear).map(([k]) => k);
+}
+
+function Verdict({ models }: { models: Record<string, ModelResult> }) {
+  const rules = Object.entries(models).filter(([k]) => k.startsWith('rule_'));
+  return (
+    <ul className="verdict">
+      {NO_FORECAST.filter((k) => models[k]).map((k) => {
+        const won = beats(models[k], rules);
+        const m = models[k];
+        const lost = rules.filter(([r]) => !won.includes(r));
+        return (
+          <li key={k}>
+            <strong>{MODEL_LABEL[k]}</strong> beats {won.length} of {rules.length} rules (more events warned, and the same or fewer false alarms).{' '}
+            {lost.map(([r, x]) => (
+              <span key={r}>
+                It does <strong>not</strong> beat "{MODEL_LABEL[r] ?? r}":{' '}
+                {m.warned12h > x.warned12h
+                  ? `it warns more events (${m.warned12h} against ${x.warned12h}) but gives more false alarms (${m.falseAlarmsPerBaYear.toFixed(2)} against ${x.falseAlarmsPerBaYear.toFixed(2)} per area per year).`
+                  : `it warns ${m.warned12h === x.warned12h ? 'the same number of' : 'fewer'} events (${m.warned12h} against ${x.warned12h}).`}{' '}
+              </span>
+            ))}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+function ResultRow({ k, m, people }: { k: string; m: ModelResult; people: boolean }) {
+  return (
+    <tr className={k.startsWith('warn') ? 'model' : 'rule'}>
+      <td>{MODEL_LABEL[k] ?? k}</td>
+      <td className="num"><strong>{fmtInt(m.warned12h)} of {fmtInt(m.testEvents)}</strong> <span className="dim">({(m.recall12h * 100).toFixed(1)}%)</span></td>
+      <td className="num">{m.medianLeadHours == null ? 'no alert' : `${Math.round(m.medianLeadHours)} h`}</td>
+      <td className="num">{m.falseAlarmsPerBaYear.toFixed(1)}</td>
+      {people && <td className="num">{m.peopleRecall12h == null ? '' : fmtShare(m.peopleRecall12h)}</td>}
+    </tr>
+  );
+}
+
+function ResultsTable({ p, warnNote }: { p: Period; warnNote: string | undefined }) {
+  const models = p.models;
+  const order = [
+    ...NO_FORECAST.filter((k) => models[k]),
+    ...Object.keys(models).filter((k) => k.startsWith('rule_')),
+    ...Object.keys(models).filter((k) => !NO_FORECAST.includes(k) && k !== WITH_FORECAST && !k.startsWith('rule_')),
+  ];
+  const people = Object.values(models).some((m) => m.peopleRecall12h != null);
+  const cols = people ? 5 : 4;
+  return (
+    <table className="results">
+      <thead>
+        <tr>
+          <th>Method</th>
+          <th className="num">Warned 12 h or more before</th>
+          <th className="num">Median lead</th>
+          <th className="num">False alarms per area per year</th>
+          {people && <th className="num">Share of people out, warned 12 h before</th>}
+        </tr>
+      </thead>
+      <tbody>
+        {order.map((k) => <ResultRow key={k} k={k} m={models[k]} people={people} />)}
+      </tbody>
+      {models[WITH_FORECAST] && (
+        <tbody className="fcst">
+          <tr className="group"><td colSpan={cols}>With a weather forecast: an upper bound, not a fair comparison</td></tr>
+          <ResultRow k={WITH_FORECAST} m={models[WITH_FORECAST]} people={people} />
+          {warnNote && <tr className="caveat"><td colSpan={cols}>{warnNote}</td></tr>}
+        </tbody>
+      )}
+    </table>
+  );
+}
+
+function DarkResult({ dark }: { dark: DarkResult | null }) {
+  if (!dark) return null;
+  return (
+    <div className="dark-result">
+      <h3>Who stays dark longest</h3>
+      {dark.top10Overlap != null ? (
+        <p>
+          In each event, of the 10 counties that stayed dark longest, the model named <strong>{fmtShare(dark.top10Overlap)}</strong> in its own top 10.
+          {dark.top10History != null && <> Past outage history alone named {fmtShare(dark.top10History)}</>}
+          {dark.top10Chance != null && <>; chance gives {fmtShare(dark.top10Chance)}</>}.
+        </p>
+      ) : null}
+      <p>
+        {fmtInt(dark.testCountyEvents)} county events. Rank correlation between predicted and real dark hours: <strong>{dark.spearman.toFixed(2)}</strong> (0 is no
+        relation, 1 is the same order). Mean error {dark.maeHours.toFixed(1)} h; each county's past mean gives {dark.baselineMaeHours.toFixed(1)} h.
+      </p>
+      <p className="dim small">Most counties have no dark hour in an event, so the mean error is small for any method. The ranking is what the county brief uses.</p>
+    </div>
+  );
+}
+
+function TopFeatures({ list }: { list: { feature: string; gain: number }[] | undefined }) {
+  if (!list || list.length === 0) return null;
+  return (
+    <div className="features">
+      <h3>What the grid-only model reads most</h3>
+      <ol>
+        {list.slice(0, 5).map((f) => (
+          <li key={f.feature}>
+            <span>{FEATURE_LABEL[f.feature] ?? f.feature}</span>
+            <span className="num dim">{(f.gain * 100).toFixed(0)}%</span>
+          </li>
+        ))}
+      </ol>
+      <p className="dim small">Share of the model's total gain. It shows what the model uses, not what causes an outage.</p>
+    </div>
+  );
+}
+
+function Summary({ lib, metrics, rows }: { lib: EventLibrary; metrics: MetricsV2 | null; rows: Row[] }) {
+  const [period, setPeriod] = useState<'test' | 'dev'>('test');
+  const n = { train: 0, dev: 0, test: 0 };
+  for (const r of rows) n[r.set]++;
   const areas = new Set(lib.events.map((e) => e.ba)).size;
   const counts = (
-    <p>
-      The library has <strong>{fmtInt(lib.events.length)} events</strong> in {areas} balancing areas, {lib.years[0]} to {lib.years[1]}:{' '}
-      {fmtInt(train)} before {lib.trainEnd.slice(0, 4)} (used to train) and {fmtInt(test)} from {lib.trainEnd.slice(0, 4)} on (used only to test).
+    <p className="dim">
+      The library has {fmtInt(lib.events.length)} events in {areas} balancing areas, {lib.years[0]} to {lib.years[1]}: {fmtInt(n.train)} train, {fmtInt(n.dev)} dev,{' '}
+      {fmtInt(n.test)} final test.
     </p>
   );
   if (!metrics || lib.stub) {
@@ -103,59 +270,51 @@ function Summary({ lib, metrics }: { lib: EventLibrary; metrics: Metrics | null 
         <h2>Results</h2>
         <p className="notice warn">
           <strong>Model results pending.</strong>{' '}
-          {lib.stub ? 'The warning model has not been run on this library yet, so no row has an alert time.' : 'The results file is not available yet.'}{' '}
-          Recall, lead time and false alarms will show here, next to two simple rules for comparison.
+          {lib.stub ? 'The warning model has not been run on this library yet, so no row has an alert time.' : 'The results file is not available yet.'}
         </p>
         {counts}
       </section>
     );
   }
-  const names = [...MODEL_ORDER.filter((k) => metrics.models[k]), ...Object.keys(metrics.models).filter((k) => !MODEL_ORDER.includes(k))];
+  const p: Period = period === 'dev' && metrics.dev ? metrics.dev : metrics;
+  const testN = metrics.models.warn_grid?.testEvents ?? Object.values(metrics.models)[0]?.testEvents;
+  const devN = metrics.dev ? (metrics.dev.models.warn_grid?.testEvents ?? Object.values(metrics.dev.models)[0]?.testEvents) : null;
+  const [tr, dv, ts] = [metrics.trainYears, metrics.dev?.testYears ?? [2021, 2022], metrics.testYears];
   return (
     <section className="summary">
-      <h2>Results on the test years, {metrics.testYears[0]} to {metrics.testYears[1]}</h2>
-      {counts}
+      <div className="bar">
+        <h2>{period === 'dev' ? `Results on the dev years, ${p.testYears[0]} to ${p.testYears[1]}` : `Final test results, ${p.testYears[0]} to ${p.testYears[1]}`}</h2>
+        {metrics.dev && (
+          <div className="toggle" role="group" aria-label="Period">
+            <button type="button" aria-pressed={period === 'test'} onClick={() => setPeriod('test')}>Final test</button>
+            <button type="button" aria-pressed={period === 'dev'} onClick={() => setPeriod('dev')}>Dev</button>
+          </div>
+        )}
+      </div>
+      <p className="protocol">
+        We trained on {tr[0]} to {tr[1]}, chose the design on {dv[0]} to {dv[1]}, and tested once on {ts[0]} to {ts[1]}: {fmtInt(testN)} events.
+        {period === 'dev' && ` Below: the ${fmtInt(devN)} dev events. We looked at the dev years many times while we chose the design, so these numbers are better than a fair test.`}
+      </p>
+      <Verdict models={p.models} />
+      <ResultsTable p={p} warnNote={lib.warnNote} />
       <div className="summary-grid">
-        <table>
-          <thead>
-            <tr>
-              <th>Method</th>
-              <th className="num">Warned 12 h or more before</th>
-              <th className="num">Median lead</th>
-              <th className="num">False alarms per area per year</th>
-            </tr>
-          </thead>
-          <tbody>
-            {names.map((k) => {
-              const m = metrics.models[k];
-              return (
-                <tr key={k} className={k.startsWith('warn') ? 'model' : 'rule'}>
-                  <td>{MODEL_LABEL[k] ?? k}</td>
-                  <td className="num"><strong>{fmtShare(m.recall12h)}</strong> <span className="dim">({m.warned12h} of {m.testEvents})</span></td>
-                  <td className="num">{m.medianLeadHours == null ? 'no alert' : `${Math.round(m.medianLeadHours)} h`}</td>
-                  <td className="num">{m.falseAlarmsPerBaYear.toFixed(1)}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <div>
+          <DarkResult dark={p.dark} />
+          <TopFeatures list={metrics.importance?.warn_grid} />
+        </div>
         {metrics.equity && metrics.equity.length > 0 && <EquityChart equity={metrics.equity} />}
       </div>
-      {metrics.dark && (
-        <p className="dim">
-          Dark-hours model, {fmtInt(metrics.dark.testCountyEvents)} county events in the test years: mean error {metrics.dark.maeHours.toFixed(1)} h
-          (a simple baseline: {metrics.dark.baselineMaeHours.toFixed(1)} h); rank correlation {metrics.dark.spearman.toFixed(2)}.
-        </p>
-      )}
-      <p className="faint small">Trained on {metrics.trainYears[0]} to {metrics.trainYears[1]}. Results made {metrics.generated}.</p>
+      {counts}
+      <p className="faint small">Results made {metrics.generated}. Full tables: models/RESULTS.md.</p>
     </section>
   );
 }
 
 export default function Page() {
   const libState = useJson<EventLibrary>(dataUrl('events.json'));
-  const metricsState = useJson<Metrics>(`${import.meta.env.BASE_URL}models/metrics.json`);
+  const metricsState = useJson<MetricsV2>(`${import.meta.env.BASE_URL}models/metrics.json`);
   const lib = libState.data;
+  const metrics = metricsState.data;
   const stub = lib?.stub ?? true;
 
   const [ba, setBa] = useState('');
@@ -165,13 +324,16 @@ export default function Page() {
   const [heroes, setHeroes] = useState(false);
   const [sort, setSort] = useState<{ key: SortKey; dir: 1 | -1 }>({ key: 'start', dir: -1 });
 
+  const devStart = parseUtc(`${metrics?.split?.dev[0] ?? '2021-01-01'} 00:00:00`);
+  const testStart = parseUtc(`${metrics?.split?.test[0] ?? '2023-01-01'} 00:00:00`);
   const rows = useMemo<Row[]>(
     () =>
       (lib?.events ?? []).map((e) => {
         const startMs = parseUtc(e.start);
-        return { ...e, startMs, lengthH: Math.round((parseUtc(e.stop) - startMs) / 3_600_000) + 1, year: new Date(startMs).getUTCFullYear() };
+        const set: SetName = startMs < devStart ? 'train' : startMs < testStart ? 'dev' : 'test';
+        return { ...e, startMs, set, lengthH: Math.round((parseUtc(e.stop) - startMs) / 3_600_000) + 1, year: new Date(startMs).getUTCFullYear() };
       }),
-    [lib],
+    [lib, devStart, testStart],
   );
   const baOptions = useMemo(() => {
     const n = new Map<string, number>();
@@ -185,7 +347,7 @@ export default function Page() {
       (r) =>
         (!ba || r.ba === ba) &&
         (!year || r.year === Number(year)) &&
-        (!split || r.split === split) &&
+        (!split || r.set === split) &&
         (!warned || stub || (warned === 'yes') === (r.leadHours != null)) &&
         (!heroes || r.hero != null),
     );
@@ -202,10 +364,10 @@ export default function Page() {
     return out;
   }, [rows, ba, year, split, warned, heroes, sort, stub]);
 
-  const head = (key: SortKey, label: string, numeric = false) => {
+  const head = (key: SortKey, label: string, numeric = false, title?: string) => {
     const on = sort.key === key;
     return (
-      <th className={numeric ? 'num' : ''} aria-sort={on ? (sort.dir === 1 ? 'ascending' : 'descending') : 'none'}>
+      <th className={numeric ? 'num' : ''} aria-sort={on ? (sort.dir === 1 ? 'ascending' : 'descending') : 'none'} title={title}>
         <button type="button" onClick={() => setSort({ key, dir: on ? (sort.dir === 1 ? -1 : 1) : key === 'ba' ? 1 : -1 })}>
           {label}
           <span className="arrow" aria-hidden="true">{on ? (sort.dir === 1 ? '▲' : '▼') : ''}</span>
@@ -231,7 +393,7 @@ export default function Page() {
 
         {lib && (
           <>
-            <Summary lib={lib} metrics={metricsState.data} />
+            <Summary lib={lib} metrics={metrics} rows={rows} />
 
             <section>
               <div className="bar">
@@ -241,6 +403,12 @@ export default function Page() {
                   <a className="btn" href={dataUrl('events.json')} download="events.json">Download events.json</a>
                 </div>
               </div>
+              {!stub && lib.warnNote && (
+                <p className="notice warn">
+                  <strong>About the lead times.</strong> "Warned before" and the yellow mark: {lib.warnNote}{' '}
+                  "No forecast" is the lead time of the model that reads only grid data, weather now and outages already reported; – means not warned.
+                </p>
+              )}
               <div className="filters">
                 <label>Balancing area
                   <select value={ba} onChange={(e) => setBa(e.target.value)}>
@@ -256,9 +424,10 @@ export default function Page() {
                 </label>
                 <label>Set
                   <select value={split} onChange={(e) => setSplit(e.target.value)}>
-                    <option value="">Train and test</option>
-                    <option value="train">Train</option>
-                    <option value="test">Test</option>
+                    <option value="">All sets</option>
+                    <option value="train">Train (before 2021)</option>
+                    <option value="dev">Dev (2021 to 2022)</option>
+                    <option value="test">Final test (2023 on)</option>
                   </select>
                 </label>
                 <label>Warning
@@ -294,11 +463,12 @@ export default function Page() {
                       </th>
                       {head('ba', 'Area')}
                       {head('start', 'Start (UTC)')}
-                      {head('peakCustomersOut', 'Peak customers out', true)}
+                      {head('peakCustomersOut', 'Peak out', true, 'Peak customers without power')}
                       {head('peakFrac', 'Peak share', true)}
                       {head('lengthH', 'Length', true)}
                       <th>Set</th>
-                      {head('leadHours', 'Warned before')}
+                      {head('leadHours', 'Warned before', false, 'Model with a weather forecast (upper bound)')}
+                      {head('leadHoursNoForecast', 'No forecast', true, 'Model with grid data, weather now and outages reported; no weather forecast')}
                       <th><span className="sr">Map replay</span></th>
                     </tr>
                   </thead>
@@ -319,19 +489,20 @@ export default function Page() {
                 </p>
                 <p>
                   <strong>The strip</strong> uses one scale for all rows. It starts 72 hours before the event. The red bar is the event, from its first hour to its last.
-                  A bar with a cut end is longer than 7 days. The yellow mark is the first alert from the warning model{stub ? ' (it shows when the results are in)' : ''}.
+                  A bar with a cut end is longer than 7 days. The yellow mark is the first alert from the model with a weather forecast.
                 </p>
                 <p>
                   <strong>Warned before</strong> is the time from the first alert to the first hour of the event. "Not warned" means the model gave no alert in those 72 hours.
                 </p>
                 <p>
-                  <strong>Train and test.</strong> The model learns only from hours before {lib.trainEnd}. Events from that date on are test events: the model did not see them,
-                  and the alert threshold was chosen without them. Only the test rows show what the model can do on a new event.
+                  <strong>Train, dev and final test.</strong> The models learn only from events before 2021. We used 2021 to 2022 (dev) to choose the design, so dev results
+                  are too good. We scored 2023 to 2024 (final test) once, with the models and alert thresholds frozen. Only the final test shows what a model can do on new events.
                 </p>
               </div>
               <div>
                 <h2>Limits</h2>
-                <p>Most events are storms: hurricanes, ice, wind. A storm breaks local lines. Grid data shows little before that, so a model that reads only grid data will miss many of these events.</p>
+                <p>Most events are storms: hurricanes, ice, wind. A storm breaks local lines. Grid data shows little before that, so a model that reads only grid data misses most of these events.</p>
+                <p>The model with a weather forecast was tested with the weather that really happened, as if the forecast had been perfect. Its lead times are an upper bound.</p>
                 <p>Outage counts are from ORNL EAGLE-I, which collects utility outage maps. Some utilities are missing in some years, so a peak can be too low.</p>
                 <p>Each county belongs to one balancing area in this data: the one that serves most of its customers. Some counties have two or more.</p>
                 <p>A test result shows what the model said on past data that it did not see. It does not prove what the model will say next time.</p>

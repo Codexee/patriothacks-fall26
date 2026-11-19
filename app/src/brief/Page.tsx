@@ -211,7 +211,7 @@ function PastOutages({ county, lib }: { county: County; lib: EventLibrary }) {
             <th className="num">Peak share, {county.ba}</th>
             <th className="num">This county: dark hours</th>
             <th className="num">This county: peak share out</th>
-            <th>Warning</th>
+            <th>{lib.stub ? 'Warning' : 'Warned before *'}</th>
           </tr>
         </thead>
         <tbody>
@@ -234,6 +234,11 @@ function PastOutages({ county, lib }: { county: County; lib: EventLibrary }) {
         A dark hour is an hour with 10% or more of this county's customers out. County records exist for the largest events only, and they leave out a county that stayed under 2% out.
         {hidden > 0 && <span className="print-only"> This page shows {PRINT_ROWS} of them; the Evidence page lists all.</span>}
         {lib.stub && ' Warning results are pending: the model test has not run yet.'}
+        {!lib.stub && (
+          <>
+            {' '}<strong>* Warned before</strong> is the time from the first alert to the start of the event. {lib.warnNote ?? ''} Events before 2021 were used to train the model.
+          </>
+        )}
       </p>
     </>
   );
