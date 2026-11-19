@@ -11,7 +11,13 @@
 .st-hollow { font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif; font-weight: 400; letter-spacing: -0.01em; }
 .st-hollow span:nth-child(2) { color: var(--lit); }
 .st-earth span:nth-child(2) { color: var(--text); }
-.st-caption .st-second { animation-delay: 0s; font-size: 0.62em; font-weight: 500; color: var(--text-dim); letter-spacing: 0; }
+.st-caption .st-note { animation-delay: 2s; margin-top: 0.3em; font-size: 0.5em; font-weight: 500; color: var(--text-dim); letter-spacing: 0; }
+.st-caption span:nth-child(3) { animation-delay: 2s; }
+/* A dark band under the captions, so they read on a bright map at 1080p. */
+.st-root::before { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 42vh; pointer-events: none;
+  background: linear-gradient(to top, rgba(7, 9, 13, 0.88) 0%, rgba(7, 9, 13, 0.6) 45%, transparent 100%); }
+/* Fewer basemap names in the video: the city names stay, but quieter. */
+.em-story .em-names { filter: opacity(0.45); }
 .st-caption a { pointer-events: auto; color: var(--lit); border-bottom: 2px solid currentColor; }
 
 .st-chart { position: absolute; left: 7vw; right: 7vw; top: 5vh; animation: st-in 0.8s both; }

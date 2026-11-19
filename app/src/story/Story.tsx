@@ -2,11 +2,11 @@
 // frame; React renders only when a caption or a panel changes.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Clock } from '../earth/clock.ts';
-import { checkFirst, fmtInt, mainGroup } from '../earth/data.ts';
+import { checkFirst, fmtInt, mainGroup, parseUtc } from '../earth/data.ts';
 import type { Live, Scene } from '../earth/data.ts';
 import type { EarthMap, View } from '../earth/map.ts';
 import { CheckFirst, Timeline } from '../earth/panels.tsx';
-import { SCRIPT, STORY_SECONDS } from './script.ts';
+import { HERO_FACTS, SCRIPT, STORY_SECONDS } from './script.ts';
 import type { Beat, Camera, CaptionId, ClockMark } from './script.ts';
 import './story.css';
 
@@ -20,21 +20,51 @@ export interface Facts {
 }
 
 export function storyFacts(scene: Scene, live: Live): Facts {
-  let level: number | null = null, hours = 0, deepestCi = -1, people = 0;
-  const long: number[] = [];
+  const ba = live.replay.ba;
+  const dark: { ci: number; hours: number; own: boolean }[] = [];
+  let people = 0;
   live.replay.counties.forEach((rc, k) => {
     const ci = live.ci[k];
-    if (ci < 0) return;
+    if (ci < 0 || rc.darkHours < 1) return;
     const c = scene.counties[ci];
-    if (rc.darkHours >= 1) people += c.dme ?? 0;
-    if (rc.darkHours < 24) return;
-    long.push(ci);
-    const l = c.level ?? 0;
-    if (level == null || l > level || (l === level && rc.darkHours > hours)) { level = l; hours = rc.darkHours; deepestCi = ci; }
+    people += c.dme ?? 0;
+    dark.push({ ci, hours: rc.darkHours, own: c.ba === ba });
   });
-  // Frame the main group of dark counties: drop the few that are far from the others.
-  const focus = mainGroup(scene, long);
-  return { level, hours, people, deepestCi, focus: focus.length ? focus : long };
+  // The counties the story is about: the ones dark for 24 h or more, when the event's own balancing
+  // area has enough of them (Texas, Irma). Otherwise the balancing area's own dark counties (Elliott in
+  // TVA, where the long outages of the same storm were in other states).
+  const long = dark.filter((d) => d.hours >= 24);
+  const own = dark.filter((d) => d.own);
+  const pool = long.filter((d) => d.own).length >= 10 ? long : own.length ? own : dark;
+  let level: number | null = null, hours = 0, deepestCi = -1;
+  for (const d of pool) {
+    const l = scene.counties[d.ci].level ?? 0;
+    if (level == null || l > level || (l === level && d.hours > hours)) { level = l; hours = d.hours; deepestCi = d.ci; }
+  }
+  // Frame the main group: drop the few counties that are far from the others.
+  const cis = pool.map((d) => d.ci);
+  const focus = mainGroup(scene, cis);
+  return { level, hours, people, deepestCi, focus: focus.length ? focus : cis };
+}
+
+/** The warning caption, from EventRow.leadHours (model with a weather forecast) and its caveat. */
+export function warningLines(scene: Scene, live: Live): { main: string; fact: string | null; note: string | null } {
+  const row = live.row;
+  if (scene.library.stub || live.replay.stub || !row) return { main: 'Warning model: result pending.', fact: null, note: null };
+  const note = 'With a weather forecast; backtest upper bound.';
+  if (row.leadHours != null) {
+    const f = row.hero ? HERO_FACTS[row.hero] : undefined;
+    let fact: string | null = null;
+    if (f && row.firstAlert) {
+      const h = Math.round((parseUtc(f.utc) - parseUtc(row.firstAlert)) / 3600_000);
+      if (h > 0) fact = f.line.replace('{h}', String(h));
+    }
+    return { main: `Warned ${Math.round(row.leadHours)} h before the first outage.`, fact, note };
+  }
+  if (row.leadHoursNoForecast != null) {
+    return { main: `Warned ${Math.round(row.leadHoursNoForecast)} h before, without a weather forecast.`, fact: null, note: null };
+  }
+  return { main: 'The model did not warn this one.', fact: null, note: null };
 }
 
 const ease = (u: number) => 0.5 - 0.5 * Math.cos(Math.PI * Math.max(0, Math.min(1, u)));
@@ -66,8 +96,12 @@ export function Story({ scene, live, map, clock }: { scene: Scene; live: Live; m
 
   useEffect(() => {
     const { replay } = live;
-    const base: View = map.fit(facts.focus, 120);
-    const mark = (m: ClockMark) => (m.at === 'peak' ? live.peakHour : replay.eventStartIndex) + (m.plus ?? 0);
+    const fit = map.fit(facts.focus, 120);
+    // A small balancing area (TVA) must not fill the screen: the opening needs many levels in view.
+    const base: View = { ...fit, zoom: Math.min(fit.zoom, 5.4) };
+    const lead = live.row?.leadHours ?? live.row?.leadHoursNoForecast ?? 12;
+    const mark = (m: ClockMark) =>
+      (m.at === 'peak' ? live.peakHour : m.at === 'firstAlert' ? replay.eventStartIndex - lead : replay.eventStartIndex) + (m.plus ?? 0);
     const cam = (c: Camera): View => ({
       longitude: base.longitude, latitude: base.latitude + (c.north ?? 0),
       zoom: base.zoom + c.zoom, pitch: c.pitch, bearing: c.bearing,
@@ -126,12 +160,13 @@ export function Story({ scene, live, map, clock }: { scene: Scene; live: Live; m
     };
   }, [scene, live, map, clock, facts]);
 
-  const { row, replay } = live;
-  const warned = !replay.stub && !scene.library.stub && row?.leadHours != null;
-  const listPeople = useMemo(
-    () => checkFirst(scene, live).rows.slice(0, 3).reduce((s, r) => s + (r.county.dme ?? 0), 0),
-    [scene, live],
-  );
+  const { row } = live;
+  const warning = useMemo(() => warningLines(scene, live), [scene, live]);
+  const check = useMemo(() => {
+    const { rows } = checkFirst(scene, live);
+    const top = rows.slice(0, 3);
+    return { n: top.length, people: top.reduce((s, r) => s + (r.county.dme ?? 0), 0) };
+  }, [scene, live]);
 
   return (
     <div className="st-root">
@@ -148,13 +183,20 @@ export function Story({ scene, live, map, clock }: { scene: Scene; live: Live; m
       {shown.caption === 'reveal' && (
         <p className="st-caption st-earth" key="reveal">
           <span>This is not 2087.</span>
-          <span>This is {row?.title ?? `the ${replay.ba} outage`}.</span>
+          <span>This is {row?.title ?? `the ${live.replay.ba} outage`}.</span>
         </p>
       )}
       {shown.caption === 'warned' && (
         <p className="st-caption st-earth" key="warned">
-          <span>{warned ? `Warned ${Math.round(row!.leadHours!)} h before the first outage.` : 'Warning model: result pending.'}</span>
-          {shown.list && <span className="st-second">Check these counties first: {fmtInt(listPeople)} people on powered medical equipment.</span>}
+          <span>{warning.main}</span>
+          {warning.fact && <span>{warning.fact}</span>}
+          {warning.note && <span className="st-note">{warning.note}</span>}
+        </p>
+      )}
+      {shown.caption === 'check' && (
+        <p className="st-caption st-earth" key="check">
+          <span>Check these {check.n} counties first.</span>
+          <span>{fmtInt(check.people)} people there use powered medical equipment.</span>
         </p>
       )}
       {shown.caption === 'proof' && (
