@@ -11,8 +11,11 @@
 // 12 h after this hour, by time). fc12_vs_30d_peak uses the 30-day window above. The RECORD
 // features compare with the BA's own records: all earlier rows (wexp), the 365 days before this hour
 // (w365), and all earlier rows in the same calendar month (wmon). They are correct only when `rows`
-// start at the first hour of the BA's data. The live page has 31 days at most, so it does not set
-// `longHistory` and these features go to the model as missing.
+// start at the first hour of the BA's data (`longHistory`). The live page has 31 days at most, so it
+// passes the area's saved records instead (`records`, from data/v1/ba_records.json): each record is
+// the larger of the saved value and the largest demand in the rows before the scored hour (past
+// only). The month record uses every earlier hour of the same calendar month in all years, as wmon
+// does. With neither option the record features are null (missing).
 
 export interface HourRow {
   /** Start of the hour, UTC, in ms since the epoch (EIA "end of hour" minus 1 h). */
@@ -63,10 +66,23 @@ export const RECORD_FEATURES = [
   'fc12_vs_month_record_max_72h',
 ] as const;
 
+/** One area's saved demand records (BaRecords[ba] in contracts.ts). */
+export interface SavedRecords {
+  asOf: string;                    // "YYYY-MM-DD HH:MM:SS", UTC
+  record: number | null;           // all-time maximum hourly demand
+  peak365: number | null;          // maximum in the 365 days before asOf
+  peak30: number | null;           // maximum in the 30 days before asOf
+  monthRecord: (number | null)[];  // index 0 = January, all years
+}
+
 export interface FeatureOptions {
   /** True only when `rows` start at the first hour of the BA's data. Default false. */
   longHistory?: boolean;
+  /** Saved records for this area. Used when longHistory is false. */
+  records?: SavedRecords | null;
 }
+
+const asOfMs = (s: string) => Date.parse(s.replace(' ', 'T') + (/[zZ]|[+-]\d\d:?\d\d$/.test(s) ? '' : 'Z'));
 
 const maxOf = (a: number | null, b: number | null): number | null => (b == null ? a : a == null || b > a ? b : a);
 
@@ -85,20 +101,23 @@ function monthRecordAt(rows: HourRow[], i: number): number | null {
   return m;
 }
 
-function recordFeatures(rows: HourRow[], i: number, fc12: number | null): FeatureMap {
+function recordFeatures(rows: HourRow[], i: number, fc12: number | null, saved: SavedRecords | null): FeatureMap {
   const r = rows[i];
-  let record: number | null = null;
-  let peak365: number | null = null;
+  const asOf = saved ? asOfMs(saved.asOf) : NaN;
+  const monRecAt = (j: number) => maxOf(saved?.monthRecord[new Date(rows[j].t).getUTCMonth()] ?? null, monthRecordAt(rows, j));
+  let record: number | null = saved?.record ?? null;
+  // The saved 365-day peak covers the year before asOf; it still applies while this hour is within a year of it.
+  let peak365: number | null = saved && r.t - asOf <= 365 * DAY ? saved.peak365 : null;
   for (let j = 0; j < i; j++) {
     const d = rows[j].demand;
     record = maxOf(record, d);
     if (r.t - rows[j].t <= 365 * DAY) peak365 = maxOf(peak365, d);
   }
-  const monRec = monthRecordAt(rows, i);
+  const monRec = monRecAt(i);
   // Trailing 72 rows, current row included (models/common.py: rolling(72, min_periods=1).max()).
   let max72: number | null = null;
   for (let j = Math.max(0, i - 71); j <= i; j++) {
-    max72 = maxOf(max72, j === i ? ratio(fc12, monRec) : ratio(fc12At(rows, j), monthRecordAt(rows, j)));
+    max72 = maxOf(max72, j === i ? ratio(fc12, monRec) : ratio(fc12At(rows, j), monRecAt(j)));
   }
   return {
     demand_vs_record: ratio(r.demand, record),
@@ -127,9 +146,13 @@ export function featuresAt(rows: HourRow[], i: number, opts: FeatureOptions = {}
     }
   }
 
+  // With a window shorter than 30 days, the saved 30-day peak fills in while it is less than 30 days old.
+  const saved = opts.longHistory ? null : opts.records ?? null;
+  if (saved && rows[0].t > r.t - 30 * DAY && r.t - asOfMs(saved.asOf) <= 30 * DAY) peak30 = maxOf(peak30, saved.peak30);
+
   const fc12 = fc12At(rows, i);
-  const records: FeatureMap = opts.longHistory
-    ? recordFeatures(rows, i, fc12)
+  const records: FeatureMap = opts.longHistory || saved
+    ? recordFeatures(rows, i, fc12, saved)
     : Object.fromEntries(RECORD_FEATURES.map((n) => [n, null]));
 
   const d = new Date(r.t);
@@ -170,7 +193,7 @@ export function featureVector(names: readonly string[], f: FeatureMap): (number 
 export function missingFeatureNames(names: readonly string[], opts: FeatureOptions = {}): string[] {
   const known = featuresAt([{ t: 0, demand: 1, forecast: 1, netgen: 1, interchange: 1, gen_gas: 1, gen_coal: 1, gen_nuclear: 1, gen_wind: 1, gen_solar: 1 }], 0);
   const records: readonly string[] = RECORD_FEATURES;
-  return names.filter((n) => !(n in known) || (!opts.longHistory && records.includes(n)));
+  return names.filter((n) => !(n in known) || (!opts.longHistory && !opts.records && records.includes(n)));
 }
 
 /** Features for the latest hour in `rows`. */

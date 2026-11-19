@@ -3,10 +3,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { dataUrl, earthName, hollowName, type County, type ModelFile } from '../contracts.ts';
 import { useRoute } from '../shell/router.ts';
-import { RECORD_FEATURES, featuresAt, missingFeatureNames, type HourRow } from '../model/features.ts';
+import { RECORD_FEATURES, featuresAt, missingFeatureNames, type HourRow, type SavedRecords } from '../model/features.ts';
+import { topInputs } from './inputs.ts';
 import { PageNav, fmtDay, fmtInt, fmtShare, fmtTime, useJson } from '../brief/shared.tsx';
 import { LineChart, Legend, type Series } from './Chart.tsx';
-import { fetchLive, loadSample, loadWarnModel, nowIndex, scoreSeries, toAllRows, toHourRows, type RiskPoint } from './data.ts';
+import { fetchLive, loadRecords, loadSample, loadWarnModel, nowIndex, scoreSeries, toAllRows, toHourRows, type RiskPoint } from './data.ts';
 import './live.css';
 
 const DEFAULT_BA = 'ERCO';
@@ -21,6 +22,7 @@ interface View {
   all: HourRow[];             // the same, plus the later hours that have only a day-ahead forecast
   model: ModelFile | null;
   risk: RiskPoint[] | null;
+  records: SavedRecords | null; // the area's saved demand records (null: area not in the file)
 }
 
 async function load(ba: string): Promise<View> {
@@ -35,6 +37,7 @@ async function load(ba: string): Promise<View> {
   }
   const rows = toHourRows(payload);
   const all = toAllRows(payload);
+  const records = await loadRecords(payload.ba);
   return {
     ba: payload.ba,
     mode: reason ? 'sample' : 'live',
@@ -43,7 +46,8 @@ async function load(ba: string): Promise<View> {
     rows,
     all,
     model,
-    risk: model ? scoreSeries(model, all, 168) : null,
+    risk: model ? scoreSeries(model, all, 168, { records }) : null,
+    records,
   };
 }
 
@@ -88,24 +92,23 @@ function RiskNow({ view }: { view: View }) {
   );
 }
 
-function ModelNote({ model, missing }: { model: ModelFile; missing: string[] }) {
-  const records: readonly string[] = RECORD_FEATURES;
-  const noHistory = missing.filter((n) => records.includes(n));
-  const other = missing.filter((n) => !records.includes(n));
+function ModelNote({ model, missing, ba, records }: { model: ModelFile; missing: string[]; ba: string; records: SavedRecords | null }) {
+  const recordNames: readonly string[] = RECORD_FEATURES;
+  const noRecords = missing.filter((n) => recordNames.includes(n));
+  const other = missing.filter((n) => !recordNames.includes(n));
   return (
     <div className="dim small model-note">
       <p>
-        Model {model.name}, version {model.version}, with {model.features.length} inputs. It runs in this browser. Alert threshold {fmtShare(model.threshold ?? 0)}: on the
+        The warning model that reads grid data only ({model.features.length} inputs, made {model.version.slice(0, 10)}). It runs in this browser. Alert threshold {fmtShare(model.threshold ?? 0)}: on the
         training years this threshold gave at most 6 false alarms per balancing area per year.
       </p>
-      {noHistory.length > 0 && (
+      {!records && noRecords.length > 0 && (
         <p>
-          <strong>Limit.</strong> {noHistory.length} of the inputs compare demand with this area's own records (for example, tomorrow's forecast against the highest demand ever seen
-          in this month). Those records need years of history. This page has only the last 31 days, so it gives these inputs to the model as missing. It does not guess them.
-          The risk here can therefore differ from the risk in the backtest.
+          <strong>Limit.</strong> The saved demand records have no entry for {ba}, so {noRecords.length} inputs that compare demand with the area's own records go to the
+          model as missing. The risk here can differ from the risk in the backtest.
         </p>
       )}
-      {other.length > 0 && <p>Also missing here: {other.join(', ')}.</p>}
+      {other.length > 0 && <p>Also missing here: {other.length} {other.length === 1 ? 'input' : 'inputs'}.</p>}
     </div>
   );
 }
@@ -139,12 +142,13 @@ export default function Page() {
 
   const week = view ? view.rows.slice(-168) : [];
   const last = view && view.rows.length ? view.rows[view.rows.length - 1] : null;
-  const f = view && last ? featuresAt(view.all, nowIndex(view.all)) : null;
+  const f = view && last ? featuresAt(view.all, nowIndex(view.all), { records: view.records }) : null;
   const demandSeries: Series[] = [
     { label: 'Demand', color: 'var(--lit)', points: week.map((r) => ({ t: r.t, v: r.demand })) },
     { label: 'Day-ahead forecast', color: 'var(--text-dim)', dashed: true, points: week.map((r) => ({ t: r.t, v: r.forecast })) },
   ];
-  const missing = view?.model ? missingFeatureNames(view.model.features) : [];
+  const missing = view?.model ? missingFeatureNames(view.model.features, { records: view.records }) : [];
+  const top = view?.model && f ? topInputs(view.model, f, 3) : [];
 
   return (
     <>
@@ -177,16 +181,32 @@ export default function Page() {
 
             <section className="now-wrap">
               <RiskNow view={view} />
-              {f && last && (
+              {f && last && top.length > 0 ? (
+                <div className="inputs-now">
+                  <h2>Inputs that move the risk most now</h2>
+                  <ul className="inputs-list">
+                    {top.map((x) => (
+                      <li key={x.feature}>
+                        <span>{x.label}</span>
+                        <span className="num">{x.value}</span>
+                        <span className={`num effect ${x.effect >= 0 ? 'up' : 'down'}`}>{x.effect >= 0 ? '+' : '−'}{Math.abs(x.effect * 100).toFixed(2)} pts</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="dim small">
+                    Values the model saw for the latest hour ({fmtInt(last.demand)} MW demand). "pts" is how much the risk changes, in percentage points, when the model
+                    runs without that input. These are not the reasons for an outage.
+                  </p>
+                  {view.records && <p className="faint small">Demand records as of {fmtDay(Date.parse(view.records.asOf.replace(' ', 'T') + 'Z'))}, then updated from the hours on this page.</p>}
+                </div>
+              ) : f && last ? (
                 <dl className="inputs">
                   <div><dt>Demand, latest hour</dt><dd>{fmtInt(last.demand)} MW</dd></div>
                   <div><dt>Demand against the forecast</dt><dd>{signed(f.fc_err)}</dd></div>
                   <div><dt>Demand against its 30-day peak</dt><dd>{f.demand_vs_30d_peak == null ? 'not known' : fmtShare(f.demand_vs_30d_peak)}</dd></div>
-                  <div><dt>Net generation, change in 6 hours</dt><dd>{signed(f.netgen_chg_6h)}</dd></div>
                   <div><dt>Gas share of generation</dt><dd>{f.gas_share == null ? 'not known' : fmtShare(f.gas_share)}</dd></div>
-                  <div><dt>Highest demand forecast in the next 12 hours, against the 30-day peak</dt><dd>{f.fc12_vs_30d_peak == null ? 'no forecast yet' : fmtShare(f.fc12_vs_30d_peak)}</dd></div>
                 </dl>
-              )}
+              ) : null}
             </section>
 
             {view.risk && view.model && (
@@ -200,7 +220,7 @@ export default function Page() {
                   format={(v) => `${(v * 100).toFixed(v < 0.1 ? 1 : 0)}%`}
                   ariaLabel={`Model risk for ${view.ba}, one value per hour for 7 days.`}
                 />
-                <ModelNote model={view.model} missing={missing} />
+                <ModelNote model={view.model} missing={missing} ba={view.ba} records={view.records} />
               </section>
             )}
 

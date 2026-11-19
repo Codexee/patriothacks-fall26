@@ -15,7 +15,10 @@
 // Errors: { error: "..." } with status 400 (bad `ba`), 503 (no key) or 502 (EIA failed).
 // A saved sample of the response is in app/src/live/sample/eia-ERCO.json.
 
-declare const process: { env: Record<string, string | undefined> };
+// Read the key without Node type packages: the build has no @types/node, and Vercel's own Node types
+// must not clash with a local `declare const process`.
+const env = (): Record<string, string | undefined> =>
+  (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env ?? {};
 
 const EIA = 'https://api.eia.gov/v2/electricity/rto';
 const CACHE_SECONDS = 600; // 10 minutes
@@ -66,7 +69,7 @@ export async function GET(request: Request): Promise<Response> {
   if (!/^[A-Z0-9]{2,6}$/.test(ba)) {
     return json({ error: 'Give a balancing area code, for example ?ba=ERCO' }, 400, false);
   }
-  const key = process.env.EIA_API_KEY;
+  const key = env().EIA_API_KEY;
   if (!key) return json({ error: 'The server has no EIA_API_KEY' }, 503, false);
 
   try {

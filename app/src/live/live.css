@@ -43,3 +43,11 @@
   .now-wrap { grid-template-columns: 1fr; gap: 28px; }
   .now-value { font-size: 64px; }
 }
+
+/* v5: inputs that move the risk most */
+.inputs-now h2 { font-size: 15px; margin: 0 0 8px; }
+.inputs-now .inputs-list { list-style: none; margin: 0 0 8px; padding: 0; }
+.inputs-now .inputs-list li { display: grid; grid-template-columns: minmax(0, 1fr) auto 84px; gap: 14px; padding: 7px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+.inputs-now .num { font-variant-numeric: tabular-nums; text-align: right; }
+.inputs-now .effect.up { color: var(--alert); }
+.inputs-now .effect.down { color: var(--ok); }

@@ -1,9 +1,9 @@
 // Live data for one balancing area: fetch /api/eia, turn it into hourly rows, score with warn_grid.
 // The brief page also uses `getLiveRisk`.
 
-import { modelUrl, type ModelFile } from '../contracts.ts';
+import { dataUrl, modelUrl, type BaRecords, type ModelFile } from '../contracts.ts';
 import { isModelFile, predict } from '../model/evaluate.ts';
-import { featureVector, featuresAt, prepareRows, type HourRow } from '../model/features.ts';
+import { featureVector, featuresAt, prepareRows, type FeatureOptions, type HourRow, type SavedRecords } from '../model/features.ts';
 
 /** The response of app/api/eia.ts (and the shape of the saved sample). */
 export interface EiaPayload {
@@ -126,11 +126,11 @@ export interface RiskPoint {
 
 /** Model output for each of the last `hours` rows up to "now". `rows` may continue past now with
  *  forecast-only hours (from toAllRows); those are read as the coming forecast, not scored. */
-export function scoreSeries(model: ModelFile, rows: HourRow[], hours = 168): RiskPoint[] {
+export function scoreSeries(model: ModelFile, rows: HourRow[], hours = 168, opts: FeatureOptions = {}): RiskPoint[] {
   const out: RiskPoint[] = [];
   const end = nowIndex(rows);
   for (let i = Math.max(0, end + 1 - hours); i <= end; i++) {
-    out.push({ t: rows[i].t, p: predict(model, featureVector(model.features, featuresAt(rows, i))) });
+    out.push({ t: rows[i].t, p: predict(model, featureVector(model.features, featuresAt(rows, i, opts))) });
   }
   return out;
 }
@@ -142,13 +142,23 @@ export type LiveRisk =
 /** Risk now for one balancing area, or a plain reason why there is none. Never throws. */
 export async function getLiveRisk(ba: string): Promise<LiveRisk> {
   try {
-    const [payload, model] = await Promise.all([fetchLive(ba), loadWarnModel()]);
+    const [payload, model, records] = await Promise.all([fetchLive(ba), loadWarnModel(), loadRecords(ba)]);
     if (!model) return { kind: 'none', reason: 'The warning model file is not available yet.' };
     const rows = toAllRows(payload);
-    const last = scoreSeries(model, rows, 1)[0];
+    const last = scoreSeries(model, rows, 1, { records })[0];
     if (!last) return { kind: 'none', reason: `EIA has no recent data for ${ba}.` };
     return { kind: 'live', ba, p: last.p, threshold: model.threshold, t: last.t, fetchedAt: payload.fetchedAt };
   } catch (err) {
     return { kind: 'none', reason: err instanceof Error ? err.message : 'Live data is not available.' };
   }
+}
+
+let recordsPromise: Promise<BaRecords | null> | null = null;
+/** The saved demand records of one area (data/v1/ba_records.json), or null when the area is not in the file. */
+export async function loadRecords(ba: string): Promise<SavedRecords | null> {
+  recordsPromise ??= fetch(dataUrl('ba_records.json'))
+    .then((r) => (r.ok ? (r.json() as Promise<BaRecords>) : null))
+    .catch(() => null);
+  const all = await recordsPromise;
+  return all?.[ba] ?? null;
 }
