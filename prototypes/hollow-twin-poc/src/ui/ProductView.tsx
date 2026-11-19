@@ -44,7 +44,7 @@ export function ProductView(p: ProductViewProps) {
     <aside className="product" aria-label="Residents' System">
       <header className="pv-head">
         <h1>RESIDENTS' SYSTEM</h1>
-        <p className="muted small">The app residents run for themselves. It sees only what residents can see: their reports, cheap sensors and power meters. Never the hidden truth.</p>
+        <p className="muted small">The app residents run for themselves. It sees only what residents have: their outage reports, their own head count and the Directorate's census. Never the hidden truth.</p>
         <div className="progress" aria-label="Progress through the 15 problems">
           {PROBLEMS.map((pr) => (
             <span key={pr.n} className={`dot ${pr.feature && BUILT.includes(pr.feature) ? 'done' : ''}`} title={`#${pr.n} ${pr.title}${pr.feature ? ` — ${moduleName(pr.feature)}` : ' — not built yet'}`}>{pr.n}</span>
