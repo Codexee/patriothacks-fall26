@@ -195,6 +195,18 @@ export interface Scenario {
   /** Demand multiplier per hour (1 = normal). Length days*24. */
   demand: number[];
   source: Source;
+  // --- Real-data scenario options (spec: .plans/hollow-real-data-spec.md). All optional; absent = old behavior. ---
+  /** One plant loses part of its capacity: loss[t] (0..1) is the share lost t hours after startHour. */
+  plantLoss?: { plant: number; startHour: number; loss: number[] };
+  /** Health lost per day by every plant (overrides the guess 0.002). */
+  agingPerDay?: number;
+  /**
+   * Real years of section growth (SectionRow.growthPerYear) played over MAX_DAYS. 0 or absent = no growth.
+   * Example: 4 means 4 real years of county growth happen in the 120-day run, and the UI must say so.
+   */
+  growthYears?: number;
+  /** The run cannot end as "stable" before this day (so slow scenarios play out). */
+  minDays?: number;
 }
 
 /** Opaque full state. ui/ and world/ must not reach inside it; they use the functions below and Frames. */

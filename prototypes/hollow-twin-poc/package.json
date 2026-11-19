@@ -7,7 +7,8 @@
     "dev": "vite --port 5180",
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
-    "sim": "node --experimental-strip-types src/sim/cli.ts"
+    "sim": "node --experimental-strip-types src/sim/cli.ts",
+    "gate": "node --experimental-strip-types src/sim/gate.ts"
   },
   "dependencies": {
     "pixi.js": "^8.6.6",

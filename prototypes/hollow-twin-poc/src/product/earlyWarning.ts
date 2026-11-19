@@ -20,10 +20,14 @@
 import { LEVELS, SECTIONS_PER_LEVEL, type Output } from '../sim/types.ts';
 import type { PredictedBlackout, ProductLog, ProductMemory } from './types.ts';
 
-const SAFE_LOAD = 0.88; // keep the plants below this share of their output
+/** The 4 guessed constants that the gate tunes (npm run gate -- --set safeLoad=0.9). Defaults = first guesses. */
+export const TUNE = {
+  safeLoad: 0.88, // keep the plants below this share of their output
+  assumedCompliance: 0.85, // share of residents expected to follow a save-power request
+  maxTrend: 0.1, // the supply trend is capped at ±10% a day
+  tripStep: 0.15, // after a Hollow-wide blackout with no other clue, ask for this much more saving
+};
 const TRIP_ZONE = 0.95; // above this, plants are close to tripping
-const ASSUMED_COMPLIANCE = 0.85; // share of residents expected to follow a save-power request
-const MAX_TREND = 0.1; // the supply trend is capped at ±10% a day
 // Easing off, carefully. Residents cannot see the plants, so one quiet day is no proof the power is back (easing
 // 15% a day made the plants trip again). The request comes down only after several quiet days in a row, a small
 // step at a time, and never to the level where trouble last started (that memory fades after a while).
@@ -33,7 +37,6 @@ export const EASE = {
   floorMargin: 0.05, // stay this far above the request that was in effect the last time there was trouble
   floorDays: 7, // forget that trouble level after this many quiet days
 };
-const TRIP_STEP = 0.15; // after a Hollow-wide blackout with no other clue, ask for this much more saving
 const HOURS = 24;
 
 const sum = (a: number[]) => a.reduce((s, v) => s + (v || 0), 0);
@@ -50,7 +53,7 @@ export function blackoutWarning(m: ProductMemory, day: number):
     let s = 0;
     for (let c = 0; c < SECTIONS_PER_LEVEL; c++) {
       const i = l * SECTIONS_PER_LEVEL + c;
-      s += critical[i] + Math.max(0, demand[i] - critical[i]) * (1 - shed * ASSUMED_COMPLIANCE);
+      s += critical[i] + Math.max(0, demand[i] - critical[i]) * (1 - shed * TUNE.assumedCompliance);
     }
     return s;
   };
@@ -69,7 +72,7 @@ export function blackoutWarning(m: ProductMemory, day: number):
   // 3. Trend: change in supply at the same hours, day over day.
   let dS = 0, n = 0, base = 0;
   if (sP) for (let h = 0; h < HOURS; h++) if (sY[h] !== null && sP[h] !== null) { dS += sY[h]! - sP[h]!; base += sY[h]!; n++; }
-  dS = n ? Math.max(-MAX_TREND, Math.min(MAX_TREND, dS / Math.max(1, base))) : 0; // as a share of supply
+  dS = n ? Math.max(-TUNE.maxTrend, Math.min(TUNE.maxTrend, dS / Math.max(1, base))) : 0; // as a share of supply
   const sToday = sY.map((v) => (v === null ? null : v * (1 + dS)));
   const lineTrend = (() => {
     if (!p) return 0;
@@ -79,7 +82,7 @@ export function blackoutWarning(m: ProductMemory, day: number):
   })();
   const hollowDarkHours = y.hollowDark.filter(Boolean).length;
 
-  // 5. Save power: keep the plants below SAFE_LOAD at the worst hour.
+  // 5. Save power: keep the plants below TUNE.safeLoad at the worst hour.
   const known = sToday.filter((v): v is number => v !== null);
   const sMin = known.length ? Math.min(...known) : null;
   let shed: number;
@@ -87,10 +90,10 @@ export function blackoutWarning(m: ProductMemory, day: number):
   if (quiet) { m.quietDays = (m.quietDays ?? 0) + 1; m.troubleAge = (m.troubleAge ?? 0) + 1; }
   else { m.quietDays = 0; m.troubleAge = 0; m.troubleShed = y.shed; } // the request that was in effect when trouble came
   if (sMin !== null) {
-    shed = Math.max(0, Math.min(0.9, (D - SAFE_LOAD * sMin) / Math.max(1, D - C) / ASSUMED_COMPLIANCE));
+    shed = Math.max(0, Math.min(0.9, (D - TUNE.safeLoad * sMin) / Math.max(1, D - C) / TUNE.assumedCompliance));
     if (shed > 0) shed = Math.max(0.05, shed);
   } else if (hollowDarkHours > 0) {
-    shed = Math.min(0.9, m.shed + TRIP_STEP); // the plants tripped: they were overloaded, by an unknown amount
+    shed = Math.min(0.9, m.shed + TUNE.tripStep); // the plants tripped: they were overloaded, by an unknown amount
   } else {
     shed = m.shed; // no blackouts yesterday: keep the request, and ease it only after several quiet days (see EASE)
     if (EASE.afterQuietDays > 0 && m.quietDays > 0 && m.quietDays % EASE.afterQuietDays === 0) {
@@ -110,7 +113,7 @@ export function blackoutWarning(m: ProductMemory, day: number):
     while (lit < LEVELS && levelNeed(lit, shed) <= left) { left -= levelNeed(lit, shed); lit++; }
     for (let l = lit; l < LEVELS; l++) { if (firstDark[l] === null) firstDark[l] = h; hoursDark[l]++; }
   }
-  const afterSaving = C + (D - C) * (1 - shed * ASSUMED_COMPLIANCE);
+  const afterSaving = C + (D - C) * (1 - shed * TUNE.assumedCompliance);
   const tripRisk = hollowDarkHours > 0 || (sMin !== null && afterSaving > TRIP_ZONE * sMin);
 
   const darkNow: number[] = [];
@@ -176,7 +179,7 @@ export function blackoutWarning(m: ProductMemory, day: number):
       evidence: sMin !== null
         ? [
           `From the blackout line, the plants made about ${fmt(sMin)} units at the worst hour; everyone together needs ${fmt(D)} (residents' own head count)`,
-          `Keeping demand under ${Math.round(SAFE_LOAD * 100)}% of that output leaves room so a plant does not trip`,
+          `Keeping demand under ${Math.round(TUNE.safeLoad * 100)}% of that output leaves room so a plant does not trip`,
         ]
         : hollowDarkHours > 0
           ? [`Yesterday the whole Hollow went dark at once for ${hollowDarkHours} h: the plants tripped from overload`]

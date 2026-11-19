@@ -15,6 +15,7 @@ import {
 import { mulberry32 } from './rng.ts';
 import { probeSig } from './sign.ts';
 import { heatOffsetFor } from '../data/index.ts';
+import { outages as realOutages, sections as realSections, air as realAir, cited } from '../data/real/index.ts';
 
 // ---------- Tunable constants ----------
 /**
@@ -52,9 +53,9 @@ const residentsOnly = (obs: Observation[]) => obs.filter((o) => !NOT_FOR_RESIDEN
 const censusShare =(level: number) => (WORLD.census ? 1 - CENSUS_MISSED_DEEP * (level - 1) / (LEVELS - 1) : 1);
 
 // Air (#1): CO2 above AIR_DANGER ppm starts to kill; a warned, prepared resident is much safer.
-const AIR_DANGER = 5000;
-const AIR_DEATH = 0.0001; // hourly death share per 1,000 ppm above the danger level
-const PREPARED_SAVE = 0.6; // share of air deaths avoided by residents who prepared after a warning
+const AIR_DANGER = cited(realAir.airDanger, 5000);
+const AIR_DEATH = cited(realAir.airDeath, 0.0001); // hourly death share per 1,000 ppm above the danger level
+const PREPARED_SAVE = cited(realAir.preparedSave, 0.6); // share of air deaths avoided by residents who prepared after a warning
 const BLACKOUT = 0.5; // a section is "in a blackout" when it gets less than half of its life-support power
 
 const MAX_DAYS = 120;
@@ -69,7 +70,7 @@ const CRITICAL_RES_SHARE = 0.25; // share of residential load that is life suppo
 
 const CO2_OUT = 420; // ppm
 const CO2_GEN = 0.0052e-3; // m³/s per person (Persily & de Jonge 2017: ≈0.0052 L/s)
-const VOL_PER_PERSON = 62; // m³ of air per resident (scaled): ≈300 ppm/h rise with fans off
+const VOL_PER_PERSON = cited(realAir.volPerPerson, 62); // m³ of air per resident (scaled): ≈300 ppm/h rise with fans off
 const FAN_BOOST = 0.3; // each extra fan adds 30% ventilation in its section
 const Q_QUANTA = 25; // quanta/h (Rudnick–Milton range 20–40)
 const EXPOSURE_SHARE = 0.008; // share of the time a resident shares air with a given infector's room
@@ -78,9 +79,11 @@ const BASE_CFR = 0.08;
 const HEAT_DEATH = 0.001; // hourly death share per °C above the wet-bulb limit
 const WETBULB_LIMIT = 31; // °C (Vecellio et al. 2022)
 const LIE_DELAY_H = 14 * 24; // without published evidence, residents learn the truth 14 days late
-const STRESS_TRIP = 0.004; // hourly trip chance per plant when the Directorate runs the plants at ≥99% load
+const STRESS_TRIP = realOutages?.stressTrip ?? 0.004; // hourly trip chance per plant when the Directorate runs the plants at ≥99% load
 const PLANT3_DECAY = 0.1; // health lost per day by Plant 3 from day 4 (hidden by the lie)
-const AGING_PER_DAY = 0.002; // all plants
+const AGING_PER_DAY = 0.002; // all plants (a scenario's agingPerDay overrides it)
+/** Plant downtime after a trip, in hours: a real EAGLE-I restoration-time sample, or the guess 12..36. */
+const REPAIR_SAMPLE: number[] = realOutages?.repairHours?.length ? realOutages.repairHours : Array.from({ length: 25 }, (_, k) => 12 + k);
 const LOST_SHARE = 0.25; // a section is lost (cannot function) when fewer than 25% of its residents remain
 const REPAIR_H = 48; // a residents' crew needs 2 days to repair a recycler
 const FAN_COOL = 0.7; // °C of wet-bulb removed by each fan, when it has power
@@ -229,6 +232,20 @@ function topicOf(text: string): ReportTopic {
   return 'hot';
 }
 
+/** The old guess for a section's people: 2,000 on level 1 to 6,000 on level 50. */
+function guessPeople(level: number): number {
+  return Math.round(2000 + 4000 * depthOf(level));
+}
+/** Total people under the old guess. Real section shares are rescaled to it, so plant capacity stays comparable. */
+const GUESS_TOTAL = Array.from({ length: SECTION_COUNT }, (_, i) => guessPeople(lvl(i))).reduce((a, b) => a + b, 0);
+/** Share of plant k's capacity left at hour h (a scenario's plantLoss). */
+function lossF(scen: Scenario, k: number, h: number): number {
+  const pl = scen.plantLoss;
+  if (!pl || pl.plant !== k) return 1;
+  const t = h - pl.startHour;
+  return t < 0 || t >= pl.loss.length ? 1 : 1 - clamp(pl.loss[t], 0, 1);
+}
+
 /** Residential load: 15% scales with residents, 85% with the section's space (cooling, air, pumps, light). */
 function resLoad(people: number): number {
   return 0.15 * people + 0.85 * SPACE_LOAD;
@@ -246,7 +263,8 @@ export function createState(scenario: Scenario, seed: number, tools: ToolSet): S
     const level = lvl(i);
     const col = i % SECTIONS_PER_LEVEL;
     const d = depthOf(level);
-    const people = Math.round(2000 + 4000 * d);
+    // Real counties (workstream 3) set each section's share of the same total; else the old depth guess.
+    const people = realSections ? Math.round(realSections.rows[i].share * GUESS_TOTAL) : guessPeople(level);
     startPeople.push(people);
     const s: StructureKind[] = [];
     if (col === 0 && PLANT_LEVELS.includes(level)) s.push('plant');
@@ -714,7 +732,7 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
     const resp = (p: Problem) => (s.respStart[p] >= 0 ? strength : 0);
 
     // --- Alerts of the residents' system in force this hour ---
-    const comply = 0.5 + 0.5 * state.systemTrust; // share of residents who follow the system's alerts
+    const comply = cited(realAir.followBase, 0.5) + cited(realAir.followTrust, 0.5) * state.systemTrust; // share of residents who follow the system's alerts
     s.alerts = s.alerts.filter((a) => a.until > h);
     shed.fill(0); boilA.fill(0); isoA.fill(0); prepA.fill(0);
     for (const a of s.alerts) {
@@ -752,7 +770,12 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
     const netUp = networkUp(s, h);
     obs.push({ kind: 'network', hour: h, up: netUp });
     const reachH = netUp ? null : computeReach(s, tools, h);
-    for (const p of s.plants) p.health = Math.max(0.2, p.health - AGING_PER_DAY / 24);
+    for (const p of s.plants) p.health = Math.max(0.2, p.health - (scen.agingPerDay ?? AGING_PER_DAY) / 24);
+    // Crowding: real county growth, compressed so that growthYears real years play over MAX_DAYS.
+    if (scen.growthYears && realSections) {
+      const years = scen.growthYears / (MAX_DAYS * HOURS_PER_DAY);
+      for (let i = 0; i < SECTION_COUNT; i++) if (!s.lost[i]) s.people[i] *= Math.pow(1 + realSections.rows[i].growthPerYear, years);
+    }
     for (const r of s.repairs) {
       if (r.at === h) {
         if (s.recyclerBroken[r.i]) {
@@ -785,7 +808,7 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
     const supply = scenarioAt(scen.supply, h);
     const costF = 1 - TOOL_POWER_COST * ((tools.earlyWarning ? 1 : 0) + (tools.ledger ? 1 : 0));
     let cap = 0;
-    for (const p of s.plants) if (h >= p.offlineUntil) cap += p.nominal * p.health * supply * costF;
+    for (let k = 0; k < s.plants.length; k++) { const p = s.plants[k]; if (h >= p.offlineUntil) cap += p.nominal * p.health * supply * costF * lossF(scen, k, h); }
     // The Directorate dispatches against last hour's capacity. A sudden drop overloads the plants.
     // While "Plant 3 is operating normally" is believed, dispatch also counts the capacity Plant 3 has lost.
     const p3 = s.plants[PLANT3];
@@ -802,13 +825,13 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
         if (r < STRESS_TRIP) {
           let r2: number;
           [r2, s.rng] = mulberry32(s.rng);
-          p.offlineUntil = h + 12 + Math.floor(r2 * 25);
+          p.offlineUntil = h + REPAIR_SAMPLE[Math.floor(r2 * REPAIR_SAMPLE.length)];
           events.push(`${stamp(h)} · Plant ${k + 1} tripped (run at full load)`);
           break;
         }
       }
       cap = 0;
-      for (const p of s.plants) if (h >= p.offlineUntil) cap += p.nominal * p.health * supply * costF;
+      for (let k = 0; k < s.plants.length; k++) { const p = s.plants[k]; if (h >= p.offlineUntil) cap += p.nominal * p.health * supply * costF * lossF(scen, k, h); }
     }
     let ratio = target / Math.max(1e-9, cap);
     let guard = 0;
@@ -823,7 +846,7 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
         if (r < pTrip) {
           let r2: number;
           [r2, s.rng] = mulberry32(s.rng);
-          p.offlineUntil = h + 12 + Math.floor(r2 * 25); // offline 12–36 h
+          p.offlineUntil = h + REPAIR_SAMPLE[Math.floor(r2 * REPAIR_SAMPLE.length)]; // offline 12–36 h
           events.push(`${stamp(h)} · Plant ${k + 1} tripped (load ${Math.round(ratio * 100)}%)`);
           tripped = true;
           break; // its load shifts to the others: re-check the cascade
@@ -831,7 +854,7 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
       }
       if (!tripped) break;
       cap = 0;
-      for (const p of s.plants) if (h >= p.offlineUntil) cap += p.nominal * p.health * supply * costF;
+      for (let k = 0; k < s.plants.length; k++) { const p = s.plants[k]; if (h >= p.offlineUntil) cap += p.nominal * p.health * supply * costF * lossF(scen, k, h); }
       ratio = target / Math.max(1e-9, cap);
     }
     const served = Math.min(target, cap);
@@ -868,7 +891,7 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
       if (urand(s) < 0.05) continue; // missing reading
       const p = s.plants[k];
       if (reachH && !reachH[sectionIndex(p.level, 0)]) continue; // network down and no mesh path to this plant
-      const out = h >= p.offlineUntil ? p.nominal * p.health * supply * costF * (1 + 0.03 * gauss(s)) : 0;
+      const out = h >= p.offlineUntil ? p.nominal * p.health * supply * costF * lossF(scen, k, h) * (1 + 0.03 * gauss(s)) : 0;
       obs.push({ kind: 'plantMeter', plant: k, level: p.level, hour: h, output: Math.max(0, Math.round(out)) });
     }
     obs.push({ kind: 'feeder', hour: h, served: Math.round(served * (1 + 0.02 * gauss(s))), demand: Math.round(D * (1 + 0.02 * gauss(s))) });
@@ -1088,7 +1111,7 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
     state.end = { kind: 'lost', day, reason: 'More than half of the population died' };
   } else if (lostLevels >= 10) {
     state.end = { kind: 'lost', day, reason: `${lostLevels} levels fully lost` };
-  } else if (s.stableStreak >= STABLE_DAYS && !state.keepGoing) {
+  } else if (s.stableStreak >= STABLE_DAYS && !state.keepGoing && day >= (state.scenario.minDays ?? 0)) {
     state.end = { kind: 'stable', day };
     state.stableDay = day;
   } else if (day >= MAX_DAYS) {
