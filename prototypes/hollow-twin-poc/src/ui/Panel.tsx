@@ -79,7 +79,7 @@ export function Panel(p: PanelProps) {
       </button>
       <div className="panel-body">
         <header className="p-head">
-          <h1>TEST WORLD</h1>
+          <h1>Test world</h1>
           <span className="muted">Hollow Twin</span>
         </header>
         <p className="muted small">A simulated Hollow that proves the Residents' System works. It knows the hidden truth; the system does not. Right now it has one problem: blackouts, and the air that goes bad when the fans stop.</p>
@@ -116,9 +116,9 @@ export function Panel(p: PanelProps) {
         <Section title="3. Play">
           <div className="row">
             <button className="primary" disabled={locked || !!state.end} onClick={p.onNextDay}>
-              {p.playing ? 'Playing…' : 'Next day ▸'}
+              {p.playing ? 'Playing…' : 'Next day'}
             </button>
-            <button disabled={p.busy !== null || !!state.end} onClick={p.onSkipToEnd}>Skip to end ▸▸</button>
+            <button disabled={p.busy !== null || !!state.end} onClick={p.onSkipToEnd}>Skip to the end</button>
           </div>
         </Section>
 

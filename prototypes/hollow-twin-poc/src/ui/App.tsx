@@ -5,6 +5,7 @@ import { sim } from '../sim/index.ts';
 import { LEVELS, NO_TOOLS, SECTIONS_PER_LEVEL, type Action, type Frame, type ToolSet, type WorldEvent } from '../sim/types.ts';
 import { createRun, stepRun, type Run } from '../product/run.ts';
 import { World } from '../world/index.tsx';
+import { FlatWorld, blackoutLine } from '../world/FlatWorld.tsx';
 import { Panel } from './Panel.tsx';
 import { ProductView } from './ProductView.tsx';
 import { MAX_DAYS, attribution, compareRuns, type Attribution, type RunResult } from './compare.ts';
@@ -13,6 +14,8 @@ import './styles.css';
 const FRAME_MS = 170; // 24 frames ≈ 4 s per day
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 const DEBUG = typeof location !== 'undefined' && new URLSearchParams(location.search).has('debug');
+/** ?pixel in the URL shows the old pixel-art cutaway instead of the flat one. */
+const PIXEL = typeof location !== 'undefined' && new URLSearchParams(location.search).has('pixel');
 
 export function App() {
   const [scenarioId, setScenarioId] = useState(sim.scenarios[0].id);
@@ -121,7 +124,10 @@ export function App() {
   return (
     <div className="app">
       <main className="world-col">
-        <World frame={frame} onHover={onHover} selected={hover ?? phoneSection} />
+        <WorldHeader frame={frame} day={state.day} playing={playing} scenario={state.scenario.name} />
+        {PIXEL
+          ? <World frame={frame} onHover={onHover} selected={hover ?? phoneSection} />
+          : <FlatWorld frame={frame} onHover={onHover} selected={phoneSection} />}
         {DEBUG && <DebugHover onHover={onHover} />}
       </main>
       <ProductView
@@ -145,6 +151,38 @@ export function App() {
         onAttribution={runAttribution}
       />
     </div>
+  );
+}
+
+/** Above the cutaway: where and when we are, what is dark right now, and what the colors mean. */
+function WorldHeader({ frame, day, playing, scenario }: { frame: Frame; day: number; playing: boolean; scenario: string }) {
+  const { line, darkLevels } = blackoutLine(frame);
+  const dark = frame.sections.filter((s) => !s.lost && s.lifeSupport < 0.5).length;
+  const lit = frame.sections.filter((s) => !s.lost).length - dark;
+  const status = darkLevels === 0
+    ? 'Every level has air and fans'
+    : darkLevels >= 0.9 * LEVELS ? 'Almost the whole Hollow is dark'
+      : `Levels ${line + 1}–${LEVELS} are in a blackout`;
+  return (
+    <header className="world-head">
+      <div className="wh-top">
+        <h1>The Hollow</h1>
+        <span className="wh-clock">Day {day}{playing ? `, ${String(frame.hour).padStart(2, '0')}:00` : ''}</span>
+        <span className="wh-scn">{scenario}</span>
+      </div>
+      <p className={`wh-status ${darkLevels ? 'bad' : 'good'}`}>
+        {status}. <span className="wh-counts">{lit} of 400 sections with air and fans, {dark} dark. Plants online: {frame.plantsOnline} of {frame.plantsTotal}.</span>
+      </p>
+      <ul className="legend" aria-label="Legend">
+        <li><i className="sw lit" />Power on</li>
+        <li><i className="sw dim" />Saving power</li>
+        <li><i className="sw dark" />Blackout: no air or fans</li>
+        <li><i className="sw badair" />Blackout, air unsafe</li>
+        <li><i className="sw empty" />Everyone died</li>
+        <li><i className="sw plant" />Power plant</li>
+        <li><i className="sw home" />Your home</li>
+      </ul>
+    </header>
   );
 }
 
