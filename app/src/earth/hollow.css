@@ -10,10 +10,10 @@
 .em-section .em-stage, .em-section .em-vignette, .em-section .em-credit { visibility: hidden; }
 .em-section { background: radial-gradient(90% 70% at 35% 30%, #0d1118 0%, var(--bg) 70%); }
 
-.em-hollow { position: absolute; left: 32px; right: 32px; top: 92px; bottom: 44px; }
-.em-hollow-live { bottom: 196px; }
+.em-xsec { position: absolute; left: 32px; right: 32px; top: 92px; bottom: 44px; }
+.em-xsec-live { bottom: 196px; }
 .em-section .em-picker { left: auto; right: 32px; }
-.em-hollow:not(.em-hollow-live) { right: 540px; }
+.em-xsec:not(.em-xsec-live) { right: 540px; }
 
 .hv { position: absolute; inset: 0; display: flex; flex-direction: column; gap: 10px; }
 .hv-body { flex: 1; min-height: 0; display: flex; gap: 18px; }
@@ -61,7 +61,58 @@
   .hv-fairnote { width: 420px; }
 }
 @media (max-width: 760px) {
-  .em-hollow, .em-hollow:not(.em-hollow-live) { left: 12px; right: 12px; }
+  .em-xsec, .em-xsec:not(.em-xsec-live) { left: 12px; right: 12px; }
   .hv-table, .hv-fairnote { display: none; }
   .em-toggle a { padding: 5px 8px; font-size: 13px; }
+}
+
+/* ---- Without / With, counters, model card ---- */
+.em-strip { position: absolute; left: 32px; right: 32px; top: 80px; display: flex; align-items: center; gap: 28px; z-index: 2; }
+.em-assist { display: inline-flex; flex: none; padding: 3px; border: 1px solid var(--line); border-radius: 4px; background: rgba(13, 16, 22, 0.85); }
+.em-assist button { font: inherit; font-size: 14px; padding: 7px 14px; border: 0; border-radius: 3px; background: none; color: var(--text-dim); cursor: pointer; }
+.em-assist button:hover { color: var(--text); }
+.em-assist button.on { background: var(--panel-2); color: var(--text); box-shadow: inset 0 0 0 1px var(--line); }
+.em-assist button.on:last-child { color: var(--lit); box-shadow: inset 0 0 0 1px rgba(242, 196, 107, 0.5); }
+
+.em-counters { display: flex; gap: 26px; min-width: 0; font-variant-numeric: tabular-nums; text-shadow: 0 0 10px var(--bg), 0 0 3px var(--bg); }
+.em-counter { display: grid; }
+.em-counter-v { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; min-width: 6.2ch; }
+.em-counter:first-child .em-counter-v { min-width: 9ch; }
+.em-counter-l { font-size: 12.5px; color: var(--text-dim); white-space: nowrap; }
+
+.em-xsec { top: 92px; }
+.em-xsec-live { top: 146px; }
+
+.em-right { position: absolute; right: 32px; top: 146px; width: 444px; display: flex; flex-direction: column; gap: 12px; }
+.em-right .em-check { position: static; width: auto; }
+
+.em-model { padding: 14px 18px; background: rgba(13, 16, 22, 0.82); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--line); border-left: 3px solid var(--lit); border-radius: 4px; animation: em-from-right 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.em-lead { margin: 0; font-size: 17px; }
+.em-lead b { color: var(--lit); font-weight: 600; }
+.em-caveat { margin: 3px 0 0; font-size: 12.5px; color: var(--text-faint); }
+.em-model h3 { margin: 12px 0 6px; font-size: 13px; font-weight: 600; color: var(--text-dim); }
+.em-model dl { margin: 0; display: grid; gap: 6px; }
+.em-model dl div { display: grid; }
+.em-model dt { font-size: 13px; color: var(--text-dim); }
+.em-model dd { margin: 0; font-size: 15.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.em-advantage { margin: 10px 0 0; padding-top: 8px; border-top: 1px solid var(--line); font-size: 13px; color: var(--text-dim); }
+
+.hv-top { display: flex; gap: 18px; align-items: stretch; }
+.hv-aside { flex: 1; min-width: 0; }
+.hv-top .hv-fairnote { flex: none; }
+.em-model-compact { animation: none; padding: 10px 14px; height: 100%; box-sizing: border-box; }
+.em-model-compact h3 { margin-top: 6px; }
+.em-model-compact dl { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.em-model-compact dd { font-size: 14.5px; }
+
+@media (max-width: 1100px) {
+  .em-counters { gap: 16px; }
+  .em-counter-l { font-size: 11px; }
+  .em-right { width: 340px; }
+}
+@media (max-width: 760px) {
+  .em-strip { flex-wrap: wrap; gap: 10px; }
+  .em-counters { display: none; }
+  .em-right { display: none; }
 }

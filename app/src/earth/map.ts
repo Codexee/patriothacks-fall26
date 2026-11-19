@@ -60,6 +60,7 @@ export class EarthMap {
   private cDark: RGB; private cAlert: RGB; private cLit: RGB;
   private labels: { ci: number; el: HTMLDivElement }[] = [];
   private interactive = true;
+  private assist = true;
   private destroyed = false;
   onHover: (h: HoverInfo | null) => void = () => {};
 
@@ -242,7 +243,16 @@ export class EarthMap {
   }
   private depth(ci: number) { return this.depth0[ci] + DARK_DEPTH * this.darkNow(ci); }
 
+  /** false = the "Without" view: no alert state on the map. */
+  setAssist(on: boolean) {
+    if (on === this.assist) return;
+    this.assist = on;
+    this.colorKey++;
+    this.render();
+  }
+
   private alertOn(): boolean {
+    if (!this.assist) return false;
     const r = this.live?.replay;
     if (!r?.risk || r.alertThreshold == null) return false;
     const p = r.risk[Math.max(0, Math.min(r.hours - 1, Math.floor(this.hour)))];

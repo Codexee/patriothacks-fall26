@@ -11,6 +11,9 @@ import { EarthMap, HOME } from './map.ts';
 import type { HoverInfo, View } from './map.ts';
 import { CheckFirst, EventPicker, HoverCard, Timeline, useClockIndex } from './panels.tsx';
 import { HollowView } from './HollowView.tsx';
+import { AssistToggle, Counters, ModelCard, officialFor } from './assist.tsx';
+import type { Assist } from './assist.tsx';
+import { checkFirst } from './data.ts';
 import './hollow.css';
 import { Story } from '../story/Story.tsx';
 import { HERO_FACTS } from '../story/script.ts';
@@ -30,6 +33,7 @@ export default function Page() {
   const [live, setLive] = useState<Live | null>(null);
   const [hover, setHover] = useState<HoverInfo | null>(null);
   const [problem, setProblem] = useState<string | null>(null);
+  const [assist, setAssist] = useState<Assist>('with');
 
   useEffect(() => {
     let on = true;
@@ -103,6 +107,13 @@ export default function Page() {
   }, [scene, map, eventId, story, clock]);
 
   const showFair = !!(live?.row?.hero && HERO_FACTS[live.row.hero]?.loadShed);
+  const official = useMemo(() => (live ? officialFor(live) : null), [live]);
+  const withTool = assist === 'with';
+  const checkCis = useMemo(
+    () => (scene && live && withTool ? checkFirst(scene, live).rows.slice(0, 4).map((r) => scene.index.get(r.county.fips)!) : []),
+    [scene, live, withTool],
+  );
+  useEffect(() => { map?.setAssist(withTool || !!story); }, [map, withTool, story]);
 
   const pointAt = (fips: string | null) => {
     if (!map || !scene) return;
@@ -133,13 +144,27 @@ export default function Page() {
       )}
 
       {!story && section && scene && (!eventId || live) && (
-        <div className={`em-hollow${live ? ' em-hollow-live' : ''}`}>
-          <HollowView key={live?.replay.id ?? 'calm'} scene={scene} live={live} clock={clock} onHover={setHover} showFair={showFair} />
+        <div className={`em-xsec${live ? ' em-xsec-live' : ''}`}>
+          <HollowView
+            key={live?.replay.id ?? 'calm'} scene={scene} live={live} clock={clock} onHover={setHover} showFair={showFair}
+            highlight={checkCis} aside={live && withTool ? <ModelCard scene={scene} live={live} compact /> : null}
+          />
         </div>
       )}
       {!story && scene && !live && !eventId && <EventPicker scene={scene} base={section ? '#/hollow/' : '#/event/'} />}
-      {!story && !section && scene && live && <CheckFirst scene={scene} live={live} onPoint={pointAt} />}
-      {!story && live && <Timeline live={live} clock={clock} />}
+      {!story && scene && live && (
+        <div className="em-strip">
+          <AssistToggle value={assist} onChange={setAssist} />
+          <Counters scene={scene} live={live} clock={clock} assist={assist} />
+        </div>
+      )}
+      {!story && !section && scene && live && withTool && (
+        <div className="em-right">
+          <CheckFirst scene={scene} live={live} onPoint={pointAt} />
+          <ModelCard scene={scene} live={live} />
+        </div>
+      )}
+      {!story && live && <Timeline live={live} clock={clock} assist={withTool} official={official} />}
       {story && scene && map && live && <Story key={live.replay.id} scene={scene} live={live} map={map} clock={clock} />}
 
       {problem && <p className="em-problem" role="alert">{problem} <a href="#/">Back to the map</a></p>}

@@ -1,6 +1,7 @@
 // The cross-section screen (#/hollow, #/hollow/<event id>). The canvas and the numbers beside it
 // follow the shared clock through refs; React renders only when the event or the view changes.
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 import type { Clock } from './clock.ts';
 import { fmtInt } from './data.ts';
 import type { Live, Scene } from './data.ts';
@@ -12,12 +13,13 @@ export const fmtPeople = (n: number) =>
   n >= 1e9 ? `${(n / 1e9).toFixed(2)} B` : n >= 1e6 ? `${(n / 1e6).toFixed(1)} M` : n >= 1e4 ? `${Math.round(n / 1e3)} k` : fmtInt(n);
 const fmtH = (h: number) => (h < 10 ? h.toFixed(1) : String(Math.round(h)));
 
-export function HollowView({ scene, live, clock, highlight, showFair, bare = false, onHover }: {
+export function HollowView({ scene, live, clock, highlight, showFair, bare = false, onHover, aside }: {
   scene: Scene; live: Live | null; clock: Clock;
   highlight?: number[];       // counties to ring (the check-first list, in the "With" view)
   showFair?: boolean;         // the load-shed comparison (per-hero flag)
   bare?: boolean;             // story mode: the picture and the level numbers only
   onHover?: (h: HoverInfo | null) => void;
+  aside?: ReactNode;          // shown above the picture, left of the fair-rotation note
 }) {
   const sec = useMemo<Section>(() => buildSection(scene, live), [scene, live]);
   const fair = useMemo<FairRotation | null>(() => (showFair && live ? fairRotation(scene, live) : null), [scene, live, showFair]);
@@ -79,7 +81,12 @@ export function HollowView({ scene, live, clock, highlight, showFair, bare = fal
 
   return (
     <div className={`hv${bare ? ' hv-bare' : ''}${live ? '' : ' hv-calm'}`}>
-      {!bare && fair && <FairNote fair={fair} />}
+      {!bare && (fair || aside) && (
+        <div className="hv-top">
+          <div className="hv-aside">{aside}</div>
+          {fair && <FairNote fair={fair} />}
+        </div>
+      )}
       <div className="hv-body">
       <div className="hv-figure">
         <div
