@@ -1,0 +1,14 @@
+[project]
+name = "bda-models"
+version = "0.1.0"
+description = "Before (warning) and During (dark hours) models: training, evaluation, export"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "duckdb>=1.1",
+  "pandas>=2.2",
+  "pyarrow>=17",
+  "lightgbm>=4.5",
+  "scikit-learn>=1.5",
+  "scipy>=1.13",
+  "numpy>=1.26",
+]
