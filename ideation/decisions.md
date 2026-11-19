@@ -62,3 +62,5 @@ Add one line per decision: date · decision · why · who. Newest last.
 - 2026-11-18 · Labels from EAGLE-I (1% of a BA's customers out 4 h+); train 2015–2020, test 2021+; lives saved only as a labelled estimate · Neil (thresholds and split: Claude)
 - 2026-11-18 · Before-during-after spec locked; data work starts tonight · Neil
 - 2026-11-18 · Contracts frozen in contracts/README.md + app/src/contracts.ts; app shell owns routing and package.json; app/public/data/v1 is written by data/build/export_app.py (moved from workstream 4 to 1); old Hollow Twin UI frozen at #/legacy; weather from NOAA ISD-Lite, not Open-Meteo · /parallelize · Neil and Claude
+- 2026-11-19 · Map drawn as one smooth surface (no county outlines; depth and color interpolated across borders; hover keeps exact county values) · Neil asked for it · Neil
+- 2026-11-19 · Protocol: Claude runs its own agents; Paradev only to run Codex when the rules send work there · Neil

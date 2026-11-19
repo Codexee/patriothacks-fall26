@@ -1,13 +1,13 @@
 # To do
 
-Last updated: Thu Nov 19, 2026, 12:45 am. Deadline: **Fri Nov 20, 11:00 pm** (we submit by 6:00 pm).
+Last updated: Thu Nov 19, 2026, 2:20 am. Deadline: **Fri Nov 20, 11:00 pm** (we submit by 6:00 pm).
 Spec: `.plans/before-during-after-spec.md`. Who owns which folders: `contracts/README.md`. Model results: `models/RESULTS.md`.
 
 To take an item: write your name after it, commit, push. Tick it when it is merged to `main`.
 
 ## Running now
 
-No AI worker is running. The three Paradev workspaces are idle and merged.
+No AI worker is running. Everything is merged to `main`. Start with `docs/handoffs/2026-11-19-earth-product.md`.
 
 ## Next (Thu morning)
 
@@ -55,4 +55,5 @@ No AI worker is running. The three Paradev workspaces are idle and merged.
 - [x] Evidence page: comparison at equal false-alarm rates (chart), cards filled from data.
 - [x] App data trimmed to 14 MB (19 replays); per-area demand records exported; Vercel config and `docs/deploy.md`.
 - [x] Live page computes the record features; the EIA function has tests (400, 503, 200, 502). Not yet checked against the real EIA API (no key).
+- [x] Smooth map surface: no county outlines, depths interpolated across borders. Not checked on a slow laptop or a phone.
 - [x] Contracts and an app shell so parallel work does not collide.

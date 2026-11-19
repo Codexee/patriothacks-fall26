@@ -65,7 +65,7 @@ To rebuild data or models you need the raw files (about 12 GB, not in git): `bre
 
 ## In progress when Neil logged off
 
-- **Smooth map surface** (branch `ws/bda-map`, folders `app/src/earth`, `app/src/story`): remove the county outlines and interpolate depths across county borders so the surface has no boxes. See "Status of the smoothing" at the end of this file for whether it was merged.
+- Nothing. The smooth map surface he asked for last is merged; see "Status of the smoothing" at the end of this file.
 
 ## Not done, and not verified
 
@@ -90,7 +90,7 @@ To rebuild data or models you need the raw files (about 12 GB, not in git): `bre
 - The app's data files are written by `data/build/export_app.py`. Do not edit `app/public/data/v1` by hand.
 - Every number on screen must come from `metrics.json`, `events.json`, a replay file or `counties.json`. Do not type results into components.
 - Wherever a lead time is shown, show the caveat (`events.json` → `warnNote`).
-- Three git worktrees exist on Neil's Mac under `~/.paradev/worktrees/patriothacks-fall26/ws/` (`bda-models`, `bda-map`, `bda-brief`). Their branches are merged into `main` except as noted above. You do not need them.
+- Three git worktrees exist on Neil's Mac under `~/.paradev/worktrees/patriothacks-fall26/ws/` (`bda-models`, `bda-map`, `bda-brief`). Their branches are all merged into `main`. You do not need them.
 
 ## Suggested skills for the next session
 
@@ -104,4 +104,15 @@ To rebuild data or models you need the raw files (about 12 GB, not in git): `bre
 
 ## Status of the smoothing
 
-Not merged yet at the time of writing. This section is updated when it lands.
+**Merged to `main` and pushed (Thu Nov 19, about 2:20 am).** The 3D map is now one smooth surface: no county outlines, no state lines, no walls between counties.
+
+- **How:** one triangle mesh in a custom deck.gl layer (`app/src/earth/surface.ts`, `surface-layer.ts`). Each point blends the depth and color of the nearest counties (reach about 30 km). The legend says "Surface smoothed for display; hover for the exact county values."
+- **Checked:** typecheck, 32 tests, build; `#/`, the Texas replay and the story opening in a browser on a fresh dev server, with no console errors. Hover still picks single counties.
+- **Know this:**
+  - During a replay, a county that is fully out is drawn dark with a sharp edge; partial outages show as a soft band. The old red county rings are gone.
+  - The view from below draws depth 1.7 times larger so the relief reads (`BELOW_DEPTH` in `app/src/earth/map.ts`; set it to 1 to undo).
+  - The mesh has about 546,000 points. It ran at 60 frames per second on an M5 Pro. **Not checked on a slower laptop or a phone.**
+  - Tuning constants: `RELIEF_LIGHT`, `BELOW_DEPTH`, `BELOW_LIGHT` in `map.ts`; `maxEdge`, `cell`, `reach` in `data.ts`.
+  - If the dev server shows "luma.gl has already been initialized" after a hot reload of the map files, restart `npm run dev`. It does not happen on a fresh start.
+- **New packages in `app/package.json`:** `earcut`, `@luma.gl/core`, `@luma.gl/engine` (deck.gl already installed them; they are now listed). Run `npm install` after `git pull`.
+- **Neil has not seen the result yet.** If he wants it stronger or weaker, change the constants above.
