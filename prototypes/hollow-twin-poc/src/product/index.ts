@@ -16,6 +16,7 @@ export function createMemory(): ProductMemory {
     outlook: null,
     outlookPrev: null,
     census: { people: [], demand: [], critical: [] },
+    selfCount: [],
     sensorPower: new Array(LEVELS).fill(null),
     sensorCo2: new Array(LEVELS).fill(null),
     darkReports: new Array(LEVELS).fill(0),
@@ -48,6 +49,8 @@ function ingest(m: ProductMemory, obs: Observation[]): Record<string, number> {
       m.census.people[i] = o.people;
       m.census.demand[i] = o.demand;
       m.census.critical[i] = o.critical;
+    } else if (o.kind === 'selfCount') {
+      m.selfCount[(o.level - 1) * 8 + o.col] = o.people;
     } else if (o.kind === 'sensor') {
       pow[o.level - 1].push(o.lifeSupport); // the air-and-fans circuit: off = a real blackout
       co2[o.level - 1].push(o.co2);

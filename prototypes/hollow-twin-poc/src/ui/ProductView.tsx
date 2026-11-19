@@ -110,6 +110,8 @@ export function ProductView(p: ProductViewProps) {
         {on && bw && (
           <div className="mod">
             <h3>{moduleName('earlyWarning')} <span className="muted small">#1</span></h3>
+            <p>Head count: the Directorate's census says <b>{fmt(bw.censusPeople)}</b>; residents counted <b>{fmt(bw.selfPeople)}</b> in the app
+              {bw.selfPeople > bw.censusPeople && <> (<b className="bad">+{Math.round((bw.selfPeople / Math.max(1, bw.censusPeople) - 1) * 100)}%</b>, +{Math.round((bw.deepRatio - 1) * 100)}% on level 50)</>}. Power needs use the residents' count.</p>
             <p>Plants now: <b>{fmt(bw.capNow)}</b> units. Worst hour ahead (in {bw.inHours} h): <b>{fmt(bw.capForecast)}</b> units for a demand of <b>{fmt(bw.demandForecast)}</b>.</p>
             {bw.shed > 0
               ? <p className="warn-text">Plants will run near their limit. Asked everyone to switch off {Math.round(bw.shed * 100)}% of non-essential load.</p>

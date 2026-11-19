@@ -53,6 +53,14 @@ Warning still trusts the census, so it under-forecasts demand on the deep levels
 
 The results table above is the "before" column.
 
+### Step 1c: residents count themselves (Nov 19)
+
+Every household enters in the app how many people live in its room (assumption: everyone uses it and reports
+honestly). Blackout Warning scales each section's census power need by residents' count ÷ census count. The console
+shows both totals (census 1,318,400 vs residents 1,600,000 at the sim's scale: +21%, +43% on level 50). With an
+honest, complete count the correction is exact, so the results return to the Step 1 table (Texas s1: 1,167 deaths,
+stable day 23). Partial or inflated counts are not modelled yet.
+
 Which part does the work (Texas seed 1, before the census change): warnings only → 374,185 deaths; saving power only → 2,379; both → 1,167.
 Saving power stops the overloads that black out the whole Hollow; the warnings cut the deaths in the blackouts that
 still happen.

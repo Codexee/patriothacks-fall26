@@ -55,6 +55,8 @@ export type Observation =
   | { kind: 'outlook'; fromHour: number; supply: number[]; demand: number[] }
   /** Section council census: residents, power asked for (critical part too), facilities, and days of food in store. */
   | { kind: 'census'; level: number; col: number; day: number; people: number; demand: number; critical: number; facilities: StructureKind[]; food: number }
+  /** Residents' own count: every household enters in the app how many people live in its room (summed per section). */
+  | { kind: 'selfCount'; level: number; col: number; day: number; people: number }
   /** Whether the Directorate's network is up, hourly. The system notices when it is cut. */
   | { kind: 'network'; hour: number; up: boolean }
   /** Daily family check-ins from one section: how many families were expected to check in, and how many did. */

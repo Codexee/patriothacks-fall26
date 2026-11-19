@@ -98,7 +98,18 @@ function group(firstDark: (number | null)[], hoursDark: number[]): { from: numbe
 export function blackoutWarning(m: ProductMemory, day: number):
   { outputs: Output[]; log: NonNullable<ProductLog['blackoutWarning']> } | null {
   const fc = forecastCapacity(m);
-  const { demand, critical } = m.census;
+  // The Directorate's census misses people. Where residents' own count is higher, scale that section's power
+  // need up by the same ratio (the census sets the need from its head count).
+  const ratio = m.census.people.map((p, i) => (p > 0 && m.selfCount[i] > 0 ? m.selfCount[i] / p : 1));
+  const demand = m.census.demand.map((v, i) => (v || 0) * ratio[i]);
+  const critical = m.census.critical.map((v, i) => (v || 0) * ratio[i]);
+  const censusTotal = m.census.people.reduce((a, b) => a + (b || 0), 0);
+  const selfTotal = m.selfCount.reduce((a, b) => a + (b || 0), 0);
+  const deepRatio = (() => {
+    let c = 0, r = 0;
+    for (let i = demand.length - 8; i < demand.length; i++) { c += m.census.people[i] || 0; r += m.selfCount[i] || 0; }
+    return c > 0 ? r / c : 1;
+  })();
   if (!fc || !demand.length) return null;
   const { capAt, capNow, lastHour } = fc;
   const levels = Math.ceil(demand.length / SECTIONS);
@@ -201,7 +212,7 @@ export function blackoutWarning(m: ProductMemory, day: number):
       text: `The plants will run near their limit in about ${worstT} h. Everyone: switch off ${Math.round(shed * 100)}% of non-essential load now, so the plants do not trip and black out the whole Hollow.`,
       evidence: [
         `Plant meters now: ${fmt(capNow)} units; forecast in ${worstT} h: ${fmt(cF)}`,
-        `Demand forecast ${fmt(dF)} units (census × public outlook); plants trip above about ${Math.round(SAFE_LOAD * 100)}% load`,
+        `Demand forecast ${fmt(dF)} units (residents' own count × public outlook; the Directorate's census undercounts); plants trip above about ${Math.round(SAFE_LOAD * 100)}% load`,
       ],
     });
   }
@@ -209,7 +220,7 @@ export function blackoutWarning(m: ProductMemory, day: number):
     outputs,
     log: {
       capNow, capForecast: cF, demandForecast: dF, shortfallPct: Math.max(0, (worst - 1) * 100), inHours: worstT, shed,
-      blackouts, darkNow, tripRisk,
+      blackouts, darkNow, tripRisk, censusPeople: censusTotal, selfPeople: selfTotal, deepRatio,
     },
   };
 }

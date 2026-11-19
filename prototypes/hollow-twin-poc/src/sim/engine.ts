@@ -1151,6 +1151,8 @@ function dailyObservations(
       facilities: s.structures[i].slice(),
       food: Math.round(s.food[i] * (1 + 0.03 * gauss(s)) * 10) / 10,
     });
+    // Residents' self-count in the app (assumption: every household uses it and reports honestly).
+    obs.push({ kind: 'selfCount', level, col, day, people: Math.round(n) });
   }
   // Surface probes: the council's 3 registered vents (signed, ±8% error) plus devices spreading the rumor.
   if (WORLD.surface && heard(sectionIndex(1, 0))) {

@@ -13,7 +13,8 @@ export interface ProductMemory {
   feederDemand: number[]; // switchyard load, hourly
   outlook: Outlook | null; // latest public weather and grid outlook (next 48 h)
   outlookPrev: Outlook | null; // the one before (covers yesterday)
-  census: { people: number[]; demand: number[]; critical: number[] }; // per section
+  census: { people: number[]; demand: number[]; critical: number[] }; // per section, the Directorate's
+  selfCount: number[]; // per section, residents' own count in the app
   sensorPower: (number | null)[]; // per level: yesterday's mean share of LIFE-SUPPORT power (air, fans)
   sensorCo2: (number | null)[]; // per level: yesterday's mean CO2
   darkReports: number[]; // per level: "the power is off" reports yesterday
@@ -43,6 +44,9 @@ export interface ProductLog {
     blackouts: PredictedBlackout[];
     darkNow: number[]; // levels whose air-and-fans circuit had less than half its power yesterday
     tripRisk: boolean; // even after saving, plants will run close to tripping: a Hollow-wide blackout is possible
+    censusPeople: number; // the Directorate's census total
+    selfPeople: number; // residents' own count total
+    deepRatio: number; // residents' count / census on the deepest level
   };
 }
 
