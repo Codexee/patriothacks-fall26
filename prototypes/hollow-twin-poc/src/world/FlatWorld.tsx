@@ -5,7 +5,61 @@
 import { useEffect, useRef } from 'react';
 import { LEVELS, SECTIONS_PER_LEVEL, SECTION_COUNT, type Frame, type WorldProps } from '../sim/types.ts';
 
-const GUTTER_L = 44, GUTTER_R = 10, SURFACE = 78, CRUST = 14, ROW = 22, GAP_X = 4, GAP_Y = 4;
+const GUTTER_L = 44, GUTTER_R = 10, SURFACE = 78, CRUST = 14, ROW = 28, GAP_X = 4, GAP_Y = 4;
+/** Levels down to here are old subway tunnels (tiled vaults, rails); below are old mine galleries (rough rock, timber). */
+const SUBWAY_LEVELS = 18;
+
+/**
+ * One section of a level is a neighborhood of the tunnel city, not a room: thousands of people living in blocks built
+ * inside an old subway tunnel or mine gallery. Its shapes do not change between frames, so they are built once.
+ */
+interface District {
+  shell: Path2D; // the tunnel's outline (clip)
+  ribs: Path2D; // vault ribs or timber props
+  blocks: Path2D; // housing blocks along the floor and stacked up the walls
+  windows: { x: number; y: number; k: number }[]; // k: lights up when the lit share is above k
+  rails: Path2D;
+  lamps: number[]; // x of each ceiling lamp
+  subway: boolean;
+}
+function buildDistrict(i: number, level: number, x: number, y: number, w: number, h: number): District {
+  const subway = level <= SUBWAY_LEVELS;
+  const shell = new Path2D();
+  if (subway) shell.roundRect(x, y, w, h, [h * 0.55, h * 0.55, 2, 2]);
+  else { // a rough-hewn gallery: jagged ceiling, near-straight walls
+    shell.moveTo(x, y + h);
+    shell.lineTo(x, y + 3 + hash(i, 1) * 3);
+    for (let px = x + 4; px < x + w - 2; px += 4 + hash(i, px) * 4) shell.lineTo(px, y + hash(i, px + 7) * 3.5);
+    shell.lineTo(x + w, y + 3 + hash(i, 2) * 3); shell.lineTo(x + w, y + h); shell.closePath();
+  }
+  const ribs = new Path2D();
+  for (let px = x + 5 + hash(i, 3) * 4; px < x + w - 2; px += subway ? 9 : 13) {
+    if (subway) { ribs.moveTo(px, y + 1); ribs.lineTo(px, y + h); }
+    else { ribs.rect(px, y + 2, 1.6, h - 2); ribs.rect(px - 2, y + 2, 5.6, 1.4); } // timber prop and cap
+  }
+  // Housing: deeper = more crowded, built higher and tighter (the brief: deep levels are darker and more crowded).
+  const crowd = 0.35 + 0.65 * ((level - 1) / (LEVELS - 1));
+  const blocks = new Path2D();
+  const windows: District['windows'] = [];
+  const floor = y + h - 4; // leave room for the rails
+  for (let bx = x + 1; bx < x + w - 2;) {
+    const bw = 4 + hash(i, bx) * (subway ? 6 : 4);
+    if (hash(i, bx + 3) < 0.18 - crowd * 0.12) { bx += bw * 0.6; continue; } // a gap: a street or square
+    const bh = Math.min(h - 6, 4 + hash(i, bx + 5) * (5 + crowd * 9));
+    blocks.rect(bx, floor - bh, bw - 0.8, bh);
+    for (let wy = floor - bh + 1.5; wy < floor - 1; wy += 2.6) {
+      for (let wx = bx + 1; wx < bx + bw - 1.8; wx += 2.2) windows.push({ x: wx, y: wy, k: hash(i * 7 + wx, wy) });
+    }
+    bx += bw;
+  }
+  const rails = new Path2D();
+  rails.rect(x, y + h - 2.6, w, 0.7); rails.rect(x, y + h - 1.2, w, 0.7);
+  for (let px = x + 1; px < x + w; px += 3) rails.rect(px, y + h - 3, 0.8, 3); // ties
+  const lamps: number[] = [];
+  const nl = Math.max(2, Math.round(w / 26));
+  for (let q = 0; q < nl; q++) lamps.push(x + ((q + 0.5) * w) / nl);
+  return { shell, ribs, blocks, windows, rails, lamps, subway };
+}
 const SHAFT_X = 28, SHAFT_W = 10;
 const BLACKOUT = 0.5, AIR_BAD = 5000;
 const ROOM_H = ROW - GAP_Y;
@@ -121,6 +175,7 @@ export function FlatWorld(props: WorldProps) {
     const host = hostRef.current!, cv = canvasRef.current!;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let staticCv: HTMLCanvasElement | null = null, staticKey = '';
+    let districts: District[] = [];
     let raf = 0, last = performance.now(), lastDraw = 0, peopleMax = 1;
     const prevTarget = new Float32Array(SECTION_COUNT).fill(1);
     let sparks: { x: number; y: number; vx: number; vy: number; life: number }[] = [];
@@ -134,6 +189,11 @@ export function FlatWorld(props: WorldProps) {
       const key = `${width}x${dpr}`;
       if (key !== staticKey) {
         staticKey = key; staticCv = paintStatic(width, g.height, dpr);
+        districts = [];
+        for (let i = 0; i < SECTION_COUNT; i++) {
+          const level = Math.floor(i / SECTIONS_PER_LEVEL) + 1;
+          districts.push(buildDistrict(i, level, g.x(i % SECTIONS_PER_LEVEL), g.y(level), g.roomW, ROOM_H));
+        }
         cv.width = Math.round(width * dpr); cv.height = Math.round(g.height * dpr);
         cv.style.width = `${width}px`; cv.style.height = `${g.height}px`;
       }
@@ -259,61 +319,116 @@ export function FlatWorld(props: WorldProps) {
           // A light that is losing power flickers on its way out.
           let b = shown.current[i];
           if (b > 0.04 && b < 0.58 && !reduce) b *= 0.55 + 0.45 * Math.abs(Math.sin(t * 31 + i * 3.7));
+          const D = districts[i];
           ctx.save();
-          ctx.beginPath(); ctx.roundRect(x, y, w, h, 4); ctx.clip();
+          ctx.clip(D.shell);
 
-          if (st === 'empty') {
-            ctx.fillStyle = '#2b3037'; ctx.fillRect(x, y, w, h);
-            ctx.strokeStyle = '#3c434d'; ctx.lineWidth = 1; ctx.beginPath();
-            for (let d = -h; d < w; d += 5) { ctx.moveTo(x + d, y + h); ctx.lineTo(x + d + h, y); }
+          if (st === 'empty') { // abandoned: grey, unlit, nobody moving
+            ctx.fillStyle = '#23272d'; ctx.fillRect(x, y, w, h);
+            ctx.fillStyle = '#2f343b'; ctx.fill(D.blocks);
+            ctx.strokeStyle = 'rgba(60,66,76,0.8)'; ctx.lineWidth = 1; ctx.beginPath();
+            for (let d = -h; d < w; d += 6) { ctx.moveTo(x + d, y + h); ctx.lineTo(x + d + h, y); }
             ctx.stroke();
           } else {
             const bad = st === 'dark' && s.co2 >= AIR_BAD;
-            // Back wall: lamp-lit warm, or dark blue-black; dark red when the air has gone bad.
             const lit = Math.max(0, Math.min(1, b));
             const warm = lit >= 0.6 ? (lit - 0.6) / 0.4 : 0;
-            const top = lit >= 0.6 ? rgb(LAMP_DIM, LAMP_HOT, warm) : rgb(bad ? [40, 12, 14] : [11, 14, 20], LAMP_DIM, lit / 0.6);
-            const bottom = lit >= 0.6 ? rgb([88, 64, 38], LAMP_WARM, warm) : rgb(bad ? [26, 8, 10] : [8, 10, 15], [88, 64, 38], lit / 0.6);
+            // The tunnel's vault or the gallery's rock, lit from the ceiling lamps.
+            const top = lit >= 0.6 ? rgb(D.subway ? [150, 128, 96] : [120, 92, 64], LAMP_HOT, warm * 0.75)
+              : rgb(bad ? [36, 12, 14] : [12, 15, 21], [110, 90, 64], lit / 0.6);
+            const bottom = lit >= 0.6 ? rgb([70, 52, 34], [150, 108, 64], warm)
+              : rgb(bad ? [22, 8, 10] : [8, 10, 14], [70, 52, 34], lit / 0.6);
             const wall = ctx.createLinearGradient(0, y, 0, y + h);
             wall.addColorStop(0, top); wall.addColorStop(1, bottom);
             ctx.fillStyle = wall; ctx.fillRect(x, y, w, h);
-            if (lit > 0.05) { // the lamp and its cone of light
-              const shimmer = reduce ? 1 : 0.94 + 0.06 * Math.sin(t * 5.3 + i * 1.9); // lamps hum a little
-              ctx.fillStyle = `rgba(255,246,220,${lit * shimmer})`; ctx.fillRect(x + w * 0.42, y + 1, w * 0.16, 1.5);
-              ctx.fillStyle = `rgba(255,235,190,${0.16 * lit * shimmer})`;
-              ctx.beginPath(); ctx.moveTo(x + w * 0.42, y + 2.5); ctx.lineTo(x + w * 0.58, y + 2.5);
-              ctx.lineTo(x + w * 0.85, y + h); ctx.lineTo(x + w * 0.15, y + h); ctx.fill();
-              if (lit > 0.6 && !reduce) { // dust drifting down through the light
-                ctx.fillStyle = `rgba(255,250,235,${0.55 * lit})`;
-                for (let q = 0; q < 2; q++) {
-                  const dy = ((t * (2.5 + q) + hash(i, q + 50) * h) % (h - 4)) + 3;
-                  ctx.fillRect(x + w * 0.5 + Math.sin(t * 0.7 + i + q * 2) * w * 0.18, y + dy, 1, 1);
-                }
+            ctx.strokeStyle = D.subway ? `rgba(0,0,0,${0.18 + 0.1 * lit})` : 'rgba(0,0,0,0)';
+            ctx.lineWidth = 0.6; ctx.stroke(D.ribs);
+            if (D.subway) { // tiled vault: a faint horizontal course line
+              ctx.fillStyle = `rgba(255,255,255,${0.06 * lit})`; ctx.fillRect(x, y + h * 0.42, w, 0.6);
+            }
+
+            // Ceiling lamps, each throwing a pool of light down onto the street.
+            const shimmer = reduce ? 1 : 0.94 + 0.06 * Math.sin(t * 5.3 + i * 1.9);
+            if (lit > 0.05) {
+              for (const lx of D.lamps) {
+                const pool = ctx.createRadialGradient(lx, y + 2, 0, lx, y + 2, h * 1.1);
+                pool.addColorStop(0, `rgba(255,236,190,${0.32 * lit * shimmer})`); pool.addColorStop(1, 'rgba(255,236,190,0)');
+                ctx.fillStyle = pool; ctx.fillRect(lx - h * 1.1, y, h * 2.2, h);
               }
+            }
+
+            // Housing blocks: lamp-lit faces, or black shapes in a blackout.
+            ctx.fillStyle = lit > 0.05 ? rgb([44, 34, 26], [104, 78, 52], lit) : bad ? '#1a0b0d' : '#0d1015';
+            ctx.fill(D.blocks);
+            // Windows: most are lit with full power, fewer while saving power; in a blackout only a few hand lights.
+            const share = lit >= 0.6 ? 0.35 + 0.55 * warm : lit > 0.05 ? 0.12 * (lit / 0.6) : 0;
+            if (share > 0) {
+              ctx.fillStyle = `rgba(255,214,140,${0.75 + 0.25 * warm})`;
+              ctx.beginPath();
+              for (const wn of D.windows) if (wn.k < share) ctx.rect(wn.x, wn.y, 1.1, 1.2);
+              ctx.fill();
+            } else if (!s.lost) {
+              ctx.fillStyle = bad ? 'rgba(255,170,160,0.55)' : 'rgba(190,210,255,0.6)'; // phones and torches
+              ctx.beginPath();
+              for (const wn of D.windows) {
+                if (wn.k > 0.035) continue;
+                if (!reduce && Math.sin(t * (1.5 + wn.k * 40) + wn.x) < -0.3) continue; // they move and go out
+                ctx.rect(wn.x, wn.y, 1, 1);
+              }
+              ctx.fill();
+            }
+
+            // The street: rails along the floor, and people on it (more in more crowded sections).
+            ctx.fillStyle = lit > 0.05 ? `rgba(30,22,16,${0.7})` : 'rgba(60,70,85,0.45)';
+            ctx.fill(D.rails);
+            const n = Math.max(2, Math.min(14, Math.round((s.people / peopleMax) * 14)));
+            ctx.fillStyle = lit > 0.3 ? 'rgba(28,18,10,0.9)' : bad ? 'rgba(255,150,140,0.35)' : 'rgba(160,180,210,0.28)';
+            for (let p = 0; p < n; p++) {
+              const speed = (hash(i, p + 30) - 0.5) * 6;
+              const px = x + ((hash(i, p) * w + (lit > 0.3 && !reduce ? t * speed : 0)) % w + w) % w;
+              ctx.fillRect(px, y + h - 6.2 - hash(i, p + 9) * 0.8, 1, 2.6);
+            }
+
+            // Facilities the section has.
+            if (s.structures.includes('farm')) { // grow racks under lamps
+              ctx.fillStyle = lit > 0.05 ? `rgba(200,120,255,${0.65 * lit})` : 'rgba(80,60,100,0.3)';
+              for (let r = 0; r < 3; r++) ctx.fillRect(x + w * 0.08, y + h - 9 - r * 3, w * 0.22, 0.9);
+              ctx.fillStyle = lit > 0.05 ? `rgba(90,170,90,${0.8 * lit})` : 'rgba(40,60,40,0.4)';
+              for (let r = 0; r < 3; r++) ctx.fillRect(x + w * 0.08, y + h - 8 - r * 3, w * 0.22, 1.2);
+            }
+            if (s.structures.includes('clinic')) {
+              const cx = x + w * 0.5, cy = y + 6;
+              ctx.fillStyle = lit > 0.05 ? 'rgba(255,255,255,0.9)' : 'rgba(200,210,230,0.3)';
+              ctx.fillRect(cx - 2.5, cy - 0.8, 5, 1.6); ctx.fillRect(cx - 0.8, cy - 2.5, 1.6, 5);
+            }
+            if (s.structures.includes('recycler')) {
+              ctx.fillStyle = lit > 0.05 ? 'rgba(110,180,220,0.85)' : 'rgba(60,80,100,0.4)';
+              ctx.beginPath(); ctx.roundRect(x + w * 0.62, y + h - 12, 6, 8, 2); ctx.fill();
+            }
+
+            if (lit > 0.6 && !reduce) { // dust drifting down through the light
+              ctx.fillStyle = `rgba(255,250,235,${0.5 * lit})`;
+              for (let q = 0; q < 2; q++) {
+                const dy = ((t * (2.5 + q) + hash(i, q + 50) * h) % (h - 4)) + 3;
+                ctx.fillRect(D.lamps[q % D.lamps.length] + Math.sin(t * 0.7 + i + q * 2) * 6, y + dy, 1, 1);
+              }
+            }
+            if (lit > 0.05) { // the lamps themselves
+              ctx.fillStyle = `rgba(255,248,225,${lit * shimmer})`;
+              for (const lx of D.lamps) ctx.fillRect(lx - 1.5, y + (D.subway ? 2.2 : 3), 3, 1.3);
             }
             if (bad) { // emergency strip and a red haze
               const p = reduce ? 0.8 : 0.45 + 0.55 * Math.max(0, Math.sin(t * 3.2 + i));
-              ctx.fillStyle = `rgba(255,70,55,${0.9 * p})`; ctx.fillRect(x, y, w, 1.5);
-              ctx.fillStyle = `rgba(200,40,40,${0.22 * p})`; ctx.fillRect(x, y, w, h);
+              ctx.fillStyle = `rgba(255,70,55,${0.9 * p})`; ctx.fillRect(x, y + (D.subway ? 3 : 4), w, 1.2);
+              ctx.fillStyle = `rgba(200,40,40,${0.09 * p})`; ctx.fillRect(x, y, w, h);
             }
-            // People: more figures in more crowded rooms.
-            const n = Math.max(1, Math.min(6, Math.round((s.people / peopleMax) * 6)));
-            const figure = lit > 0.3 ? 'rgba(52,34,18,0.9)' : bad ? 'rgba(255,140,130,0.28)' : 'rgba(140,165,200,0.22)';
-            ctx.fillStyle = figure;
-            for (let p = 0; p < n && w > 18; p++) {
-              // People move about while the lights are on, and stand still in the dark.
-              const roam = lit > 0.3 && !reduce ? Math.sin(t * (0.25 + hash(i, p + 30) * 0.35) + hash(i, p + 31) * 6.3) * Math.min(7, (w - 22) * 0.2) : 0;
-              const fx = Math.max(x + 3, Math.min(x + w - 6, x + 6 + hash(i, p) * (w - 22) + roam)), fh = 6 + hash(i, p + 9) * 2.5;
-              ctx.beginPath(); ctx.arc(fx + 1.5, y + h - fh - 2.2, 1.7, 0, 7); ctx.fill();
-              ctx.beginPath(); ctx.roundRect(fx, y + h - fh, 3, fh, 1.2); ctx.fill();
-            }
-            if (s.structures.includes('fan')) { // a fan that turns with the power
-              const cx = x + 6, cy = y + 6, a = t * 10 * (st === 'lit' ? lit : 0) + i;
-              ctx.strokeStyle = lit > 0.3 ? 'rgba(60,40,20,0.8)' : 'rgba(150,170,200,0.3)'; ctx.lineWidth = 1;
-              ctx.beginPath(); ctx.arc(cx, cy, 4, 0, 7); ctx.stroke();
+            if (s.structures.includes('fan')) { // a ventilation fan in the ceiling, turning with the power
+              const cx = x + 7, cy = y + 6.5, a = t * 10 * (st === 'lit' ? lit : 0) + i;
+              ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.beginPath(); ctx.arc(cx, cy, 4.6, 0, 7); ctx.fill();
+              ctx.strokeStyle = lit > 0.3 ? 'rgba(220,200,170,0.75)' : 'rgba(150,170,200,0.3)'; ctx.lineWidth = 1;
               for (let bl = 0; bl < 3; bl++) {
                 const ang = a + (bl * Math.PI * 2) / 3;
-                ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(ang) * 3.4, cy + Math.sin(ang) * 3.4); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(ang) * 3.8, cy + Math.sin(ang) * 3.8); ctx.stroke();
               }
             }
           }
