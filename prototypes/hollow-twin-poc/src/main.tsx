@@ -1,3 +1,3 @@
 import { createRoot } from 'react-dom/client';
-import { App } from './ui/App.tsx';
-createRoot(document.getElementById('root')!).render(<App />);
+import { Site } from './site/Site.tsx';
+createRoot(document.getElementById('root')!).render(<Site />);
