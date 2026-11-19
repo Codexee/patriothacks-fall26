@@ -111,3 +111,7 @@ Use `hollowName(county)` from `app/src/contracts.ts`.
   `EventReplay` gains `warnModel`. `firstAlert`, `leadHours` and the replay `risk` line now come from
   `warn_fcst`. **Wherever a lead time is shown, show `warnNote` near it.** `metrics.json` has extra
   optional keys (`dev`, `importance`, `split`); `models` holds FINAL TEST results.
+- **Nov 18, 11:15 pm.** `EventReplay` gains `firstAlertIndex` and `alertInputs` (plain-language model
+  inputs at the first alert hour: label, unit, value; these are observed input values, not SHAP).
+  New route `#/hollow` and `#/hollow/<event id>` → `app/src/earth/Page.tsx` (workstream 3 owns the
+  cross-section view inside `app/src/earth/`).

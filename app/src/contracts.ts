@@ -52,6 +52,9 @@ export interface EventReplay {
   risk: (number | null)[] | null; // model probability per hour for the BA; null while stub
   alertThreshold: number | null;
   warnModel?: string;
+  firstAlertIndex?: number | null; // index of the first alert hour in the hourly arrays
+  // Values of plain-language model inputs at the first alert hour ("what the model saw"). Not SHAP.
+  alertInputs?: { feature: string; label: string; unit: 'ratio' | 'share' | 'sigma' | 'm/s' | 'mm'; value: number }[] | null;
   counties: {
     fips: string;
     out: number[];         // percent of customers out, 0..100, per hour

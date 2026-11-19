@@ -77,6 +77,22 @@ def counties(con) -> pd.DataFrame:
     return c[["fips", "name", "state", "pop", "svi", "level", "customers", "dme", "medicare", "ba"]]
 
 
+# Plain-language inputs shown as "why the model alerted" (values at the first alert hour).
+REASONS = [
+    ("fc12_vs_month_record", "Tomorrow's demand forecast against this month's record", "ratio"),
+    ("fc12_vs_record", "Tomorrow's demand forecast against the all-time record", "ratio"),
+    ("demand_vs_30d_peak", "Demand now against the 30-day peak", "ratio"),
+    ("fc_err_max_24h", "Largest demand-over-forecast error in the last 24 h", "share"),
+    ("temp_z_month", "Temperature now against normal for the month", "sigma"),
+    ("fx_temp_min_48h_z", "Coldest forecast temperature in the next 48 h against normal", "sigma"),
+    ("fx_temp_max_48h_z", "Hottest forecast temperature in the next 48 h against normal", "sigma"),
+    ("fx_wind_max_48h", "Strongest forecast wind in the next 48 h", "m/s"),
+    ("fx_precip_48h", "Forecast precipitation in the next 48 h", "mm"),
+    ("out_nat_lag1", "Share of US customers already out", "share"),
+    ("out_own_lag1", "Share of this area's customers already out", "share"),
+]
+
+
 def nn(v):
     """JSON-safe number: NaN -> None, whole floats -> int."""
     if v is None or pd.isna(v):
@@ -165,9 +181,18 @@ def main() -> None:
             risk = [None] * len(hours)
             for h, v in zip(p.hour, p.p):
                 risk[idx[h]] = nn(v)
+        reasons = None
+        if first_alert is not None:
+            cols = ", ".join(c for c, _, _ in REASONS)
+            fr = con.execute(f"SELECT {cols} FROM '{DERIVED}/ba_hour_features.parquet' WHERE ba = ? AND hour = ?",
+                             [e.ba, pd.Timestamp(first_alert)]).fetchone()
+            if fr is not None:
+                reasons = [{"feature": c, "label": lab, "unit": u, "value": nn(v)}
+                           for (c, lab, u), v in zip(REASONS, fr) if v is not None and not pd.isna(v)]
         (APP / "events" / f"{e.event_id}.json").write_text(json.dumps({
             "id": e.event_id, "ba": e.ba, "t0": str(t0), "hours": len(hours), "eventStartIndex": 72,
-            "risk": risk, "alertThreshold": thr.get(WARN_COL), "warnModel": WARN_MODEL, "counties": cl,
+            "risk": risk, "alertThreshold": thr.get(WARN_COL), "warnModel": WARN_MODEL,
+            "firstAlertIndex": (idx.get(pd.Timestamp(first_alert)) if first_alert else None), "alertInputs": reasons, "counties": cl,
             "stub": not (have_pred and have_dark)}, separators=(",", ":")))
 
     meta = json.loads((OUT / "events.json").read_text())
