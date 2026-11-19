@@ -241,9 +241,14 @@ const GUESS_TOTAL = Array.from({ length: SECTION_COUNT }, (_, i) => guessPeople(
 /** Share of plant k's capacity left at hour h (a scenario's plantLoss). */
 function lossF(scen: Scenario, k: number, h: number): number {
   const pl = scen.plantLoss;
-  if (!pl || pl.plant !== k) return 1;
-  const t = h - pl.startHour;
-  return t < 0 || t >= pl.loss.length ? 1 : 1 - clamp(pl.loss[t], 0, 1);
+  if (!pl) return 1;
+  let left = 1;
+  for (const x of Array.isArray(pl) ? pl : [pl]) {
+    if (x.plant !== k) continue;
+    const t = h - x.startHour;
+    if (t >= 0 && t < x.loss.length) left *= 1 - clamp(x.loss[t], 0, 1);
+  }
+  return left;
 }
 
 /** Residential load: 15% scales with residents, 85% with the section's space (cooling, air, pumps, light). */
