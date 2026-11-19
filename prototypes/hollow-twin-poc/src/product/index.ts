@@ -1,79 +1,76 @@
 // REBUILD: the Residents' System. One call per day:
 //   observations of yesterday (from the test world) + memory → outputs for today + a log for the console.
 // It reads nothing else from the sim. Step 1: one feature, Blackout Warning (problem #1).
-import { LEVELS, type Observation, type Output, type ToolSet } from '../sim/types.ts';
+// Inputs are only what the brief gives residents, or what this app collects: the Directorate's census, residents'
+// own head count, residents' outage reports, and typed reports.
+import { LEVELS, SECTIONS_PER_LEVEL, type Observation, type Output, type ToolSet } from '../sim/types.ts';
 import type { ProductLog, ProductMemory, ProductStep } from './types.ts';
 import { blackoutWarning } from './earlyWarning.ts';
 
-const HISTORY_H = 96;
+const HOURS = 24;
+const HOLLOW_DARK = 0.9; // share of levels dark at once that means a plant trip, not the usual deep-first cut
 
 export function createMemory(): ProductMemory {
   return {
     day: 0,
-    plantOut: [],
-    plantHours: [],
-    feederDemand: [],
-    outlook: null,
-    outlookPrev: null,
     census: { people: [], demand: [], critical: [] },
     selfCount: [],
-    sensorPower: new Array(LEVELS).fill(null),
-    sensorCo2: new Array(LEVELS).fill(null),
-    darkReports: new Array(LEVELS).fill(0),
+    outDark: new Array(LEVELS * SECTIONS_PER_LEVEL).fill(false),
+    lines: [],
+    shed: 0,
     userReports: [],
   };
 }
 
-/** Folds one day of observations into memory. Sections not heard from keep their last known values. */
+/** Levels from the top that have power: a level is dark when at least half its sections report dark. */
+function lineOf(dark: boolean[]): { line: number; darkLevels: number } {
+  let line = -1, darkLevels = 0;
+  for (let l = 0; l < LEVELS; l++) {
+    let d = 0;
+    for (let c = 0; c < SECTIONS_PER_LEVEL; c++) if (dark[l * SECTIONS_PER_LEVEL + c]) d++;
+    if (d >= SECTIONS_PER_LEVEL / 2) { darkLevels++; if (line < 0) line = l; }
+  }
+  return { line: line < 0 ? LEVELS : line, darkLevels };
+}
+
+/** Folds one day of observations into memory. */
 function ingest(m: ProductMemory, obs: Observation[]): Record<string, number> {
   const seen: Record<string, number> = {};
-  const hours = new Map<number, (number | null)[]>();
-  const pow: number[][] = Array.from({ length: LEVELS }, () => []);
-  const co2: number[][] = Array.from({ length: LEVELS }, () => []);
-  const dark = new Array<number>(LEVELS).fill(0);
-  let plantCount = 0;
+  const outages: Extract<Observation, { kind: 'outage' }>[] = [];
   for (const o of obs) {
     seen[o.kind] = (seen[o.kind] ?? 0) + 1;
-    if (o.kind === 'plantMeter') {
-      plantCount = Math.max(plantCount, o.plant + 1);
-      if (!hours.has(o.hour)) hours.set(o.hour, []);
-      hours.get(o.hour)![o.plant] = o.output;
-    } else if (o.kind === 'feeder') {
-      m.feederDemand.push(o.demand);
-      if (!hours.has(o.hour)) hours.set(o.hour, []);
-    } else if (o.kind === 'outlook') {
-      m.outlookPrev = m.outlook;
-      m.outlook = { fromHour: o.fromHour, supply: o.supply.slice(), demand: o.demand.slice() };
-    } else if (o.kind === 'census') {
-      const i = (o.level - 1) * 8 + o.col;
+    if (o.kind === 'census') {
+      const i = (o.level - 1) * SECTIONS_PER_LEVEL + o.col;
       m.census.people[i] = o.people;
       m.census.demand[i] = o.demand;
       m.census.critical[i] = o.critical;
     } else if (o.kind === 'selfCount') {
-      m.selfCount[(o.level - 1) * 8 + o.col] = o.people;
-    } else if (o.kind === 'sensor') {
-      pow[o.level - 1].push(o.lifeSupport); // the air-and-fans circuit: off = a real blackout
-      co2[o.level - 1].push(o.co2);
+      m.selfCount[(o.level - 1) * SECTIONS_PER_LEVEL + o.col] = o.people;
+    } else if (o.kind === 'outage') {
+      outages.push(o);
     } else if (o.kind === 'reports') {
-      if (o.topic === 'dark') dark[o.level - 1] += o.count;
       if (o.byUser) m.userReports.push({ day: o.day, level: o.level, col: o.col, text: o.text });
     }
   }
-  while (m.plantOut.length < plantCount) m.plantOut.push([]);
-  for (const h of [...hours.keys()].sort((a, b) => a - b)) {
-    const row = hours.get(h)!;
-    for (let k = 0; k < m.plantOut.length; k++) m.plantOut[k].push(row[k] ?? null);
-    m.plantHours.push(h);
+  // Replay the outage reports hour by hour to get yesterday's blackout line.
+  if (outages.length || m.census.people.length) {
+    outages.sort((a, b) => a.hour - b.hour);
+    const dark = m.outDark.slice();
+    const line: number[] = [], hollowDark: boolean[] = [];
+    let k = 0;
+    for (let h = 0; h < HOURS; h++) {
+      while (k < outages.length && outages[k].hour % HOURS <= h) {
+        const o = outages[k++];
+        dark[(o.level - 1) * SECTIONS_PER_LEVEL + o.col] = o.dark;
+      }
+      const r = lineOf(dark);
+      line.push(r.line);
+      hollowDark.push(r.darkLevels >= HOLLOW_DARK * LEVELS);
+    }
+    m.outDark = dark;
+    m.lines.push({ line, hollowDark, shed: m.shed });
+    if (m.lines.length > 2) m.lines.splice(0, m.lines.length - 2);
   }
-  for (const k of m.plantOut) if (k.length > HISTORY_H) k.splice(0, k.length - HISTORY_H);
-  if (m.plantHours.length > HISTORY_H) m.plantHours.splice(0, m.plantHours.length - HISTORY_H);
-  if (m.feederDemand.length > HISTORY_H) m.feederDemand.splice(0, m.feederDemand.length - HISTORY_H);
-  const mean = (a: number[]) => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : null);
-  for (let l = 0; l < LEVELS; l++) {
-    m.sensorPower[l] = mean(pow[l]) ?? m.sensorPower[l];
-    m.sensorCo2[l] = mean(co2[l]) ?? m.sensorCo2[l];
-  }
-  m.darkReports = dark;
   if (m.userReports.length > 20) m.userReports.splice(0, m.userReports.length - 20);
   return seen;
 }
@@ -92,7 +89,7 @@ export function stepProduct(obs: Observation[], prev: ProductMemory, modules: To
   if (!obs.length) return { outputs, memory: m, log };
   if (modules.earlyWarning) {
     const bw = blackoutWarning(m, day);
-    if (bw) { outputs.push(...bw.outputs); log.blackoutWarning = bw.log; }
+    if (bw) { outputs.push(...bw.outputs); log.blackoutWarning = bw.log; m.shed = bw.log.shed; }
   }
   return { outputs, memory: m, log };
 }

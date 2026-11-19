@@ -61,6 +61,38 @@ shows both totals (census 1,318,400 vs residents 1,600,000 at the sim's scale: +
 honest, complete count the correction is exact, so the results return to the Step 1 table (Texas s1: 1,167 deaths,
 stable day 23). Partial or inflated counts are not modelled yet.
 
+### Step 1d: no plant meters, no forecast, no sensor boxes (Nov 19)
+
+The brief gives residents none of these, so the Residents' System no longer receives them (the sim still makes them,
+filtered by `residentsOnly` in `engine.ts`, so "without" results do not change). New input: residents' **outage
+reports** in the app (the hour their section's air and fans lose power, and the hour it comes back).
+
+How Blackout Warning now works (`src/product/earlyWarning.ts`):
+1. From yesterday's outage reports, the **blackout line** for each hour: how many levels from the top had power.
+2. Power goes to the upper levels first, so the line shows how much the plants made: the needs of every level above
+   it (from residents' head count). Hours when almost the whole Hollow was dark at once are plant trips and are left out.
+3. Trend: the same hours compared with the day before (capped at ±10% a day).
+4. Today's prediction: yesterday's supply × the trend, replayed hour by hour with today's power saving → which levels
+   go dark, from what time, for how long. Warnings are for today only (no forecast to see further).
+5. Save power: enough that demand stays under 88% of the worst hour's supply. After a Hollow-wide trip with no other
+   clue, +15 points. With no blackouts, the request is **kept**: residents cannot see the plants, so a quiet day is
+   no evidence the power is back. (Easing off 15% a day let the load creep back until plants tripped: ~90 trips,
+   never stable, 29,190 deaths in Texas s1.)
+
+| Scenario | Without | Step 1c (meters + forecast) | Step 1d (residents' data only) |
+| --- | --- | --- | --- |
+| Texas, seed 1 | 637,782 | 1,167, stable day 23 | 1,260, stable day 21, 75% warned, 6 trips |
+| Texas, seed 2 | 565,107 | 1,468, stable day 24 | 10,342, stable day 21, 85% warned, 12 trips |
+| Texas, seed 7 | 624,054 | 0, stable day 21 | 6,473, stable day 22, 83% warned, 12 trips |
+| Chicago 1995 | 345,945 | 0, stable day 14 | 1,570, stable day 18, 60% warned, 6 trips |
+| Baseline | 344,666 | 0, stable day 14 | 1,208, stable day 21, 71% warned, 6 trips |
+
+**Limits:** the system can't see a storm or a plant trip coming; it learns from the first day of blackouts, so the
+first trips happen unwarned. The power-saving request ratchets up and stays high (it reached the 90% cap in Texas s1
+by day 7), because nothing residents can see shows when the plants have recovered. The cost of that (non-essential
+power switched off for weeks) is not counted in the sim. The 0.85 compliance, 88% safe load and +15 step are first
+guesses; the hold rule was chosen after seeing that easing off failed.
+
 Which part does the work (Texas seed 1, before the census change): warnings only → 374,185 deaths; saving power only → 2,379; both → 1,167.
 Saving power stops the overloads that black out the whole Hollow; the warnings cut the deaths in the blackouts that
 still happen.

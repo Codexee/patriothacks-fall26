@@ -42,7 +42,14 @@ export const WORLD = {
 // packed in beyond the registered count). ASSUMPTION: 0% missed on level 1, 30% on level 50.
 const CENSUS_MISSED_DEEP = 0.3;
 const HOLLOW_POPULATION = 2_000_000_000; // the brief's figure; the sim's ~1.6 million stand in for it
-const censusShare = (level: number) => (WORLD.census ? 1 - CENSUS_MISSED_DEEP * (level - 1) / (LEVELS - 1) : 1);
+/**
+ * Data the brief does not give residents: the Directorate's plant and switchyard meters, a weather/grid outlook,
+ * and sensor boxes (not part of the solution yet). The sim still makes them (so the random streams and results stay
+ * comparable) but the Residents' System never receives them.
+ */
+const NOT_FOR_RESIDENTS = new Set<Observation['kind']>(['plantMeter', 'feeder', 'outlook', 'sensor']);
+const residentsOnly = (obs: Observation[]) => obs.filter((o) => !NOT_FOR_RESIDENTS.has(o.kind));
+const censusShare =(level: number) => (WORLD.census ? 1 - CENSUS_MISSED_DEEP * (level - 1) / (LEVELS - 1) : 1);
 
 // Air (#1): CO2 above AIR_DANGER ppm starts to kill; a warned, prepared resident is much safer.
 const AIR_DANGER = 5000;
@@ -153,6 +160,7 @@ interface Internal {
   pendingFindings: Output[]; // findings that could not reach residents while the network was down
   relays: number[]; // sections with a Lantern battery relay
   critPow: number[]; // share of life-support power each section got last hour (phones charge on it)
+  outDark: boolean[]; // per section: dark as residents last reported it in the app
   welfareUntil: number[];
   // Food (problem 12).
   diversions: { from: number; to: number; start: number; farms: number[] }[]; // farms: the Directorate's farms at that moment
@@ -293,6 +301,7 @@ export function createState(scenario: Scenario, seed: number, tools: ToolSet): S
     pendingFindings: [],
     relays: [],
     critPow: new Array(n).fill(1),
+    outDark: new Array(n).fill(false),
     welfareUntil: new Array(n).fill(-1),
     diversions: [],
     surfaceTox: SURFACE_TOX,
@@ -314,7 +323,7 @@ export function createState(scenario: Scenario, seed: number, tools: ToolSet): S
     internal,
   };
   state.bulletin = makeBulletin(state, internal);
-  state.observations = warmupObservations(state, internal);
+  state.observations = residentsOnly(warmupObservations(state, internal));
   return state;
 }
 
@@ -903,6 +912,12 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
       const p = fd > 0 ? (critFrac[i] * fullC[i] + nonFrac[i] * fullN[i]) / fd : 0;
       s.power[i] = s.lost[i] ? 0 : p;
       s.critPow[i] = s.lost[i] ? 0 : critFrac[i];
+      // Residents' outage reports in the app: when their fans and air lose power, and when it comes back.
+      const darkNowI = !s.lost[i] && critFrac[i] < BLACKOUT;
+      if (darkNowI !== s.outDark[i] && !s.lost[i]) {
+        obs.push({ kind: 'outage', level, col: i % SECTIONS_PER_LEVEL, hour: h, dark: darkNowI });
+      }
+      s.outDark[i] = darkNowI;
       sumPow[i] += s.power[i];
       sumLife[i] += s.lost[i] ? 0 : critFrac[i];
       // Blackout bookkeeping (#1): person-hours without life-support power, and how many were warned ahead.
@@ -1086,7 +1101,7 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
   state.lastFrame = frames[frames.length - 1];
   state.bulletin = makeBulletin(state, s);
   dailyObservations(state, s, day, obs, { sumPow, sumLife, sumWet, sumCo2, sumInf }, I, fullC, fullN, netUpEnd ? null : reachEnd, expected, known);
-  state.observations = obs;
+  state.observations = residentsOnly(obs);
   return { state, frames, events };
 }
 

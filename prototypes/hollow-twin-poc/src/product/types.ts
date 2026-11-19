@@ -2,31 +2,30 @@
 // Outputs. They never read the engine's hidden state. We add one feature per Hollow problem, step by step.
 import type { Output } from '../sim/types.ts';
 
-export interface Outlook { fromHour: number; supply: number[]; demand: number[] }
+/** One day of residents' outage reports, summarized by hour of day. */
+export interface DayLine {
+  line: number[]; // per hour (0–23): how many levels from the top had power (50 = nobody dark)
+  hollowDark: boolean[]; // per hour: most of the Hollow dark at once (a plant tripped), so the line says nothing
+  shed: number; // the power saving the system had asked for that day
+}
 
 /** Everything the system remembers between days. Plain JSON, so runs can be cloned and replayed. */
 export interface ProductMemory {
   day: number; // last day of observations processed
-  // Plant meters: hourly history (newest last), up to 96 h.
-  plantOut: (number | null)[][]; // per plant
-  plantHours: number[]; // absolute hour of each plantOut column
-  feederDemand: number[]; // switchyard load, hourly
-  outlook: Outlook | null; // latest public weather and grid outlook (next 48 h)
-  outlookPrev: Outlook | null; // the one before (covers yesterday)
   census: { people: number[]; demand: number[]; critical: number[] }; // per section, the Directorate's
   selfCount: number[]; // per section, residents' own count in the app
-  sensorPower: (number | null)[]; // per level: yesterday's mean share of LIFE-SUPPORT power (air, fans)
-  sensorCo2: (number | null)[]; // per level: yesterday's mean CO2
-  darkReports: number[]; // per level: "the power is off" reports yesterday
+  outDark: boolean[]; // per section: dark at the end of the last day, from outage reports
+  lines: DayLine[]; // the last 2 days, oldest first
+  shed: number; // the power saving asked for most recently
   userReports: { day: number; level: number; col: number; text: string }[];
 }
 
-/** A predicted blackout for a range of levels, worked out from the forecast and the Directorate's rule. */
+/** A predicted blackout for a range of levels, worked out from residents' reports and the Directorate's rule. */
 export interface PredictedBlackout {
   from: number; // levels
   to: number;
   startsIn: number; // hours from the start of the day
-  hours: number; // expected length within the 36 h horizon
+  hours: number; // expected length today
   startClock: number; // hour of day (0–23)
 }
 
@@ -35,15 +34,16 @@ export interface ProductLog {
   day: number;
   seen: Record<string, number>; // observation counts by kind
   blackoutWarning?: {
-    capNow: number;
-    capForecast: number; // at the worst hour
-    demandForecast: number;
-    shortfallPct: number; // at the worst hour
-    inHours: number; // worst hour
-    shed: number; // share of non-essential load residents were asked to switch off
+    lineWorst: number | null; // yesterday's blackout line at its worst hour (levels with power), null = nobody dark
+    lineWorstHour: number;
+    trend: number; // levels per day the line is moving (negative = blackouts reach higher levels)
+    supplyEstimate: number | null; // plant output worked out from the line, at the worst hour (units)
+    demand: number; // what all sections need (units, from residents' count)
+    hollowDarkHours: number; // hours yesterday when most of the Hollow was dark (plant trips)
+    shed: number; // share of non-essential load residents are asked to switch off today
     blackouts: PredictedBlackout[];
-    darkNow: number[]; // levels whose air-and-fans circuit had less than half its power yesterday
-    tripRisk: boolean; // even after saving, plants will run close to tripping: a Hollow-wide blackout is possible
+    darkNow: number[]; // levels still dark at the end of yesterday
+    tripRisk: boolean; // a blackout of the whole Hollow is possible
     censusPeople: number; // the Directorate's census total
     selfPeople: number; // residents' own count total
     deepRatio: number; // residents' count / census on the deepest level

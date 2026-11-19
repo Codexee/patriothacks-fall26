@@ -75,9 +75,9 @@ export function ProductView(p: ProductViewProps) {
           <>
             <h3>Next blackout on your level</h3>
             {mine ? (
-              <p className="big-line bad">In about {mine.startsIn} h (around {clock(mine.startClock)}), lasting about {mine.hours} h.</p>
+              <p className="big-line bad">Today from about {clock(mine.startClock)}, lasting about {mine.hours} h.</p>
             ) : bw ? (
-              <p className="big-line good">None expected in the next 36 hours.</p>
+              <p className="big-line good">None expected today.</p>
             ) : <p className="muted">Gathering data. The first forecast comes tomorrow.</p>}
           </>
         )}
@@ -112,23 +112,27 @@ export function ProductView(p: ProductViewProps) {
             <h3>{moduleName('earlyWarning')} <span className="muted small">#1</span></h3>
             <p>Head count: the Directorate's census says <b>{fmt(bw.censusPeople)}</b>; residents counted <b>{fmt(bw.selfPeople)}</b> in the app
               {bw.selfPeople > bw.censusPeople && <> (<b className="bad">+{Math.round((bw.selfPeople / Math.max(1, bw.censusPeople) - 1) * 100)}%</b>, +{Math.round((bw.deepRatio - 1) * 100)}% on level 50)</>}. Power needs use the residents' count.</p>
-            <p>Plants now: <b>{fmt(bw.capNow)}</b> units. Worst hour ahead (in {bw.inHours} h): <b>{fmt(bw.capForecast)}</b> units for a demand of <b>{fmt(bw.demandForecast)}</b>.</p>
+            <p>Blackout line yesterday: {bw.lineWorst === null
+              ? <b>no level lost power</b>
+              : <>at {clock(bw.lineWorstHour)} only the top <b>{bw.lineWorst}</b> levels had power ({bw.trend < 0 ? `moving up ${-bw.trend} levels a day` : bw.trend > 0 ? `moving down ${bw.trend} levels a day` : 'not moving'})</>}.
+              {bw.hollowDarkHours > 0 && <> The whole Hollow went dark for <b className="bad">{bw.hollowDarkHours} h</b> (plants tripped).</>}</p>
+            {bw.supplyEstimate !== null && <p>So the plants made about <b>{fmt(bw.supplyEstimate)}</b> units at the worst hour, for a need of <b>{fmt(bw.demand)}</b>.</p>}
             {bw.shed > 0
-              ? <p className="warn-text">Plants will run near their limit. Asked everyone to switch off {Math.round(bw.shed * 100)}% of non-essential load.</p>
-              : <p className="good">Plants stay below their safe limit.</p>}
-            <h4>Blackouts predicted (next 36 h)</h4>
+              ? <p className="warn-text">{bw.lineWorst === null && bw.hollowDarkHours === 0 ? 'Keeping the request (residents cannot see the plants, so a quiet day is no proof the power is back):' : 'Plants are running at their limit.'} Asked everyone to switch off {Math.round(bw.shed * 100)}% of non-essential load today.</p>
+              : <p className="good">No blackouts yesterday: no power saving needed.</p>}
+            <h4>Blackouts predicted (today)</h4>
             {bw.blackouts.length === 0 ? <p className="muted">None.</p> : (
               <table className="bo-table">
                 <thead><tr><th>Levels</th><th>Starts</th><th>Lasts</th></tr></thead>
                 <tbody>
                   {bw.blackouts.map((b) => (
-                    <tr key={b.from}><td>{b.from === b.to ? b.from : `${b.from}–${b.to}`}</td><td>in {b.startsIn} h ({clock(b.startClock)})</td><td>{b.hours} h</td></tr>
+                    <tr key={b.from}><td>{b.from === b.to ? b.from : `${b.from}–${b.to}`}</td><td>about {clock(b.startClock)}</td><td>{b.hours} h</td></tr>
                   ))}
                 </tbody>
               </table>
             )}
-            {bw.darkNow.length > 0 && <p className="small bad">Without power yesterday (sensor boxes): levels {bw.darkNow.join(', ')}</p>}
-            <p className="muted small">How it predicts: plant meters × the public weather and grid outlook give the power coming; the census gives the power needed; the Directorate's public rule (upper levels first) shows who loses out.</p>
+            {bw.darkNow.length > 0 && <p className="small bad">Still without power at the end of yesterday (outage reports): levels {bw.darkNow.join(', ')}</p>}
+            <p className="muted small">How it predicts: power goes to the upper levels first, so the line where residents report blackouts shows how much power the plants make. Yesterday's line, and how it moved since the day before, predicts today's. Power needs come from residents' own head count. No plant meters, no forecast.</p>
           </div>
         )}
         {run.log?.seen && (

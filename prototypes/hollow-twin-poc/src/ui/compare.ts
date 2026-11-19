@@ -17,7 +17,7 @@ export const TOOL_HINTS: Record<ToolKey, string> = {
   layout: 'Moves fans from cool upper levels to the hottest deep levels, from the sensor boxes.',
   larder: 'Tracks each level\'s food runway; carries food from surplus levels and builds grow-lamp farms where it runs out.',
   witness: 'Verifies signed surface probe readings, rejects fakes, and broadcasts whether the surface is safe.',
-  earlyWarning: 'Forecasts the power coming (plant meters × the public outlook) against the power needed, works out which levels will go dark and when, and warns them ahead, including when their air turns unsafe.',
+  earlyWarning: 'From residents\' outage reports, finds the line above which levels still have power. Power goes to the upper levels first, so the line shows how much power the plants make. It predicts today\'s line from yesterday\'s and its trend, warns the levels that will go dark, and asks everyone to save power so the plants do not trip.',
   fairShare: 'Plans power from the census: life support in every section first, then the same share for all, more for hot levels and farms.',
   ledger: 'Checks Directorate claims against residents\' own data (including the real outbreak count) and publishes them in a record nobody can quietly change.',
   snow: 'Traces water complaints and tap readings to the failing recycler, warns only the levels it serves, sends a repair crew.',

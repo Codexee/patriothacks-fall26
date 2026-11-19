@@ -2,225 +2,183 @@
 // "Blackouts in the deep levels now last for days, and no one knows when the next one will hit.
 //  How would you warn people before the power or air cuts out?"
 //
-// What it does each day, from observations only:
-//  1. Forecasts plant output 36 h ahead: each plant's own health trend (from its feeder meter, so a plant that is
-//     wearing out is caught) × the public weather and grid outlook (so a storm is seen before it arrives).
-//  2. Forecasts demand: the section census × the outlook's demand curve.
-//  3. Predicts WHO goes dark and WHEN: the Directorate's rule is public — upper levels are served first — so where
-//     the forecast is short, it can say which levels lose power, at what time, and for how long.
-//  4. Warns those levels ahead of time, including when their air turns unsafe after the fans stop, so residents can
-//     prepare (charge lights, store water, plan where the vulnerable go for air).
-//  5. If demand will push the plants near their limit, asks everyone to switch off non-essential load, so the plants
-//     do not overload and trip — which would black out the whole Hollow, not only the deep levels.
-import type { Output } from '../sim/types.ts';
-import type { Outlook, PredictedBlackout, ProductLog, ProductMemory } from './types.ts';
+// Inputs (only what residents have, or what this app collects):
+//  - residents' outage reports in the app (when their air and fans lose power, and when it comes back);
+//  - residents' own head count in the app, and the Directorate's census (which undercounts);
+//  - the rule everyone knows from the brief: the deep levels lose power first.
+// No plant meters, no weather or grid forecast, no sensor boxes.
+//
+// What it does each day:
+//  1. From yesterday's outage reports, finds the BLACKOUT LINE for each hour: how many levels from the top had power.
+//  2. Because power goes to the upper levels first, the line shows how much power the plants made at that hour:
+//     the power needs of every level above the line (from residents' head count).
+//  3. Compares the line with the day before: is it moving up (less power each day) or down?
+//  4. Predicts today's line hour by hour (yesterday's line + the trend), so it can say which levels go dark, at
+//     what time, and for how long.
+//  5. Asks everyone to switch off enough non-essential load that the plants stop running at their limit. Plants at
+//     their limit trip and black out the whole Hollow, not only the deep levels.
+import { LEVELS, SECTIONS_PER_LEVEL, type Output } from '../sim/types.ts';
+import type { PredictedBlackout, ProductLog, ProductMemory } from './types.ts';
 
-const HORIZON = 36; // hours
-const SAFE_LOAD = 0.88; // above this load, plants risk tripping (at ≥ 99% they trip from stress)
-const ASSUMED_COMPLIANCE = 0.85;
-const TRIP_ZONE = 0.95; // load at which plants are close to tripping (they trip from stress at about 99%)
-const OFFLINE_HOURS = 12; // a tripped plant is assumed to stay off this long
-const DARK = 0.5; // a section is dark when it gets less than half of what it needs
-const CO2_RISE = 300; // ppm per hour with the fans off (measured by residents' sensor boxes in past blackouts)
-const AIR_UNSAFE = 5000; // ppm
-const SECTIONS = 8;
+const SAFE_LOAD = 0.88; // keep the plants below this share of their output
+const TRIP_ZONE = 0.95; // above this, plants are close to tripping
+const ASSUMED_COMPLIANCE = 0.85; // share of residents expected to follow a save-power request
+const MAX_TREND = 0.1; // the supply trend is capped at ±10% a day
+// With no blackouts yesterday the save-power request is KEPT: residents cannot see the plants, so a quiet day is
+// no evidence that the power has come back, and easing off was what made the plants trip again.
+const TRIP_STEP = 0.15; // after a Hollow-wide blackout with no other clue, ask for this much more saving
+const HOURS = 24;
 
-function fit(xs: number[], ys: number[]): { a: number; b: number } {
-  const n = xs.length;
-  if (n < 2) return { a: ys[0] ?? 0, b: 0 };
-  const mx = xs.reduce((p, q) => p + q, 0) / n;
-  const my = ys.reduce((p, q) => p + q, 0) / n;
-  let sxy = 0, sxx = 0;
-  for (let i = 0; i < n; i++) { sxy += (xs[i] - mx) * (ys[i] - my); sxx += (xs[i] - mx) ** 2; }
-  const b = sxx > 0 ? sxy / sxx : 0;
-  return { a: my - b * mx, b };
-}
-
-/** Value of an outlook at an absolute hour, or null when the outlook does not cover it. */
-function at(o: Outlook | null, key: 'supply' | 'demand', hour: number): number | null {
-  if (!o) return null;
-  const i = hour - o.fromHour;
-  return i >= 0 && i < o[key].length ? o[key][i] : null;
-}
-
-/** Capacity forecast for hours 1..HORIZON after the last meter reading. */
-export function forecastCapacity(m: ProductMemory): { capAt: (t: number) => number; capNow: number; lastHour: number } | null {
-  const hist = m.plantOut;
-  if (!hist.length || hist[0].length < 24) return null;
-  const hours = m.plantHours.slice(-24);
-  const lastHour = hours[hours.length - 1];
-  let capNow = 0;
-  const perPlant: ((t: number) => number)[] = [];
-  for (const series of hist) {
-    const last24 = series.slice(-24);
-    let lastValid = 0;
-    for (const v of last24) if (v !== null) lastValid = v;
-    capNow += lastValid;
-    // Normalize each reading by the supply the outlook expected that hour: what is left is the plant's own health.
-    const xs: number[] = [], ys: number[] = [];
-    last24.forEach((v, i) => {
-      if (v === null || v <= 0) return;
-      const sup = at(m.outlookPrev, 'supply', hours[i]) ?? 1;
-      xs.push(i); ys.push(v / Math.max(0.05, sup));
-    });
-    const meanNorm = ys.length ? ys.reduce((p, q) => p + q, 0) / ys.length : 0;
-    const maxNorm = ys.length ? Math.max(...ys) : 0;
-    const supNext = (t: number) => at(m.outlook, 'supply', lastHour + t) ?? at(m.outlookPrev, 'supply', lastHour + t) ?? 1;
-    if (lastValid === 0) {
-      perPlant.push((t) => (t > OFFLINE_HOURS ? meanNorm * supNext(t) : 0));
-      continue;
-    }
-    // A plant's own health never improves by itself: the trend may only stay flat or fall.
-    const { a, b } = fit(xs, ys);
-    const slope = Math.min(0, b);
-    const level = Math.min(maxNorm, a + b * 23);
-    perPlant.push((t) => Math.max(0, Math.min(maxNorm, level + slope * t)) * supNext(t));
-  }
-  return { capAt: (t) => perPlant.reduce((s, f) => s + f(t), 0), capNow, lastHour };
-}
-
-/** Group levels that go dark at about the same time into ranges, for one alert each. */
-function group(firstDark: (number | null)[], hoursDark: number[]): { from: number; to: number; startsIn: number; hours: number }[] {
-  const out: { from: number; to: number; startsIn: number; hours: number }[] = [];
-  for (let l = 1; l <= firstDark.length; l++) {
-    const t0 = firstDark[l - 1];
-    if (t0 === null) continue;
-    const last = out[out.length - 1];
-    if (last && last.to === l - 1 && Math.abs(last.startsIn - t0) <= 2) {
-      last.to = l;
-      last.startsIn = Math.min(last.startsIn, t0);
-      last.hours = Math.max(last.hours, hoursDark[l - 1]);
-    } else out.push({ from: l, to: l, startsIn: t0, hours: hoursDark[l - 1] });
-  }
-  return out;
-}
+const sum = (a: number[]) => a.reduce((s, v) => s + (v || 0), 0);
 
 export function blackoutWarning(m: ProductMemory, day: number):
   { outputs: Output[]; log: NonNullable<ProductLog['blackoutWarning']> } | null {
-  const fc = forecastCapacity(m);
-  // The Directorate's census misses people. Where residents' own count is higher, scale that section's power
-  // need up by the same ratio (the census sets the need from its head count).
+  if (!m.census.demand.length || !m.lines.length) return null;
+
+  // Power needs per section: the census ration, scaled up where residents counted more people than the census.
   const ratio = m.census.people.map((p, i) => (p > 0 && m.selfCount[i] > 0 ? m.selfCount[i] / p : 1));
   const demand = m.census.demand.map((v, i) => (v || 0) * ratio[i]);
   const critical = m.census.critical.map((v, i) => (v || 0) * ratio[i]);
-  const censusTotal = m.census.people.reduce((a, b) => a + (b || 0), 0);
-  const selfTotal = m.selfCount.reduce((a, b) => a + (b || 0), 0);
-  const deepRatio = (() => {
-    let c = 0, r = 0;
-    for (let i = demand.length - 8; i < demand.length; i++) { c += m.census.people[i] || 0; r += m.selfCount[i] || 0; }
-    return c > 0 ? r / c : 1;
+  const levelNeed = (l: number, shed: number) => { // l = 0-based level
+    let s = 0;
+    for (let c = 0; c < SECTIONS_PER_LEVEL; c++) {
+      const i = l * SECTIONS_PER_LEVEL + c;
+      s += critical[i] + Math.max(0, demand[i] - critical[i]) * (1 - shed * ASSUMED_COMPLIANCE);
+    }
+    return s;
+  };
+  const above = (line: number, shed: number) => { let s = 0; for (let l = 0; l < line; l++) s += levelNeed(l, shed); return s; };
+  const D = sum(demand), C = sum(critical);
+
+  // 1–2. Yesterday's line → the power the plants made at each hour (only where the line is informative: some
+  // levels dark, but not the whole Hollow at once).
+  const supplyOf = (d: { line: number[]; hollowDark: boolean[]; shed: number }) =>
+    d.line.map((ln, h) => (ln < LEVELS && !d.hollowDark[h] ? above(ln, d.shed) : null));
+  const y = m.lines[m.lines.length - 1];
+  const p = m.lines.length > 1 ? m.lines[0] : null;
+  const sY = supplyOf(y);
+  const sP = p ? supplyOf(p) : null;
+
+  // 3. Trend: change in supply at the same hours, day over day.
+  let dS = 0, n = 0, base = 0;
+  if (sP) for (let h = 0; h < HOURS; h++) if (sY[h] !== null && sP[h] !== null) { dS += sY[h]! - sP[h]!; base += sY[h]!; n++; }
+  dS = n ? Math.max(-MAX_TREND, Math.min(MAX_TREND, dS / Math.max(1, base))) : 0; // as a share of supply
+  const sToday = sY.map((v) => (v === null ? null : v * (1 + dS)));
+  const lineTrend = (() => {
+    if (!p) return 0;
+    let a = 0, b = 0, k = 0;
+    for (let h = 0; h < HOURS; h++) if (!y.hollowDark[h] && !p.hollowDark[h]) { a += y.line[h]; b += p.line[h]; k++; }
+    return k ? Math.round(((a - b) / k) * 10) / 10 : 0;
   })();
-  if (!fc || !demand.length) return null;
-  const { capAt, capNow, lastHour } = fc;
-  const levels = Math.ceil(demand.length / SECTIONS);
+  const hollowDarkHours = y.hollowDark.filter(Boolean).length;
 
-  // Demand forecast: the census total, divided by the load multiplier at that hour, times the outlook's multiplier.
-  const d0 = demand.reduce((s, v) => s + (v || 0), 0);
-  const crit0 = critical.reduce((s, v) => s + (v || 0), 0);
-  const multNow = at(m.outlookPrev, 'demand', lastHour) ?? at(m.outlook, 'demand', lastHour + 1) ?? 1;
-  const scaleAt = (t: number) => (at(m.outlook, 'demand', lastHour + t) ?? multNow) / Math.max(0.05, multNow);
-
-  // 5. Overload risk: ask everyone to cut non-essential load before the plants run near their limit.
-  let worst = 0, worstT = 1;
-  for (let t = 1; t <= HORIZON; t++) {
-    const r = (d0 * scaleAt(t)) / Math.max(1, SAFE_LOAD * capAt(t));
-    if (r > worst) { worst = r; worstT = t; }
+  // 5. Save power: keep the plants below SAFE_LOAD at the worst hour.
+  const known = sToday.filter((v): v is number => v !== null);
+  const sMin = known.length ? Math.min(...known) : null;
+  let shed: number;
+  if (sMin !== null) {
+    shed = Math.max(0, Math.min(0.9, (D - SAFE_LOAD * sMin) / Math.max(1, D - C) / ASSUMED_COMPLIANCE));
+    if (shed > 0) shed = Math.max(0.05, shed);
+  } else if (hollowDarkHours > 0) {
+    shed = Math.min(0.9, m.shed + TRIP_STEP); // the plants tripped: they were overloaded, by an unknown amount
+  } else {
+    shed = m.shed; // no blackouts yesterday: keep the same request (see above)
+    if (shed < 0.03) shed = 0;
   }
-  const dF = d0 * scaleAt(worstT), cF = capAt(worstT);
-  const critAt = crit0 * scaleAt(worstT);
-  const shed = worst > 1 ? Math.min(0.9, Math.max(0.05, (dF - SAFE_LOAD * cF) / Math.max(1, dF - critAt) / ASSUMED_COMPLIANCE)) : 0;
 
-  // 3. Who goes dark, and when: replay the Directorate's "upper levels first" rule on the forecast, hour by hour,
-  // with the load residents will switch off.
-  const firstDark: (number | null)[] = new Array(levels).fill(null);
-  const hoursDark = new Array<number>(levels).fill(0);
-  for (let t = 1; t <= HORIZON; t++) {
-    let left = capAt(t);
-    const k = scaleAt(t);
-    const darkSections = new Array<number>(levels).fill(0);
-    for (let i = 0; i < demand.length; i++) {
-      const c = (critical[i] || 0) * k;
-      const need = c + Math.max(0, (demand[i] || 0) * k - c) * (1 - shed * ASSUMED_COMPLIANCE);
-      if (need <= 0) continue;
-      const got = Math.min(1, Math.max(0, left / need));
-      left -= got * need;
-      if (got < DARK) darkSections[Math.floor(i / SECTIONS)]++;
-    }
-    for (let l = 0; l < levels; l++) {
-      if (darkSections[l] >= SECTIONS / 2) {
-        if (firstDark[l] === null) firstDark[l] = t;
-        hoursDark[l]++;
-      }
-    }
+  // 4. Today's predicted blackouts, with today's power saving.
+  const firstDark: (number | null)[] = new Array(LEVELS).fill(null);
+  const hoursDark = new Array<number>(LEVELS).fill(0);
+  for (let h = 0; h < HOURS; h++) {
+    const s = sToday[h];
+    if (s === null) continue;
+    let left = s, lit = 0;
+    while (lit < LEVELS && levelNeed(lit, shed) <= left) { left -= levelNeed(lit, shed); lit++; }
+    for (let l = lit; l < LEVELS; l++) { if (firstDark[l] === null) firstDark[l] = h; hoursDark[l]++; }
   }
+  const afterSaving = C + (D - C) * (1 - shed * ASSUMED_COMPLIANCE);
+  const tripRisk = hollowDarkHours > 0 || (sMin !== null && afterSaving > TRIP_ZONE * sMin);
+
   const darkNow: number[] = [];
-  for (let l = 1; l <= levels; l++) { const p = m.sensorPower[l - 1]; if (p !== null && p < DARK) darkNow.push(l); }
+  for (let l = 0; l < LEVELS; l++) {
+    let d = 0;
+    for (let c = 0; c < SECTIONS_PER_LEVEL; c++) if (m.outDark[l * SECTIONS_PER_LEVEL + c]) d++;
+    if (d >= SECTIONS_PER_LEVEL / 2) darkNow.push(l + 1);
+  }
 
   const outputs: Output[] = [];
-  const fmt = (n: number) => Math.round(n).toLocaleString('en-US');
-  const clock = (t: number) => `${String((lastHour + t + 24) % 24).padStart(2, '0')}:00`;
-  const airHours = (from: number, to: number) => {
-    let co2 = 0, k = 0;
-    for (let l = from; l <= to; l++) { const v = m.sensorCo2[l - 1]; if (v !== null) { co2 += v; k++; } }
-    return Math.max(1, Math.round((AIR_UNSAFE - (k ? co2 / k : 1000)) / CO2_RISE));
-  };
+  const fmt = (x: number) => Math.round(x).toLocaleString('en-US');
+  const clock = (h: number) => `${String(h % 24).padStart(2, '0')}:00`;
+  let worstH = -1; // the worst hour of the usual deep-first cut (plant-trip hours left out)
+  for (let h = 0; h < HOURS; h++) if (!y.hollowDark[h] && (worstH < 0 || y.line[h] < y.line[worstH])) worstH = h;
+  if (worstH < 0) worstH = 0;
+  const trendText = lineTrend < 0 ? `moving up about ${-lineTrend} levels a day` : lineTrend > 0 ? `moving down about ${lineTrend} levels a day` : 'not moving';
 
-  // 4. One "prepare" warning per group of levels expected to go dark.
-  const blackouts: PredictedBlackout[] = group(firstDark, hoursDark).map((g) => ({ ...g, startClock: (lastHour + g.startsIn + 24) % 24 }));
+  const blackouts: PredictedBlackout[] = [];
+  for (let l = 1; l <= LEVELS; l++) {
+    const t0 = firstDark[l - 1];
+    if (t0 === null) continue;
+    const last = blackouts[blackouts.length - 1];
+    if (last && last.to === l - 1 && Math.abs(last.startsIn - t0) <= 2) {
+      last.to = l; last.startsIn = Math.min(last.startsIn, t0); last.startClock = last.startsIn; last.hours = Math.max(last.hours, hoursDark[l - 1]);
+    } else blackouts.push({ from: l, to: l, startsIn: t0, hours: hoursDark[l - 1], startClock: t0 });
+  }
   for (const b of blackouts) {
-    const air = airHours(b.from, b.to);
     const levelsText = b.from === b.to ? `level ${b.from}` : `levels ${b.from}–${b.to}`;
     outputs.push({
       kind: 'alert', id: `bw-${day}-${b.from}`, module: 'earlyWarning', action: 'prepare', from: b.from, to: b.to,
-      hours: Math.min(48, b.startsIn + b.hours + 6),
-      text: `Blackout expected on ${levelsText} in about ${b.startsIn} h (around ${clock(b.startsIn)}), lasting about ${b.hours} h. Without fans, the air becomes unsafe about ${air} h after the power goes. Get ready now: charge lights, store water, and plan where children, the elderly and the sick will go for air.`,
+      hours: 24,
+      text: `Blackout expected on ${levelsText} today from about ${clock(b.startClock)}, for about ${b.hours} h. The fans stop with the power, so the air will go bad. Get ready now: charge lights, store water, and plan where children, the elderly and the sick will go for air.`,
       evidence: [
-        `Plant output forecast at ${clock(b.startsIn)}: ${fmt(capAt(b.startsIn))} units, against demand of ${fmt(d0 * scaleAt(b.startsIn))} units`,
-        `The Directorate serves the upper levels first, so with this shortfall the power runs out at ${levelsText}`,
-        `Residents' sensors: air rises about ${CO2_RISE} ppm per hour with the fans off; unsafe at ${fmt(AIR_UNSAFE)} ppm`,
+        `Residents' outage reports yesterday: at ${clock(worstH)} only the top ${y.line[worstH]} levels had power`,
+        `The blackout line is ${trendText}${p ? '' : ' (only one day of reports so far)'}`,
+        `Power goes to the upper levels first, so with the same plant output ${levelsText} run out at that hour`,
       ],
     });
   }
-  // Levels that were dark yesterday and are not covered above: their air is the urgent risk.
   const covered = new Set(blackouts.flatMap((b) => Array.from({ length: b.to - b.from + 1 }, (_, k) => b.from + k)));
   const stillDark = darkNow.filter((l) => !covered.has(l));
   if (stillDark.length) {
     const from = Math.min(...stillDark), to = Math.max(...stillDark);
     outputs.push({
       kind: 'alert', id: `bw-now-${day}`, module: 'earlyWarning', action: 'prepare', from, to, hours: 24,
-      text: `Levels ${from}–${to} had their air and fans cut yesterday. If the fans are still off, move children, the elderly and the sick to better air now.`,
-      evidence: [`Sensor boxes on the air-and-fans circuit of these levels averaged under ${Math.round(DARK * 100)}% power yesterday`],
+      text: `Levels ${from}–${to} were still without power for their air and fans at the end of yesterday. Move children, the elderly and the sick to better air now.`,
+      evidence: [`Outage reports from these levels: no "power back" report since the power went`],
     });
   }
-  // Even with everyone saving power, will the plants still run in their trip zone? Then a blackout of the WHOLE
-  // Hollow is possible: plants that trip shift their load to the others, which trip too. Warn every level.
-  const afterSaving = critAt + (dF - critAt) * (1 - shed * ASSUMED_COMPLIANCE);
-  const tripRisk = afterSaving > TRIP_ZONE * cF;
   if (tripRisk) {
     outputs.push({
-      kind: 'alert', id: `bw-trip-${day}`, module: 'earlyWarning', action: 'prepare', from: 1, to: levels, hours: Math.min(48, worstT + 24),
-      text: `Even if everyone saves power, the plants will run close to tripping in about ${worstT} h (around ${clock(worstT)}). A blackout of the whole Hollow is possible. Every level: get ready now: charge lights, store water, and plan where children, the elderly and the sick will go for air.`,
-      evidence: [
-        `Forecast in ${worstT} h: ${fmt(cF)} units of plant output; demand even after saving: ${fmt(afterSaving)} units (${Math.round((afterSaving / Math.max(1, cF)) * 100)}% of output)`,
-        `Plants trip from overload above about ${Math.round(TRIP_ZONE * 100)}% load, and one trip pushes its load onto the others`,
-      ],
+      kind: 'alert', id: `bw-trip-${day}`, module: 'earlyWarning', action: 'prepare', from: 1, to: LEVELS, hours: 24,
+      text: `The plants are running at their limit. A blackout of the whole Hollow is possible today. Every level: get ready now: charge lights, store water, and plan where children, the elderly and the sick will go for air.`,
+      evidence: hollowDarkHours > 0
+        ? [`Yesterday, for ${hollowDarkHours} h, almost every level reported a blackout at the same time: a plant tripped from overload`]
+        : [`Even with the power saving, demand would be ${Math.round((afterSaving / Math.max(1, sMin!)) * 100)}% of what the plants made at the worst hour yesterday`],
     });
   }
   if (shed > 0) {
     outputs.push({
-      kind: 'alert', id: `bw-shed-${day}`, module: 'earlyWarning', action: 'shed', from: 1, to: levels, hours: 24, amount: shed,
-      text: `The plants will run near their limit in about ${worstT} h. Everyone: switch off ${Math.round(shed * 100)}% of non-essential load now, so the plants do not trip and black out the whole Hollow.`,
-      evidence: [
-        `Plant meters now: ${fmt(capNow)} units; forecast in ${worstT} h: ${fmt(cF)}`,
-        `Demand forecast ${fmt(dF)} units (residents' own count × public outlook; the Directorate's census undercounts); plants trip above about ${Math.round(SAFE_LOAD * 100)}% load`,
-      ],
+      kind: 'alert', id: `bw-shed-${day}`, module: 'earlyWarning', action: 'shed', from: 1, to: LEVELS, hours: 24, amount: shed,
+      text: `${sMin === null && hollowDarkHours === 0 ? 'No blackouts yesterday because everyone saved power. Keep it up' : 'The plants are running at their limit'}. Everyone: switch off ${Math.round(shed * 100)}% of non-essential load today, so the plants do not trip and black out the whole Hollow.`,
+      evidence: sMin !== null
+        ? [
+          `From the blackout line, the plants made about ${fmt(sMin)} units at the worst hour; everyone together needs ${fmt(D)} (residents' own head count)`,
+          `Keeping demand under ${Math.round(SAFE_LOAD * 100)}% of that output leaves room so a plant does not trip`,
+        ]
+        : hollowDarkHours > 0
+          ? [`Yesterday the whole Hollow went dark at once for ${hollowDarkHours} h: the plants tripped from overload`]
+          : [`No blackouts yesterday because everyone is saving power. Residents cannot see the plants, so the request stays until the reports show more room`],
     });
   }
+
+  const censusTotal = sum(m.census.people), selfTotal = sum(m.selfCount);
+  let c50 = 0, r50 = 0;
+  for (let i = (LEVELS - 1) * SECTIONS_PER_LEVEL; i < LEVELS * SECTIONS_PER_LEVEL; i++) { c50 += m.census.people[i] || 0; r50 += m.selfCount[i] || 0; }
   return {
     outputs,
     log: {
-      capNow, capForecast: cF, demandForecast: dF, shortfallPct: Math.max(0, (worst - 1) * 100), inHours: worstT, shed,
-      blackouts, darkNow, tripRisk, censusPeople: censusTotal, selfPeople: selfTotal, deepRatio,
+      lineWorst: !y.hollowDark[worstH] && y.line[worstH] < LEVELS ? y.line[worstH] : null, lineWorstHour: worstH, trend: lineTrend,
+      supplyEstimate: sMin, demand: D, hollowDarkHours, shed, blackouts, darkNow, tripRisk,
+      censusPeople: censusTotal, selfPeople: selfTotal, deepRatio: c50 > 0 ? r50 / c50 : 1,
     },
   };
 }
