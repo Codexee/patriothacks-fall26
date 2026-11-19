@@ -49,7 +49,7 @@ export default function Twin3D({ data: site, scenario }: { data: SiteData | null
   const [speed, setSpeed] = useState(2);
   const [day, setDay] = useState(0); // the shown day, whole days (the clock holds the fraction)
   const [meanWith, setMeanWith] = useState<number | null>(null);
-  const clock = useRef<Clock>({ day: 0, pulseT: 0, pulse: !reduced });
+  const clock = useRef<Clock>({ day: 0, pulseT: 0, pulse: !reduced, hold: 0.85 });
   const invalidateRef = useRef<(() => void) | null>(null);
   clock.current.pulse = !reduced;
 

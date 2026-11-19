@@ -36,6 +36,11 @@ export interface Clock {
   pulseT: number;
   /** False with prefers-reduced-motion: the air stays a steady red. */
   pulse: boolean;
+  /**
+   * Share of each day that shows that day's snapshot unchanged before the cross-fade to the next day (0..1).
+   * The demo page uses 0.85 so the drawn state matches its whole-day labels; the film (no labels) blends smoothly (0).
+   */
+  hold?: number;
 }
 
 // Static geometry and materials, created once per module (disposed by the scene on unmount).
@@ -155,7 +160,8 @@ function LiveInstances({ side, days, clock, res }: { side: SideData; days: numbe
     L.day = day; L.phase = phase; L.side = side;
     const d0 = Math.floor(day);
     const d1 = Math.min(days, d0 + 1);
-    const f = day - d0;
+    const h = Math.max(0, Math.min(0.99, c.hold ?? 0));
+    const f = h > 0 ? Math.max(0, (day - d0 - h) / (1 - h)) : day - d0;
     const col = rooms.current!.instanceColor!.array as Float32Array;
     const lo = RGB.airLow, hi = RGB.air;
     for (let i = 0; i < SECTION_COUNT; i++) {
