@@ -20,10 +20,10 @@ We are a 4-person team competing in **Patriot HackFest Fall 2026** (George Mason
 
 ## Where we are (update this section after every milestone)
 
-- **Phase:** Tue Nov 17. Track changed to the Hollow; software only. **Hollow Twin spec drafted** (`.plans/hollow-twin-spec.md`). Off the Record is on hold.
-- **Done:** repo, shared context, skills, hooks, and **ideation rounds 1–13** (`ideation/ideas.md`, `ideation/shortlist.md`). **Read the top entry of `CHANGELOG.md`.**
-- **Next:** the team reads `.plans/hollow-twin-spec.md`, picks workstreams at the sync, agrees on the day-1 interfaces in `packages/sim/src/types.ts`, sets `Status: locked`, then `/parallelize`.
-- **Blockers:** the spec is a draft; confirm the raw data for the 4 scenario packs Wed morning; the judging criteria are not published.
+- **Phase:** Thu Nov 19, night. **The Hollow (branch `hollow`) is the product**; the Earth map on `main` is abandoned (Neil). Locked spec: `.plans/hollow-real-data-spec.md`.
+- **Done:** Blackout Warning (problem #1) on residents' data only; real data in the test world (EIA-930 demand, EAGLE-I repair times, real counties as sections, cited CO₂ limit); no storms (scenarios Cascade, Baseline, Aging, Crowding); `npm run gate` with tune/check/test seeds; module retuned. Results: `prototypes/hollow-twin-poc/REBUILD.md` Step 2.
+- **Next:** pitch and video; problem #2 onward, one at a time, each through the gate.
+- **Blockers:** judging criteria not published. Cascade looks like Baseline with the module on (see REBUILD.md limits).
 
 ## Start of every session (all AIs)
 
