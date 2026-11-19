@@ -957,7 +957,7 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
       const V = n * VOL_PER_PERSON;
       const gen = n * CO2_GEN * 1e6; // ppm·m³/s
       const css = CO2_OUT + gen / Q;
-      s.co2[i] = clamp(css + (s.co2[i] - css) * Math.exp((-Q / V) * 3600), CO2_OUT, 10000);
+      s.co2[i] = clamp(css + (s.co2[i] - css) * Math.exp((-Q / V) * 3600), CO2_OUT, 10000); // 10,000 ppm cap = MSHA refuge-chamber CO2 limit, 1.0% average (30 CFR 7.506, https://www.law.cornell.edu/cfr/text/30/7.506)
 
       // Heat: cooling needs power; without it the section drifts toward base + 6.
       // Fans also move hot air out (they are life support, so they run on critical power).
