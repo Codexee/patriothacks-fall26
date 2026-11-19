@@ -102,3 +102,12 @@ Shared colors and type are CSS variables in `app/src/shell/theme.css`; use them,
 
 Line 1: Earth name ("Harris County, TX"). Line 2, smaller and dimmer: Hollow name ("Level 47").
 Use `hollowName(county)` from `app/src/contracts.ts`.
+
+## Change log
+
+- **Nov 18, 10:30 pm (models v2).** Three-way split: TRAIN before 2021, DEV 2021–2022, FINAL TEST 2023–2024.
+  New model file `warn_fcst` (with a weather forecast; the backtest uses observed weather, so it is an
+  upper bound). `events.json` gains `warnModel` and `warnNote`; `EventRow` gains `leadHoursNoForecast`;
+  `EventReplay` gains `warnModel`. `firstAlert`, `leadHours` and the replay `risk` line now come from
+  `warn_fcst`. **Wherever a lead time is shown, show `warnNote` near it.** `metrics.json` has extra
+  optional keys (`dev`, `importance`, `split`); `models` holds FINAL TEST results.

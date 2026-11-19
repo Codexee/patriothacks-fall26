@@ -26,6 +26,9 @@ ROOT = Path(__file__).resolve().parents[1]
 RAW, OUT, DERIVED = ROOT / "raw", ROOT / "out", ROOT / "raw" / "derived"
 APP = ROOT.parent / "app" / "public" / "data" / "v1"
 TRAIN_END = "2021-01-01"           # train < this, test >= this (spec)
+WARN_COL, WARN_MODEL = "p_fcst", "warn_fcst"   # the model behind risk, firstAlert and leadHours
+WARN_NOTE = ("Model with a weather forecast. The backtest uses the observed weather as the forecast, "
+             "so these lead times are an upper bound.")
 ALERT_THRESHOLD_FILE = DERIVED / "warn_threshold.json"   # written by models/: {"p_full": x, "p_grid": y}
 
 STATE = {"01": "AL", "02": "AK", "04": "AZ", "05": "AR", "06": "CA", "08": "CO", "09": "CT", "10": "DE", "11": "DC",
@@ -111,20 +114,24 @@ def main() -> None:
 
     rows = []
     for e in ev.itertuples():
-        lead, first_alert = None, None
-        if have_pred and "p_full" in thr:
-            r = con.execute(f"""SELECT min(hour) FROM '{DERIVED}/ba_hour_pred.parquet'
-                                WHERE ba = ? AND hour >= ? - INTERVAL 72 HOUR AND hour < ? AND p_full >= ?""",
-                            [e.ba, e.start, e.start, thr["p_full"]]).fetchone()[0]
+        lead, first_alert, lead_nofc = None, None, None
+        if have_pred and WARN_COL in thr:
+            r, r2 = con.execute(f"""
+                SELECT min(hour) FILTER (WHERE {WARN_COL} >= ?), min(hour) FILTER (WHERE p_full >= ?)
+                FROM '{DERIVED}/ba_hour_pred.parquet'
+                WHERE ba = ? AND hour >= ? - INTERVAL 72 HOUR AND hour < ?""",
+                [thr[WARN_COL], thr["p_full"], e.ba, e.start, e.start]).fetchone()
             if r is not None:
                 first_alert, lead = str(r), int((e.start - r).total_seconds() // 3600)
+            if r2 is not None:
+                lead_nofc = int((e.start - r2).total_seconds() // 3600)
         slug, title = hero_of.get(e.event_id, (None, None))
         rows.append({"id": e.event_id, "ba": e.ba, "start": str(e.start), "stop": str(e.stop),
                      "hoursAbove": int(e.hours_above), "peakFrac": round(float(e.peak_frac), 4),
                      "peakCustomersOut": int(e.peak_customers_out),
                      "split": "train" if str(e.start) < TRAIN_END else "test",
                      "hero": slug, "title": title, "hasReplay": e.event_id in replay_ids,
-                     "firstAlert": first_alert, "leadHours": lead})
+                     "firstAlert": first_alert, "leadHours": lead, "leadHoursNoForecast": lead_nofc})
 
         if e.event_id not in replay_ids:
             continue
@@ -153,20 +160,20 @@ def main() -> None:
                        "predDarkHours": nn(dark.get(fips))})
         risk = None
         if have_pred:
-            p = con.execute(f"""SELECT hour, p_full FROM '{DERIVED}/ba_hour_pred.parquet'
+            p = con.execute(f"""SELECT hour, {WARN_COL} AS p FROM '{DERIVED}/ba_hour_pred.parquet'
                                 WHERE ba = ? AND hour BETWEEN ? AND ?""", [e.ba, t0, t1]).df()
             risk = [None] * len(hours)
-            for h, v in zip(p.hour, p.p_full):
+            for h, v in zip(p.hour, p.p):
                 risk[idx[h]] = nn(v)
         (APP / "events" / f"{e.event_id}.json").write_text(json.dumps({
             "id": e.event_id, "ba": e.ba, "t0": str(t0), "hours": len(hours), "eventStartIndex": 72,
-            "risk": risk, "alertThreshold": thr.get("p_full"), "counties": cl,
+            "risk": risk, "alertThreshold": thr.get(WARN_COL), "warnModel": WARN_MODEL, "counties": cl,
             "stub": not (have_pred and have_dark)}, separators=(",", ":")))
 
     meta = json.loads((OUT / "events.json").read_text())
     (APP / "events.json").write_text(json.dumps({
         "rule": meta["rule"], "years": [meta["years"][0], meta["years"][-1]], "trainEnd": TRAIN_END,
-        "count": len(rows), "stub": not have_pred, "events": rows}, separators=(",", ":")))
+        "count": len(rows), "stub": not have_pred, "warnModel": WARN_MODEL, "warnNote": WARN_NOTE, "events": rows}, separators=(",", ":")))
     with open(APP / "evidence.csv", "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
         w.writeheader()

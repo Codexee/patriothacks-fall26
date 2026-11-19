@@ -28,7 +28,8 @@ export interface EventRow {
   title: string | null;
   hasReplay: boolean;
   firstAlert: string | null; // first hour in the 72 h before start with p >= threshold
-  leadHours: number | null;  // start - firstAlert, in hours; null = not warned (or stub)
+  leadHours: number | null;  // start - firstAlert, in hours; null = not warned (or stub). Model: EventLibrary.warnModel
+  leadHoursNoForecast?: number | null; // the same for warn_full (no weather forecast)
 }
 
 export interface EventLibrary {
@@ -37,6 +38,8 @@ export interface EventLibrary {
   trainEnd: string;
   count: number;
   stub: boolean;           // true until model outputs are in
+  warnModel?: string;      // "warn_fcst": which model produced firstAlert, leadHours and the replay risk line
+  warnNote?: string;       // the caveat to show wherever a lead time is shown
   events: EventRow[];
 }
 
@@ -48,6 +51,7 @@ export interface EventReplay {
   eventStartIndex: number; // index of the event's first hour (72)
   risk: (number | null)[] | null; // model probability per hour for the BA; null while stub
   alertThreshold: number | null;
+  warnModel?: string;
   counties: {
     fips: string;
     out: number[];         // percent of customers out, 0..100, per hour
