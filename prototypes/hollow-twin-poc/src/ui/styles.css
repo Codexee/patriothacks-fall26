@@ -499,3 +499,6 @@ kbd:first-child { margin-left: 0; }
   .mod-expand { flex-direction: row; width: auto; padding: 6px 12px; }
   .mod-chips { flex-direction: row; }
 }
+
+/* Info popups float above every panel (portal, fixed position). */
+.src-pop.info-pop { z-index: 1000; right: auto; bottom: auto; transform: none; line-height: 1.45; pointer-events: auto; }
