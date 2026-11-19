@@ -153,6 +153,22 @@ export function FlatWorld(props: WorldProps) {
         shown.current[i] = Math.abs(target - v) < 0.003 ? target : v;
       }
 
+      // The surface: smoke drifting over the ruins, and a machine's searchlight sweeping the sky.
+      ctx.save(); ctx.beginPath(); ctx.rect(0, 0, width, SURFACE); ctx.clip();
+      for (let j = 0; j < 4; j++) {
+        const cx = ((t * (6 + j * 3) + hash(j, 60) * width) % (width + 160)) - 80, cy = 16 + hash(j, 61) * 30;
+        const sm = ctx.createRadialGradient(cx, cy, 2, cx, cy, 46);
+        sm.addColorStop(0, 'rgba(30,24,30,0.32)'); sm.addColorStop(1, 'rgba(30,24,30,0)');
+        ctx.fillStyle = sm; ctx.fillRect(cx - 50, cy - 50, 100, 100);
+      }
+      const sx = width * 0.3, sy = SURFACE - 30, ang = -Math.PI / 2 + Math.sin(t * 0.35) * 0.9;
+      const beam = ctx.createLinearGradient(sx, sy, sx + Math.cos(ang) * 120, sy + Math.sin(ang) * 120);
+      beam.addColorStop(0, 'rgba(255,120,90,0.22)'); beam.addColorStop(1, 'rgba(255,120,90,0)');
+      ctx.fillStyle = beam; ctx.beginPath(); ctx.moveTo(sx, sy);
+      ctx.lineTo(sx + Math.cos(ang - 0.09) * 140, sy + Math.sin(ang - 0.09) * 140);
+      ctx.lineTo(sx + Math.cos(ang + 0.09) * 140, sy + Math.sin(ang + 0.09) * 140); ctx.fill();
+      ctx.restore();
+
       // Machine lights on the surface.
       for (let j = 0; j < 7; j++) {
         const x = (0.08 + j * 0.13 + hash(j, 40) * 0.05) * width, y = SURFACE - 18 - hash(j, 41) * 26;
@@ -179,6 +195,20 @@ export function FlatWorld(props: WorldProps) {
         const gl = ctx.createRadialGradient(cx, cy, 2, cx, cy, r);
         gl.addColorStop(0, `rgba(255,180,90,${0.13 * b})`); gl.addColorStop(1, 'rgba(255,180,90,0)');
         ctx.fillStyle = gl; ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
+      }
+      // Power flowing along the floor pipes of every level that has it.
+      const pipeW = width - GUTTER_L - GUTTER_R;
+      for (let level = 1; level <= LEVELS && !reduce; level++) {
+        let lit = 0;
+        for (let c = 0; c < SECTIONS_PER_LEVEL; c++) if (shown.current[(level - 1) * SECTIONS_PER_LEVEL + c] > 0.3) lit++;
+        if (lit < SECTIONS_PER_LEVEL / 2) continue;
+        const py = g.y(level) + ROOM_H + 2;
+        for (let d = 0; d < 2; d++) {
+          const px = GUTTER_L + ((t * (34 + hash(level, 70) * 20) + hash(level, d + 71) * pipeW + d * pipeW / 2) % pipeW);
+          const pg = ctx.createRadialGradient(px, py, 0, px, py, 6);
+          pg.addColorStop(0, 'rgba(255,205,130,0.75)'); pg.addColorStop(1, 'rgba(255,205,130,0)');
+          ctx.fillStyle = pg; ctx.fillRect(px - 6, py - 6, 12, 12);
+        }
       }
       ctx.globalCompositeOperation = 'source-over';
 
@@ -216,8 +246,9 @@ export function FlatWorld(props: WorldProps) {
             wall.addColorStop(0, top); wall.addColorStop(1, bottom);
             ctx.fillStyle = wall; ctx.fillRect(x, y, w, h);
             if (lit > 0.05) { // the lamp and its cone of light
-              ctx.fillStyle = `rgba(255,246,220,${lit})`; ctx.fillRect(x + w * 0.42, y + 1, w * 0.16, 1.5);
-              ctx.fillStyle = `rgba(255,235,190,${0.16 * lit})`;
+              const shimmer = reduce ? 1 : 0.94 + 0.06 * Math.sin(t * 5.3 + i * 1.9); // lamps hum a little
+              ctx.fillStyle = `rgba(255,246,220,${lit * shimmer})`; ctx.fillRect(x + w * 0.42, y + 1, w * 0.16, 1.5);
+              ctx.fillStyle = `rgba(255,235,190,${0.16 * lit * shimmer})`;
               ctx.beginPath(); ctx.moveTo(x + w * 0.42, y + 2.5); ctx.lineTo(x + w * 0.58, y + 2.5);
               ctx.lineTo(x + w * 0.85, y + h); ctx.lineTo(x + w * 0.15, y + h); ctx.fill();
             }
@@ -231,7 +262,9 @@ export function FlatWorld(props: WorldProps) {
             const figure = lit > 0.3 ? 'rgba(52,34,18,0.9)' : bad ? 'rgba(255,140,130,0.28)' : 'rgba(140,165,200,0.22)';
             ctx.fillStyle = figure;
             for (let p = 0; p < n && w > 18; p++) {
-              const fx = x + 6 + hash(i, p) * (w - 22), fh = 6 + hash(i, p + 9) * 2.5;
+              // People move about while the lights are on, and stand still in the dark.
+              const roam = lit > 0.3 && !reduce ? Math.sin(t * (0.25 + hash(i, p + 30) * 0.35) + hash(i, p + 31) * 6.3) * Math.min(7, (w - 22) * 0.2) : 0;
+              const fx = Math.max(x + 3, Math.min(x + w - 6, x + 6 + hash(i, p) * (w - 22) + roam)), fh = 6 + hash(i, p + 9) * 2.5;
               ctx.beginPath(); ctx.arc(fx + 1.5, y + h - fh - 2.2, 1.7, 0, 7); ctx.fill();
               ctx.beginPath(); ctx.roundRect(fx, y + h - fh, 3, fh, 1.2); ctx.fill();
             }
@@ -256,6 +289,11 @@ export function FlatWorld(props: WorldProps) {
             core.addColorStop(0, `rgba(255,250,220,${on * pulse})`); core.addColorStop(0.35, `rgba(255,150,60,${0.85 * on * pulse})`);
             core.addColorStop(1, 'rgba(255,120,40,0)');
             ctx.fillStyle = core; ctx.beginPath(); ctx.arc(cx, cy, 9, 0, 7); ctx.fill();
+            for (let k = 0; k < 3 && !reduce && st === 'lit'; k++) { // steam rising off the core
+              const ph = (t * 0.45 + k / 3 + hash(i, 80)) % 1;
+              ctx.fillStyle = `rgba(235,225,215,${0.3 * (1 - ph)})`;
+              ctx.beginPath(); ctx.arc(cx + Math.sin(ph * 6 + k) * 1.5, cy - 4 - ph * 9, 1.2 + ph * 2.4, 0, 7); ctx.fill();
+            }
             ctx.strokeStyle = 'rgba(30,24,20,0.9)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(cx, cy, 4.2, 0, 7); ctx.stroke();
           }
         }
