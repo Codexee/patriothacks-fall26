@@ -6,6 +6,7 @@ import { href } from '../router.ts';
 import { bounds, num, pct, rangeText, pctPoints } from '../format.ts';
 import { scaleInterval, tCrit, tInterval } from '../stats.ts';
 import { Sparkline } from '../charts.tsx';
+import { HeroVideo } from '../HeroVideo.tsx';
 import { Generated, Stat, displayName, scaleNote, seedRange } from '../parts.tsx';
 
 /** Total deaths over every run (all disasters × all seeds), with a 95% interval from the per-seed totals. */
@@ -38,10 +39,15 @@ export function Results({ data }: { data: SiteData }) {
   return (
     <>
       <header className="hero">
+        <div className="hero-top">
+        <div className="hero-copy">
         <h1 tabIndex={-1} className="hero-line">
           Across {nS} disasters and {nSeeds} held-out seeds, Blackout Warning cut deaths from{' '}
           <span className="hero-num without">{num(wo.mean)}</span> to <span className="hero-num with">{num(wi.mean)}</span>.
         </h1>
+        </div>
+        <HeroVideo scenarios={f.scenarios} />
+        </div>
         <dl className="hero-stats">
           <Stat label="Deaths without Blackout Warning" value={wo} tone="without" />
           <Stat label="Deaths with Blackout Warning" value={wi} tone="with" />

@@ -1,0 +1,88 @@
+{
+  "rows": [
+    {
+      "name": "twoplants",
+      "scenario": "twoplants",
+      "title": "Two plants lost at once",
+      "footage": "assets/footage/twoplants.mp4",
+      "event": "Plants 4 and 5 lose output",
+      "eventDay": 5,
+      "endWithout": "288,711",
+      "endWith": "212",
+      "endNote": "Mean deaths per run, held-out seeds 11–20.",
+      "source": "EIA-930, TVA and CPLE coal, Dec 2022"
+    },
+    {
+      "name": "elliott",
+      "scenario": "elliott",
+      "title": "Plant loss, Winter Storm Elliott",
+      "footage": "assets/footage/elliott.mp4",
+      "event": "Plant 4 loses output",
+      "eventDay": 5,
+      "endWithout": "284,851",
+      "endWith": "8",
+      "endNote": "Mean deaths per run, held-out seeds 11–20.",
+      "source": "EIA-930, TVA coal, Dec 2022"
+    },
+    {
+      "name": "cascade",
+      "scenario": "cascade",
+      "title": "Plant loss, Texas, Feb 2021",
+      "footage": "assets/footage/cascade.mp4",
+      "event": "Plant 2 loses output",
+      "eventDay": 5,
+      "endWithout": "292,329",
+      "endWith": "8",
+      "endNote": "Mean deaths per run, held-out seeds 11–20.",
+      "source": "EIA-930, ERCOT generation, Feb 2021"
+    },
+    {
+      "name": "slowloss",
+      "scenario": "slowloss",
+      "title": "Slow two-week plant loss",
+      "footage": "assets/footage/slowloss.mp4",
+      "event": "Plant 6 loses output for two weeks",
+      "eventDay": 5,
+      "endWithout": "296,843",
+      "endWith": "8",
+      "endNote": "Mean deaths per run, held-out seeds 11–20.",
+      "source": "EIA-930, SPP wind, Feb 2021"
+    },
+    {
+      "name": "aging",
+      "scenario": "aging",
+      "title": "Aging plants",
+      "footage": "assets/footage/aging.mp4",
+      "event": "Every plant wears out (4 real years in 120 days)",
+      "eventDay": 1,
+      "endWithout": "364,754",
+      "endWith": "340",
+      "endNote": "Mean deaths per run, held-out seeds 11–20.",
+      "source": "The Geysers decline, Foulger et al. 1997"
+    },
+    {
+      "name": "crowding",
+      "scenario": "crowding",
+      "title": "Crowding",
+      "footage": "assets/footage/crowding.mp4",
+      "event": "Sections grow (4 real years in 120 days)",
+      "eventDay": 1,
+      "endWithout": "287,520",
+      "endWith": "8",
+      "endNote": "Mean deaths per run, held-out seeds 11–20.",
+      "source": "Census county growth 2020–2024"
+    },
+    {
+      "name": "baseline",
+      "scenario": "baseline",
+      "title": "Baseline",
+      "footage": "assets/footage/baseline.mp4",
+      "event": "Normal weekly demand, no extra failure",
+      "eventDay": 1,
+      "endWithout": "281,493",
+      "endWith": "8",
+      "endNote": "Mean deaths per run, held-out seeds 11–20.",
+      "source": "EIA-930, ERCOT demand, 2023"
+    }
+  ]
+}

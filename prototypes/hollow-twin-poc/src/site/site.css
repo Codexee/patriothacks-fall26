@@ -308,3 +308,23 @@ html, body { margin: 0; background: var(--rock); }
 }
 .sb-row dt code { align-self: flex-start; }
 .ex-table td:first-child, .ex-table thead th:nth-child(-n+2) { text-align: left; }
+
+/* ---------- Hero video (the homepage film beside the numbers) ---------- */
+.hero-top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 36px; align-items: start; }
+.hero-top .site h1.hero-line, .hero-top h1.hero-line { font-size: clamp(30px, 3.6vw, 48px); max-width: 22ch; }
+.hero-video { margin: 4px 0 0; }
+.hv-frame { position: relative; aspect-ratio: 16 / 9; border-radius: 6px; overflow: hidden; background: var(--seam); box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 12px 32px rgba(0, 0, 0, 0.35); border: 1px solid var(--line); }
+.hv-frame video { display: block; width: 100%; height: 100%; object-fit: cover; }
+.hv-missing { position: absolute; inset: 0; display: grid; place-items: center; padding: 20px; text-align: center; color: var(--dust); font-size: 15px; margin: 0 !important; }
+.hv-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-top: 10px; font-family: var(--cond); font-size: 16px; }
+.hv-pick { display: inline-flex; align-items: center; gap: 8px; color: var(--dust); }
+.hv-pick select { font: inherit; font-weight: 600; color: var(--chalk); background: var(--seam-2); border: 1px solid var(--line); border-radius: 4px; padding: 6px 30px 6px 10px; }
+.hv-play { font: inherit; font-weight: 600; color: var(--chalk); background: transparent; border: 1px solid var(--line); border-radius: 4px; padding: 6px 14px; cursor: pointer; transition: background-color 150ms var(--ease-out), transform 150ms ease-out; }
+.hv-play:not(:disabled):active { transform: scale(0.96); }
+.hv-play:disabled { opacity: 0.5; cursor: default; }
+@media (hover: hover) { .hv-play:not(:disabled):hover { background: var(--seam-2); } }
+.site a.hv-link { margin-left: auto; font-weight: 600; }
+@media (max-width: 900px) {
+  .hero-top { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .hero-video { order: 2; }
+}
