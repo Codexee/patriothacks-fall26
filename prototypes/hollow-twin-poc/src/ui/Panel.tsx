@@ -2,10 +2,10 @@
 // can show the Residents' System working. Step 1: only blackouts and air exist in the world.
 import { useState, type ReactNode } from 'react';
 import { sim } from '../sim/index.ts';
-import type { Action, Frame, Score, SimState, ToolKey, ToolSet, WorldEvent } from '../sim/types.ts';
+import type { Action, Frame, Score, SimState, ToolSet, WorldEvent } from '../sim/types.ts';
 import { HoverCard, SourceInfo } from './HoverCard.tsx';
 import { Info } from './Info.tsx';
-import { TOOL_HINTS, TOOL_KEYS, TOOL_LABELS, TOOL_PROBLEMS, type Attribution, type RunResult } from './compare.ts';
+import type { Attribution, RunResult } from './compare.ts';
 
 export interface PanelProps {
   state: SimState;
@@ -26,7 +26,6 @@ export interface PanelProps {
   onScenario: (id: string) => void;
   onSeed: (seed: number) => void;
   onReset: () => void;
-  onToggleTool: (k: ToolKey) => void;
   onNextDay: () => void;
   onSkipToEnd: () => void;
   onCompare: () => void;
@@ -101,18 +100,7 @@ export function Panel(p: PanelProps) {
           </details>
         </Section>
 
-        <Section title="2. Turn the system on or off" hint="Changes apply from the next day. Press Reset to start over with your choice.">
-          <div className="tools one">
-            {TOOL_KEYS.map((k) => (
-              <label key={k} className={`tool ${p.pendingTools[k] ? 'on' : ''}`} title={TOOL_HINTS[k]}>
-                <input type="checkbox" checked={p.pendingTools[k]} disabled={locked || !!state.end} onChange={() => p.onToggleTool(k)} />
-                {TOOL_LABELS[k]} <span className="muted small">#{TOOL_PROBLEMS[k]}</span> <Info>{TOOL_HINTS[k]}</Info>
-              </label>
-            ))}
-          </div>
-        </Section>
-
-        <Section title="3. Play">
+        <Section title="2. Play">
           <div className="row">
             <button className="primary" disabled={locked || !!state.end} onClick={p.onNextDay}>
               {p.playing ? 'Playing…' : 'Next day'}

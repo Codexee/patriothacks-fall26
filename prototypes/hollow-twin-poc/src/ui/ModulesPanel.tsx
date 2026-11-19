@@ -52,29 +52,60 @@ const MODULE_CARDS: Partial<Record<ToolKey, { card: (p: CardProps) => ReactNode;
   },
 };
 
-export function ModulesPanel({ run, modules, open, onToggle }: { run: Run; modules: ToolSet; open: boolean; onToggle: () => void }) {
+export interface ModulesPanelProps {
+  run: Run;
+  running: ToolSet; // modules running in the Hollow today
+  pending: ToolSet; // the choice for the next day
+  locked: boolean;
+  onToggleModule: (k: ToolKey) => void;
+  onReset: () => void;
+  open: boolean;
+  onToggle: () => void;
+}
+
+/** The solution modules: switch each one on or off, and see what it worked out today. Minimizes to a slim strip. */
+export function ModulesPanel(p: ModulesPanelProps) {
   const [collapsed, setCollapsed] = useState<Partial<Record<ToolKey, boolean>>>({});
-  const onCount = BUILT.filter((k) => modules[k]).length;
-  if (!open) {
+  const changed = BUILT.some((k) => p.pending[k] !== p.running[k]);
+  const solved = PROBLEMS.filter((pr) => pr.feature && BUILT.includes(pr.feature)).length;
+
+  if (!p.open) {
     return (
-      <aside className="modules min" aria-label="Modules (minimized)">
-        <button className="mod-tab" onClick={onToggle} title="Open the Modules panel (M)" aria-label="Open the Modules panel">
-          <span className="mod-tab-count">{onCount}/{BUILT.length}</span>
+      <aside className="modules min" aria-label="Solution modules (minimized)">
+        <button className="mod-expand" onClick={p.onToggle} title="Open the Modules panel (M)" aria-label="Open the Modules panel">
+          <span aria-hidden>‹</span>
           <span className="mod-tab-label">Modules</span>
         </button>
+        <div className="mod-chips">
+          {BUILT.map((k) => {
+            const pr = PROBLEMS.find((x) => x.feature === k);
+            return (
+              <button key={k} className={`mod-chip ${p.pending[k] ? 'on' : ''}`} aria-pressed={p.pending[k]} disabled={p.locked}
+                onClick={() => p.onToggleModule(k)}
+                title={`${moduleName(k)}: ${p.pending[k] ? 'on' : 'off'}${p.pending[k] !== p.running[k] ? ' (from next day)' : ''}. Click to switch.`}>
+                <span className="dot" aria-hidden />#{pr?.n ?? '?'}
+              </button>
+            );
+          })}
+        </div>
       </aside>
     );
   }
+
   return (
-    <aside className="modules" aria-label="Modules">
+    <aside className="modules" aria-label="Solution modules">
       <header className="mods-head">
-        <h1>Modules <Info label="About the modules">The features of the Residents' System, one per Hollow problem. Each card shows what the module worked out from today's data. Turn modules on or off in the demo bar or the Test World panel.</Info></h1>
-        <button className="ghost" onClick={onToggle} title="Minimize (M)">Minimize</button>
+        <h1>Solution modules <Info label="About the solution modules">The features of the Residents' System, one per Hollow problem. Switch each one on or off here; the change applies from the next day, and Reset starts the Hollow over with your choice. Each card shows what the module worked out from today's data.</Info></h1>
+        <button className="ghost" onClick={p.onToggle} title="Minimize (M)">Minimize</button>
       </header>
+      <p className="mods-progress">{solved} of 15 Hollow problems solved</p>
+      {changed && (
+        <p className="mods-pending">Your changes apply from the next day. <button onClick={p.onReset} disabled={p.locked}>Reset to start over with them</button></p>
+      )}
       {BUILT.map((k) => {
         const def = MODULE_CARDS[k];
         const pr = PROBLEMS.find((x) => x.feature === k);
-        const on = modules[k];
+        const on = p.running[k], next = p.pending[k];
         const shut = collapsed[k] ?? false;
         return (
           <section key={k} className={`mod-card ${on ? 'on' : 'off'}`}>
@@ -82,22 +113,26 @@ export function ModulesPanel({ run, modules, open, onToggle }: { run: Run; modul
               <button className="mc-toggle" aria-expanded={!shut} onClick={() => setCollapsed((c) => ({ ...c, [k]: !shut }))}>
                 <span className="mc-caret" aria-hidden>{shut ? '▸' : '▾'}</span>
                 <span className="mc-title">{moduleName(k)}</span>
+                {pr && <span className="mc-num" title={pr.title}>#{pr.n}</span>}
               </button>
-              {pr && <span className="mc-num" title={pr.title}>#{pr.n}</span>}
               {def && <Info label={`How ${moduleName(k)} works`}>{def.about}</Info>}
-              <span className={`mc-state ${on ? 'on' : ''}`}>{on ? 'On' : 'Off'}</span>
+              <button className={`switch ${next ? 'on' : ''}`} role="switch" aria-checked={next} disabled={p.locked}
+                onClick={() => p.onToggleModule(k)} title={`${moduleName(k)} ${next ? 'on' : 'off'} (S switches all)`}>
+                <span className="knob" aria-hidden />{next ? 'On' : 'Off'}
+              </button>
             </header>
+            {pr && <p className="mc-problem">{pr.title}</p>}
             {!shut && (
               <div className="mc-body">
-                {!on ? <p className="muted">Off. Turn it on (S, or the switch in the demo bar) and press Reset to run the Hollow with it.</p>
-                  : def ? def.card({ run }) : <p className="muted">No view for this module yet.</p>}
+                {!on ? <p className="muted">{next ? 'Starts tomorrow, or press Reset to run the Hollow with it from day 0.' : 'Off. Switch it on to run the Hollow with it.'}</p>
+                  : def ? def.card({ run: p.run }) : <p className="muted">No view for this module yet.</p>}
               </div>
             )}
           </section>
         );
       })}
-      {run.log?.seen && (
-        <p className="muted small mods-data">Data received today: {Object.entries(run.log.seen).map(([key, v]) => `${v} ${key}`).join(', ')}</p>
+      {p.run.log?.seen && (
+        <p className="muted small mods-data">Data received today: {Object.entries(p.run.log.seen).map(([key, v]) => `${v} ${key}`).join(', ')}</p>
       )}
       <p className="muted small mods-next">More modules arrive as more of the 15 problems are solved.</p>
     </aside>

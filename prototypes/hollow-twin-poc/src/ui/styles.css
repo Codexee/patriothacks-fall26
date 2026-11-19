@@ -461,3 +461,41 @@ kbd:first-child { margin-left: 0; }
   .app.mods-open .demo-bar, .app.mods-min .demo-bar { left: 50%; max-width: calc(100vw - 24px); }
   .app.mods-open .compare-card, .app.mods-min .compare-card { transform: translateX(-50%); width: min(560px, calc(100vw - 32px)); }
 }
+
+/* ---------- Solution modules (round 2): switches live here; compact strip when minimized ---------- */
+.app.panel-min.mods-min, .app.panel-open.mods-min { --m-w: 58px; }
+.app.panel-min.mods-open { --m-w: 380px; --p-w: 380px; }
+.modules.min { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 10px 0; }
+.mod-expand {
+  display: flex; flex-direction: column; align-items: center; gap: 8px; width: 44px; padding: 10px 0; border-radius: 10px;
+  background: var(--system-bg); border: 1px solid rgba(108, 182, 255, 0.35); color: var(--system); font-size: 16px;
+}
+.mod-expand .mod-tab-label { font-size: 13px; }
+.mod-chips { display: flex; flex-direction: column; gap: 6px; }
+.mod-chip {
+  width: 44px; padding: 5px 0; border-radius: 8px; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  font-family: var(--cond); font-size: 12px; font-weight: 600; color: var(--muted); background: var(--panel-2);
+}
+.mod-chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--faint); }
+.mod-chip.on { color: var(--system); border-color: rgba(108, 182, 255, 0.5); }
+.mod-chip.on .dot { background: var(--system); box-shadow: 0 0 8px var(--system); }
+
+.modules:not(.min) { box-shadow: inset 1px 0 0 rgba(108, 182, 255, 0.25), -12px 0 30px rgba(0, 0, 0, 0.25); }
+.mods-head h1 { font-size: 24px; text-shadow: 0 0 22px rgba(108, 182, 255, 0.4); }
+.mods-progress { margin: -6px 0 12px; font-size: 12.5px; color: var(--muted); }
+.mods-pending { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; padding: 8px 10px; border-radius: 8px; background: var(--warn-bg); color: var(--warn); font-size: 12.5px; }
+.mods-pending button { font-size: 12px; padding: 3px 9px; }
+.mod-card { margin-bottom: 12px; }
+.mc-head { padding: 10px 12px 4px; }
+.mc-title { font-size: 17px; }
+.mc-num { margin-left: 4px; }
+.mc-head .switch { font-size: 12.5px; padding: 4px 10px; gap: 6px; border-radius: 999px; }
+.mc-head .switch .knob { width: 26px; height: 15px; }
+.mc-head .switch .knob::after { width: 11px; height: 11px; }
+.mc-head .switch.on .knob::after { transform: translateX(11px); }
+.mc-problem { margin: 0 12px 8px 30px; font-size: 12.5px; color: var(--muted); }
+@media (max-width: 1180px) {
+  .modules.min { flex-direction: row; justify-content: center; padding: 8px; }
+  .mod-expand { flex-direction: row; width: auto; padding: 6px 12px; }
+  .mod-chips { flex-direction: row; }
+}

@@ -2,7 +2,8 @@
 // and sends outputs; the sim (the test world) applies them. A person can inject world events and type reports.
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { sim } from '../sim/index.ts';
-import { LEVELS, NO_TOOLS, SECTIONS_PER_LEVEL, type Action, type Frame, type ToolSet, type WorldEvent } from '../sim/types.ts';
+import { LEVELS, NO_TOOLS, SECTIONS_PER_LEVEL, type Action, type Frame, type ToolKey, type ToolSet, type WorldEvent } from '../sim/types.ts';
+import { BUILT } from '../product/names.ts';
 import { createRun, stepRun, type Run } from '../product/run.ts';
 import { World } from '../world/index.tsx';
 import { FlatWorld, blackoutLine } from '../world/FlatWorld.tsx';
@@ -121,7 +122,14 @@ export function App() {
     if (state.end?.kind !== 'stable') return;
     setRun((r) => ({ ...r, sim: { ...r.sim, end: null, keepGoing: true } }));
   };
-  const toggleSystem = () => setPendingTools((t) => ({ ...t, earlyWarning: !t.earlyWarning }));
+  /** Solution modules: switch one, or (S) all of them. Changes apply from the next day; Reset starts over with them. */
+  const toggleModule = (k: ToolKey) => setPendingTools((t) => ({ ...t, [k]: !t[k] }));
+  const toggleSystem = () => setPendingTools((t) => {
+    const anyOn = BUILT.some((k) => t[k]);
+    const n = { ...t };
+    for (const k of BUILT) n[k] = !anyOn;
+    return n;
+  });
   const openCompare = () => { setCompareOpen(true); if (!compare) void runCompare(); };
 
   // Keyboard shortcuts for presenting: Space next day, S system, R reset, T panel. Ignored while typing.
@@ -164,8 +172,7 @@ export function App() {
         {!panelOpen && (
           <DemoBar
             state={state} hour={frame.hour} playing={playing} busy={busy}
-            systemOn={pendingTools.earlyWarning} systemNow={state.tools.earlyWarning}
-            onNextDay={() => void nextDay()} onSkipToEnd={skipToEnd} onToggleSystem={toggleSystem}
+            onNextDay={() => void nextDay()} onSkipToEnd={skipToEnd}
             onReset={() => reset(scenarioId, seed, pendingTools)} onCompare={openCompare} onOpenPanel={() => setPanelOpen(true)}
           />
         )}
@@ -174,7 +181,11 @@ export function App() {
           : <FlatWorld frame={frame} onHover={onHover} selected={phoneSection} />}
         {DEBUG && <DebugHover onHover={onHover} />}
       </main>
-      <ModulesPanel run={run} modules={state.tools} open={modsOpen} onToggle={() => setModsOpen((v) => !v)} />
+      <ModulesPanel
+        run={run} running={state.tools} pending={pendingTools} locked={playing || busy !== null}
+        onToggleModule={toggleModule} onReset={() => reset(scenarioId, seed, pendingTools)}
+        open={modsOpen} onToggle={() => setModsOpen((v) => !v)}
+      />
       <ProductView
         run={run} modules={state.tools} section={phoneSection} onPickSection={setPhoneSection}
         homeLocked={homeLocked} onToggleLock={() => setHomeLocked((v) => !v)}
@@ -188,7 +199,6 @@ export function App() {
         onScenario={(id) => { setScenarioId(id); reset(id, seed, pendingTools); }}
         onSeed={(s) => { setSeed(s); reset(scenarioId, s, pendingTools); }}
         onReset={() => reset(scenarioId, seed, pendingTools)}
-        onToggleTool={(k) => setPendingTools((t) => ({ ...t, [k]: !t[k] }))}
         onEvent={queueEvent}
         onNextDay={nextDay}
         onSkipToEnd={skipToEnd}

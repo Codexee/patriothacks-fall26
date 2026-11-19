@@ -11,11 +11,8 @@ export interface DemoBarProps {
   hour: number;
   playing: boolean;
   busy: string | null;
-  systemOn: boolean; // the choice for the next day
-  systemNow: boolean; // what is running today
   onNextDay: () => void;
   onSkipToEnd: () => void;
-  onToggleSystem: () => void;
   onReset: () => void;
   onCompare: () => void;
   onOpenPanel: () => void;
@@ -32,11 +29,6 @@ export function DemoBar(p: DemoBarProps) {
         {p.playing ? 'Playing…' : '▶ Next day'}
       </button>
       <button className="db-icon" disabled={p.busy !== null || !!p.state.end} onClick={p.onSkipToEnd} title="Skip to the end" aria-label="Skip to the end">⏭</button>
-      <button className={`switch ${p.systemOn ? 'on' : ''}`} role="switch" aria-checked={p.systemOn} disabled={locked} onClick={p.onToggleSystem}
-        title={`Blackout Warning ${p.systemOn ? 'on' : 'off'} (S). Applies from the next day; Reset starts over with it.`}>
-        <span className="knob" aria-hidden />Warning
-        {p.systemOn !== p.systemNow && <span className="db-note">from next day</span>}
-      </button>
       <button className="db-icon" disabled={locked} onClick={p.onReset} title="Reset (R)" aria-label="Reset">↺</button>
       <span className="db-sep" aria-hidden />
       <span className="db-stat">Day <b>{p.state.day}</b>{p.playing && <span className="muted"> {String(p.hour).padStart(2, '0')}:00</span>}</span>
@@ -48,7 +40,7 @@ export function DemoBar(p: DemoBarProps) {
       <button className="db-icon" disabled={locked} onClick={p.onCompare} title="Compare the same disaster with and without the system" aria-label="Compare">⇄</button>
       <button className="db-icon" onClick={p.onOpenPanel} title="Open the full Test World panel (T)" aria-label="Open test world">⚙</button>
       <Info label="Keyboard shortcuts">
-        <kbd>Space</kbd> next day, <kbd>S</kbd> Blackout Warning on or off, <kbd>R</kbd> reset, <kbd>T</kbd> open or minimize the Test World panel, <kbd>M</kbd> open or minimize the Modules panel.
+        <kbd>Space</kbd> next day, <kbd>S</kbd> all solution modules on or off, <kbd>R</kbd> reset, <kbd>T</kbd> open or minimize the Test World panel, <kbd>M</kbd> open or minimize the Modules panel.
       </Info>
     </div>
   );
