@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import { useRoute } from './router.ts';
 import { useSiteData } from './data.ts';
 import { Nav } from './Nav.tsx';
-import { SampleBanner } from './parts.tsx';
+import { SampleBanner, displayName } from './parts.tsx';
 import { Results } from './pages/Results.tsx';
 import { Disaster } from './pages/Disaster.tsx';
 import { Model } from './pages/Model.tsx';
@@ -37,7 +37,7 @@ export function Site() {
 
   useEffect(() => {
     const name = route.page === 'disaster'
-      ? data?.scenarios.data.scenarios.find((s) => s.id === route.id)?.name.split(/[:(]/)[0].trim() ?? TITLES.disaster
+      ? (() => { const s = data?.scenarios.data.scenarios.find((x) => x.id === route.id); return s ? displayName(s) : TITLES.disaster; })()
       : TITLES[route.page];
     document.title = `${name}: Residents’ System`;
   }, [route, data]);
@@ -54,6 +54,7 @@ export function Site() {
         ) : (
           <>
             <SampleBanner data={data} />
+            <div key={key} className="route-enter">
             {route.page === 'results' && <Results data={data} />}
             {route.page === 'disaster' && <Disaster data={data} id={route.id} />}
             {route.page === 'model' && <Model data={data} />}
@@ -63,6 +64,7 @@ export function Site() {
                 <p><a className="text-link" href={href.results}>Go to the results</a></p>
               </section>
             )}
+            </div>
           </>
         )}
       </main>

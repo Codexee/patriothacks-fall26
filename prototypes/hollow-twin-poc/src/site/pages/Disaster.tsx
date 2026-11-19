@@ -2,9 +2,9 @@
 import { useState } from 'react';
 import type { SiteData } from '../data.ts';
 import { href } from '../router.ts';
-import { interval, num, pct } from '../format.ts';
+import { interval, num, pct, pctPoints } from '../format.ts';
 import { DailyChart } from '../charts.tsx';
-import { SourceLink, Stat, scaleNote, seedRange, shortName } from '../parts.tsx';
+import { SourceLink, Stat, displayName, scaleNote, seedRange } from '../parts.tsx';
 
 export function Disaster({ data, id }: { data: SiteData; id: string }) {
   const f = data.scenarios.data;
@@ -27,9 +27,10 @@ export function Disaster({ data, id }: { data: SiteData; id: string }) {
 
   return (
     <>
-      <nav className="crumbs" aria-label="Breadcrumb"><a href={href.results}>Results</a> <span aria-hidden="true">/</span> <span aria-current="page">{shortName(s.name)}</span></nav>
+      <nav className="crumbs" aria-label="Breadcrumb"><a href={href.results}>Results</a> <span aria-hidden="true">/</span> <span aria-current="page">{displayName(s)}</span></nav>
       <header className="page-head">
-        <h1 tabIndex={-1}>{s.name}</h1>
+        <h1 tabIndex={-1}>{displayName(s)}</h1>
+        <p className="subtitle">{s.name}</p>
         <p className="lede">{s.summary}</p>
         <p className="real-data"><span>Real data:</span> {s.realData}</p>
         <SourceLink source={s.source} />
@@ -56,7 +57,7 @@ export function Disaster({ data, id }: { data: SiteData; id: string }) {
           </div>
           <div className="stat">
             <dt>Blackout hours that were warned</dt>
-            <dd><span className="stat-num">{pct(s.with.warnedPct)}</span><span className="stat-ci">{s.with.warnedPct == null ? 'no blackouts with it' : 'with it, all seeds pooled'}</span></dd>
+            <dd><span className="stat-num">{pctPoints(s.with.warnedPct)}</span><span className="stat-ci">{s.with.warnedPct == null ? 'no blackouts with it' : 'with it, all seeds pooled'}</span></dd>
           </div>
         </dl>
       </section>
@@ -72,14 +73,14 @@ export function Disaster({ data, id }: { data: SiteData; id: string }) {
         {!log && s.with.deaths.mean < s.without.deaths.mean / 100 && (
           <p className="chart-note">On the linear scale the “with” line stays near 0. Select Log to see its shape.</p>
         )}
-        <DailyChart daily={s.daily} keys={['withoutDeaths', 'withDeaths']} unit="deaths" log={log} title={`Cumulative deaths per day, ${s.name}`} />
+        <DailyChart daily={s.daily} keys={['withoutDeaths', 'withDeaths']} unit="deaths" log={log} title={`Cumulative deaths per day, ${displayName(s)}`} />
         <Legend />
       </section>
 
       <section aria-labelledby="h-dark" className="block">
         <h2 id="h-dark">Sections without air and fans, at each day’s worst hour</h2>
         <p className="lede">The test world has 400 sections (50 levels × 8). Mean of {n} seeds.</p>
-        <DailyChart daily={s.daily} keys={['withoutDarkSections', 'withDarkSections']} unit="dark sections" title={`Dark sections per day, ${s.name}`} />
+        <DailyChart daily={s.daily} keys={['withoutDarkSections', 'withDarkSections']} unit="dark sections" title={`Dark sections per day, ${displayName(s)}`} />
         <Legend />
       </section>
 
@@ -106,8 +107,8 @@ export function Disaster({ data, id }: { data: SiteData; id: string }) {
       </section>
 
       <nav className="pager" aria-label="Other disasters">
-        <a href={href.disaster(prev.id)}><span>Previous</span>{shortName(prev.name)}</a>
-        <a href={href.disaster(next.id)}><span>Next</span>{shortName(next.name)}</a>
+        <a href={href.disaster(prev.id)}><span>Previous</span>{displayName(prev)}</a>
+        <a href={href.disaster(next.id)}><span>Next</span>{displayName(next)}</a>
       </nav>
     </>
   );

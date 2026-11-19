@@ -1,11 +1,12 @@
 // #/ — the results landing page.
+import { useState } from 'react';
 import type { Interval, ScenarioResult, ScenariosFile } from '../contracts.ts';
 import type { SiteData } from '../data.ts';
 import { href } from '../router.ts';
-import { bounds, num, pct, rangeText } from '../format.ts';
+import { bounds, num, pct, rangeText, pctPoints } from '../format.ts';
 import { scaleInterval, tCrit, tInterval } from '../stats.ts';
 import { Sparkline } from '../charts.tsx';
-import { Generated, Stat, scaleNote, seedRange, shortName } from '../parts.tsx';
+import { Generated, Stat, displayName, scaleNote, seedRange } from '../parts.tsx';
 
 /** Total deaths over every run (all disasters × all seeds), with a 95% interval from the per-seed totals. */
 function totals(f: ScenariosFile, side: 'withoutDeaths' | 'withDeaths', stat: 'without' | 'with'): Interval {
@@ -37,7 +38,6 @@ export function Results({ data }: { data: SiteData }) {
   return (
     <>
       <header className="hero">
-        <p className="kicker">Measured in the test world, not reported by the Directorate</p>
         <h1 tabIndex={-1} className="hero-line">
           Across {nS} disasters and {nSeeds} held-out seeds, Blackout Warning cut deaths from{' '}
           <span className="hero-num without">{num(wo.mean)}</span> to <span className="hero-num with">{num(wi.mean)}</span>.
@@ -51,7 +51,7 @@ export function Results({ data }: { data: SiteData }) {
           </div>
         </dl>
         <p className="hero-note">
-          Held-out seeds {seedRange(f.seeds)}, never used for tuning. Each total is the sum of {runs} runs ({nS} disasters × {nSeeds} seeds).
+          Measured in the test world, not reported by the Directorate. Held-out seeds {seedRange(f.seeds)}, never used for tuning. Each total is the sum of {runs} runs ({nS} disasters × {nSeeds} seeds).
           The interval comes from the {nSeeds} per-seed totals (Student t, {nSeeds - 1} degrees of freedom, t = {tCrit(nSeeds - 1).toFixed(3)}).
           Stable Hollow at the end: {num(stableWith)} of {runs} runs with it, {num(stableWithout)} of {runs} without it.
         </p>
@@ -139,7 +139,7 @@ function DisasterRow({ s }: { s: ScenarioResult }) {
     <li>
       <a className="dz-row" href={href.disaster(s.id)}>
         <span className="dz-name">
-          <span className="dz-title">{s.name}</span>
+          <span className="dz-title">{displayName(s)}</span>
           <span className="dz-real">{s.realData}</span>
         </span>
         <span className="dz-cell without"><span className="dz-label">Deaths per run, without</span><Ci x={s.without.deaths} /></span>
@@ -160,17 +160,21 @@ function Ci({ x }: { x: Interval }) {
   return <><span className="dz-mean">{m}</span><span className="dz-ci">95% interval {rangeText(lo, hi)}</span></>;
 }
 
+/** The hero bar fills in once per visit (the site's one authored motion), not on every return to this page. */
+let revealed = false;
+
 /** The hero chart: deaths without, stacked by disaster, over the same bar for deaths with, on one scale. */
 function Strata({ f }: { f: ScenariosFile }) {
+  const [reveal] = useState(() => { const first = !revealed; revealed = true; return first; });
   const n = f.seeds.length;
   // Exact per-seed sums when present (the JSON means are rounded), so the bar matches the headline total.
   const sum = (s: ScenariosFile['scenarios'][number], k: 'withoutDeaths' | 'withDeaths', mean: number) =>
     s.perSeed.length === n ? s.perSeed.reduce((a, r) => a + r[k], 0) : mean * n;
-  const parts = f.scenarios.map((s) => ({ id: s.id, name: shortName(s.name), wo: sum(s, 'withoutDeaths', s.without.deaths.mean), wi: sum(s, 'withDeaths', s.with.deaths.mean) }));
+  const parts = f.scenarios.map((s) => ({ id: s.id, name: displayName(s), wo: sum(s, 'withoutDeaths', s.without.deaths.mean), wi: sum(s, 'withDeaths', s.with.deaths.mean) }));
   const total = Math.max(1, parts.reduce((a, p) => a + p.wo, 0));
   const withTotal = parts.reduce((a, p) => a + p.wi, 0);
   return (
-    <figure className="strata" aria-label={`Bar chart. Deaths without Blackout Warning, by disaster: ${parts.map((p) => `${p.name} ${num(p.wo)}`).join('; ')}. Deaths with it: ${num(withTotal)}, ${pct(withTotal / total, 2)} of the bar above.`}>
+    <figure className={reveal ? 'strata reveal' : 'strata'} aria-label={`Bar chart. Deaths without Blackout Warning, by disaster: ${parts.map((p) => `${p.name} ${num(p.wo)}`).join('; ')}. Deaths with it: ${num(withTotal)}, ${pct(withTotal / total, 2)} of the bar above.`}>
       <div className="strata-row">
         <span className="strata-label">Without</span>
         <div className="strata-bar">
@@ -198,7 +202,7 @@ function simLimits(f: ScenariosFile): string[] {
   const out: string[] = [];
   if (warned.length) {
     const lo = Math.min(...warned), hi = Math.max(...warned);
-    out.push(`Warned share is a weak measure here: with Blackout Warning only ${pct(lo)}–${pct(hi)} of the remaining blackout hours were warned, because most blackouts are prevented and the few left are short and sudden.`);
+    out.push(`Warned share is a weak measure here: with Blackout Warning only ${pctPoints(lo)}–${pctPoints(hi)} of the remaining blackout hours were warned, because most blackouts are prevented and the few left are short and sudden.`);
   }
   out.push(
     'Blackout Warning keeps plants under 82% of their output. The simulation does not count the cost of saving that much power.',

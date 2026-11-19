@@ -30,6 +30,11 @@ export function pct(x: number | null, digits = 0): string {
   return x == null || !Number.isFinite(x) ? 'n/a' : `${(x * 100).toFixed(digits)}%`;
 }
 
+/** A value that is already in percent (0..100), such as warnedPct. */
+export function pctPoints(x: number | null, digits = 0): string {
+  return x == null || !Number.isFinite(x) ? 'n/a' : `${x.toFixed(digits)}%`;
+}
+
 export function shortDate(iso: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;

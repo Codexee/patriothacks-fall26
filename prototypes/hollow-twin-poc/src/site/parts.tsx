@@ -23,9 +23,15 @@ export function Stat({ label, value, digits = 0, count = true, tone, children }:
 
 export function SourceLink({ source }: { source: Source }) {
   return (
-    <p className="source">
-      Source: <a href={source.url} target="_blank" rel="noreferrer">{source.label}</a>. {source.detail}
-    </p>
+    <div className="source">
+      <p>Source: <a href={source.url} target="_blank" rel="noreferrer">{source.label}</a></p>
+      {source.detail.length > 160 ? (
+        <details>
+          <summary>How this data was used</summary>
+          <p>{source.detail.replace(/(\d{4})-(\d{2})-(\d{2})/g, (_, y, mo, d) => new Date(+y, +mo - 1, +d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }))}</p>
+        </details>
+      ) : <p className="source-detail">{source.detail}</p>}
+    </div>
   );
 }
 
@@ -62,4 +68,18 @@ export function scaleNote(f: ScenariosFile): string {
 /** The part of a scenario name before a colon or a parenthesis: "Aging plants (4 years …)" → "Aging plants". */
 export function shortName(name: string): string {
   return name.split(/[:(]/)[0].trim() || name;
+}
+
+/** Short display titles. The full scenario name (with its real source) stays on the disaster page as the subtitle. */
+const DISPLAY: Record<string, string> = {
+  twoplants: 'Two plants lost at once',
+  elliott: 'Plant loss, Winter Storm Elliott',
+  cascade: 'Plant loss, Texas, Feb 2021',
+  slowloss: 'Slow two-week plant loss',
+  aging: 'Aging plants',
+  crowding: 'Crowding',
+  baseline: 'Baseline',
+};
+export function displayName(s: { id: string; name: string }): string {
+  return DISPLAY[s.id] ?? shortName(s.name);
 }
