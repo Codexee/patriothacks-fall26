@@ -3,10 +3,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { dataUrl, earthName, hollowName, type County, type ModelFile } from '../contracts.ts';
 import { useRoute } from '../shell/router.ts';
-import { featuresAt, missingFeatureNames, type HourRow } from '../model/features.ts';
+import { RECORD_FEATURES, featuresAt, missingFeatureNames, type HourRow } from '../model/features.ts';
 import { PageNav, fmtDay, fmtInt, fmtShare, fmtTime, useJson } from '../brief/shared.tsx';
 import { LineChart, Legend, type Series } from './Chart.tsx';
-import { fetchLive, loadSample, loadWarnModel, scoreSeries, toHourRows, type RiskPoint } from './data.ts';
+import { fetchLive, loadSample, loadWarnModel, nowIndex, scoreSeries, toAllRows, toHourRows, type RiskPoint } from './data.ts';
 import './live.css';
 
 const DEFAULT_BA = 'ERCO';
@@ -17,7 +17,8 @@ interface View {
   mode: 'live' | 'sample';
   reason: string | null;      // why live data is not shown
   fetchedAt: string;
-  rows: HourRow[];
+  rows: HourRow[];            // up to now (the latest hour with demand)
+  all: HourRow[];             // the same, plus the later hours that have only a day-ahead forecast
   model: ModelFile | null;
   risk: RiskPoint[] | null;
 }
@@ -33,14 +34,16 @@ async function load(ba: string): Promise<View> {
     payload = await loadSample();
   }
   const rows = toHourRows(payload);
+  const all = toAllRows(payload);
   return {
     ba: payload.ba,
     mode: reason ? 'sample' : 'live',
     reason,
     fetchedAt: payload.fetchedAt,
     rows,
+    all,
     model,
-    risk: model ? scoreSeries(model, rows, 168) : null,
+    risk: model ? scoreSeries(model, all, 168) : null,
   };
 }
 
@@ -85,6 +88,28 @@ function RiskNow({ view }: { view: View }) {
   );
 }
 
+function ModelNote({ model, missing }: { model: ModelFile; missing: string[] }) {
+  const records: readonly string[] = RECORD_FEATURES;
+  const noHistory = missing.filter((n) => records.includes(n));
+  const other = missing.filter((n) => !records.includes(n));
+  return (
+    <div className="dim small model-note">
+      <p>
+        Model {model.name}, version {model.version}, with {model.features.length} inputs. It runs in this browser. Alert threshold {fmtShare(model.threshold ?? 0)}: on the
+        training years this threshold gave at most 6 false alarms per balancing area per year.
+      </p>
+      {noHistory.length > 0 && (
+        <p>
+          <strong>Limit.</strong> {noHistory.length} of the inputs compare demand with this area's own records (for example, tomorrow's forecast against the highest demand ever seen
+          in this month). Those records need years of history. This page has only the last 31 days, so it gives these inputs to the model as missing. It does not guess them.
+          The risk here can therefore differ from the risk in the backtest.
+        </p>
+      )}
+      {other.length > 0 && <p>Also missing here: {other.join(', ')}.</p>}
+    </div>
+  );
+}
+
 export default function Page() {
   const { query } = useRoute();
   const wanted = (query.get('ba') ?? DEFAULT_BA).toUpperCase();
@@ -114,7 +139,7 @@ export default function Page() {
 
   const week = view ? view.rows.slice(-168) : [];
   const last = view && view.rows.length ? view.rows[view.rows.length - 1] : null;
-  const f = view && last ? featuresAt(view.rows, view.rows.length - 1) : null;
+  const f = view && last ? featuresAt(view.all, nowIndex(view.all)) : null;
   const demandSeries: Series[] = [
     { label: 'Demand', color: 'var(--lit)', points: week.map((r) => ({ t: r.t, v: r.demand })) },
     { label: 'Day-ahead forecast', color: 'var(--text-dim)', dashed: true, points: week.map((r) => ({ t: r.t, v: r.forecast })) },
@@ -159,6 +184,7 @@ export default function Page() {
                   <div><dt>Demand against its 30-day peak</dt><dd>{f.demand_vs_30d_peak == null ? 'not known' : fmtShare(f.demand_vs_30d_peak)}</dd></div>
                   <div><dt>Net generation, change in 6 hours</dt><dd>{signed(f.netgen_chg_6h)}</dd></div>
                   <div><dt>Gas share of generation</dt><dd>{f.gas_share == null ? 'not known' : fmtShare(f.gas_share)}</dd></div>
+                  <div><dt>Highest demand forecast in the next 12 hours, against the 30-day peak</dt><dd>{f.fc12_vs_30d_peak == null ? 'no forecast yet' : fmtShare(f.fc12_vs_30d_peak)}</dd></div>
                 </dl>
               )}
             </section>
@@ -174,10 +200,7 @@ export default function Page() {
                   format={(v) => `${(v * 100).toFixed(v < 0.1 ? 1 : 0)}%`}
                   ariaLabel={`Model risk for ${view.ba}, one value per hour for 7 days.`}
                 />
-                <p className="dim small">
-                  Model {view.model.name}, version {view.model.version}. It runs in this browser.
-                  {missing.length > 0 && ` ${missing.length} of its ${view.model.features.length} inputs are not in live data (${missing.slice(0, 4).join(', ')}${missing.length > 4 ? ', ...' : ''}); the model reads them as missing.`}
-                </p>
+                <ModelNote model={view.model} missing={missing} />
               </section>
             )}
 

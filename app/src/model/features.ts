@@ -6,6 +6,13 @@
 //   - lag(x, 6) counts ROWS (6 rows back), the 24 h and 30 d windows count TIME.
 // Weather features (temp_*, wind_*, precip_*, slp_*, fx_*) need station data that the live page
 // does not have. They are returned as null, which the model reads as "missing".
+//
+// v2 adequacy features. fc12 = the highest day-ahead demand forecast in the next 12 hours (1 h to
+// 12 h after this hour, by time). fc12_vs_30d_peak uses the 30-day window above. The RECORD
+// features compare with the BA's own records: all earlier rows (wexp), the 365 days before this hour
+// (w365), and all earlier rows in the same calendar month (wmon). They are correct only when `rows`
+// start at the first hour of the BA's data. The live page has 31 days at most, so it does not set
+// `longHistory` and these features go to the model as missing.
 
 export interface HourRow {
   /** Start of the hour, UTC, in ms since the epoch (EIA "end of hour" minus 1 h). */
@@ -46,8 +53,65 @@ export function prepareRows(rows: HourRow[]): HourRow[] {
   return [...byT.values()].sort((a, b) => a.t - b.t);
 }
 
+/** Features that need the BA's full history (see the note at the top). */
+export const RECORD_FEATURES = [
+  'demand_vs_record',
+  'demand_vs_month_record',
+  'fc12_vs_record',
+  'fc12_vs_365d_peak',
+  'fc12_vs_month_record',
+  'fc12_vs_month_record_max_72h',
+] as const;
+
+export interface FeatureOptions {
+  /** True only when `rows` start at the first hour of the BA's data. Default false. */
+  longHistory?: boolean;
+}
+
+const maxOf = (a: number | null, b: number | null): number | null => (b == null ? a : a == null || b > a ? b : a);
+
+/** max(forecast) over the rows 1 h to 12 h after row i (by time). */
+function fc12At(rows: HourRow[], i: number): number | null {
+  let m: number | null = null;
+  for (let j = i + 1; j < rows.length && rows[j].t - rows[i].t <= 12 * HOUR; j++) m = maxOf(m, rows[j].forecast);
+  return m;
+}
+
+/** max(demand) over the earlier rows of the same UTC month (any year). */
+function monthRecordAt(rows: HourRow[], i: number): number | null {
+  const mon = new Date(rows[i].t).getUTCMonth();
+  let m: number | null = null;
+  for (let j = 0; j < i; j++) if (new Date(rows[j].t).getUTCMonth() === mon) m = maxOf(m, rows[j].demand);
+  return m;
+}
+
+function recordFeatures(rows: HourRow[], i: number, fc12: number | null): FeatureMap {
+  const r = rows[i];
+  let record: number | null = null;
+  let peak365: number | null = null;
+  for (let j = 0; j < i; j++) {
+    const d = rows[j].demand;
+    record = maxOf(record, d);
+    if (r.t - rows[j].t <= 365 * DAY) peak365 = maxOf(peak365, d);
+  }
+  const monRec = monthRecordAt(rows, i);
+  // Trailing 72 rows, current row included (models/common.py: rolling(72, min_periods=1).max()).
+  let max72: number | null = null;
+  for (let j = Math.max(0, i - 71); j <= i; j++) {
+    max72 = maxOf(max72, j === i ? ratio(fc12, monRec) : ratio(fc12At(rows, j), monthRecordAt(rows, j)));
+  }
+  return {
+    demand_vs_record: ratio(r.demand, record),
+    demand_vs_month_record: ratio(r.demand, monRec),
+    fc12_vs_record: ratio(fc12, record),
+    fc12_vs_365d_peak: ratio(fc12, peak365),
+    fc12_vs_month_record: ratio(fc12, monRec),
+    fc12_vs_month_record_max_72h: max72,
+  };
+}
+
 /** All features for row `i` of `rows` (sorted by time, one row per hour). */
-export function featuresAt(rows: HourRow[], i: number): FeatureMap {
+export function featuresAt(rows: HourRow[], i: number, opts: FeatureOptions = {}): FeatureMap {
   const r = rows[i];
   const lag6 = rows[i - 6];
 
@@ -62,6 +126,11 @@ export function featuresAt(rows: HourRow[], i: number): FeatureMap {
       if (e != null && (fcMax24 == null || e > fcMax24)) fcMax24 = e;
     }
   }
+
+  const fc12 = fc12At(rows, i);
+  const records: FeatureMap = opts.longHistory
+    ? recordFeatures(rows, i, fc12)
+    : Object.fromEntries(RECORD_FEATURES.map((n) => [n, null]));
 
   const d = new Date(r.t);
   return {
@@ -84,6 +153,8 @@ export function featuresAt(rows: HourRow[], i: number): FeatureMap {
     hod: d.getUTCHours(),
     doy: dayOfYear(d),
     month: d.getUTCMonth() + 1,
+    fc12_vs_30d_peak: ratio(fc12, peak30),
+    ...records,
   };
 }
 
@@ -96,9 +167,10 @@ export function featureVector(names: readonly string[], f: FeatureMap): (number 
 }
 
 /** Names in `names` that this module cannot compute (they go to the model as missing). */
-export function missingFeatureNames(names: readonly string[]): string[] {
+export function missingFeatureNames(names: readonly string[], opts: FeatureOptions = {}): string[] {
   const known = featuresAt([{ t: 0, demand: 1, forecast: 1, netgen: 1, interchange: 1, gen_gas: 1, gen_coal: 1, gen_nuclear: 1, gen_wind: 1, gen_solar: 1 }], 0);
-  return names.filter((n) => !(n in known));
+  const records: readonly string[] = RECORD_FEATURES;
+  return names.filter((n) => !(n in known) || (!opts.longHistory && records.includes(n)));
 }
 
 /** Features for the latest hour in `rows`. */

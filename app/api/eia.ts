@@ -6,6 +6,8 @@
 //   region: electricity/rto/region-data, last 31 days. Types: D (demand), DF (day-ahead demand
 //           forecast), NG (net generation), TI (total interchange). The browser shows the last
 //           7 days; the model feature "demand against its 30-day peak" needs the 31 days.
+//           The region request ends 36 h after now, so it also returns the day-ahead forecast (DF)
+//           for the coming hours. The model feature fc12 needs the forecast for the next 12 hours.
 //   fuel:   electricity/rto/fuel-type-data, last 8 days (7 days plus room for the 6-hour change).
 //
 // Response: { ba, fetchedAt, source: "eia", region: [{period, type, value}], fuel: [{period, fueltype, value}] }
@@ -39,14 +41,14 @@ function json(body: unknown, status: number, cache: boolean): Response {
   });
 }
 
-async function eiaRows(route: string, ba: string, days: number, key: string, now: Date): Promise<Record<string, unknown>[]> {
+async function eiaRows(route: string, ba: string, days: number, key: string, now: Date, aheadHours = 0): Promise<Record<string, unknown>[]> {
   const q = new URLSearchParams();
   q.set('api_key', key);
   q.set('frequency', 'hourly');
   q.set('data[0]', 'value');
   q.set('facets[respondent][]', ba);
   q.set('start', hourStamp(new Date(now.getTime() - days * 86_400_000)));
-  q.set('end', hourStamp(now));
+  q.set('end', hourStamp(new Date(now.getTime() + aheadHours * 3_600_000)));
   q.set('sort[0][column]', 'period');
   q.set('sort[0][direction]', 'asc');
   q.set('offset', '0');
@@ -70,7 +72,7 @@ export async function GET(request: Request): Promise<Response> {
   try {
     const now = new Date();
     const [region, fuel] = await Promise.all([
-      eiaRows('region-data', ba, REGION_DAYS, key, now),
+      eiaRows('region-data', ba, REGION_DAYS, key, now, 36),
       eiaRows('fuel-type-data', ba, FUEL_DAYS, key, now),
     ]);
     return json(
