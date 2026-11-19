@@ -8,7 +8,8 @@
     "build": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
     "sim": "node --experimental-strip-types src/sim/cli.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "earth": "node --experimental-strip-types src/earth/cli.ts"
   },
   "dependencies": {
     "deck.gl": "^9.4.1",

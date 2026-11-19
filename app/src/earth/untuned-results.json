@@ -1,0 +1,55 @@
+{
+  "parameters": {
+    "generationMultiplier": 1,
+    "trailingPeakHours": 1
+  },
+  "results": {
+    "meter-time": {
+      "firstAlertUtc": "2021-02-08T23:00:00Z",
+      "firstAlertMeterUtc": "2021-02-08T23:00:00Z",
+      "leadHours": 152.4167,
+      "referenceUtc": "2021-02-15T07:25:00Z",
+      "hours": 360,
+      "evaluatedHours": 337,
+      "warmupOrMissingHours": 23,
+      "alertHours": 332,
+      "alertHourFraction": 0.9852,
+      "alertEpisodes": 2,
+      "episodeStartsUtc": [
+        "2021-02-08T23:00:00Z",
+        "2021-02-20T22:00:00Z"
+      ],
+      "firstAlertLog": {
+        "capNow": 39708,
+        "capForecast": 40836.310000000005,
+        "demandForecast": 42927.66262036469,
+        "shortfallPct": 19.45603017478552,
+        "inHours": 27,
+        "shed": 0.25548532773620775
+      }
+    },
+    "public-delay": {
+      "firstAlertUtc": "2021-02-09T16:00:00Z",
+      "firstAlertMeterUtc": "2021-02-09T06:00:00Z",
+      "leadHours": 135.4167,
+      "referenceUtc": "2021-02-15T07:25:00Z",
+      "hours": 360,
+      "evaluatedHours": 320,
+      "warmupOrMissingHours": 40,
+      "alertHours": 320,
+      "alertHourFraction": 1,
+      "alertEpisodes": 1,
+      "episodeStartsUtc": [
+        "2021-02-09T16:00:00Z"
+      ],
+      "firstAlertLog": {
+        "capNow": 37061,
+        "capForecast": 41750.159999999996,
+        "demandForecast": 44461.1038643873,
+        "shortfallPct": 21.015061173601456,
+        "inHours": 20,
+        "shed": 0.27240247223156805
+      }
+    }
+  }
+}

@@ -1,0 +1,1772 @@
+{
+  "schemaVersion": 1,
+  "module": "app/src/product/earlyWarning.ts (unchanged, through stepProduct)",
+  "referenceUtc": "2021-02-15T07:25:00Z",
+  "untunedParameters": {
+    "generationMultiplier": 1,
+    "trailingPeakHours": 1
+  },
+  "untuned": {
+    "meter-time": {
+      "firstAlertUtc": "2021-02-08T23:00:00Z",
+      "firstAlertMeterUtc": "2021-02-08T23:00:00Z",
+      "leadHours": 152.4167,
+      "referenceUtc": "2021-02-15T07:25:00Z",
+      "hours": 360,
+      "evaluatedHours": 337,
+      "warmupOrMissingHours": 23,
+      "alertHours": 332,
+      "alertHourFraction": 0.9852,
+      "alertEpisodes": 2,
+      "episodeStartsUtc": [
+        "2021-02-08T23:00:00Z",
+        "2021-02-20T22:00:00Z"
+      ],
+      "firstAlertLog": {
+        "capNow": 39708,
+        "capForecast": 40836.310000000005,
+        "demandForecast": 42927.66262036469,
+        "shortfallPct": 19.45603017478552,
+        "inHours": 27,
+        "shed": 0.25548532773620775
+      }
+    },
+    "public-delay": {
+      "firstAlertUtc": "2021-02-09T16:00:00Z",
+      "firstAlertMeterUtc": "2021-02-09T06:00:00Z",
+      "leadHours": 135.4167,
+      "referenceUtc": "2021-02-15T07:25:00Z",
+      "hours": 360,
+      "evaluatedHours": 320,
+      "warmupOrMissingHours": 40,
+      "alertHours": 320,
+      "alertHourFraction": 1,
+      "alertEpisodes": 1,
+      "episodeStartsUtc": [
+        "2021-02-09T16:00:00Z"
+      ],
+      "firstAlertLog": {
+        "capNow": 37061,
+        "capForecast": 41750.159999999996,
+        "demandForecast": 44461.1038643873,
+        "shortfallPct": 21.015061173601456,
+        "inHours": 20,
+        "shed": 0.27240247223156805
+      }
+    }
+  },
+  "calibration": {
+    "parameters": {
+      "generationMultiplier": 1.5,
+      "trailingPeakHours": 6
+    },
+    "candidates": [
+      {
+        "parameters": {
+          "generationMultiplier": 1.5,
+          "trailingPeakHours": 6
+        },
+        "firstAlertUtc": "2021-02-13T16:00:00Z",
+        "leadHours": 39.4167,
+        "preStormAlertHours": 0,
+        "alertHours": 48,
+        "score": 39.4167
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.6,
+          "trailingPeakHours": 6
+        },
+        "firstAlertUtc": "2021-02-14T16:00:00Z",
+        "leadHours": 15.4167,
+        "preStormAlertHours": 0,
+        "alertHours": 39,
+        "score": 15.4167
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.5,
+          "trailingPeakHours": 12
+        },
+        "firstAlertUtc": "2021-02-14T16:00:00Z",
+        "leadHours": 15.4167,
+        "preStormAlertHours": 0,
+        "alertHours": 41,
+        "score": 15.4167
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 2,
+          "trailingPeakHours": 72
+        },
+        "firstAlertUtc": "2021-02-18T14:00:00Z",
+        "leadHours": -78.5833,
+        "preStormAlertHours": 0,
+        "alertHours": 9,
+        "score": -100
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.8,
+          "trailingPeakHours": 72
+        },
+        "firstAlertUtc": "2021-02-18T13:00:00Z",
+        "leadHours": -77.5833,
+        "preStormAlertHours": 0,
+        "alertHours": 11,
+        "score": -100
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.6,
+          "trailingPeakHours": 72
+        },
+        "firstAlertUtc": "2021-02-18T13:00:00Z",
+        "leadHours": -77.5833,
+        "preStormAlertHours": 0,
+        "alertHours": 12,
+        "score": -100
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 2,
+          "trailingPeakHours": 48
+        },
+        "firstAlertUtc": "2021-02-17T15:00:00Z",
+        "leadHours": -55.5833,
+        "preStormAlertHours": 0,
+        "alertHours": 13,
+        "score": -100
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.5,
+          "trailingPeakHours": 72
+        },
+        "firstAlertUtc": "2021-02-18T12:00:00Z",
+        "leadHours": -76.5833,
+        "preStormAlertHours": 0,
+        "alertHours": 14,
+        "score": -100
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.8,
+          "trailingPeakHours": 48
+        },
+        "firstAlertUtc": "2021-02-17T14:00:00Z",
+        "leadHours": -54.5833,
+        "preStormAlertHours": 0,
+        "alertHours": 16,
+        "score": -100
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.6,
+          "trailingPeakHours": 48
+        },
+        "firstAlertUtc": "2021-02-17T14:00:00Z",
+        "leadHours": -54.5833,
+        "preStormAlertHours": 0,
+        "alertHours": 18,
+        "score": -100
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.5,
+          "trailingPeakHours": 48
+        },
+        "firstAlertUtc": "2021-02-17T14:00:00Z",
+        "leadHours": -54.5833,
+        "preStormAlertHours": 0,
+        "alertHours": 19,
+        "score": -100
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 2,
+          "trailingPeakHours": 24
+        },
+        "firstAlertUtc": "2021-02-16T15:00:00Z",
+        "leadHours": -31.5833,
+        "preStormAlertHours": 0,
+        "alertHours": 26,
+        "score": -100
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 2,
+          "trailingPeakHours": 6
+        },
+        "firstAlertUtc": "2021-02-15T22:00:00Z",
+        "leadHours": -14.5833,
+        "preStormAlertHours": 0,
+        "alertHours": 28,
+        "score": -100
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 2,
+          "trailingPeakHours": 12
+        },
+        "firstAlertUtc": "2021-02-16T03:00:00Z",
+        "leadHours": -19.5833,
+        "preStormAlertHours": 0,
+        "alertHours": 28,
+        "score": -100
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.8,
+          "trailingPeakHours": 24
+        },
+        "firstAlertUtc": "2021-02-16T15:00:00Z",
+        "leadHours": -31.5833,
+        "preStormAlertHours": 0,
+        "alertHours": 28,
+        "score": -100
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 2,
+          "trailingPeakHours": 1
+        },
+        "firstAlertUtc": "2021-02-15T17:00:00Z",
+        "leadHours": -9.5833,
+        "preStormAlertHours": 0,
+        "alertHours": 29,
+        "score": -100
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.6,
+          "trailingPeakHours": 24
+        },
+        "firstAlertUtc": "2021-02-16T14:00:00Z",
+        "leadHours": -30.5833,
+        "preStormAlertHours": 0,
+        "alertHours": 30,
+        "score": -100
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.5,
+          "trailingPeakHours": 24
+        },
+        "firstAlertUtc": "2021-02-16T14:00:00Z",
+        "leadHours": -30.5833,
+        "preStormAlertHours": 0,
+        "alertHours": 32,
+        "score": -100
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.8,
+          "trailingPeakHours": 6
+        },
+        "firstAlertUtc": "2021-02-15T21:00:00Z",
+        "leadHours": -13.5833,
+        "preStormAlertHours": 0,
+        "alertHours": 33,
+        "score": -100
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.8,
+          "trailingPeakHours": 12
+        },
+        "firstAlertUtc": "2021-02-16T03:00:00Z",
+        "leadHours": -19.5833,
+        "preStormAlertHours": 0,
+        "alertHours": 33,
+        "score": -100
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.6,
+          "trailingPeakHours": 12
+        },
+        "firstAlertUtc": "2021-02-16T03:00:00Z",
+        "leadHours": -19.5833,
+        "preStormAlertHours": 0,
+        "alertHours": 35,
+        "score": -100
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.8,
+          "trailingPeakHours": 1
+        },
+        "firstAlertUtc": "2021-02-15T16:00:00Z",
+        "leadHours": -8.5833,
+        "preStormAlertHours": 0,
+        "alertHours": 39,
+        "score": -100
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.4,
+          "trailingPeakHours": 72
+        },
+        "firstAlertUtc": "2021-02-11T17:00:00Z",
+        "leadHours": 86.4167,
+        "preStormAlertHours": 6,
+        "alertHours": 20,
+        "score": -1006
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.4,
+          "trailingPeakHours": 48
+        },
+        "firstAlertUtc": "2021-02-11T17:00:00Z",
+        "leadHours": 86.4167,
+        "preStormAlertHours": 6,
+        "alertHours": 28,
+        "score": -1006
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.4,
+          "trailingPeakHours": 24
+        },
+        "firstAlertUtc": "2021-02-11T17:00:00Z",
+        "leadHours": 86.4167,
+        "preStormAlertHours": 6,
+        "alertHours": 40,
+        "score": -1006
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.4,
+          "trailingPeakHours": 12
+        },
+        "firstAlertUtc": "2021-02-11T17:00:00Z",
+        "leadHours": 86.4167,
+        "preStormAlertHours": 6,
+        "alertHours": 54,
+        "score": -1006
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.6,
+          "trailingPeakHours": 1
+        },
+        "firstAlertUtc": "2021-02-09T12:00:00Z",
+        "leadHours": 139.4167,
+        "preStormAlertHours": 8,
+        "alertHours": 58,
+        "score": -1008
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.5,
+          "trailingPeakHours": 1
+        },
+        "firstAlertUtc": "2021-02-09T11:00:00Z",
+        "leadHours": 140.4167,
+        "preStormAlertHours": 13,
+        "alertHours": 78,
+        "score": -1013
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.4,
+          "trailingPeakHours": 6
+        },
+        "firstAlertUtc": "2021-02-09T13:00:00Z",
+        "leadHours": 138.4167,
+        "preStormAlertHours": 14,
+        "alertHours": 75,
+        "score": -1014
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.4,
+          "trailingPeakHours": 1
+        },
+        "firstAlertUtc": "2021-02-09T10:00:00Z",
+        "leadHours": 141.4167,
+        "preStormAlertHours": 32,
+        "alertHours": 116,
+        "score": -1032
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.3,
+          "trailingPeakHours": 72
+        },
+        "firstAlertUtc": "2021-02-09T14:00:00Z",
+        "leadHours": 137.4167,
+        "preStormAlertHours": 37,
+        "alertHours": 70,
+        "score": -1037
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.3,
+          "trailingPeakHours": 48
+        },
+        "firstAlertUtc": "2021-02-09T14:00:00Z",
+        "leadHours": 137.4167,
+        "preStormAlertHours": 37,
+        "alertHours": 78,
+        "score": -1037
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.3,
+          "trailingPeakHours": 24
+        },
+        "firstAlertUtc": "2021-02-09T14:00:00Z",
+        "leadHours": 137.4167,
+        "preStormAlertHours": 37,
+        "alertHours": 104,
+        "score": -1037
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.3,
+          "trailingPeakHours": 12
+        },
+        "firstAlertUtc": "2021-02-09T14:00:00Z",
+        "leadHours": 137.4167,
+        "preStormAlertHours": 37,
+        "alertHours": 129,
+        "score": -1037
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.3,
+          "trailingPeakHours": 6
+        },
+        "firstAlertUtc": "2021-02-09T11:00:00Z",
+        "leadHours": 140.4167,
+        "preStormAlertHours": 44,
+        "alertHours": 159,
+        "score": -1044
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.3,
+          "trailingPeakHours": 1
+        },
+        "firstAlertUtc": "2021-02-09T09:00:00Z",
+        "leadHours": 142.4167,
+        "preStormAlertHours": 54,
+        "alertHours": 198,
+        "score": -1054
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.2,
+          "trailingPeakHours": 72
+        },
+        "firstAlertUtc": "2021-02-09T07:00:00Z",
+        "leadHours": 144.4167,
+        "preStormAlertHours": 64,
+        "alertHours": 157,
+        "score": -1064
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.2,
+          "trailingPeakHours": 48
+        },
+        "firstAlertUtc": "2021-02-09T07:00:00Z",
+        "leadHours": 144.4167,
+        "preStormAlertHours": 64,
+        "alertHours": 171,
+        "score": -1064
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.2,
+          "trailingPeakHours": 24
+        },
+        "firstAlertUtc": "2021-02-09T07:00:00Z",
+        "leadHours": 144.4167,
+        "preStormAlertHours": 64,
+        "alertHours": 204,
+        "score": -1064
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.2,
+          "trailingPeakHours": 12
+        },
+        "firstAlertUtc": "2021-02-09T07:00:00Z",
+        "leadHours": 144.4167,
+        "preStormAlertHours": 64,
+        "alertHours": 232,
+        "score": -1064
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.2,
+          "trailingPeakHours": 6
+        },
+        "firstAlertUtc": "2021-02-09T07:00:00Z",
+        "leadHours": 144.4167,
+        "preStormAlertHours": 67,
+        "alertHours": 248,
+        "score": -1067
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.2,
+          "trailingPeakHours": 1
+        },
+        "firstAlertUtc": "2021-02-09T06:00:00Z",
+        "leadHours": 145.4167,
+        "preStormAlertHours": 71,
+        "alertHours": 278,
+        "score": -1071
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.1,
+          "trailingPeakHours": 72
+        },
+        "firstAlertUtc": "2021-02-08T23:00:00Z",
+        "leadHours": 152.4167,
+        "preStormAlertHours": 81,
+        "alertHours": 184,
+        "score": -1081
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1,
+          "trailingPeakHours": 72
+        },
+        "firstAlertUtc": "2021-02-08T23:00:00Z",
+        "leadHours": 152.4167,
+        "preStormAlertHours": 81,
+        "alertHours": 198,
+        "score": -1081
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.1,
+          "trailingPeakHours": 48
+        },
+        "firstAlertUtc": "2021-02-08T23:00:00Z",
+        "leadHours": 152.4167,
+        "preStormAlertHours": 81,
+        "alertHours": 210,
+        "score": -1081
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1,
+          "trailingPeakHours": 48
+        },
+        "firstAlertUtc": "2021-02-08T23:00:00Z",
+        "leadHours": 152.4167,
+        "preStormAlertHours": 81,
+        "alertHours": 226,
+        "score": -1081
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.1,
+          "trailingPeakHours": 24
+        },
+        "firstAlertUtc": "2021-02-08T23:00:00Z",
+        "leadHours": 152.4167,
+        "preStormAlertHours": 81,
+        "alertHours": 248,
+        "score": -1081
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1,
+          "trailingPeakHours": 24
+        },
+        "firstAlertUtc": "2021-02-08T23:00:00Z",
+        "leadHours": 152.4167,
+        "preStormAlertHours": 81,
+        "alertHours": 271,
+        "score": -1081
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.1,
+          "trailingPeakHours": 12
+        },
+        "firstAlertUtc": "2021-02-08T23:00:00Z",
+        "leadHours": 152.4167,
+        "preStormAlertHours": 81,
+        "alertHours": 285,
+        "score": -1081
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.1,
+          "trailingPeakHours": 6
+        },
+        "firstAlertUtc": "2021-02-08T23:00:00Z",
+        "leadHours": 152.4167,
+        "preStormAlertHours": 81,
+        "alertHours": 300,
+        "score": -1081
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1,
+          "trailingPeakHours": 12
+        },
+        "firstAlertUtc": "2021-02-08T23:00:00Z",
+        "leadHours": 152.4167,
+        "preStormAlertHours": 81,
+        "alertHours": 300,
+        "score": -1081
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1,
+          "trailingPeakHours": 6
+        },
+        "firstAlertUtc": "2021-02-08T23:00:00Z",
+        "leadHours": 152.4167,
+        "preStormAlertHours": 81,
+        "alertHours": 313,
+        "score": -1081
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1.1,
+          "trailingPeakHours": 1
+        },
+        "firstAlertUtc": "2021-02-08T23:00:00Z",
+        "leadHours": 152.4167,
+        "preStormAlertHours": 81,
+        "alertHours": 317,
+        "score": -1081
+      },
+      {
+        "parameters": {
+          "generationMultiplier": 1,
+          "trailingPeakHours": 1
+        },
+        "firstAlertUtc": "2021-02-08T23:00:00Z",
+        "leadHours": 152.4167,
+        "preStormAlertHours": 81,
+        "alertHours": 332,
+        "score": -1081
+      }
+    ],
+    "method": "54 fixed adapter settings; Texas event only. Reject any alert earlier than 72 h before EEA3, then maximize positive lead within 72 h. Tie-break on fewer alert hours, shorter peak window, smaller generation multiplier. This fits the demonstration event and does not establish predictive accuracy."
+  },
+  "tuned": {
+    "meter-time": {
+      "firstAlertUtc": "2021-02-13T16:00:00Z",
+      "firstAlertMeterUtc": "2021-02-13T16:00:00Z",
+      "leadHours": 39.4167,
+      "referenceUtc": "2021-02-15T07:25:00Z",
+      "hours": 360,
+      "evaluatedHours": 337,
+      "warmupOrMissingHours": 23,
+      "alertHours": 48,
+      "alertHourFraction": 0.1424,
+      "alertEpisodes": 6,
+      "episodeStartsUtc": [
+        "2021-02-13T16:00:00Z",
+        "2021-02-14T13:00:00Z",
+        "2021-02-14T16:00:00Z",
+        "2021-02-15T20:00:00Z",
+        "2021-02-20T06:00:00Z",
+        "2021-02-21T05:00:00Z"
+      ],
+      "firstAlertLog": {
+        "capNow": 93000,
+        "capForecast": 77789.68760869565,
+        "demandForecast": 72947.7620170184,
+        "shortfallPct": 6.563204787805077,
+        "inHours": 34,
+        "shed": 0.09661142621468112
+      }
+    },
+    "public-delay": {
+      "firstAlertUtc": "2021-02-16T16:00:00Z",
+      "firstAlertMeterUtc": "2021-02-16T06:00:00Z",
+      "leadHours": -32.5833,
+      "referenceUtc": "2021-02-15T07:25:00Z",
+      "hours": 360,
+      "evaluatedHours": 320,
+      "warmupOrMissingHours": 40,
+      "alertHours": 72,
+      "alertHourFraction": 0.225,
+      "alertEpisodes": 2,
+      "episodeStartsUtc": [
+        "2021-02-16T16:00:00Z",
+        "2021-02-20T16:00:00Z"
+      ],
+      "firstAlertLog": {
+        "capNow": 66511.5,
+        "capForecast": 0,
+        "demandForecast": 27470.837827377112,
+        "shortfallPct": 2746983.7827377114,
+        "inHours": 35,
+        "shed": 0.9
+      }
+    }
+  },
+  "elliott": {
+    "TVA": {
+      "meter-time": {
+        "firstAlertUtc": "2022-12-22T09:00:00Z",
+        "firstAlertMeterUtc": "2022-12-22T09:00:00Z",
+        "leadHours": null,
+        "referenceUtc": null,
+        "hours": 192,
+        "evaluatedHours": 169,
+        "warmupOrMissingHours": 23,
+        "alertHours": 44,
+        "alertHourFraction": 0.2604,
+        "alertEpisodes": 3,
+        "episodeStartsUtc": [
+          "2022-12-22T09:00:00Z",
+          "2022-12-23T15:00:00Z",
+          "2022-12-25T00:00:00Z"
+        ],
+        "firstAlertLog": {
+          "capNow": 29167.5,
+          "capForecast": 23735.418478260868,
+          "demandForecast": 21734.44651374063,
+          "shortfallPct": 4.056453427717033,
+          "inHours": 21,
+          "shed": 0.06115011602582199
+        }
+      },
+      "public-delay": {
+        "firstAlertUtc": "2022-12-23T16:00:00Z",
+        "firstAlertMeterUtc": "2022-12-23T06:00:00Z",
+        "leadHours": null,
+        "referenceUtc": null,
+        "hours": 192,
+        "evaluatedHours": 152,
+        "warmupOrMissingHours": 40,
+        "alertHours": 48,
+        "alertHourFraction": 0.3158,
+        "alertEpisodes": 2,
+        "episodeStartsUtc": [
+          "2022-12-23T16:00:00Z",
+          "2022-12-25T16:00:00Z"
+        ],
+        "firstAlertLog": {
+          "capNow": 34590,
+          "capForecast": 34004.765,
+          "demandForecast": 32409.004414819945,
+          "shortfallPct": 8.303686579660052,
+          "inHours": 19,
+          "shed": 0.12026728844185508
+        }
+      }
+    },
+    "DUK": {
+      "meter-time": {
+        "firstAlertUtc": "2022-12-22T11:00:00Z",
+        "firstAlertMeterUtc": "2022-12-22T11:00:00Z",
+        "leadHours": null,
+        "referenceUtc": null,
+        "hours": 192,
+        "evaluatedHours": 169,
+        "warmupOrMissingHours": 23,
+        "alertHours": 43,
+        "alertHourFraction": 0.2544,
+        "alertEpisodes": 4,
+        "episodeStartsUtc": [
+          "2022-12-22T11:00:00Z",
+          "2022-12-23T11:00:00Z",
+          "2022-12-25T10:00:00Z",
+          "2022-12-26T00:00:00Z"
+        ],
+        "firstAlertLog": {
+          "capNow": 18111,
+          "capForecast": 12352.034782608695,
+          "demandForecast": 13043.036983265836,
+          "shortfallPct": 19.993452061823746,
+          "inHours": 36,
+          "shed": 0.2613665763018351
+        }
+      },
+      "public-delay": {
+        "firstAlertUtc": "2022-12-26T16:00:00Z",
+        "firstAlertMeterUtc": "2022-12-26T05:00:00Z",
+        "leadHours": null,
+        "referenceUtc": null,
+        "hours": 192,
+        "evaluatedHours": 152,
+        "warmupOrMissingHours": 40,
+        "alertHours": 24,
+        "alertHourFraction": 0.1579,
+        "alertEpisodes": 1,
+        "episodeStartsUtc": [
+          "2022-12-26T16:00:00Z"
+        ],
+        "firstAlertLog": {
+          "capNow": 23682,
+          "capForecast": 9968.851086956518,
+          "demandForecast": 16066.010536159602,
+          "shortfallPct": 83.13875887477636,
+          "inHours": 36,
+          "shed": 0.712103435737413
+        }
+      }
+    }
+  },
+  "holdout": {
+    "meter-time": {
+      "firstAlertUtc": "2019-01-05T06:00:00Z",
+      "firstAlertMeterUtc": "2019-01-05T06:00:00Z",
+      "leadHours": null,
+      "referenceUtc": null,
+      "hours": 17544,
+      "evaluatedHours": 17521,
+      "warmupOrMissingHours": 23,
+      "alertHours": 5010,
+      "alertHourFraction": 0.2859,
+      "alertEpisodes": 594,
+      "episodeStartsUtc": [
+        "2019-01-05T06:00:00Z",
+        "2019-01-06T09:00:00Z",
+        "2019-01-12T13:00:00Z",
+        "2019-01-17T13:00:00Z",
+        "2019-01-19T12:00:00Z",
+        "2019-01-21T11:00:00Z",
+        "2019-01-22T11:00:00Z",
+        "2019-01-24T13:00:00Z",
+        "2019-01-25T08:00:00Z",
+        "2019-01-26T10:00:00Z",
+        "2019-01-27T12:00:00Z",
+        "2019-01-30T12:00:00Z",
+        "2019-01-31T13:00:00Z",
+        "2019-02-01T12:00:00Z",
+        "2019-02-02T13:00:00Z",
+        "2019-02-03T15:00:00Z",
+        "2019-02-06T16:00:00Z",
+        "2019-02-07T16:00:00Z",
+        "2019-02-09T15:00:00Z",
+        "2019-02-10T15:00:00Z",
+        "2019-02-10T19:00:00Z",
+        "2019-02-11T01:00:00Z",
+        "2019-02-11T13:00:00Z",
+        "2019-02-14T10:00:00Z",
+        "2019-02-15T12:00:00Z",
+        "2019-02-17T14:00:00Z",
+        "2019-02-21T10:00:00Z",
+        "2019-02-23T13:00:00Z",
+        "2019-02-26T12:00:00Z",
+        "2019-02-27T16:00:00Z",
+        "2019-03-02T12:00:00Z",
+        "2019-03-03T13:00:00Z",
+        "2019-03-06T10:00:00Z",
+        "2019-03-07T08:00:00Z",
+        "2019-03-08T12:00:00Z",
+        "2019-03-09T16:00:00Z",
+        "2019-03-10T15:00:00Z",
+        "2019-03-12T15:00:00Z",
+        "2019-03-13T15:00:00Z",
+        "2019-03-16T13:00:00Z",
+        "2019-03-17T12:00:00Z",
+        "2019-03-19T11:00:00Z",
+        "2019-03-20T12:00:00Z",
+        "2019-03-23T15:00:00Z",
+        "2019-03-24T15:00:00Z",
+        "2019-03-26T15:00:00Z",
+        "2019-03-27T17:00:00Z",
+        "2019-03-28T15:00:00Z",
+        "2019-03-30T14:00:00Z",
+        "2019-03-31T15:00:00Z",
+        "2019-04-02T11:00:00Z",
+        "2019-04-03T10:00:00Z",
+        "2019-04-04T12:00:00Z",
+        "2019-04-05T16:00:00Z",
+        "2019-04-06T15:00:00Z",
+        "2019-04-07T15:00:00Z",
+        "2019-04-08T15:00:00Z",
+        "2019-04-09T14:00:00Z",
+        "2019-04-10T14:00:00Z",
+        "2019-04-11T15:00:00Z",
+        "2019-04-12T15:00:00Z",
+        "2019-04-13T18:00:00Z",
+        "2019-04-14T14:00:00Z",
+        "2019-04-16T15:00:00Z",
+        "2019-04-17T16:00:00Z",
+        "2019-04-18T15:00:00Z",
+        "2019-04-19T14:00:00Z",
+        "2019-04-20T15:00:00Z",
+        "2019-04-21T14:00:00Z",
+        "2019-04-22T16:00:00Z",
+        "2019-04-23T15:00:00Z",
+        "2019-04-24T15:00:00Z",
+        "2019-04-25T14:00:00Z",
+        "2019-04-26T15:00:00Z",
+        "2019-04-27T14:00:00Z",
+        "2019-04-28T15:00:00Z",
+        "2019-04-29T15:00:00Z",
+        "2019-04-30T15:00:00Z",
+        "2019-05-01T15:00:00Z",
+        "2019-05-02T15:00:00Z",
+        "2019-05-03T14:00:00Z",
+        "2019-05-04T14:00:00Z",
+        "2019-05-05T14:00:00Z",
+        "2019-05-06T15:00:00Z",
+        "2019-05-07T15:00:00Z",
+        "2019-05-08T15:00:00Z",
+        "2019-05-09T18:00:00Z",
+        "2019-05-10T14:00:00Z",
+        "2019-05-11T14:00:00Z",
+        "2019-05-12T13:00:00Z",
+        "2019-05-13T15:00:00Z",
+        "2019-05-14T15:00:00Z",
+        "2019-05-15T14:00:00Z",
+        "2019-05-16T14:00:00Z",
+        "2019-05-17T14:00:00Z",
+        "2019-05-18T15:00:00Z",
+        "2019-05-19T13:00:00Z",
+        "2019-05-20T15:00:00Z",
+        "2019-05-21T14:00:00Z",
+        "2019-05-22T13:00:00Z",
+        "2019-05-23T15:00:00Z",
+        "2019-05-24T14:00:00Z",
+        "2019-05-25T14:00:00Z",
+        "2019-05-26T14:00:00Z",
+        "2019-05-27T14:00:00Z",
+        "2019-05-28T15:00:00Z",
+        "2019-05-29T15:00:00Z",
+        "2019-05-30T14:00:00Z",
+        "2019-05-31T14:00:00Z",
+        "2019-06-01T13:00:00Z",
+        "2019-06-02T14:00:00Z",
+        "2019-06-03T14:00:00Z",
+        "2019-06-04T14:00:00Z",
+        "2019-06-05T14:00:00Z",
+        "2019-06-06T13:00:00Z",
+        "2019-06-07T13:00:00Z",
+        "2019-06-08T13:00:00Z",
+        "2019-06-09T14:00:00Z",
+        "2019-06-10T14:00:00Z",
+        "2019-06-11T14:00:00Z",
+        "2019-06-12T12:00:00Z",
+        "2019-06-13T14:00:00Z",
+        "2019-06-14T13:00:00Z",
+        "2019-06-15T14:00:00Z",
+        "2019-06-16T15:00:00Z",
+        "2019-06-17T13:00:00Z",
+        "2019-06-18T14:00:00Z",
+        "2019-06-19T14:00:00Z",
+        "2019-06-20T14:00:00Z",
+        "2019-06-21T15:00:00Z",
+        "2019-06-22T14:00:00Z",
+        "2019-06-23T14:00:00Z",
+        "2019-06-24T15:00:00Z",
+        "2019-06-25T14:00:00Z",
+        "2019-06-26T14:00:00Z",
+        "2019-06-27T13:00:00Z",
+        "2019-06-28T13:00:00Z",
+        "2019-06-29T14:00:00Z",
+        "2019-06-30T14:00:00Z",
+        "2019-07-01T14:00:00Z",
+        "2019-07-02T14:00:00Z",
+        "2019-07-03T14:00:00Z",
+        "2019-07-04T14:00:00Z",
+        "2019-07-05T14:00:00Z",
+        "2019-07-06T14:00:00Z",
+        "2019-07-07T14:00:00Z",
+        "2019-07-08T14:00:00Z",
+        "2019-07-09T13:00:00Z",
+        "2019-07-10T14:00:00Z",
+        "2019-07-11T14:00:00Z",
+        "2019-07-12T14:00:00Z",
+        "2019-07-13T14:00:00Z",
+        "2019-07-14T14:00:00Z",
+        "2019-07-15T14:00:00Z",
+        "2019-07-16T14:00:00Z",
+        "2019-07-17T14:00:00Z",
+        "2019-07-18T14:00:00Z",
+        "2019-07-19T14:00:00Z",
+        "2019-07-20T14:00:00Z",
+        "2019-07-21T14:00:00Z",
+        "2019-07-22T14:00:00Z",
+        "2019-07-23T14:00:00Z",
+        "2019-07-24T14:00:00Z",
+        "2019-07-25T13:00:00Z",
+        "2019-07-26T14:00:00Z",
+        "2019-07-27T14:00:00Z",
+        "2019-07-28T14:00:00Z",
+        "2019-07-29T14:00:00Z",
+        "2019-07-30T13:00:00Z",
+        "2019-07-31T14:00:00Z",
+        "2019-08-01T14:00:00Z",
+        "2019-08-02T14:00:00Z",
+        "2019-08-03T14:00:00Z",
+        "2019-08-04T14:00:00Z",
+        "2019-08-05T14:00:00Z",
+        "2019-08-06T14:00:00Z",
+        "2019-08-07T14:00:00Z",
+        "2019-08-08T14:00:00Z",
+        "2019-08-09T14:00:00Z",
+        "2019-08-10T14:00:00Z",
+        "2019-08-11T14:00:00Z",
+        "2019-08-12T14:00:00Z",
+        "2019-08-13T14:00:00Z",
+        "2019-08-14T14:00:00Z",
+        "2019-08-15T14:00:00Z",
+        "2019-08-16T14:00:00Z",
+        "2019-08-17T14:00:00Z",
+        "2019-08-18T14:00:00Z",
+        "2019-08-19T14:00:00Z",
+        "2019-08-20T14:00:00Z",
+        "2019-08-21T14:00:00Z",
+        "2019-08-22T14:00:00Z",
+        "2019-08-23T14:00:00Z",
+        "2019-08-24T13:00:00Z",
+        "2019-08-25T14:00:00Z",
+        "2019-08-26T14:00:00Z",
+        "2019-08-27T15:00:00Z",
+        "2019-08-28T13:00:00Z",
+        "2019-08-29T14:00:00Z",
+        "2019-08-30T14:00:00Z",
+        "2019-08-31T13:00:00Z",
+        "2019-09-01T14:00:00Z",
+        "2019-09-02T14:00:00Z",
+        "2019-09-03T14:00:00Z",
+        "2019-09-04T14:00:00Z",
+        "2019-09-05T13:00:00Z",
+        "2019-09-06T14:00:00Z",
+        "2019-09-07T14:00:00Z",
+        "2019-09-08T14:00:00Z",
+        "2019-09-09T14:00:00Z",
+        "2019-09-10T14:00:00Z",
+        "2019-09-11T13:00:00Z",
+        "2019-09-12T13:00:00Z",
+        "2019-09-13T14:00:00Z",
+        "2019-09-14T13:00:00Z",
+        "2019-09-15T14:00:00Z",
+        "2019-09-16T14:00:00Z",
+        "2019-09-17T14:00:00Z",
+        "2019-09-18T15:00:00Z",
+        "2019-09-19T15:00:00Z",
+        "2019-09-20T13:00:00Z",
+        "2019-09-21T14:00:00Z",
+        "2019-09-22T14:00:00Z",
+        "2019-09-23T14:00:00Z",
+        "2019-09-24T14:00:00Z",
+        "2019-09-25T14:00:00Z",
+        "2019-09-26T14:00:00Z",
+        "2019-09-27T14:00:00Z",
+        "2019-09-28T14:00:00Z",
+        "2019-09-29T14:00:00Z",
+        "2019-09-30T14:00:00Z",
+        "2019-10-01T14:00:00Z",
+        "2019-10-02T14:00:00Z",
+        "2019-10-03T14:00:00Z",
+        "2019-10-04T14:00:00Z",
+        "2019-10-05T14:00:00Z",
+        "2019-10-06T14:00:00Z",
+        "2019-10-07T14:00:00Z",
+        "2019-10-08T14:00:00Z",
+        "2019-10-09T13:00:00Z",
+        "2019-10-10T14:00:00Z",
+        "2019-10-11T14:00:00Z",
+        "2019-10-12T12:00:00Z",
+        "2019-10-13T13:00:00Z",
+        "2019-10-14T15:00:00Z",
+        "2019-10-15T14:00:00Z",
+        "2019-10-16T14:00:00Z",
+        "2019-10-17T13:00:00Z",
+        "2019-10-18T15:00:00Z",
+        "2019-10-19T13:00:00Z",
+        "2019-10-20T14:00:00Z",
+        "2019-10-21T16:00:00Z",
+        "2019-10-22T14:00:00Z",
+        "2019-10-23T15:00:00Z",
+        "2019-10-24T17:00:00Z",
+        "2019-10-25T15:00:00Z",
+        "2019-10-26T14:00:00Z",
+        "2019-10-27T13:00:00Z",
+        "2019-11-01T10:00:00Z",
+        "2019-11-02T07:00:00Z",
+        "2019-11-03T11:00:00Z",
+        "2019-11-05T16:00:00Z",
+        "2019-11-06T16:00:00Z",
+        "2019-11-07T15:00:00Z",
+        "2019-11-10T12:00:00Z",
+        "2019-11-11T16:00:00Z",
+        "2019-11-14T11:00:00Z",
+        "2019-11-16T07:00:00Z",
+        "2019-11-17T10:00:00Z",
+        "2019-11-19T12:00:00Z",
+        "2019-11-20T16:00:00Z",
+        "2019-11-24T14:00:00Z",
+        "2019-11-29T13:00:00Z",
+        "2019-11-30T16:00:00Z",
+        "2019-12-01T16:00:00Z",
+        "2019-12-03T13:00:00Z",
+        "2019-12-04T11:00:00Z",
+        "2019-12-05T13:00:00Z",
+        "2019-12-08T16:00:00Z",
+        "2019-12-09T16:00:00Z",
+        "2019-12-12T12:00:00Z",
+        "2019-12-13T11:00:00Z",
+        "2019-12-14T12:00:00Z",
+        "2019-12-15T14:00:00Z",
+        "2019-12-16T16:00:00Z",
+        "2019-12-19T10:00:00Z",
+        "2019-12-20T10:00:00Z",
+        "2019-12-21T15:00:00Z",
+        "2019-12-24T09:00:00Z",
+        "2019-12-25T11:00:00Z",
+        "2019-12-28T16:00:00Z",
+        "2019-12-29T16:00:00Z",
+        "2020-01-01T11:00:00Z",
+        "2020-01-05T12:00:00Z",
+        "2020-01-07T12:00:00Z",
+        "2020-01-08T13:00:00Z",
+        "2020-01-09T11:00:00Z",
+        "2020-01-13T12:00:00Z",
+        "2020-01-14T13:00:00Z",
+        "2020-01-18T14:00:00Z",
+        "2020-01-21T12:00:00Z",
+        "2020-01-22T12:00:00Z",
+        "2020-01-23T13:00:00Z",
+        "2020-01-25T11:00:00Z",
+        "2020-01-26T12:00:00Z",
+        "2020-01-28T13:00:00Z",
+        "2020-01-28T16:00:00Z",
+        "2020-02-01T12:00:00Z",
+        "2020-02-02T09:00:00Z",
+        "2020-02-03T13:00:00Z",
+        "2020-02-04T16:00:00Z",
+        "2020-02-07T10:00:00Z",
+        "2020-02-08T04:00:00Z",
+        "2020-02-09T13:00:00Z",
+        "2020-02-15T07:00:00Z",
+        "2020-02-16T10:00:00Z",
+        "2020-02-18T16:00:00Z",
+        "2020-02-22T09:00:00Z",
+        "2020-02-23T12:00:00Z",
+        "2020-02-28T07:00:00Z",
+        "2020-02-29T08:00:00Z",
+        "2020-03-01T13:00:00Z",
+        "2020-03-06T13:00:00Z",
+        "2020-03-07T14:00:00Z",
+        "2020-03-08T15:00:00Z",
+        "2020-03-10T15:00:00Z",
+        "2020-03-11T15:00:00Z",
+        "2020-03-12T16:00:00Z",
+        "2020-03-13T15:00:00Z",
+        "2020-03-14T14:00:00Z",
+        "2020-03-15T15:00:00Z",
+        "2020-03-16T15:00:00Z",
+        "2020-03-17T15:00:00Z",
+        "2020-03-18T15:00:00Z",
+        "2020-03-19T16:00:00Z",
+        "2020-03-20T15:00:00Z",
+        "2020-03-21T14:00:00Z",
+        "2020-03-22T15:00:00Z",
+        "2020-03-23T15:00:00Z",
+        "2020-03-24T14:00:00Z",
+        "2020-03-25T14:00:00Z",
+        "2020-03-26T15:00:00Z",
+        "2020-03-27T15:00:00Z",
+        "2020-03-28T15:00:00Z",
+        "2020-03-29T14:00:00Z",
+        "2020-03-31T15:00:00Z",
+        "2020-04-01T15:00:00Z",
+        "2020-04-02T15:00:00Z",
+        "2020-04-04T15:00:00Z",
+        "2020-04-05T14:00:00Z",
+        "2020-04-06T15:00:00Z",
+        "2020-04-07T14:00:00Z",
+        "2020-04-08T14:00:00Z",
+        "2020-04-09T15:00:00Z",
+        "2020-04-10T14:00:00Z",
+        "2020-04-11T15:00:00Z",
+        "2020-04-12T18:00:00Z",
+        "2020-04-13T14:00:00Z",
+        "2020-04-16T13:00:00Z",
+        "2020-04-18T15:00:00Z",
+        "2020-04-19T13:00:00Z",
+        "2020-04-20T15:00:00Z",
+        "2020-04-21T15:00:00Z",
+        "2020-04-22T15:00:00Z",
+        "2020-04-23T14:00:00Z",
+        "2020-04-24T14:00:00Z",
+        "2020-04-25T15:00:00Z",
+        "2020-04-26T14:00:00Z",
+        "2020-04-27T15:00:00Z",
+        "2020-04-28T14:00:00Z",
+        "2020-04-29T15:00:00Z",
+        "2020-04-30T14:00:00Z",
+        "2020-05-01T14:00:00Z",
+        "2020-05-02T14:00:00Z",
+        "2020-05-03T14:00:00Z",
+        "2020-05-04T14:00:00Z",
+        "2020-05-05T15:00:00Z",
+        "2020-05-06T14:00:00Z",
+        "2020-05-07T13:00:00Z",
+        "2020-05-08T16:00:00Z",
+        "2020-05-09T13:00:00Z",
+        "2020-05-10T14:00:00Z",
+        "2020-05-11T15:00:00Z",
+        "2020-05-12T15:00:00Z",
+        "2020-05-13T13:00:00Z",
+        "2020-05-14T15:00:00Z",
+        "2020-05-15T15:00:00Z",
+        "2020-05-16T14:00:00Z",
+        "2020-05-17T13:00:00Z",
+        "2020-05-18T13:00:00Z",
+        "2020-05-19T14:00:00Z",
+        "2020-05-20T14:00:00Z",
+        "2020-05-21T14:00:00Z",
+        "2020-05-22T14:00:00Z",
+        "2020-05-23T14:00:00Z",
+        "2020-05-24T15:00:00Z",
+        "2020-05-25T13:00:00Z",
+        "2020-05-26T15:00:00Z",
+        "2020-05-27T13:00:00Z",
+        "2020-05-28T13:00:00Z",
+        "2020-05-29T13:00:00Z",
+        "2020-05-30T14:00:00Z",
+        "2020-05-31T15:00:00Z",
+        "2020-06-01T14:00:00Z",
+        "2020-06-02T13:00:00Z",
+        "2020-06-03T13:00:00Z",
+        "2020-06-04T13:00:00Z",
+        "2020-06-05T14:00:00Z",
+        "2020-06-06T14:00:00Z",
+        "2020-06-07T14:00:00Z",
+        "2020-06-08T13:00:00Z",
+        "2020-06-09T14:00:00Z",
+        "2020-06-10T13:00:00Z",
+        "2020-06-11T14:00:00Z",
+        "2020-06-12T13:00:00Z",
+        "2020-06-13T13:00:00Z",
+        "2020-06-14T14:00:00Z",
+        "2020-06-15T14:00:00Z",
+        "2020-06-16T14:00:00Z",
+        "2020-06-17T13:00:00Z",
+        "2020-06-18T14:00:00Z",
+        "2020-06-19T14:00:00Z",
+        "2020-06-20T14:00:00Z",
+        "2020-06-21T14:00:00Z",
+        "2020-06-22T14:00:00Z",
+        "2020-06-23T15:00:00Z",
+        "2020-06-24T14:00:00Z",
+        "2020-06-25T14:00:00Z",
+        "2020-06-26T14:00:00Z",
+        "2020-06-27T14:00:00Z",
+        "2020-06-28T15:00:00Z",
+        "2020-06-29T13:00:00Z",
+        "2020-06-30T13:00:00Z",
+        "2020-07-01T14:00:00Z",
+        "2020-07-02T14:00:00Z",
+        "2020-07-03T13:00:00Z",
+        "2020-07-04T14:00:00Z",
+        "2020-07-05T15:00:00Z",
+        "2020-07-06T15:00:00Z",
+        "2020-07-07T14:00:00Z",
+        "2020-07-08T13:00:00Z",
+        "2020-07-09T14:00:00Z",
+        "2020-07-10T14:00:00Z",
+        "2020-07-11T14:00:00Z",
+        "2020-07-12T15:00:00Z",
+        "2020-07-13T14:00:00Z",
+        "2020-07-14T14:00:00Z",
+        "2020-07-15T14:00:00Z",
+        "2020-07-16T14:00:00Z",
+        "2020-07-17T15:00:00Z",
+        "2020-07-18T14:00:00Z",
+        "2020-07-19T14:00:00Z",
+        "2020-07-20T15:00:00Z",
+        "2020-07-21T14:00:00Z",
+        "2020-07-22T15:00:00Z",
+        "2020-07-23T14:00:00Z",
+        "2020-07-24T14:00:00Z",
+        "2020-07-25T14:00:00Z",
+        "2020-07-26T15:00:00Z",
+        "2020-07-27T14:00:00Z",
+        "2020-07-28T15:00:00Z",
+        "2020-07-29T13:00:00Z",
+        "2020-07-30T13:00:00Z",
+        "2020-07-31T14:00:00Z",
+        "2020-08-01T14:00:00Z",
+        "2020-08-02T14:00:00Z",
+        "2020-08-03T14:00:00Z",
+        "2020-08-04T13:00:00Z",
+        "2020-08-05T14:00:00Z",
+        "2020-08-06T14:00:00Z",
+        "2020-08-07T14:00:00Z",
+        "2020-08-08T14:00:00Z",
+        "2020-08-09T14:00:00Z",
+        "2020-08-10T14:00:00Z",
+        "2020-08-11T14:00:00Z",
+        "2020-08-12T14:00:00Z",
+        "2020-08-13T14:00:00Z",
+        "2020-08-14T14:00:00Z",
+        "2020-08-15T14:00:00Z",
+        "2020-08-16T15:00:00Z",
+        "2020-08-17T14:00:00Z",
+        "2020-08-18T14:00:00Z",
+        "2020-08-19T14:00:00Z",
+        "2020-08-20T14:00:00Z",
+        "2020-08-21T14:00:00Z",
+        "2020-08-22T14:00:00Z",
+        "2020-08-23T13:00:00Z",
+        "2020-08-24T14:00:00Z",
+        "2020-08-25T13:00:00Z",
+        "2020-08-26T14:00:00Z",
+        "2020-08-27T14:00:00Z",
+        "2020-08-28T14:00:00Z",
+        "2020-08-29T14:00:00Z",
+        "2020-08-30T14:00:00Z",
+        "2020-08-31T15:00:00Z",
+        "2020-09-01T14:00:00Z",
+        "2020-09-02T14:00:00Z",
+        "2020-09-03T14:00:00Z",
+        "2020-09-04T14:00:00Z",
+        "2020-09-05T13:00:00Z",
+        "2020-09-06T13:00:00Z",
+        "2020-09-07T14:00:00Z",
+        "2020-09-08T15:00:00Z",
+        "2020-09-09T14:00:00Z",
+        "2020-09-10T13:00:00Z",
+        "2020-09-11T13:00:00Z",
+        "2020-09-12T14:00:00Z",
+        "2020-09-13T14:00:00Z",
+        "2020-09-14T14:00:00Z",
+        "2020-09-15T14:00:00Z",
+        "2020-09-16T14:00:00Z",
+        "2020-09-17T14:00:00Z",
+        "2020-09-18T14:00:00Z",
+        "2020-09-19T14:00:00Z",
+        "2020-09-20T14:00:00Z",
+        "2020-09-21T16:00:00Z",
+        "2020-09-22T14:00:00Z",
+        "2020-09-23T15:00:00Z",
+        "2020-09-24T14:00:00Z",
+        "2020-09-25T13:00:00Z",
+        "2020-09-26T14:00:00Z",
+        "2020-09-27T14:00:00Z",
+        "2020-09-28T15:00:00Z",
+        "2020-09-29T14:00:00Z",
+        "2020-09-30T13:00:00Z",
+        "2020-10-01T14:00:00Z",
+        "2020-10-02T14:00:00Z",
+        "2020-10-03T14:00:00Z",
+        "2020-10-04T15:00:00Z",
+        "2020-10-05T15:00:00Z",
+        "2020-10-06T14:00:00Z",
+        "2020-10-07T14:00:00Z",
+        "2020-10-08T14:00:00Z",
+        "2020-10-09T15:00:00Z",
+        "2020-10-10T13:00:00Z",
+        "2020-10-11T14:00:00Z",
+        "2020-10-12T15:00:00Z",
+        "2020-10-13T13:00:00Z",
+        "2020-10-14T13:00:00Z",
+        "2020-10-15T15:00:00Z",
+        "2020-10-16T14:00:00Z",
+        "2020-10-17T13:00:00Z",
+        "2020-10-18T13:00:00Z",
+        "2020-10-19T15:00:00Z",
+        "2020-10-20T14:00:00Z",
+        "2020-10-21T14:00:00Z",
+        "2020-10-22T14:00:00Z",
+        "2020-10-23T14:00:00Z",
+        "2020-10-24T12:00:00Z",
+        "2020-10-25T14:00:00Z",
+        "2020-10-27T15:00:00Z",
+        "2020-10-30T11:00:00Z",
+        "2020-10-31T10:00:00Z",
+        "2020-11-01T11:00:00Z",
+        "2020-11-04T16:00:00Z",
+        "2020-11-05T16:00:00Z",
+        "2020-11-06T15:00:00Z",
+        "2020-11-07T15:00:00Z",
+        "2020-11-08T15:00:00Z",
+        "2020-11-09T16:00:00Z",
+        "2020-11-10T15:00:00Z",
+        "2020-11-11T15:00:00Z",
+        "2020-11-12T15:00:00Z",
+        "2020-11-13T16:00:00Z",
+        "2020-11-14T15:00:00Z",
+        "2020-11-15T15:00:00Z",
+        "2020-11-19T16:00:00Z",
+        "2020-11-20T16:00:00Z",
+        "2020-11-21T15:00:00Z",
+        "2020-11-22T15:00:00Z",
+        "2020-11-23T16:00:00Z",
+        "2020-11-25T16:00:00Z",
+        "2020-11-26T19:00:00Z",
+        "2020-11-27T14:00:00Z",
+        "2020-11-28T16:00:00Z",
+        "2020-11-29T16:00:00Z",
+        "2020-12-02T10:00:00Z",
+        "2020-12-05T11:00:00Z",
+        "2020-12-06T13:00:00Z",
+        "2020-12-08T12:00:00Z",
+        "2020-12-09T11:00:00Z",
+        "2020-12-10T12:00:00Z",
+        "2020-12-11T13:00:00Z",
+        "2020-12-12T16:00:00Z",
+        "2020-12-13T16:00:00Z",
+        "2020-12-18T09:00:00Z",
+        "2020-12-19T11:00:00Z",
+        "2020-12-22T12:00:00Z",
+        "2020-12-23T14:00:00Z",
+        "2020-12-25T12:00:00Z",
+        "2020-12-26T06:00:00Z",
+        "2020-12-27T12:00:00Z",
+        "2020-12-29T16:00:00Z",
+        "2020-12-30T16:00:00Z"
+      ],
+      "firstAlertLog": {
+        "capNow": 61587,
+        "capForecast": 41379.46304347826,
+        "demandForecast": 37257.14582552884,
+        "shortfallPct": 2.315647900851592,
+        "inHours": 36,
+        "shed": 0.05
+      },
+      "months": {
+        "2019-01": {
+          "hours": 744,
+          "evaluatedHours": 721,
+          "alertHours": 86,
+          "episodeStarts": 13
+        },
+        "2019-02": {
+          "hours": 672,
+          "evaluatedHours": 672,
+          "alertHours": 102,
+          "episodeStarts": 17
+        },
+        "2019-03": {
+          "hours": 744,
+          "evaluatedHours": 744,
+          "alertHours": 130,
+          "episodeStarts": 20
+        },
+        "2019-04": {
+          "hours": 720,
+          "evaluatedHours": 720,
+          "alertHours": 220,
+          "episodeStarts": 28
+        },
+        "2019-05": {
+          "hours": 744,
+          "evaluatedHours": 744,
+          "alertHours": 266,
+          "episodeStarts": 31
+        },
+        "2019-06": {
+          "hours": 720,
+          "evaluatedHours": 720,
+          "alertHours": 292,
+          "episodeStarts": 30
+        },
+        "2019-07": {
+          "hours": 744,
+          "evaluatedHours": 744,
+          "alertHours": 293,
+          "episodeStarts": 31
+        },
+        "2019-08": {
+          "hours": 744,
+          "evaluatedHours": 744,
+          "alertHours": 299,
+          "episodeStarts": 31
+        },
+        "2019-09": {
+          "hours": 720,
+          "evaluatedHours": 720,
+          "alertHours": 280,
+          "episodeStarts": 30
+        },
+        "2019-10": {
+          "hours": 744,
+          "evaluatedHours": 744,
+          "alertHours": 251,
+          "episodeStarts": 27
+        },
+        "2019-11": {
+          "hours": 720,
+          "evaluatedHours": 720,
+          "alertHours": 98,
+          "episodeStarts": 16
+        },
+        "2019-12": {
+          "hours": 744,
+          "evaluatedHours": 744,
+          "alertHours": 99,
+          "episodeStarts": 18
+        },
+        "2020-01": {
+          "hours": 744,
+          "evaluatedHours": 744,
+          "alertHours": 82,
+          "episodeStarts": 15
+        },
+        "2020-02": {
+          "hours": 696,
+          "evaluatedHours": 696,
+          "alertHours": 114,
+          "episodeStarts": 14
+        },
+        "2020-03": {
+          "hours": 744,
+          "evaluatedHours": 744,
+          "alertHours": 171,
+          "episodeStarts": 25
+        },
+        "2020-04": {
+          "hours": 720,
+          "evaluatedHours": 720,
+          "alertHours": 228,
+          "episodeStarts": 26
+        },
+        "2020-05": {
+          "hours": 744,
+          "evaluatedHours": 744,
+          "alertHours": 305,
+          "episodeStarts": 31
+        },
+        "2020-06": {
+          "hours": 720,
+          "evaluatedHours": 720,
+          "alertHours": 289,
+          "episodeStarts": 30
+        },
+        "2020-07": {
+          "hours": 744,
+          "evaluatedHours": 744,
+          "alertHours": 292,
+          "episodeStarts": 31
+        },
+        "2020-08": {
+          "hours": 744,
+          "evaluatedHours": 744,
+          "alertHours": 295,
+          "episodeStarts": 31
+        },
+        "2020-09": {
+          "hours": 720,
+          "evaluatedHours": 720,
+          "alertHours": 276,
+          "episodeStarts": 30
+        },
+        "2020-10": {
+          "hours": 744,
+          "evaluatedHours": 744,
+          "alertHours": 259,
+          "episodeStarts": 28
+        },
+        "2020-11": {
+          "hours": 720,
+          "evaluatedHours": 720,
+          "alertHours": 162,
+          "episodeStarts": 23
+        },
+        "2020-12": {
+          "hours": 744,
+          "evaluatedHours": 744,
+          "alertHours": 121,
+          "episodeStarts": 18
+        }
+      },
+      "falseAlarmEpisodesPerMonth": 24.75,
+      "definition": "Every alert episode start in the 2019-2020 control period is counted as an unverified/false alarm. No event labels were supplied; some may coincide with real grid stress. Consecutive alert hours count as one episode; month boundaries do not reset episodes."
+    },
+    "public-delay": {
+      "firstAlertUtc": "2019-01-05T16:00:00Z",
+      "firstAlertMeterUtc": "2019-01-05T06:00:00Z",
+      "leadHours": null,
+      "referenceUtc": null,
+      "hours": 17544,
+      "evaluatedHours": 17504,
+      "warmupOrMissingHours": 40,
+      "alertHours": 96,
+      "alertHourFraction": 0.0055,
+      "alertEpisodes": 4,
+      "episodeStartsUtc": [
+        "2019-01-05T16:00:00Z",
+        "2019-10-12T15:00:00Z",
+        "2020-02-08T16:00:00Z",
+        "2020-12-26T16:00:00Z"
+      ],
+      "firstAlertLog": {
+        "capNow": 61587,
+        "capForecast": 41379.46304347826,
+        "demandForecast": 37257.14582552884,
+        "shortfallPct": 2.315647900851592,
+        "inHours": 36,
+        "shed": 0.05
+      },
+      "months": {
+        "2019-01": {
+          "hours": 744,
+          "evaluatedHours": 704,
+          "alertHours": 24,
+          "episodeStarts": 1
+        },
+        "2019-02": {
+          "hours": 672,
+          "evaluatedHours": 672,
+          "alertHours": 0,
+          "episodeStarts": 0
+        },
+        "2019-03": {
+          "hours": 744,
+          "evaluatedHours": 744,
+          "alertHours": 0,
+          "episodeStarts": 0
+        },
+        "2019-04": {
+          "hours": 720,
+          "evaluatedHours": 720,
+          "alertHours": 0,
+          "episodeStarts": 0
+        },
+        "2019-05": {
+          "hours": 744,
+          "evaluatedHours": 744,
+          "alertHours": 0,
+          "episodeStarts": 0
+        },
+        "2019-06": {
+          "hours": 720,
+          "evaluatedHours": 720,
+          "alertHours": 0,
+          "episodeStarts": 0
+        },
+        "2019-07": {
+          "hours": 744,
+          "evaluatedHours": 744,
+          "alertHours": 0,
+          "episodeStarts": 0
+        },
+        "2019-08": {
+          "hours": 744,
+          "evaluatedHours": 744,
+          "alertHours": 0,
+          "episodeStarts": 0
+        },
+        "2019-09": {
+          "hours": 720,
+          "evaluatedHours": 720,
+          "alertHours": 0,
+          "episodeStarts": 0
+        },
+        "2019-10": {
+          "hours": 744,
+          "evaluatedHours": 744,
+          "alertHours": 24,
+          "episodeStarts": 1
+        },
+        "2019-11": {
+          "hours": 720,
+          "evaluatedHours": 720,
+          "alertHours": 0,
+          "episodeStarts": 0
+        },
+        "2019-12": {
+          "hours": 744,
+          "evaluatedHours": 744,
+          "alertHours": 0,
+          "episodeStarts": 0
+        },
+        "2020-01": {
+          "hours": 744,
+          "evaluatedHours": 744,
+          "alertHours": 0,
+          "episodeStarts": 0
+        },
+        "2020-02": {
+          "hours": 696,
+          "evaluatedHours": 696,
+          "alertHours": 24,
+          "episodeStarts": 1
+        },
+        "2020-03": {
+          "hours": 744,
+          "evaluatedHours": 744,
+          "alertHours": 0,
+          "episodeStarts": 0
+        },
+        "2020-04": {
+          "hours": 720,
+          "evaluatedHours": 720,
+          "alertHours": 0,
+          "episodeStarts": 0
+        },
+        "2020-05": {
+          "hours": 744,
+          "evaluatedHours": 744,
+          "alertHours": 0,
+          "episodeStarts": 0
+        },
+        "2020-06": {
+          "hours": 720,
+          "evaluatedHours": 720,
+          "alertHours": 0,
+          "episodeStarts": 0
+        },
+        "2020-07": {
+          "hours": 744,
+          "evaluatedHours": 744,
+          "alertHours": 0,
+          "episodeStarts": 0
+        },
+        "2020-08": {
+          "hours": 744,
+          "evaluatedHours": 744,
+          "alertHours": 0,
+          "episodeStarts": 0
+        },
+        "2020-09": {
+          "hours": 720,
+          "evaluatedHours": 720,
+          "alertHours": 0,
+          "episodeStarts": 0
+        },
+        "2020-10": {
+          "hours": 744,
+          "evaluatedHours": 744,
+          "alertHours": 0,
+          "episodeStarts": 0
+        },
+        "2020-11": {
+          "hours": 720,
+          "evaluatedHours": 720,
+          "alertHours": 0,
+          "episodeStarts": 0
+        },
+        "2020-12": {
+          "hours": 744,
+          "evaluatedHours": 744,
+          "alertHours": 24,
+          "episodeStarts": 1
+        }
+      },
+      "falseAlarmEpisodesPerMonth": 0.1667,
+      "definition": "Every alert episode start in the 2019-2020 control period is counted as an unverified/false alarm. No event labels were supplied; some may coincide with real grid stress. Consecutive alert hours count as one episode; month boundaries do not reset episodes."
+    }
+  },
+  "timing": {
+    "meter-time": "Ideal immediate BA meter access and prior-day 11 ET access to BA day-ahead DF. Retrospective event-time replay, not public EIA availability.",
+    "public-delay": "NG withheld until next BA operating day 11 ET; DF until target BA operating day 11 ET. Actions evaluated hourly with actual meter timestamps. Module horizon is 36 h after newest meter, so a delayed meter shortens remaining actionable horizon."
+  },
+  "assumptions": [
+    "One aggregate plant, not individual generators. Raw D is measured load served, not total demand including disconnected customers.",
+    "NG is dispatched generation, not available capacity. Tuned plantMeter is an assumed capacity proxy: trailing maximum NG multiplied by a fitted factor; no measured reserves or imports are available in these series.",
+    "Critical share=25% is an adapter assumption, changes shed amount but not the alert trigger. Census people=1 is a contract placeholder, not a population estimate.",
+    "Demand outlook uses only released day-ahead DF; unavailable targets persist last measured D. No future realized generation or demand enters observations.",
+    "Historical EIA data are revised, not original release vintages. Publication schedules are conservative approximations, not exact historical arrival logs.",
+    "Texas is the calibration event, not an independent test. Elliott is a transfer check. TVA/DUK imports limit comparisons using NG alone.",
+    "Hold-out false alarms are conservative unverified episode starts, without labeled real emergencies. Also inspect alert-hour fractions."
+  ]
+}
