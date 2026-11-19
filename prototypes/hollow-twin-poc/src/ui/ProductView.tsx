@@ -1,7 +1,7 @@
 // REBUILD: the product view — the Residents' System. A resident's phone for one section, and the council console
 // with the reasoning of each feature. Everything here comes from the system's own outputs, memory and log; none of
 // it comes from the test world's hidden state. Step 1: Blackout Warning (problem #1).
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { type Output, type ToolSet } from '../sim/types.ts';
 import type { Run } from '../product/run.ts';
 import { BUILT, PROBLEMS, moduleName } from '../product/names.ts';
@@ -34,6 +34,7 @@ export function ProductView(p: ProductViewProps) {
   const { run, section } = p;
   const [text, setText] = useState('');
   const day = run.sim.day;
+  useEffect(() => { setText(''); }, [day]); // a new day starts with an empty report box (also after Reset)
   const on = p.modules.earlyWarning;
   const alerts = run.outputs.filter((o): o is Extract<Output, { kind: 'alert' }> =>
     o.kind === 'alert' && section.level >= o.from && section.level <= o.to);
