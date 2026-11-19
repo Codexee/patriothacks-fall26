@@ -77,10 +77,8 @@ def data_end_h() -> int:
 def load_features() -> pd.DataFrame:
     """Every row of the BA-hour feature table, sorted by ba, hour, with labels and masks.
 
-    y48 and in_event are computed again here from data/out/events.parquet with the rule of
-    data/build/features_ba_hour.py, so a feature table that is older than the event library still
-    gets correct labels. The table's own columns are kept as y48_table / in_event_table.
-    `scored` = the BA has mapped customers, the hour is not in an event, and labels exist.
+    Recompute y48 and in_event from events.parquet to detect mismatched input versions.
+    Scored hours have a complete label horizon in an observed BA window.
     """
     cols = ", ".join(f'"{c}"' for c in GRID + WX + FX)
     df = duckdb.sql(f"""
@@ -210,7 +208,7 @@ class Panel:
 
 
 def pick_threshold(panel: Panel, score: np.ndarray, all_starts, train_panel, train_score) -> float:
-    """Lowest threshold (most alerts) with false alarms per BA-year <= limit, scanning from the top.
+    """Scan descending thresholds under the budget on both historical panels.
 
     The scan stops at the first threshold above the limit, so every higher threshold also passes.
     """

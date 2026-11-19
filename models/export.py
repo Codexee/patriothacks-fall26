@@ -61,9 +61,10 @@ def export(name: str, objective: str, feats: list[str], threshold: float | None,
     doc = {"name": name, "version": version, "objective": objective, "features": feats,
            "threshold": threshold, "trees": trees, "parity": parity}
     path = C.APP_MODELS / f"{name}.json"
-    path.write_text(json.dumps(doc, separators=(",", ":"), allow_nan=False))
-    size = path.stat().st_size
+    payload = json.dumps(doc, separators=(",", ":"), allow_nan=False).encode()
+    size = len(payload)
     assert size < MAX_BYTES, f"{name}: {size} bytes"
+    path.write_bytes(payload)
     print(f"{name}: {len(trees)} trees, {size/1e6:.2f} MB, parity max difference {worst:.1e}, "
           f"rows with a missing value {sum(any(v is None for v in r['x']) for r in parity)}")
     return {"trees": len(trees), "bytes": size, "parityMaxDiff": worst}
@@ -83,8 +84,9 @@ def main() -> None:
         feats = C.VARIANTS[name]
         # Half random test rows, half rows with a missing value, so both paths are tested.
         miss = pool[np.isnan(df[feats].values[pool]).any(1)]
-        rows = np.r_[rng.choice(pool, N_PARITY - min(N_PARITY // 2, len(miss)), replace=False),
-                     rng.choice(miss, min(N_PARITY // 2, len(miss)), replace=False)]
+        missing_rows = rng.choice(miss, min(N_PARITY // 2, len(miss)), replace=False)
+        other_rows = rng.choice(np.setdiff1d(pool, missing_rows), N_PARITY - len(missing_rows), replace=False)
+        rows = np.r_[other_rows, missing_rows]
         info[name] = export(name, "binary", feats, warn["models"][name]["threshold"],
                             df[feats].values[rows].astype(float), version)
     dark = json.loads((C.OUT / "dark_results.json").read_text())
@@ -94,7 +96,8 @@ def main() -> None:
     if len(pool) < N_PARITY:
         pool = np.arange(len(ce))
     rows = rng.choice(pool, N_PARITY, replace=False)
-    info["dark"] = export("dark", "regression", feats, None, ce[feats].values[rows].astype(float), version)
+    info["dark"] = export("dark", "regression", feats, None,
+                          ce.iloc[rows][feats].to_numpy(dtype=float, na_value=np.nan), version)
     (C.OUT / "export_info.json").write_text(json.dumps({"version": version, **info}, indent=1))
 
 

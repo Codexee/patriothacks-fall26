@@ -55,10 +55,11 @@ def build_table() -> pd.DataFrame:
                 for y in range(start, stop + 1)}
     if not required.issubset(years):
         raise ValueError(f"Missing county-hour years {sorted(required.difference(years))}")
-    con.execute("CREATE TABLE cov AS SELECT DISTINCT fips, year(hour) AS y FROM ch")
+    con.execute("CREATE TABLE cov AS SELECT fips, year(hour) AS y, min(hour) AS first_report FROM ch GROUP BY 1, 2")
     con.execute("""CREATE TABLE ce AS
         SELECT e.event_id, e.ba, e.start, e.stop, c.fips, m.customers AS target_customers,
-               first_year.fips IS NOT NULL AND last_year.fips IS NOT NULL AND m.customers > 0 AS covered
+               first_year.fips IS NOT NULL AND last_year.fips IS NOT NULL AND m.customers > 0 AS covered,
+               first_year.first_report <= e.stop AND last_year.first_report <= e.stop AS coverage_known_at_stop
         FROM ev e JOIN cba c USING (ba) LEFT JOIN mcc m USING (fips)
         LEFT JOIN cov first_year ON first_year.fips = c.fips AND first_year.y = year(e.start)
         LEFT JOIN cov last_year ON last_year.fips = c.fips AND last_year.y = year(e.stop)""")
@@ -85,6 +86,8 @@ def build_table() -> pd.DataFrame:
                    FROM read_csv('{C.RAW}/svi/SVI_2022_US_county.csv', header=true)) s ON s.fips = ce.fips
         ORDER BY ce.start, ce.event_id, ce.fips""").df()
     df["dark_hours"] = df.dark_hours.astype(float)
+    # The CDC documentation for the 2010 SVI is dated March 31, 2015.
+    df.loc[df.start < "2015-04-01", ["svi", "svi_t1", "svi_t2", "svi_t3", "svi_t4"]] = np.nan
     if df.duplicated(["event_id", "fips"]).any():
         raise ValueError("Multiple county-event rows for one key")
 
@@ -101,13 +104,16 @@ def build_table() -> pd.DataFrame:
     g = df.groupby("fips")
     if (g.stop.shift(1) >= df.start).any():
         raise ValueError("Overlapping county-event history")
-    df["_known"] = df.dark_hours.notna().astype(int)
-    df["_hours"] = df.dark_hours.fillna(0)
-    df["_any"] = (df.dark_hours > 0).astype(int)
+    # The year-end coverage check is appropriate for evaluating a target. To
+    # use it as history, the county already needed a report when the event ended.
+    history = df.dark_hours.where(df.coverage_known_at_stop.fillna(False))
+    df["_known"] = history.notna().astype(int)
+    df["_hours"] = history.fillna(0)
+    df["_any"] = (history > 0).astype(int)
     df["past_events"] = g._known.cumsum() - df._known
     n = df.past_events.replace(0, np.nan)
     df["past_dark_mean"] = (g._hours.cumsum() - df._hours) / n
-    df["past_dark_max"] = g.dark_hours.transform(lambda s: s.shift(1).ffill().cummax())
+    df["past_dark_max"] = history.groupby(df.fips).transform(lambda s: s.shift(1).ffill().cummax())
     df["past_dark_share"] = (g._any.cumsum() - df._any) / n
     df["baseline"] = df.past_dark_mean.fillna(0.0)               # no history -> 0 h
     df["start_h"] = C.to_h(df.start)
@@ -161,7 +167,7 @@ def main() -> None:
     df = df.assign(**ba_features)
     feats = FEATS + list(ba_features)
     df.to_parquet(C.ART / "county_event.parquet", index=False)
-    X = df[feats].values.astype(float)
+    X = df[feats].to_numpy(dtype=float, na_value=np.nan)
     year = df.start.dt.year.values
     split_year = C.from_h(C.SPLIT_H).year
     val_years = list(range(int(year.min()) + 2, split_year))
