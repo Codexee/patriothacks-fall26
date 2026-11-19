@@ -5,9 +5,9 @@ Spec: `.plans/before-during-after-spec.md`. Who owns which folders: `contracts/R
 
 To take an item: write your name after it, commit, push. Tick it when it is merged to `main`.
 
-## Running now (AI worker in Paradev; do not edit these folders until it merges)
+## Running now
 
-- [ ] **Live page record features and a check of the Vercel function** (`app/src/live`, `app/src/model`, `app/api`, branch `ws/bda-brief`).
+No AI worker is running. The three Paradev workspaces are idle and merged.
 
 ## Next (Thu morning)
 
@@ -54,4 +54,5 @@ To take an item: write your name after it, commit, push. Tick it when it is merg
 - [x] Real archived forecast test (2024), Hollow cross-section (`#/hollow`), Without/With comparison, live counters, detailed evidence and brief pages.
 - [x] Evidence page: comparison at equal false-alarm rates (chart), cards filled from data.
 - [x] App data trimmed to 14 MB (19 replays); per-area demand records exported; Vercel config and `docs/deploy.md`.
+- [x] Live page computes the record features; the EIA function has tests (400, 503, 200, 502). Not yet checked against the real EIA API (no key).
 - [x] Contracts and an app shell so parallel work does not collide.
