@@ -32,7 +32,7 @@ function Evidence({ items }: { items: string[] }) {
 
 export function ProductView(p: ProductViewProps) {
   const { run, section } = p;
-  const [text, setText] = useState('The power has been off for hours on our level.');
+  const [text, setText] = useState('');
   const day = run.sim.day;
   const on = p.modules.earlyWarning;
   const alerts = run.outputs.filter((o): o is Extract<Output, { kind: 'alert' }> =>
@@ -97,7 +97,7 @@ export function ProductView(p: ProductViewProps) {
 
         <h3>Report a problem <Info>Optional. Residents report outages on their own; your report joins tomorrow's data.</Info></h3>
         <form className="report" onSubmit={(e) => { e.preventDefault(); if (text.trim()) p.onReport(section.level, section.col, text.trim()); }}>
-          <textarea value={text} onChange={(e) => setText(e.target.value)} rows={2} aria-label="Report text" />
+          <textarea value={text} onChange={(e) => setText(e.target.value)} rows={2} aria-label="Report text" placeholder="Describe what is happening on your level" />
           <button type="submit" disabled={p.locked || !text.trim()}>Send report</button>
         </form>
         {p.queuedReports > 0 && <p className="muted small">{p.queuedReports} report(s) queued for tomorrow's data.</p>}
