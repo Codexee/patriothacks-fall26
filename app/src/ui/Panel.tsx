@@ -235,10 +235,12 @@ export function Panel(p: PanelProps) {
         <Section title="Score">
           <div className="stats">
             <div><span className="k">Total</span><span className="v">{fmt(Math.round(p.score.total))}</span></div>
+            <div><span className="k">Lives saved</span><span className="v">{fmt(p.score.livesSaved)}</span></div>
             <div><span className="k">Days</span><span className="v">{p.score.days}</span></div>
             <div><span className="k">Alive</span><span className="v">{p.score.alivePct.toFixed(1)}%</span></div>
             <div><span className="k">Fairness</span><span className="v">{p.score.fairness.toFixed(0)}</span></div>
           </div>
+          <p className="muted small">Baseline: {fmt(Math.round(p.score.baselineDeaths))} deaths without modules, same scenario and seed. {state.end ? 'Final comparison.' : 'Final comparison at run end.'}</p>
         </Section>
 
         <Section title="Same plants, different decisions">

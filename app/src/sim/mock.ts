@@ -53,6 +53,10 @@ export const mockSim: SimApi = {
     };
     return { state: next, frames, events: [`Day ${day}: mock event`] };
   },
-  score(state) { return { total: state.day * 100, days: state.day, alivePct: 90, fairness: 50 }; },
+  score(state) {
+    const baselineDeaths = 25 * 1200; // the mock always ends on day 25, losing 1,200 people per day
+    const livesSaved = baselineDeaths - Math.round(state.totals.deaths);
+    return { total: livesSaved + 0.05 + Math.min(state.day, 25) / 10_000_000, livesSaved, baselineDeaths, days: state.day, alivePct: 90, fairness: 50 };
+  },
   sourceFor() { return src; },
 };

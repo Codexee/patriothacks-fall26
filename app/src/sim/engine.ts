@@ -1125,7 +1125,8 @@ function dailyObservations(
 }
 
 // ---------- Score ----------
-export function score(state: SimState): Score {
+/** Pure: the caller supplies the completed no-module run's deaths for this scenario and seed. */
+export function score(state: SimState, baselineDeaths: number): Score {
   const s = state.internal as Internal;
   const days = state.day;
   const alivePct = (state.totals.population / state.totals.startPopulation) * 100;
@@ -1133,12 +1134,17 @@ export function score(state: SimState): Score {
   for (const d of s.darkLevel) { if (d > mx) mx = d; if (d < mn) mn = d; }
   const gap = s.hour > 0 ? (mx - mn) / s.hour : 0;
   const fairness = clamp(100 * (1 - gap), 0, 100);
-  // A stable Hollow would survive to the cap, so it is credited with MAX_DAYS (else an early stable scores less).
+  // Report whole people, as the UI does. One additional whole life saved always beats every secondary term.
+  const livesSaved = Math.round(baselineDeaths) - Math.round(state.totals.deaths);
+  const fairnessTenths = Math.round(fairness * 10);
   const stable = state.end?.kind === 'stable';
-  const total = Math.round((stable ? MAX_DAYS : days) * 100 + alivePct * 20 + fairness * 10 + (stable ? 500 : 0));
+  const survival = clamp(days, 0, MAX_DAYS) + (stable ? MAX_DAYS + 1 : 0);
+  // Fairness contributes at most 0.1; survival at most 0.0000241. Even one fairness tenth beats survival.
+  // Keep the fractional tie-breakers: rounding the total here would discard them.
+  const total = livesSaved + fairnessTenths / 10_000 + survival / 10_000_000;
   return {
-    total, days,
+    total, days, livesSaved, baselineDeaths,
     alivePct: Math.round(alivePct * 10) / 10,
-    fairness: Math.round(fairness * 10) / 10,
+    fairness: fairnessTenths / 10,
   };
 }

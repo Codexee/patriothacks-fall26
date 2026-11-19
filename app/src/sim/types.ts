@@ -214,7 +214,9 @@ export interface DayResult {
 }
 
 export interface Score {
-  total: number;
+  total: number; // whole lives saved, then fractional fairness and survival tie-breakers (together < 1)
+  livesSaved: number; // rounded baselineDeaths minus rounded deaths; may be negative
+  baselineDeaths: number; // unrounded deaths in the completed no-module run, same scenario and seed
   days: number;
   alivePct: number; // 0..100
   fairness: number; // 0..100, 100 = no gap between best and worst level
