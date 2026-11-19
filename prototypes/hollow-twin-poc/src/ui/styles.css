@@ -404,3 +404,60 @@ kbd:first-child { margin-left: 0; }
   .demo-bar { flex-wrap: wrap; border-radius: 14px; justify-content: center; }
   .db-sep { display: none; }
 }
+
+/* ---------- Modules panel (one card per feature; minimizable) ---------- */
+/* Column widths for each combination: Test World panel (t), Modules (m), Residents' System (p). */
+.app.panel-min.mods-open { --t-w: 0px; --m-w: 360px; --p-w: 400px; }
+.app.panel-min.mods-min { --t-w: 0px; --m-w: 34px; --p-w: 520px; }
+.app.panel-open.mods-open { --t-w: var(--panel-w); --m-w: 340px; --p-w: 380px; }
+.app.panel-open.mods-min { --t-w: var(--panel-w); --m-w: 34px; --p-w: 380px; }
+.app.mods-open, .app.mods-min { --right-w: calc(var(--t-w) + var(--m-w) + var(--p-w)); }
+.app.mods-open .world-col, .app.mods-min .world-col { margin-right: var(--right-w); }
+.app.mods-open .product, .app.mods-min .product { right: var(--t-w); width: var(--p-w); }
+.app.mods-open .demo-bar, .app.mods-min .demo-bar { left: calc((100vw - var(--right-w)) / 2); max-width: calc(100vw - var(--right-w) - 24px); }
+.app.mods-open .compare-card, .app.mods-min .compare-card {
+  transform: translateX(calc(-50% - var(--right-w) / 2)); width: min(560px, calc(100vw - var(--right-w) - 48px));
+}
+.app.mods-open .world-head, .app.mods-open .flat-world, .app.mods-open .end-banner { max-width: 720px; }
+
+.modules {
+  position: fixed; top: 0; bottom: 0; right: calc(var(--t-w) + var(--p-w)); width: var(--m-w); z-index: 9;
+  overflow-y: auto; padding: 16px 16px 28px; border-left: 1px solid var(--line);
+  background: radial-gradient(420px 220px at 20% -60px, rgba(108, 182, 255, 0.1), transparent 70%), linear-gradient(180deg, #19212b 0, #161c24 320px);
+}
+.modules.min { padding: 0; overflow: hidden; background: #161c24; }
+.mod-tab {
+  width: 100%; height: 100%; border: none; border-radius: 0; background: transparent; padding: 14px 0;
+  display: flex; flex-direction: column; align-items: center; gap: 10px; color: var(--muted);
+}
+.mod-tab:hover { background: rgba(108, 182, 255, 0.08); color: var(--system); }
+.mod-tab-label { writing-mode: vertical-rl; transform: rotate(180deg); font-family: var(--cond); font-weight: 600; letter-spacing: 0.04em; }
+.mod-tab-count { font-family: var(--cond); font-size: 11px; padding: 2px 5px; border-radius: 8px; background: var(--system-bg); color: var(--system); }
+.mods-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+.mods-head h1 { color: var(--system); font-size: 22px; }
+.mods-head .ghost { font-size: 12.5px; padding: 4px 10px; }
+
+.mod-card { border-radius: 10px; background: var(--panel); margin-bottom: 10px; box-shadow: inset 0 0 0 1px var(--line); }
+.mod-card.on { box-shadow: inset 0 0 0 1px rgba(108, 182, 255, 0.45), 0 0 18px rgba(108, 182, 255, 0.08); }
+.mc-head { display: flex; align-items: center; gap: 6px; padding: 8px 10px; }
+.mc-toggle { display: flex; align-items: center; gap: 6px; background: none; border: none; padding: 0; flex: 1; min-width: 0; text-align: left; }
+.mc-caret { color: var(--muted); width: 12px; }
+.mc-title { font-family: var(--cond); font-size: 16px; font-weight: 600; color: var(--text); }
+.mod-card.on .mc-title { color: var(--system); }
+.mc-num { font-family: var(--cond); font-size: 12px; color: var(--faint); }
+.mc-state { font-family: var(--cond); font-size: 11.5px; font-weight: 600; padding: 1px 8px; border-radius: 9px; background: var(--raise); color: var(--muted); }
+.mc-state.on { background: var(--system); color: #08131f; }
+.mc-body { padding: 0 12px 12px; border-top: 1px solid var(--line); padding-top: 10px; }
+.mc-body p { margin: 4px 0; }
+.mods-data, .mods-next { margin-top: 10px; }
+
+@media (max-width: 1180px) {
+  .app.mods-open .world-col, .app.mods-min .world-col { margin-right: var(--t-w); }
+  .app.mods-open .product, .app.mods-min .product { position: static; width: auto; margin-right: var(--t-w); }
+  .modules { position: static; width: auto; margin-right: var(--t-w); }
+  .modules.min { height: auto; }
+  .mod-tab { flex-direction: row; justify-content: center; padding: 10px; }
+  .mod-tab-label { writing-mode: horizontal-tb; transform: none; }
+  .app.mods-open .demo-bar, .app.mods-min .demo-bar { left: 50%; max-width: calc(100vw - 24px); }
+  .app.mods-open .compare-card, .app.mods-min .compare-card { transform: translateX(-50%); width: min(560px, calc(100vw - 32px)); }
+}

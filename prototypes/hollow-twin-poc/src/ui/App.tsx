@@ -9,6 +9,7 @@ import { FlatWorld, blackoutLine } from '../world/FlatWorld.tsx';
 import { Panel } from './Panel.tsx';
 import { ProductView } from './ProductView.tsx';
 import { CompareCard, DemoBar, EndBanner } from './DemoBar.tsx';
+import { ModulesPanel } from './ModulesPanel.tsx';
 import { MAX_DAYS, attribution, compareRuns, type Attribution, type RunResult } from './compare.ts';
 import './styles.css';
 
@@ -38,6 +39,7 @@ export function App() {
   const skipRef = useRef(false);
   const [panelOpen, setPanelOpen] = useState(false); // the Test World panel starts minimized (demo-ready)
   const [compareOpen, setCompareOpen] = useState(false);
+  const [modsOpen, setModsOpen] = useState(true); // the Modules panel (one card per feature)
   const state = run.sim;
 
   const reset = useCallback((id: string, s: number, tools: ToolSet) => {
@@ -123,8 +125,8 @@ export function App() {
   const openCompare = () => { setCompareOpen(true); if (!compare) void runCompare(); };
 
   // Keyboard shortcuts for presenting: Space next day, S system, R reset, T panel. Ignored while typing.
-  const keys = useRef({ nextDay, toggleSystem, reset: () => reset(scenarioId, seed, pendingTools), panel: () => setPanelOpen((v) => !v) });
-  keys.current = { nextDay, toggleSystem, reset: () => reset(scenarioId, seed, pendingTools), panel: () => setPanelOpen((v) => !v) };
+  const keys = useRef({ nextDay, toggleSystem, reset: () => reset(scenarioId, seed, pendingTools), panel: () => setPanelOpen((v) => !v), mods: () => setModsOpen((v) => !v) });
+  keys.current = { nextDay, toggleSystem, reset: () => reset(scenarioId, seed, pendingTools), panel: () => setPanelOpen((v) => !v), mods: () => setModsOpen((v) => !v) };
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const el = e.target instanceof Element ? e.target : null;
@@ -135,6 +137,7 @@ export function App() {
       else if (k === 's') keys.current.toggleSystem();
       else if (k === 'r') keys.current.reset();
       else if (k === 't') keys.current.panel();
+      else if (k === 'm') keys.current.mods();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -153,7 +156,7 @@ export function App() {
   useEffect(() => { document.title = `Day ${state.day} · Residents' System (rebuild)`; }, [state.day]);
 
   return (
-    <div className={`app ${panelOpen ? 'panel-open' : 'panel-min'}`}>
+    <div className={`app ${panelOpen ? 'panel-open' : 'panel-min'} ${modsOpen ? 'mods-open' : 'mods-min'}`}>
       <main className="world-col">
         <WorldHeader frame={frame} day={state.day} playing={playing} scenario={state.scenario.name} />
         <EndBanner state={state} onKeepPlaying={keepPlaying} onReset={() => reset(scenarioId, seed, pendingTools)} />
@@ -171,6 +174,7 @@ export function App() {
           : <FlatWorld frame={frame} onHover={onHover} selected={phoneSection} />}
         {DEBUG && <DebugHover onHover={onHover} />}
       </main>
+      <ModulesPanel run={run} modules={state.tools} open={modsOpen} onToggle={() => setModsOpen((v) => !v)} />
       <ProductView
         run={run} modules={state.tools} section={phoneSection} onPickSection={setPhoneSection}
         homeLocked={homeLocked} onToggleLock={() => setHomeLocked((v) => !v)}

@@ -48,7 +48,7 @@ export function DemoBar(p: DemoBarProps) {
       <button className="db-icon" disabled={locked} onClick={p.onCompare} title="Compare the same disaster with and without the system" aria-label="Compare">⇄</button>
       <button className="db-icon" onClick={p.onOpenPanel} title="Open the full Test World panel (T)" aria-label="Open test world">⚙</button>
       <Info label="Keyboard shortcuts">
-        <kbd>Space</kbd> next day, <kbd>S</kbd> Blackout Warning on or off, <kbd>R</kbd> reset, <kbd>T</kbd> open or minimize the Test World panel.
+        <kbd>Space</kbd> next day, <kbd>S</kbd> Blackout Warning on or off, <kbd>R</kbd> reset, <kbd>T</kbd> open or minimize the Test World panel, <kbd>M</kbd> open or minimize the Modules panel.
       </Info>
     </div>
   );
