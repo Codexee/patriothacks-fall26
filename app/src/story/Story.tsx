@@ -2,7 +2,7 @@
 // frame; React renders only when a caption or a panel changes.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Clock } from '../earth/clock.ts';
-import { checkFirst, fmtInt } from '../earth/data.ts';
+import { checkFirst, fmtInt, mainGroup } from '../earth/data.ts';
 import type { Live, Scene } from '../earth/data.ts';
 import type { EarthMap, View } from '../earth/map.ts';
 import { CheckFirst, Timeline } from '../earth/panels.tsx';
@@ -33,13 +33,7 @@ export function storyFacts(scene: Scene, live: Live): Facts {
     if (level == null || l > level || (l === level && rc.darkHours > hours)) { level = l; hours = rc.darkHours; deepestCi = ci; }
   });
   // Frame the main group of dark counties: drop the few that are far from the others.
-  const xs = long.map((ci) => scene.centroid[ci * 2]).sort((a, b) => a - b);
-  const ys = long.map((ci) => scene.centroid[ci * 2 + 1]).sort((a, b) => a - b);
-  const q = (v: number[], p: number) => v[Math.min(v.length - 1, Math.max(0, Math.round(p * (v.length - 1))))];
-  const focus = long.filter((ci) => {
-    const x = scene.centroid[ci * 2], y = scene.centroid[ci * 2 + 1];
-    return x >= q(xs, 0.04) && x <= q(xs, 0.96) && y >= q(ys, 0.04) && y <= q(ys, 0.96);
-  });
+  const focus = mainGroup(scene, long);
   return { level, hours, people, deepestCi, focus: focus.length ? focus : long };
 }
 

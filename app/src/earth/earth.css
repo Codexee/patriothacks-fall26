@@ -26,7 +26,7 @@
 
 /* top line */
 .em-top { position: absolute; left: 0; right: 0; top: 0; display: flex; align-items: baseline; gap: 22px; padding: 22px 32px 40px;
-  background: linear-gradient(rgba(7, 9, 13, 0.82), transparent); pointer-events: none; }
+  background: linear-gradient(rgba(7, 9, 13, 0.94) 45%, transparent); pointer-events: none; z-index: 2; }
 .em-top > * { pointer-events: auto; }
 .em-brand { color: var(--text-dim); font-size: 15px; font-weight: 600; letter-spacing: 0.01em; }
 .em-event-title { font-size: 24px; font-weight: 600; letter-spacing: -0.012em; }

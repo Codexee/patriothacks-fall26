@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRoute } from '../shell/router.ts';
 import { Clock } from './clock.ts';
-import { findHero, loadReplay, loadScene, prepareLive } from './data.ts';
+import { findHero, loadReplay, loadScene, mainGroup, prepareLive } from './data.ts';
 import type { Live, Scene } from './data.ts';
 import { EarthMap, HOME } from './map.ts';
 import type { HoverInfo, View } from './map.ts';
@@ -36,6 +36,7 @@ export default function Page() {
     const m = new EarthMap(stageRef.current, scene);
     m.onHover = setHover;
     setMap(m);
+    (window as unknown as { __em: EarthMap }).__em = m;
     const off = clock.subscribe(() => m.setHour(clock.hour));
     return () => { off(); m.destroy(); setMap(null); };
   }, [scene, clock]);
@@ -84,7 +85,7 @@ export default function Page() {
       setLive(next);
       if (story) return;   // the story script moves the camera and the clock
       const dark = replay.counties.map((c, k) => (c.darkHours >= 12 ? next.ci[k] : -1)).filter((ci) => ci >= 0);
-      const fit = map.fit(dark.length ? dark : Array.from(next.ci).filter((ci) => ci >= 0), 60);
+      const fit = map.fit(mainGroup(scene, dark.length ? dark : Array.from(next.ci).filter((ci) => ci >= 0)), 60);
       flyTo({ ...fit, zoom: Math.max(3.6, fit.zoom - 0.55), latitude: fit.latitude - 0.6, pitch: 48, bearing: 0 });
       clock.play();
     }, () => {

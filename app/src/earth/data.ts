@@ -131,6 +131,18 @@ export function prepareLive(scene: Scene, replay: EventReplay): Live {
   return { replay, row, ci, slot, cumDark, share, peakHour };
 }
 
+/** The main group of these counties: drops the few that are far from the others (the 10% farthest
+ *  from the median point), so a camera that frames them does not frame the whole country. */
+export function mainGroup(scene: Scene, cis: number[]): number[] {
+  if (cis.length < 5) return cis;
+  const med = (v: number[]) => v.sort((a, b) => a - b)[Math.floor(v.length / 2)];
+  const mx = med(cis.map((ci) => scene.centroid[ci * 2]));
+  const my = med(cis.map((ci) => scene.centroid[ci * 2 + 1]));
+  const dist = (ci: number) => Math.hypot(scene.centroid[ci * 2] - mx, scene.centroid[ci * 2 + 1] - my);
+  const cut = cis.map(dist).sort((a, b) => a - b)[Math.floor(cis.length * 0.9)];
+  return cis.filter((ci) => dist(ci) <= cut);
+}
+
 export interface CheckRow {
   county: County;
   hours: number;      // predicted dark hours, or observed while the model output is not in
