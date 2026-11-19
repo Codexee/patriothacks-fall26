@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { type Output, type ToolSet } from '../sim/types.ts';
 import type { Run } from '../product/run.ts';
 import { BUILT, PROBLEMS, moduleName } from '../product/names.ts';
+import { Info } from './Info.tsx';
 
 export interface ProductViewProps {
   run: Run;
@@ -43,8 +44,7 @@ export function ProductView(p: ProductViewProps) {
   return (
     <aside className="product" aria-label="Residents' System">
       <header className="pv-head">
-        <h1>Residents' System</h1>
-        <p className="muted small">The app residents run for themselves. It sees only what residents have: their outage reports, their own head count and the Directorate's census. Never the hidden truth.</p>
+        <h1>Residents' System <Info label="About the Residents' System">The app residents run for themselves. It sees only what residents have: their outage reports, their own head count and the Directorate's census. Never the hidden truth.</Info></h1>
         <div className="progress" aria-label="Progress through the 15 problems">
           {PROBLEMS.map((pr) => (
             <span key={pr.n} className={`dot ${pr.feature && BUILT.includes(pr.feature) ? 'done' : ''}`} title={`#${pr.n} ${pr.title}${pr.feature ? ` — ${moduleName(pr.feature)}` : ' — not built yet'}`}>{pr.n}</span>
@@ -95,12 +95,12 @@ export function ProductView(p: ProductViewProps) {
           </ul>
         )}
 
-        <h3>Report a problem</h3>
+        <h3>Report a problem <Info>Optional. Residents report outages on their own; your report joins tomorrow's data.</Info></h3>
         <form className="report" onSubmit={(e) => { e.preventDefault(); if (text.trim()) p.onReport(section.level, section.col, text.trim()); }}>
           <textarea value={text} onChange={(e) => setText(e.target.value)} rows={2} aria-label="Report text" />
           <button type="submit" disabled={p.locked || !text.trim()}>Send report</button>
         </form>
-        <p className="muted small">{p.queuedReports > 0 ? `${p.queuedReports} report(s) queued for tomorrow's data.` : 'Optional. Residents report outages on their own; your report joins tomorrow\'s data.'}</p>
+        {p.queuedReports > 0 && <p className="muted small">{p.queuedReports} report(s) queued for tomorrow's data.</p>}
       </div>
 
       {/* ---------- Council console ---------- */}
@@ -109,7 +109,7 @@ export function ProductView(p: ProductViewProps) {
         {!on && <p className="muted">Turn on Blackout Warning (right panel) to see its forecast here.</p>}
         {on && bw && (
           <div className="mod">
-            <h3>{moduleName('earlyWarning')} <span className="muted small">#1</span></h3>
+            <h3>{moduleName('earlyWarning')} <span className="muted small">#1</span> <Info label="How it predicts">Power goes to the upper levels first, so the line where residents report blackouts shows how much power the plants make. Yesterday's line, and how it moved since the day before, predicts today's. Power needs come from residents' own head count. No plant meters, no forecast.</Info></h3>
             <p>Head count: the Directorate's census says <b>{fmt(bw.censusPeople)}</b>; residents counted <b>{fmt(bw.selfPeople)}</b> in the app
               {bw.selfPeople > bw.censusPeople && <> (<b className="bad">+{Math.round((bw.selfPeople / Math.max(1, bw.censusPeople) - 1) * 100)}%</b>, +{Math.round((bw.deepRatio - 1) * 100)}% on level 50)</>}. Power needs use the residents' count.</p>
             <p>Blackout line yesterday: {bw.lineWorst === null
@@ -132,7 +132,6 @@ export function ProductView(p: ProductViewProps) {
               </table>
             )}
             {bw.darkNow.length > 0 && <p className="small bad">Still without power at the end of yesterday (outage reports): levels {bw.darkNow.join(', ')}</p>}
-            <p className="muted small">How it predicts: power goes to the upper levels first, so the line where residents report blackouts shows how much power the plants make. Yesterday's line, and how it moved since the day before, predicts today's. Power needs come from residents' own head count. No plant meters, no forecast.</p>
           </div>
         )}
         {run.log?.seen && (

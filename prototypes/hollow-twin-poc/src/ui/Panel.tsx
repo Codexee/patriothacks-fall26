@@ -4,6 +4,7 @@ import { useState, type ReactNode } from 'react';
 import { sim } from '../sim/index.ts';
 import type { Action, Frame, Score, SimState, ToolKey, ToolSet, WorldEvent } from '../sim/types.ts';
 import { HoverCard, SourceInfo } from './HoverCard.tsx';
+import { Info } from './Info.tsx';
 import { TOOL_HINTS, TOOL_KEYS, TOOL_LABELS, TOOL_PROBLEMS, type Attribution, type RunResult } from './compare.ts';
 
 export interface PanelProps {
@@ -37,8 +38,7 @@ export interface PanelProps {
 function Section({ title, hint, children, extra }: { title: string; hint?: string; children: ReactNode; extra?: ReactNode }) {
   return (
     <section className="p-sec">
-      <h2>{title}{extra}</h2>
-      {hint && <p className="muted small hint">{hint}</p>}
+      <h2>{title}{hint && <Info>{hint}</Info>}{extra}</h2>
       {children}
     </section>
   );
@@ -81,25 +81,23 @@ export function Panel(p: PanelProps) {
       </button>
       <div className="panel-body">
         <header className="p-head">
-          <h1>Test world</h1>
+          <h1>Test world <Info label="About the test world">A simulated Hollow that proves the Residents' System works. It knows the hidden truth; the system does not. Right now it has one problem: blackouts, and the air that goes bad when the fans stop.</Info></h1>
           <button className="ghost" onClick={p.onMinimize} title="Minimize to the demo bar (T)">Minimize</button>
         </header>
-        <p className="muted small">A simulated Hollow that proves the Residents' System works. It knows the hidden truth; the system does not. Right now it has one problem: blackouts, and the air that goes bad when the fans stop.</p>
 
-        <Section title="1. Choose a disaster" extra={<SourceInfo source={sim.sourceFor('scenario')} label="scenario" />}>
+        <Section title="1. Choose a disaster" hint={state.scenario.summary} extra={<SourceInfo source={sim.sourceFor('scenario')} label="scenario" />}>
           <div className="row">
             <select value={p.scenarioId} disabled={locked} onChange={(e) => p.onScenario(e.target.value)} aria-label="Scenario">
               {sim.scenarios.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
             <button disabled={locked} onClick={p.onReset}>Reset</button>
           </div>
-          <p className="muted small">{state.scenario.summary}</p>
           <details className="advanced">
             <summary>Advanced / replay</summary>
             <label className="seed">Seed
               <input type="number" value={p.seed} disabled={locked} onChange={(e) => p.onSeed(Number(e.target.value) || 0)} />
+              <Info>The same seed replays the same disaster, so runs with and without the system are a fair comparison.</Info>
             </label>
-            <p className="muted small">The same seed replays the same disaster, so runs with and without the system are a fair comparison.</p>
           </details>
         </Section>
 
@@ -108,11 +106,10 @@ export function Panel(p: PanelProps) {
             {TOOL_KEYS.map((k) => (
               <label key={k} className={`tool ${p.pendingTools[k] ? 'on' : ''}`} title={TOOL_HINTS[k]}>
                 <input type="checkbox" checked={p.pendingTools[k]} disabled={locked || !!state.end} onChange={() => p.onToggleTool(k)} />
-                {TOOL_LABELS[k]} <span className="muted small">#{TOOL_PROBLEMS[k]}</span>
+                {TOOL_LABELS[k]} <span className="muted small">#{TOOL_PROBLEMS[k]}</span> <Info>{TOOL_HINTS[k]}</Info>
               </label>
             ))}
           </div>
-          <p className="muted small">{TOOL_HINTS.earlyWarning}</p>
         </Section>
 
         <Section title="3. Play">

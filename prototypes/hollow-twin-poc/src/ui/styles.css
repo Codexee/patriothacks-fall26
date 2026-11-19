@@ -374,3 +374,33 @@ kbd:first-child { margin-left: 0; }
 @media (prefers-reduced-motion: reduce) {
   .switch .knob, .switch .knob::after { transition: none; }
 }
+
+/* ---------- Compact demo bar (round 2: smaller, less in the way) ---------- */
+.demo-bar {
+  left: calc((100vw - var(--product-w-min)) / 2); right: auto; transform: translateX(-50%); bottom: 14px;
+  width: max-content; max-width: calc(100vw - var(--product-w-min) - 24px); flex-wrap: nowrap;
+  gap: 6px; padding: 6px 8px; border-radius: 999px; font-size: 13px; opacity: 0.88; transition: opacity 160ms;
+}
+.demo-bar:hover, .demo-bar:focus-within { opacity: 1; }
+.demo-bar button { padding: 4px 10px; border-radius: 999px; font-size: 13px; }
+.demo-bar .db-play { padding: 4px 14px; box-shadow: 0 0 12px rgba(242, 190, 100, 0.3); }
+.demo-bar .db-icon { width: 30px; height: 28px; padding: 0; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; }
+.demo-bar .switch { gap: 6px; }
+.demo-bar .switch .knob { width: 24px; height: 14px; }
+.demo-bar .switch .knob::after { width: 10px; height: 10px; }
+.demo-bar .switch.on .knob::after { transform: translateX(10px); }
+.db-note { margin-left: 2px; }
+.db-sep { width: 1px; height: 18px; background: var(--line); margin: 0 2px; }
+.db-stat { color: var(--muted); white-space: nowrap; }
+.db-stat b { color: var(--text); font-family: var(--cond); font-size: 15px; font-variant-numeric: tabular-nums; }
+.db-stat b.bad { color: var(--bad); }
+.db-stat b.good { color: var(--good); }
+.demo-bar .src-pop { top: auto; bottom: calc(100% + 10px); left: auto; right: -8px; width: 260px; }
+.app.panel-min .world-col { padding-bottom: 70px; }
+@media (max-width: 1180px) {
+  .demo-bar { left: 50%; max-width: calc(100vw - 24px); }
+}
+@media (max-width: 640px) {
+  .demo-bar { flex-wrap: wrap; border-radius: 14px; justify-content: center; }
+  .db-sep { display: none; }
+}

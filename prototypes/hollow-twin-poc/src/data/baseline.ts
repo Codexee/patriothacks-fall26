@@ -5,7 +5,7 @@ import { hourlyFromDaily } from './shape.ts';
 export const baseline: Scenario = {
   id: 'baseline',
   name: 'Baseline (steady)',
-  summary: 'Normal supply and demand. Only aging, the lies of the Directorate and the outbreak cause trouble.',
+  summary: 'No storm: normal supply and demand. Plants still age, and the Hollow runs close to its limit, so overloaded plants can still trip.',
   days: 1,
   supply: hourlyFromDaily([1.0], 0),
   demand: hourlyFromDaily([1.0], 0.05),

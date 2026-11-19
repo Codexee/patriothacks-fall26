@@ -12,6 +12,8 @@ import { CompareCard, DemoBar, EndBanner } from './DemoBar.tsx';
 import { MAX_DAYS, attribution, compareRuns, type Attribution, type RunResult } from './compare.ts';
 import './styles.css';
 
+/** The steady Hollow is the default; Texas and Chicago stay in the list. */
+const DEFAULT_SCENARIO = sim.scenarios.find((x) => x.id === 'baseline')?.id ?? sim.scenarios[0].id;
 const FRAME_MS = 170; // 24 frames ≈ 4 s per day
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 const DEBUG = typeof location !== 'undefined' && new URLSearchParams(location.search).has('debug');
@@ -19,10 +21,10 @@ const DEBUG = typeof location !== 'undefined' && new URLSearchParams(location.se
 const PIXEL = typeof location !== 'undefined' && new URLSearchParams(location.search).has('pixel');
 
 export function App() {
-  const [scenarioId, setScenarioId] = useState(sim.scenarios[0].id);
+  const [scenarioId, setScenarioId] = useState(DEFAULT_SCENARIO);
   const [seed, setSeed] = useState(1);
   const [pendingTools, setPendingTools] = useState<ToolSet>(NO_TOOLS);
-  const [run, setRun] = useState<Run>(() => createRun(sim.scenarios[0].id, 1, NO_TOOLS));
+  const [run, setRun] = useState<Run>(() => createRun(DEFAULT_SCENARIO, 1, NO_TOOLS));
   const [frame, setFrame] = useState<Frame>(run.sim.lastFrame);
   const [events, setEvents] = useState<string[]>([]);
   const [queued, setQueued] = useState<Action[]>([]); // a person's events and reports for the next day

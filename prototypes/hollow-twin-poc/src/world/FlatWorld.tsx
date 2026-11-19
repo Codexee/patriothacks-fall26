@@ -201,13 +201,20 @@ function paintStatic(width: number, height: number, dpr: number): HTMLCanvasElem
   const c = cv.getContext('2d')!;
   c.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-  // Dusk sky over the dead cities.
+  // The brief: superstorms, fires and poisoned air over dead cities that machines still run. A storm-dark sky, a
+  // sickly yellow-green haze low down, and a sun that barely gets through.
   const sky = c.createLinearGradient(0, 0, 0, SURFACE);
-  sky.addColorStop(0, '#2b2733'); sky.addColorStop(0.55, '#6b4a48'); sky.addColorStop(1, '#c47a48');
+  sky.addColorStop(0, '#1c1f22'); sky.addColorStop(0.45, '#3d3b2c'); sky.addColorStop(0.8, '#6f6236'); sky.addColorStop(1, '#8e6a34');
   c.fillStyle = sky; c.fillRect(0, 0, width, SURFACE);
-  const sun = c.createRadialGradient(width * 0.72, SURFACE - 6, 2, width * 0.72, SURFACE - 6, 70);
-  sun.addColorStop(0, 'rgba(255,200,140,0.75)'); sun.addColorStop(1, 'rgba(255,170,110,0)');
+  const sun = c.createRadialGradient(width * 0.72, SURFACE - 10, 2, width * 0.72, SURFACE - 10, 60);
+  sun.addColorStop(0, 'rgba(230,210,120,0.45)'); sun.addColorStop(1, 'rgba(200,180,90,0)');
   c.fillStyle = sun; c.fillRect(0, 0, width, SURFACE);
+  for (let k = 0; k < 3; k++) { // storm clouds
+    c.fillStyle = `rgba(12,14,16,${0.35 - k * 0.08})`;
+    c.beginPath();
+    for (let x = 0; x <= width; x += 8) c.lineTo(x, 6 + k * 7 + 6 * Math.sin(x / (40 + k * 13) + k * 2) + 3 * Math.sin(x / 11 + k));
+    c.lineTo(width, 0); c.lineTo(0, 0); c.closePath(); c.fill();
+  }
   for (const [layer, color, maxH] of [[0, '#4a3a40', 40], [1, '#271e24', 28]] as const) {
     c.fillStyle = color;
     for (let x = -10, k = 0; x < width + 20; k++) {
@@ -216,6 +223,14 @@ function paintStatic(width: number, height: number, dpr: number): HTMLCanvasElem
       if (hash(k, layer + 5) > 0.6) c.fillRect(x + w * 0.3, SURFACE - h - 8, 2, 8); // antenna
       if (layer === 0 && hash(k, 21) > 0.55) { // broken top
         c.beginPath(); c.moveTo(x, SURFACE - h); c.lineTo(x + w * 0.5, SURFACE - h - 6); c.lineTo(x + w, SURFACE - h); c.fill();
+      }
+      // Machines still run some of the dead buildings: a few cold, working lights in the windows.
+      if (layer === 1 && hash(k, 31) > 0.5) {
+        c.fillStyle = 'rgba(120,225,255,0.75)';
+        for (let wy = SURFACE - h + 3; wy < SURFACE - 3; wy += 4) {
+          for (let wx = x + 2; wx < x + w - 2; wx += 3) if (hash(wx, wy) > 0.72) c.fillRect(wx, wy, 1.2, 1.4);
+        }
+        c.fillStyle = color;
       }
       x += w + (layer ? 3 : 6) + hash(k, layer + 11) * 10;
     }
@@ -279,6 +294,7 @@ export function FlatWorld(props: WorldProps) {
     let raf = 0, last = performance.now(), lastDraw = 0, peopleMax = 1;
     const prevTarget = new Float32Array(SECTION_COUNT).fill(1);
     let sparks: { x: number; y: number; vx: number; vy: number; life: number }[] = [];
+    const lift = { pos: 6, target: 1 + Math.floor(hash(0, 90) * LEVELS), wait: 1, hops: 0, halted: false };
     const t0 = performance.now();
 
     const draw = (now: number) => {
@@ -345,11 +361,34 @@ export function FlatWorld(props: WorldProps) {
 
       // The surface: smoke drifting over the ruins, and a machine's searchlight sweeping the sky.
       ctx.save(); ctx.beginPath(); ctx.rect(0, 0, width, SURFACE); ctx.clip();
-      for (let j = 0; j < 4; j++) {
-        const cx = ((t * (6 + j * 3) + hash(j, 60) * width) % (width + 160)) - 80, cy = 16 + hash(j, 61) * 30;
-        const sm = ctx.createRadialGradient(cx, cy, 2, cx, cy, 46);
-        sm.addColorStop(0, 'rgba(30,24,30,0.32)'); sm.addColorStop(1, 'rgba(30,24,30,0)');
-        ctx.fillStyle = sm; ctx.fillRect(cx - 50, cy - 50, 100, 100);
+      for (let j = 0; j < 4; j++) { // poisoned air: yellow-green haze drifting over the ruins
+        const cx = ((t * (6 + j * 3) + hash(j, 60) * width) % (width + 160)) - 80, cy = 26 + hash(j, 61) * 34;
+        const sm = ctx.createRadialGradient(cx, cy, 2, cx, cy, 52);
+        sm.addColorStop(0, 'rgba(150,160,60,0.22)'); sm.addColorStop(1, 'rgba(150,160,60,0)');
+        ctx.fillStyle = sm; ctx.fillRect(cx - 56, cy - 56, 112, 112);
+      }
+      for (let j = 0; j < 3; j++) { // fires still burning in the dead city
+        const fx = (0.18 + j * 0.31 + hash(j, 62) * 0.08) * width, fy = SURFACE - 2;
+        const fl = reduce ? 1 : 0.7 + 0.3 * Math.sin(t * 9 + j * 3) * Math.sin(t * 4.3 + j);
+        const fg = ctx.createRadialGradient(fx, fy, 0, fx, fy, 16 * fl);
+        fg.addColorStop(0, `rgba(255,170,70,${0.85 * fl})`); fg.addColorStop(0.4, `rgba(230,90,30,${0.45 * fl})`); fg.addColorStop(1, 'rgba(200,60,20,0)');
+        ctx.fillStyle = fg; ctx.fillRect(fx - 18, fy - 18, 36, 20);
+        ctx.fillStyle = 'rgba(25,20,18,0.35)'; // its smoke column
+        for (let k = 0; k < 4 && !reduce; k++) {
+          const ph = (t * 0.25 + k / 4 + j * 0.3) % 1;
+          ctx.beginPath(); ctx.arc(fx + Math.sin(ph * 5 + j) * 4 + ph * 10, fy - 6 - ph * 40, 3 + ph * 7, 0, 7); ctx.fill();
+        }
+      }
+      // Superstorm: every few seconds, lightning.
+      const strikeCycle = 11, sc = Math.floor(t / strikeCycle), st0 = t - sc * strikeCycle;
+      if (!reduce && st0 < 0.22) {
+        const flash = st0 < 0.08 || (st0 > 0.13 && st0 < 0.18) ? 1 : 0.35;
+        ctx.fillStyle = `rgba(220,230,255,${0.18 * flash})`; ctx.fillRect(0, 0, width, SURFACE);
+        ctx.strokeStyle = `rgba(235,240,255,${0.9 * flash})`; ctx.lineWidth = 1.2; ctx.beginPath();
+        let lx = (0.15 + hash(sc, 63) * 0.7) * width, ly = 0;
+        ctx.moveTo(lx, ly);
+        while (ly < SURFACE - 22) { ly += 6 + hash(sc, ly) * 6; lx += (hash(ly, sc) - 0.5) * 14; ctx.lineTo(lx, ly); }
+        ctx.stroke();
       }
       const sx = width * 0.3, sy = SURFACE - 30, ang = -Math.PI / 2 + Math.sin(t * 0.35) * 0.9;
       const beam = ctx.createLinearGradient(sx, sy, sx + Math.cos(ang) * 120, sy + Math.sin(ang) * 120);
@@ -381,16 +420,32 @@ export function FlatWorld(props: WorldProps) {
       ctx.fillStyle = 'rgba(255,236,220,0.85)';
       ctx.fillText('The surface: closed for 30 years, held by the machines', GUTTER_L, 14);
 
-      // The lift: travels between levels, stops, and lights the landing while its door is open.
-      const HOP = 7, hop = Math.floor(t / HOP), u = (t % HOP) / HOP;
-      const stopAt = (n: number) => 1 + Math.floor(hash(n, 90) * LEVELS);
-      const from = stopAt(hop), to = stopAt(hop + 1);
-      const m = u < 0.45 ? 0 : (1 - Math.cos(((u - 0.45) / 0.55) * Math.PI)) / 2;
-      const liftLevel = from + (to - from) * m;
-      const liftY = g.y(liftLevel) + 2;
+      // The lift: travels between levels and stops to let people on. It needs power: when the level it is at has a
+      // blackout, it halts there, dark, until the power comes back.
+      const levelDark = (L: number) => {
+        let d = 0;
+        for (let c2 = 0; c2 < SECTIONS_PER_LEVEL; c2++) if (shown.current[(L - 1) * SECTIONS_PER_LEVEL + c2] < 0.3) d++;
+        return d >= SECTIONS_PER_LEVEL / 2;
+      };
+      const here = Math.max(1, Math.min(LEVELS, Math.round(lift.pos)));
+      lift.halted = levelDark(here);
+      if (!lift.halted && !reduce) {
+        if (lift.wait > 0) lift.wait -= dt;
+        else {
+          const dist = lift.target - lift.pos, step = Math.sign(dist) * Math.min(Math.abs(dist), dt * Math.min(6, 0.8 + Math.abs(dist) * 1.5));
+          lift.pos += step;
+          if (Math.abs(lift.target - lift.pos) < 0.01) {
+            lift.pos = lift.target; lift.wait = 2.5; lift.hops++;
+            lift.target = 1 + Math.floor(hash(lift.hops, 90) * LEVELS);
+          }
+        }
+      }
+      const m = lift.halted ? 1 : lift.wait > 0 ? 0 : 1;
+      const liftY = g.y(lift.pos) + 2;
       ctx.fillStyle = 'rgba(160,170,185,0.35)'; ctx.fillRect(SHAFT_X + SHAFT_W / 2 - 0.4, g.top - 6, 0.8, liftY - g.top + 6); // cable
-      ctx.fillStyle = '#c9a46a'; ctx.fillRect(SHAFT_X + 2, liftY, SHAFT_W - 4, 13);
-      ctx.fillStyle = 'rgba(255,220,150,0.95)'; ctx.fillRect(SHAFT_X + 3, liftY + 2, SHAFT_W - 6, 3);
+      ctx.fillStyle = lift.halted ? '#5a4c38' : '#c9a46a'; ctx.fillRect(SHAFT_X + 2, liftY, SHAFT_W - 4, 13);
+      ctx.fillStyle = lift.halted ? `rgba(255,70,55,${reduce ? 0.9 : 0.4 + 0.5 * Math.max(0, Math.sin(t * 4))})` : 'rgba(255,220,150,0.95)';
+      ctx.fillRect(SHAFT_X + 3, liftY + 2, SHAFT_W - 6, lift.halted ? 2 : 3); // a stuck lift shows a red emergency light
       if (m === 0) { // stopped: the landing light is on
         const lg = ctx.createRadialGradient(SHAFT_X + SHAFT_W, liftY + 6, 0, SHAFT_X + SHAFT_W, liftY + 6, 14);
         lg.addColorStop(0, 'rgba(255,215,140,0.55)'); lg.addColorStop(1, 'rgba(255,215,140,0)');
@@ -586,7 +641,7 @@ export function FlatWorld(props: WorldProps) {
     cv.addEventListener('pointermove', onMove);
     cv.addEventListener('pointerleave', onLeave);
     const ro = new ResizeObserver(() => kickRef.current()); ro.observe(host);
-    if (import.meta.env.DEV) (window as unknown as { __drawHollow?: () => void }).__drawHollow = () => draw(performance.now()); // timing in dev
+    if (import.meta.env.DEV) Object.assign(window, { __drawHollow: () => draw(performance.now()), __lift: lift }); // dev checks
     document.fonts?.ready.then(() => { staticKey = ''; sheetKey = ''; kickRef.current(); }); // repaint labels in the real font
     kickRef.current();
     return () => {

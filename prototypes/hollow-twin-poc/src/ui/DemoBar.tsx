@@ -2,6 +2,7 @@
 // and the end-of-run banner. Everything here calls the same handlers as the full panel.
 import type { SimState } from '../sim/types.ts';
 import type { RunResult } from './compare.ts';
+import { Info } from './Info.tsx';
 
 const fmt = (n: number) => Math.round(n).toLocaleString('en-US');
 
@@ -20,37 +21,35 @@ export interface DemoBarProps {
   onOpenPanel: () => void;
 }
 
+/** One compact row: play, the system switch, three numbers, and icons for the rest. */
 export function DemoBar(p: DemoBarProps) {
   const t = p.state.totals;
   const locked = p.playing || p.busy !== null;
   const warned = t.blackoutPersonHours > 0 ? `${Math.round((t.warnedPersonHours / t.blackoutPersonHours) * 100)}%` : '–';
   return (
     <div className="demo-bar" role="toolbar" aria-label="Demo controls">
-      <div className="db-group">
-        <button className="primary" disabled={locked || !!p.state.end} onClick={p.onNextDay} title="Next day (Space)">
-          {p.playing ? 'Playing…' : 'Next day'}
-        </button>
-        <button disabled={p.busy !== null || !!p.state.end} onClick={p.onSkipToEnd}>Skip to the end</button>
-      </div>
-      <div className="db-group">
-        <button className={`switch ${p.systemOn ? 'on' : ''}`} role="switch" aria-checked={p.systemOn} disabled={locked}
-          onClick={p.onToggleSystem} title="Blackout Warning on or off (S). Applies from the next day; press Reset to start over with it.">
-          <span className="knob" aria-hidden />
-          Blackout Warning {p.systemOn ? 'on' : 'off'}
-          {p.systemOn !== p.systemNow && <span className="db-note">from next day</span>}
-        </button>
-        <button disabled={locked} onClick={p.onReset} title="Reset (R)">Reset</button>
-      </div>
-      <dl className="db-stats">
-        <div><dt>Day</dt><dd>{p.state.day}{p.playing ? `, ${String(p.hour).padStart(2, '0')}:00` : ''}</dd></div>
-        <div><dt>Deaths</dt><dd className={t.deaths > 0 ? 'bad' : ''}>{fmt(t.deaths)}</dd></div>
-        <div><dt>Warned ahead</dt><dd className={t.blackoutPersonHours > 0 ? 'good' : ''}>{warned}</dd></div>
-      </dl>
-      <div className="db-group">
-        <button disabled={locked} onClick={p.onCompare} title="Run the same disaster with and without the system">Compare</button>
-        <button className="ghost" onClick={p.onOpenPanel} title="Open the full Test World panel (T)">Open test world</button>
-      </div>
-      <p className="db-keys" aria-label="Keyboard shortcuts"><kbd>Space</kbd> next day <kbd>S</kbd> system <kbd>R</kbd> reset <kbd>T</kbd> panel</p>
+      <button className="primary db-play" disabled={locked || !!p.state.end} onClick={p.onNextDay} title="Next day (Space)">
+        {p.playing ? 'Playing…' : '▶ Next day'}
+      </button>
+      <button className="db-icon" disabled={p.busy !== null || !!p.state.end} onClick={p.onSkipToEnd} title="Skip to the end" aria-label="Skip to the end">⏭</button>
+      <button className={`switch ${p.systemOn ? 'on' : ''}`} role="switch" aria-checked={p.systemOn} disabled={locked} onClick={p.onToggleSystem}
+        title={`Blackout Warning ${p.systemOn ? 'on' : 'off'} (S). Applies from the next day; Reset starts over with it.`}>
+        <span className="knob" aria-hidden />Warning
+        {p.systemOn !== p.systemNow && <span className="db-note">from next day</span>}
+      </button>
+      <button className="db-icon" disabled={locked} onClick={p.onReset} title="Reset (R)" aria-label="Reset">↺</button>
+      <span className="db-sep" aria-hidden />
+      <span className="db-stat">Day <b>{p.state.day}</b>{p.playing && <span className="muted"> {String(p.hour).padStart(2, '0')}:00</span>}</span>
+      <span className="db-stat" title="Deaths so far"><b className={t.deaths > 0 ? 'bad' : ''}>{fmt(t.deaths)}</b> dead</span>
+      <span className="db-stat" title="Share of blackout hours that residents had been warned about">
+        <b className={t.blackoutPersonHours > 0 ? 'good' : ''}>{warned}</b> warned
+      </span>
+      <span className="db-sep" aria-hidden />
+      <button className="db-icon" disabled={locked} onClick={p.onCompare} title="Compare the same disaster with and without the system" aria-label="Compare">⇄</button>
+      <button className="db-icon" onClick={p.onOpenPanel} title="Open the full Test World panel (T)" aria-label="Open test world">⚙</button>
+      <Info label="Keyboard shortcuts">
+        <kbd>Space</kbd> next day, <kbd>S</kbd> Blackout Warning on or off, <kbd>R</kbd> reset, <kbd>T</kbd> open or minimize the Test World panel.
+      </Info>
     </div>
   );
 }
