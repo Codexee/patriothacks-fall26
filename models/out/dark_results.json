@@ -1,0 +1,443 @@
+{
+ "periods": {
+  "train": "event stop < 2021-01-01",
+  "dev": [
+   "2021-01-01",
+   "2023-01-01"
+  ],
+  "test": [
+   "2023-01-01",
+   "2025-01-01"
+  ]
+ },
+ "objective": "log1p",
+ "features": [
+  "month",
+  "hod",
+  "ba_past_events",
+  "ba_past_mean_hours",
+  "ba_hours_since_last",
+  "ev_fc_err",
+  "ev_fc_err_max_24h",
+  "ev_demand_vs_30d_peak",
+  "ev_import_share",
+  "ev_gas_share",
+  "ev_netgen_chg_6h",
+  "ev_gas_chg_6h",
+  "ev_temp_c",
+  "ev_dew_c",
+  "ev_slp_min_hpa",
+  "ev_wind_max_ms",
+  "ev_precip_max_mm",
+  "ev_temp_anom_30d",
+  "ev_temp_min_24h",
+  "ev_temp_max_24h",
+  "ev_wind_max_24h",
+  "ev_precip_24h",
+  "ev_slp_chg_12h",
+  "customers",
+  "pop",
+  "svi",
+  "svi_t1",
+  "svi_t2",
+  "svi_t3",
+  "svi_t4",
+  "utilities",
+  "past_events",
+  "past_dark_mean",
+  "past_dark_max",
+  "past_dark_share",
+  "out_prev1h",
+  "out_max_prev6h",
+  "ba_is_AECI",
+  "ba_is_AVA",
+  "ba_is_AZPS",
+  "ba_is_BANC",
+  "ba_is_BPAT",
+  "ba_is_CHPD",
+  "ba_is_CISO",
+  "ba_is_CPLE",
+  "ba_is_DOPD",
+  "ba_is_DUK",
+  "ba_is_EPE",
+  "ba_is_ERCO",
+  "ba_is_FMPP",
+  "ba_is_FPC",
+  "ba_is_FPL",
+  "ba_is_IPCO",
+  "ba_is_ISNE",
+  "ba_is_JEA",
+  "ba_is_LDWP",
+  "ba_is_LGEE",
+  "ba_is_MISO",
+  "ba_is_NEVP",
+  "ba_is_NWMT",
+  "ba_is_NYIS",
+  "ba_is_PACE",
+  "ba_is_PACW",
+  "ba_is_PGE",
+  "ba_is_PJM",
+  "ba_is_PNM",
+  "ba_is_PSCO",
+  "ba_is_PSEI",
+  "ba_is_SC",
+  "ba_is_SCEG",
+  "ba_is_SCL",
+  "ba_is_SEC",
+  "ba_is_SOCO",
+  "ba_is_SRP",
+  "ba_is_SWPP",
+  "ba_is_TAL",
+  "ba_is_TEC",
+  "ba_is_TEPC",
+  "ba_is_TPWR",
+  "ba_is_TVA",
+  "ba_is_WACM",
+  "ba_is_WALC",
+  "ba_is_WAUW"
+ ],
+ "config": {
+  "num_leaves": 7,
+  "min_child_samples": 50,
+  "rounds": 300
+ },
+ "valYears": [
+  2017,
+  2018,
+  2019,
+  2020
+ ],
+ "years": [
+  2015,
+  2024
+ ],
+ "countyEventRows": 95789,
+ "observedRows": 91558,
+ "observedEvents": 1244,
+ "allEvents": 1477,
+ "importance": [
+  {
+   "feature": "out_prev1h",
+   "gain": 0.22933459083106525
+  },
+  {
+   "feature": "pop",
+   "gain": 0.07974807211147304
+  },
+  {
+   "feature": "past_dark_share",
+   "gain": 0.07097328705175275
+  },
+  {
+   "feature": "ev_dew_c",
+   "gain": 0.0669086431963048
+  },
+  {
+   "feature": "month",
+   "gain": 0.05743444732904959
+  },
+  {
+   "feature": "ev_fc_err",
+   "gain": 0.043652156809605394
+  },
+  {
+   "feature": "ev_import_share",
+   "gain": 0.039889129070227715
+  },
+  {
+   "feature": "out_max_prev6h",
+   "gain": 0.039618426780221594
+  },
+  {
+   "feature": "ev_demand_vs_30d_peak",
+   "gain": 0.0343364498732293
+  },
+  {
+   "feature": "ba_past_mean_hours",
+   "gain": 0.027643731497308487
+  }
+ ],
+ "objectives": {
+  "l2": {
+   "config": {
+    "num_leaves": 15,
+    "min_child_samples": 200,
+    "rounds": 300
+   },
+   "cvWithinEventSpearman": 0.29733751784088897,
+   "train_oof": {
+    "countyEvents": 31011,
+    "events": 425,
+    "meanDarkHours": 2.721840637193254,
+    "maeHours": 4.7750365290319765,
+    "baselineMaeHours": 4.154596754173087,
+    "zeroMaeHours": 2.721840637193254,
+    "rmseHours": 13.231797185616543,
+    "baselineRmseHours": 13.607126512942129,
+    "spearman": 0.2530711485566648,
+    "baselineSpearman": 0.20609328020194845,
+    "withinEventSpearman": 0.29733751784088897,
+    "baselineWithinEventSpearman": 0.1827038299849707,
+    "withinEventSpearmanEvents": 284,
+    "top10Overlap": 0.3903766069165309,
+    "baselineTop10Overlap": 0.2501071277687247,
+    "top10Events": 263,
+    "top10Chance": 0.1399876709276979
+   },
+   "dev": {
+    "countyEvents": 19708,
+    "events": 309,
+    "meanDarkHours": 2.296275624112036,
+    "maeHours": 4.25087080920114,
+    "baselineMaeHours": 4.1264611472880635,
+    "zeroMaeHours": 2.296275624112036,
+    "rmseHours": 12.25851687479298,
+    "baselineRmseHours": 12.89178647405989,
+    "spearman": 0.2600179751681344,
+    "baselineSpearman": 0.1556453724779832,
+    "withinEventSpearman": 0.319093930324407,
+    "baselineWithinEventSpearman": 0.20986934772982901,
+    "withinEventSpearmanEvents": 176,
+    "top10Overlap": 0.40487351190476184,
+    "baselineTop10Overlap": 0.25579117063492063,
+    "top10Events": 160,
+    "top10Chance": 0.13505773935499144
+   }
+  },
+  "log1p": {
+   "config": {
+    "num_leaves": 7,
+    "min_child_samples": 50,
+    "rounds": 300
+   },
+   "cvWithinEventSpearman": 0.30087921213970653,
+   "train_oof": {
+    "countyEvents": 31011,
+    "events": 425,
+    "meanDarkHours": 2.721840637193254,
+    "maeHours": 2.8764324219486963,
+    "baselineMaeHours": 4.154596754173087,
+    "zeroMaeHours": 2.721840637193254,
+    "rmseHours": 12.827093232428053,
+    "baselineRmseHours": 13.607126512942129,
+    "spearman": 0.2877165404425459,
+    "baselineSpearman": 0.20609328020194845,
+    "withinEventSpearman": 0.30087921213970653,
+    "baselineWithinEventSpearman": 0.1827038299849707,
+    "withinEventSpearmanEvents": 290,
+    "top10Overlap": 0.44584163196330495,
+    "baselineTop10Overlap": 0.2501071277687247,
+    "top10Events": 263,
+    "top10Chance": 0.1399876709276979
+   },
+   "dev": {
+    "countyEvents": 19708,
+    "events": 309,
+    "meanDarkHours": 2.296275624112036,
+    "maeHours": 2.4091865257349845,
+    "baselineMaeHours": 4.1264611472880635,
+    "zeroMaeHours": 2.296275624112036,
+    "rmseHours": 12.286033538077794,
+    "baselineRmseHours": 12.89178647405989,
+    "spearman": 0.3219197956813628,
+    "baselineSpearman": 0.1556453724779832,
+    "withinEventSpearman": 0.3420952182270195,
+    "baselineWithinEventSpearman": 0.20986934772982901,
+    "withinEventSpearmanEvents": 178,
+    "top10Overlap": 0.44843253968253965,
+    "baselineTop10Overlap": 0.25579117063492063,
+    "top10Events": 160,
+    "top10Chance": 0.13505773935499144
+   }
+  },
+  "poisson": {
+   "config": {
+    "num_leaves": 7,
+    "min_child_samples": 200,
+    "rounds": 300
+   },
+   "cvWithinEventSpearman": 0.2954493826645555,
+   "train_oof": {
+    "countyEvents": 31011,
+    "events": 425,
+    "meanDarkHours": 2.721840637193254,
+    "maeHours": 3.447382976369871,
+    "baselineMaeHours": 4.154596754173087,
+    "zeroMaeHours": 2.721840637193254,
+    "rmseHours": 12.632885088922372,
+    "baselineRmseHours": 13.607126512942129,
+    "spearman": 0.298443739964555,
+    "baselineSpearman": 0.20609328020194845,
+    "withinEventSpearman": 0.2954493826645555,
+    "baselineWithinEventSpearman": 0.1827038299849707,
+    "withinEventSpearmanEvents": 290,
+    "top10Overlap": 0.4111277083710544,
+    "baselineTop10Overlap": 0.2501071277687247,
+    "top10Events": 263,
+    "top10Chance": 0.1399876709276979
+   },
+   "dev": {
+    "countyEvents": 19708,
+    "events": 309,
+    "meanDarkHours": 2.296275624112036,
+    "maeHours": 3.2564551540158964,
+    "baselineMaeHours": 4.1264611472880635,
+    "zeroMaeHours": 2.296275624112036,
+    "rmseHours": 12.110405016951086,
+    "baselineRmseHours": 12.89178647405989,
+    "spearman": 0.2736926811410401,
+    "baselineSpearman": 0.1556453724779832,
+    "withinEventSpearman": 0.31089110701282113,
+    "baselineWithinEventSpearman": 0.20986934772982901,
+    "withinEventSpearmanEvents": 178,
+    "top10Overlap": 0.4033804563492064,
+    "baselineTop10Overlap": 0.25579117063492063,
+    "top10Events": 160,
+    "top10Chance": 0.13505773935499144
+   }
+  },
+  "tweedie": {
+   "config": {
+    "num_leaves": 7,
+    "min_child_samples": 50,
+    "rounds": 300
+   },
+   "cvWithinEventSpearman": 0.30130311551670785,
+   "train_oof": {
+    "countyEvents": 31011,
+    "events": 425,
+    "meanDarkHours": 2.721840637193254,
+    "maeHours": 3.142947255844982,
+    "baselineMaeHours": 4.154596754173087,
+    "zeroMaeHours": 2.721840637193254,
+    "rmseHours": 12.70780183508086,
+    "baselineRmseHours": 13.607126512942129,
+    "spearman": 0.3044706033651374,
+    "baselineSpearman": 0.20609328020194845,
+    "withinEventSpearman": 0.30130311551670785,
+    "baselineWithinEventSpearman": 0.1827038299849707,
+    "withinEventSpearmanEvents": 290,
+    "top10Overlap": 0.422955519343352,
+    "baselineTop10Overlap": 0.2501071277687247,
+    "top10Events": 263,
+    "top10Chance": 0.1399876709276979
+   },
+   "dev": {
+    "countyEvents": 19708,
+    "events": 309,
+    "meanDarkHours": 2.296275624112036,
+    "maeHours": 2.8502894642379815,
+    "baselineMaeHours": 4.1264611472880635,
+    "zeroMaeHours": 2.296275624112036,
+    "rmseHours": 12.264293427941464,
+    "baselineRmseHours": 12.89178647405989,
+    "spearman": 0.2701361943476876,
+    "baselineSpearman": 0.1556453724779832,
+    "withinEventSpearman": 0.3162854662276719,
+    "baselineWithinEventSpearman": 0.20986934772982901,
+    "withinEventSpearmanEvents": 178,
+    "top10Overlap": 0.40954613095238096,
+    "baselineTop10Overlap": 0.25579117063492063,
+    "top10Events": 160,
+    "top10Chance": 0.13505773935499144
+   }
+  }
+ },
+ "train_oof": {
+  "countyEvents": 31011,
+  "events": 425,
+  "meanDarkHours": 2.721840637193254,
+  "maeHours": 2.8764324219486963,
+  "baselineMaeHours": 4.154596754173087,
+  "zeroMaeHours": 2.721840637193254,
+  "rmseHours": 12.827093232428053,
+  "baselineRmseHours": 13.607126512942129,
+  "spearman": 0.2877165404425459,
+  "baselineSpearman": 0.20609328020194845,
+  "withinEventSpearman": 0.30087921213970653,
+  "baselineWithinEventSpearman": 0.1827038299849707,
+  "withinEventSpearmanEvents": 290,
+  "top10Overlap": 0.44584163196330495,
+  "baselineTop10Overlap": 0.2501071277687247,
+  "top10Events": 263,
+  "top10Chance": 0.1399876709276979
+ },
+ "dev": {
+  "countyEvents": 19708,
+  "events": 309,
+  "meanDarkHours": 2.296275624112036,
+  "maeHours": 2.4091865257349845,
+  "baselineMaeHours": 4.1264611472880635,
+  "zeroMaeHours": 2.296275624112036,
+  "rmseHours": 12.286033538077794,
+  "baselineRmseHours": 12.89178647405989,
+  "spearman": 0.3219197956813628,
+  "baselineSpearman": 0.1556453724779832,
+  "withinEventSpearman": 0.3420952182270195,
+  "baselineWithinEventSpearman": 0.20986934772982901,
+  "withinEventSpearmanEvents": 178,
+  "top10Overlap": 0.44843253968253965,
+  "baselineTop10Overlap": 0.25579117063492063,
+  "top10Events": 160,
+  "top10Chance": 0.13505773935499144
+ },
+ "equity": {
+  "quartiles": [
+   {
+    "quartile": 1,
+    "meanDarkHours": 1.2691233691920347,
+    "lo": 0.9706927212474779,
+    "hi": 1.5884138381884694,
+    "countyEvents": 21845
+   },
+   {
+    "quartile": 2,
+    "meanDarkHours": 2.046655424395728,
+    "lo": 1.6900155792142795,
+    "hi": 2.460477022657052,
+    "countyEvents": 23127
+   },
+   {
+    "quartile": 3,
+    "meanDarkHours": 2.4875334311103443,
+    "lo": 1.9945173890931482,
+    "hi": 3.1243685483173795,
+    "countyEvents": 23182
+   },
+   {
+    "quartile": 4,
+    "meanDarkHours": 3.378894691035683,
+    "lo": 2.391669607626624,
+    "hi": 4.643775377127979,
+    "countyEvents": 22980
+   }
+  ],
+  "events": 1244,
+  "countyEvents": 91134,
+  "events24hOrLonger": {
+   "events": 306,
+   "q4MinusQ1": {
+    "mean": 6.551196772646524,
+    "lo": 3.7874839328552405,
+    "hi": 10.05862617763532
+   },
+   "withinEventQ4MinusQ1": {
+    "events": 209,
+    "mean": 0.40185366455648025,
+    "lo": -2.5822989600880106,
+    "hi": 3.699348031051366
+   }
+  },
+  "q4MinusQ1": {
+   "mean": 2.1097713218436485,
+   "lo": 1.14889540166009,
+   "hi": 3.287898115218768
+  },
+  "withinEventQ4MinusQ1": {
+   "events": 712,
+   "mean": 0.1138678528147887,
+   "lo": -0.7460635506629382,
+   "hi": 1.0729701079833065
+  }
+ }
+}

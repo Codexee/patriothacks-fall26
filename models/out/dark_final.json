@@ -1,0 +1,19 @@
+{
+ "countyEvents": 34877,
+ "events": 390,
+ "meanDarkHours": 2.000229377526737,
+ "maeHours": 2.225688132512774,
+ "baselineMaeHours": 3.5766075503548476,
+ "zeroMaeHours": 2.000229377526737,
+ "rmseHours": 13.564854859675021,
+ "baselineRmseHours": 13.872188671822244,
+ "spearman": 0.3247846428810704,
+ "baselineSpearman": 0.20006763825674403,
+ "withinEventSpearman": 0.309621746790792,
+ "baselineWithinEventSpearman": 0.21970069780667223,
+ "withinEventSpearmanEvents": 256,
+ "top10Overlap": 0.4600143995713616,
+ "baselineTop10Overlap": 0.27760196905766527,
+ "top10Events": 237,
+ "top10Chance": 0.13182064113097922
+}

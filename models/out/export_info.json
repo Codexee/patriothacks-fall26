@@ -1,0 +1,23 @@
+{
+ "version": "2026-11-19T02:21Z",
+ "warn_grid": {
+  "trees": 100,
+  "bytes": 296852,
+  "parityMaxDiff": 1.3877787807814457e-16
+ },
+ "warn_full": {
+  "trees": 200,
+  "bytes": 615999,
+  "parityMaxDiff": 4.440892098500626e-16
+ },
+ "warn_fcst": {
+  "trees": 200,
+  "bytes": 2427143,
+  "parityMaxDiff": 4.579669976578771e-16
+ },
+ "dark": {
+  "trees": 300,
+  "bytes": 806653,
+  "parityMaxDiff": 5.329070518200751e-15
+ }
+}

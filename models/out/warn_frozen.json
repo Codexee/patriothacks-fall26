@@ -1,0 +1,143 @@
+{
+ "design": {
+  "trail": true,
+  "monotone": true
+ },
+ "methods": {
+  "warn_grid": {
+   "threshold": 0.02289615447369614,
+   "features": [
+    "fc_err",
+    "fc_err_max_24h",
+    "demand_vs_30d_peak",
+    "import_share",
+    "gas_share",
+    "netgen_chg_6h",
+    "gas_chg_6h",
+    "hod",
+    "month",
+    "demand_vs_record",
+    "demand_vs_month_record",
+    "fc12_vs_record",
+    "fc12_vs_365d_peak",
+    "fc12_vs_30d_peak",
+    "fc12_vs_month_record",
+    "fc12_vs_month_record_max_72h"
+   ]
+  },
+  "warn_full": {
+   "threshold": 0.11022380047238367,
+   "features": [
+    "fc_err",
+    "fc_err_max_24h",
+    "demand_vs_30d_peak",
+    "import_share",
+    "gas_share",
+    "netgen_chg_6h",
+    "gas_chg_6h",
+    "hod",
+    "month",
+    "demand_vs_record",
+    "demand_vs_month_record",
+    "fc12_vs_record",
+    "fc12_vs_365d_peak",
+    "fc12_vs_30d_peak",
+    "fc12_vs_month_record",
+    "temp_c",
+    "dew_c",
+    "slp_min_hpa",
+    "wind_max_ms",
+    "precip_max_mm",
+    "temp_anom_30d",
+    "temp_min_24h",
+    "temp_max_24h",
+    "wind_max_24h",
+    "precip_24h",
+    "slp_chg_12h",
+    "temp_z_month",
+    "wind_z_month",
+    "temp_above_record_low",
+    "temp_below_record_high",
+    "out_own_lag1",
+    "out_own_chg_6h",
+    "out_nat_lag1",
+    "out_nat_chg_12h",
+    "fc12_vs_month_record_max_72h",
+    "temp_z_month_min_72h",
+    "wind_z_month_max_72h",
+    "out_own_lag1_max_72h"
+   ]
+  },
+  "warn_fcst": {
+   "threshold": 0.09843352224327048,
+   "features": [
+    "fc_err",
+    "fc_err_max_24h",
+    "demand_vs_30d_peak",
+    "import_share",
+    "gas_share",
+    "netgen_chg_6h",
+    "gas_chg_6h",
+    "hod",
+    "month",
+    "demand_vs_record",
+    "demand_vs_month_record",
+    "fc12_vs_record",
+    "fc12_vs_365d_peak",
+    "fc12_vs_30d_peak",
+    "fc12_vs_month_record",
+    "temp_c",
+    "dew_c",
+    "slp_min_hpa",
+    "wind_max_ms",
+    "precip_max_mm",
+    "temp_anom_30d",
+    "temp_min_24h",
+    "temp_max_24h",
+    "wind_max_24h",
+    "precip_24h",
+    "slp_chg_12h",
+    "temp_z_month",
+    "wind_z_month",
+    "temp_above_record_low",
+    "temp_below_record_high",
+    "out_own_lag1",
+    "out_own_chg_6h",
+    "out_nat_lag1",
+    "out_nat_chg_12h",
+    "fx_wind_max_48h",
+    "fx_temp_min_48h",
+    "fx_temp_max_48h",
+    "fx_precip_48h",
+    "fx_temp_min_48h_z",
+    "fx_temp_max_48h_z",
+    "fx_wind_max_48h_z",
+    "fx_temp_min_48h_above_record",
+    "fx_slp_min_48h",
+    "fx_wind_max_24h",
+    "fx_temp_min_24h",
+    "fx_temp_max_24h",
+    "fx_precip_24h",
+    "fc12_vs_month_record_max_72h",
+    "temp_z_month_min_72h",
+    "wind_z_month_max_72h",
+    "out_own_lag1_max_72h"
+   ]
+  },
+  "rule_forecast_error": {
+   "threshold": 0.3297078330054624,
+   "config": {}
+  },
+  "rule_hand": {
+   "threshold": 3.9784981759461964,
+   "config": {
+    "wd": 0.5,
+    "wt": 1.0
+   }
+  },
+  "rule_record": {
+   "threshold": 1.0201294422149658,
+   "config": {}
+  }
+ }
+}
