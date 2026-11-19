@@ -29,15 +29,24 @@ export function modelLabel(name: string | undefined, short = false): string {
 
 /** Replay hour of the first alert (EventRow.firstAlert), or null when the model did not warn. */
 export function firstAlertIndex(live: Live): number | null {
+  if (live.replay.stub) return null;
+  if (live.replay.firstAlertIndex != null) return live.replay.firstAlertIndex;
   const fa = live.row?.firstAlert;
-  if (!fa || live.replay.stub) return null;
+  if (!fa) return null;
   const h = Math.round((parseUtc(fa) - parseUtc(live.replay.t0)) / 3600_000);
   return h >= 0 && h < live.replay.hours ? h : null;
 }
 
 const CW = 1000, CH = 84;   // chart coordinates (the SVG stretches to the panel width)
 
-export function Timeline({ live, clock, bare = false }: { live: Live; clock: Clock; bare?: boolean }) {
+/** A marked moment on the timeline that is not from the model, e.g. an official load-shed order. */
+export interface Official { index: number; label: string }
+
+export function Timeline({ live, clock, bare = false, assist = true, official = null }: {
+  live: Live; clock: Clock; bare?: boolean;
+  assist?: boolean;            // false = the "Without" view: no risk line, no alert
+  official?: Official | null;
+}) {
   const { replay } = live;
   const playing = useClockPlaying(clock);
   const speed = useClockSpeed(clock);
@@ -123,16 +132,22 @@ export function Timeline({ live, clock, bare = false }: { live: Live; clock: Clo
         >
           <svg viewBox={`0 0 ${CW} ${CH}`} preserveAspectRatio="none" aria-hidden="true">
             <path className="em-area" d={paths.area} />
-            {paths.thresholdY != null && <line className="em-threshold" x1="0" x2={CW} y1={paths.thresholdY} y2={paths.thresholdY} />}
-            {paths.risk && <path className="em-risk" d={paths.risk} />}
+            {assist && paths.thresholdY != null && <line className="em-threshold" x1="0" x2={CW} y1={paths.thresholdY} y2={paths.thresholdY} />}
+            {assist && paths.risk && <path className="em-risk" d={paths.risk} />}
             <line className="em-start" x1={paths.startX} x2={paths.startX} y1="0" y2={CH} />
-            {paths.alertX != null && <line className="em-alert" x1={paths.alertX} x2={paths.alertX} y1="0" y2={CH} />}
+            {assist && paths.alertX != null && <line className="em-alert" x1={paths.alertX} x2={paths.alertX} y1="0" y2={CH} />}
+            {official && <line className="em-official" x1={(official.index / last) * CW} x2={(official.index / last) * CW} y1="0" y2={CH} />}
           </svg>
           <span className="em-start-label" style={{ left: `${(replay.eventStartIndex / last) * 100}%` }}>first outage</span>
-          {paths.alertIdx != null && (
+          {assist && paths.alertIdx != null && (
             <span className="em-alert-label" style={{ right: `${100 - (paths.alertIdx / last) * 100}%` }}>first alert</span>
           )}
-          {paths.risk
+          {official && (
+            <span className="em-official-label" style={{ left: `${(official.index / last) * 100}%` }}>{official.label}</span>
+          )}
+          {!assist
+            ? <span className="em-chart-note">Share of customers out in these counties. No warning.</span>
+            : paths.risk
             ? <span className="em-chart-note">{bare
                 ? `${replay.ba} risk, ${modelLabel(replay.warnModel, true)}`
                 : `Risk of an outage event in ${replay.ba}, ${model}${paths.thresholdY != null ? '. Dashed line: alert level' : ''}`}</span>
@@ -186,7 +201,7 @@ export function CheckFirst({ scene, live, count = 4, onPoint }: {
 
 // ---------------------------------------------------------------- event picker (calm map)
 
-export function EventPicker({ scene }: { scene: Scene }) {
+export function EventPicker({ scene, base = '#/event/' }: { scene: Scene; base?: string }) {
   const { heroes, others } = useMemo(() => playable(scene.library), [scene]);
   const label = (e: EventRow) => e.title ?? `${e.ba}, ${fmtDay(e.start)}`;
   return (
@@ -198,7 +213,7 @@ export function EventPicker({ scene }: { scene: Scene }) {
       </p>
       <div className="em-heroes">
         {heroes.map((e) => (
-          <a key={e.id} className="em-hero" href={`#/event/${e.id}`}>
+          <a key={e.id} className="em-hero" href={`${base}${e.id}`}>
             <span className="em-hero-title">{label(e)}</span>
             <span className="em-hero-sub">{fmtInt(e.peakCustomersOut)} customers out at the peak</span>
           </a>
@@ -208,7 +223,7 @@ export function EventPicker({ scene }: { scene: Scene }) {
       {others.length > 0 && (
         <label className="em-more">
           <span className="em-sr">Other outages</span>
-          <select value="" onChange={(e) => { if (e.target.value) window.location.hash = `#/event/${e.target.value}`; }}>
+          <select value="" onChange={(e) => { if (e.target.value) window.location.hash = `${base}${e.target.value}`; }}>
             <option value="">{others.length} more outages</option>
             {others.map((e) => (
               <option key={e.id} value={e.id}>{fmtDay(e.start)}, {e.ba}, {fmtInt(e.peakCustomersOut)} out</option>
