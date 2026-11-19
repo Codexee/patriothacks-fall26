@@ -130,7 +130,10 @@ for (const sc of sim.scenarios) {
   });
   console.log(`${sc.id}: ${((Date.now() - t0) / 1000).toFixed(1)} s`);
 }
-results.sort((a, b) => b.livesSaved.lo - a.livesSaved.lo);
+// Real grid failures first, the hardest (Two Plants) leading; then the slow scenarios; Baseline last.
+const ORDER = ['twoplants', 'elliott', 'cascade', 'slowloss', 'aging', 'crowding', 'baseline'];
+const rank = (id: string) => (ORDER.indexOf(id) < 0 ? ORDER.length : ORDER.indexOf(id));
+results.sort((a, b) => rank(a.id) - rank(b.id));
 
 const simPeople = sim.createState(sim.scenarios[0].id, SEEDS[0], NO_TOOLS).totals.startPopulation;
 const file: ScenariosFile = {
