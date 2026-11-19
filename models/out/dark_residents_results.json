@@ -1,0 +1,597 @@
+{
+ "periods": {
+  "train": "event stop < 2021-01-01",
+  "dev": [
+   "2021-01-01",
+   "2023-01-01"
+  ],
+  "test": [
+   "2023-01-01",
+   "2025-01-01"
+  ]
+ },
+ "objective": "log1p",
+ "rule": "config and rounds by within-event Spearman on TRAIN year folds; feature set by DEV within-event Spearman",
+ "valYears": [
+  2017,
+  2018,
+  2019,
+  2020
+ ],
+ "chosen": "residents",
+ "features": [
+  "month",
+  "hod",
+  "ba_past_events",
+  "ba_past_mean_hours",
+  "ba_hours_since_last",
+  "customers",
+  "pop",
+  "svi",
+  "svi_t1",
+  "svi_t2",
+  "svi_t3",
+  "svi_t4",
+  "utilities",
+  "past_events",
+  "past_dark_mean",
+  "past_dark_max",
+  "past_dark_share",
+  "out_prev1h",
+  "out_max_prev6h",
+  "ba_is_AECI",
+  "ba_is_AVA",
+  "ba_is_AZPS",
+  "ba_is_BANC",
+  "ba_is_BPAT",
+  "ba_is_CHPD",
+  "ba_is_CISO",
+  "ba_is_CPLE",
+  "ba_is_DOPD",
+  "ba_is_DUK",
+  "ba_is_EPE",
+  "ba_is_ERCO",
+  "ba_is_FMPP",
+  "ba_is_FPC",
+  "ba_is_FPL",
+  "ba_is_IPCO",
+  "ba_is_ISNE",
+  "ba_is_JEA",
+  "ba_is_LDWP",
+  "ba_is_LGEE",
+  "ba_is_MISO",
+  "ba_is_NEVP",
+  "ba_is_NWMT",
+  "ba_is_NYIS",
+  "ba_is_PACE",
+  "ba_is_PACW",
+  "ba_is_PGE",
+  "ba_is_PJM",
+  "ba_is_PNM",
+  "ba_is_PSCO",
+  "ba_is_PSEI",
+  "ba_is_SC",
+  "ba_is_SCEG",
+  "ba_is_SCL",
+  "ba_is_SEC",
+  "ba_is_SOCO",
+  "ba_is_SRP",
+  "ba_is_SWPP",
+  "ba_is_TAL",
+  "ba_is_TEC",
+  "ba_is_TEPC",
+  "ba_is_TPWR",
+  "ba_is_TVA",
+  "ba_is_WACM",
+  "ba_is_WALC",
+  "ba_is_WAUW"
+ ],
+ "config": {
+  "num_leaves": 7,
+  "min_child_samples": 200,
+  "rounds": 200
+ },
+ "importance": [
+  {
+   "feature": "out_prev1h",
+   "share": 0.2924413894538043
+  },
+  {
+   "feature": "month",
+   "share": 0.12427808854023503
+  },
+  {
+   "feature": "ba_past_mean_hours",
+   "share": 0.09559091208497424
+  },
+  {
+   "feature": "pop",
+   "share": 0.08773291803479234
+  },
+  {
+   "feature": "past_dark_share",
+   "share": 0.08723215730818792
+  },
+  {
+   "feature": "out_max_prev6h",
+   "share": 0.05894451051655477
+  },
+  {
+   "feature": "ba_hours_since_last",
+   "share": 0.05379721830383202
+  },
+  {
+   "feature": "past_events",
+   "share": 0.03451047519996422
+  },
+  {
+   "feature": "ba_past_events",
+   "share": 0.026627064399597652
+  },
+  {
+   "feature": "hod",
+   "share": 0.024665521152067573
+  },
+  {
+   "feature": "past_dark_mean",
+   "share": 0.021841789728657288
+  },
+  {
+   "feature": "ba_is_SOCO",
+   "share": 0.01956294621603821
+  },
+  {
+   "feature": "past_dark_max",
+   "share": 0.014677691755088746
+  },
+  {
+   "feature": "customers",
+   "share": 0.012179181629907776
+  },
+  {
+   "feature": "svi_t3",
+   "share": 0.01181662317132948
+  },
+  {
+   "feature": "svi",
+   "share": 0.009820753467297126
+  },
+  {
+   "feature": "ba_is_CPLE",
+   "share": 0.00791393899397529
+  },
+  {
+   "feature": "svi_t1",
+   "share": 0.0045846605006899036
+  },
+  {
+   "feature": "utilities",
+   "share": 0.003306325110820018
+  },
+  {
+   "feature": "ba_is_PJM",
+   "share": 0.001623708235315274
+  },
+  {
+   "feature": "svi_t4",
+   "share": 0.0014520133830138902
+  },
+  {
+   "feature": "ba_is_MISO",
+   "share": 0.001270654307281382
+  },
+  {
+   "feature": "ba_is_ERCO",
+   "share": 0.001165928318855789
+  },
+  {
+   "feature": "ba_is_TVA",
+   "share": 0.001083971095699356
+  },
+  {
+   "feature": "ba_is_ISNE",
+   "share": 0.0008699264396518484
+  },
+  {
+   "feature": "ba_is_DUK",
+   "share": 0.000415940358776602
+  },
+  {
+   "feature": "ba_is_SWPP",
+   "share": 0.00033662504299889856
+  },
+  {
+   "feature": "svi_t2",
+   "share": 0.00016137662609760981
+  },
+  {
+   "feature": "ba_is_CISO",
+   "share": 9.569062449540783e-05
+  },
+  {
+   "feature": "ba_is_AECI",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_AVA",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_AZPS",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_BANC",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_BPAT",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_CHPD",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_DOPD",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_EPE",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_FMPP",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_FPC",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_FPL",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_IPCO",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_JEA",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_LDWP",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_LGEE",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_NEVP",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_NWMT",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_NYIS",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_PACE",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_PACW",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_PGE",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_PNM",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_PSCO",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_PSEI",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_SC",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_SCEG",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_SCL",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_SEC",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_SRP",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_TAL",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_TEC",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_TEPC",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_TPWR",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_WACM",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_WALC",
+   "share": 0.0
+  },
+  {
+   "feature": "ba_is_WAUW",
+   "share": 0.0
+  }
+ ],
+ "sets": {
+  "residents": {
+   "features": [
+    "month",
+    "hod",
+    "ba_past_events",
+    "ba_past_mean_hours",
+    "ba_hours_since_last",
+    "customers",
+    "pop",
+    "svi",
+    "svi_t1",
+    "svi_t2",
+    "svi_t3",
+    "svi_t4",
+    "utilities",
+    "past_events",
+    "past_dark_mean",
+    "past_dark_max",
+    "past_dark_share",
+    "out_prev1h",
+    "out_max_prev6h",
+    "ba_is_AECI",
+    "ba_is_AVA",
+    "ba_is_AZPS",
+    "ba_is_BANC",
+    "ba_is_BPAT",
+    "ba_is_CHPD",
+    "ba_is_CISO",
+    "ba_is_CPLE",
+    "ba_is_DOPD",
+    "ba_is_DUK",
+    "ba_is_EPE",
+    "ba_is_ERCO",
+    "ba_is_FMPP",
+    "ba_is_FPC",
+    "ba_is_FPL",
+    "ba_is_IPCO",
+    "ba_is_ISNE",
+    "ba_is_JEA",
+    "ba_is_LDWP",
+    "ba_is_LGEE",
+    "ba_is_MISO",
+    "ba_is_NEVP",
+    "ba_is_NWMT",
+    "ba_is_NYIS",
+    "ba_is_PACE",
+    "ba_is_PACW",
+    "ba_is_PGE",
+    "ba_is_PJM",
+    "ba_is_PNM",
+    "ba_is_PSCO",
+    "ba_is_PSEI",
+    "ba_is_SC",
+    "ba_is_SCEG",
+    "ba_is_SCL",
+    "ba_is_SEC",
+    "ba_is_SOCO",
+    "ba_is_SRP",
+    "ba_is_SWPP",
+    "ba_is_TAL",
+    "ba_is_TEC",
+    "ba_is_TEPC",
+    "ba_is_TPWR",
+    "ba_is_TVA",
+    "ba_is_WACM",
+    "ba_is_WALC",
+    "ba_is_WAUW"
+   ],
+   "config": {
+    "num_leaves": 7,
+    "min_child_samples": 200,
+    "rounds": 200
+   },
+   "cvWithinEventSpearman": 0.30578803858771514,
+   "dev": {
+    "countyEvents": 19708,
+    "events": 309,
+    "maeHours": 2.5126950561902963,
+    "baselineMaeHours": 4.1264611472880635,
+    "zeroMaeHours": 2.296275624112036,
+    "withinEventSpearman": 0.33961224567648585,
+    "baselineWithinEventSpearman": 0.20986934772982901,
+    "withinEventSpearmanEvents": 178,
+    "top10Overlap": 0.44233134920634926,
+    "baselineTop10Overlap": 0.25579117063492063,
+    "top10Events": 160,
+    "top10Chance": 0.13505773935499144
+   }
+  },
+  "residents_shares": {
+   "features": [
+    "month",
+    "hod",
+    "ba_past_events",
+    "ba_past_mean_hours",
+    "ba_hours_since_last",
+    "customers",
+    "pop",
+    "svi",
+    "svi_t1",
+    "svi_t2",
+    "svi_t3",
+    "svi_t4",
+    "utilities",
+    "past_events",
+    "past_dark_mean",
+    "past_dark_max",
+    "past_dark_share",
+    "out_prev1h",
+    "out_max_prev6h",
+    "out_prev1h_share",
+    "out_max_prev6h_share",
+    "ba_is_AECI",
+    "ba_is_AVA",
+    "ba_is_AZPS",
+    "ba_is_BANC",
+    "ba_is_BPAT",
+    "ba_is_CHPD",
+    "ba_is_CISO",
+    "ba_is_CPLE",
+    "ba_is_DOPD",
+    "ba_is_DUK",
+    "ba_is_EPE",
+    "ba_is_ERCO",
+    "ba_is_FMPP",
+    "ba_is_FPC",
+    "ba_is_FPL",
+    "ba_is_IPCO",
+    "ba_is_ISNE",
+    "ba_is_JEA",
+    "ba_is_LDWP",
+    "ba_is_LGEE",
+    "ba_is_MISO",
+    "ba_is_NEVP",
+    "ba_is_NWMT",
+    "ba_is_NYIS",
+    "ba_is_PACE",
+    "ba_is_PACW",
+    "ba_is_PGE",
+    "ba_is_PJM",
+    "ba_is_PNM",
+    "ba_is_PSCO",
+    "ba_is_PSEI",
+    "ba_is_SC",
+    "ba_is_SCEG",
+    "ba_is_SCL",
+    "ba_is_SEC",
+    "ba_is_SOCO",
+    "ba_is_SRP",
+    "ba_is_SWPP",
+    "ba_is_TAL",
+    "ba_is_TEC",
+    "ba_is_TEPC",
+    "ba_is_TPWR",
+    "ba_is_TVA",
+    "ba_is_WACM",
+    "ba_is_WALC",
+    "ba_is_WAUW"
+   ],
+   "config": {
+    "num_leaves": 7,
+    "min_child_samples": 200,
+    "rounds": 200
+   },
+   "cvWithinEventSpearman": 0.30993569912144414,
+   "dev": {
+    "countyEvents": 19708,
+    "events": 309,
+    "maeHours": 2.4692278896066258,
+    "baselineMaeHours": 4.1264611472880635,
+    "zeroMaeHours": 2.296275624112036,
+    "withinEventSpearman": 0.33658320888034643,
+    "baselineWithinEventSpearman": 0.20986934772982901,
+    "withinEventSpearmanEvents": 178,
+    "top10Overlap": 0.45389880952380957,
+    "baselineTop10Overlap": 0.25579117063492063,
+    "top10Events": 160,
+    "top10Chance": 0.13505773935499144
+   }
+  },
+  "residents_shares_no_region_id": {
+   "features": [
+    "month",
+    "hod",
+    "ba_past_events",
+    "ba_past_mean_hours",
+    "ba_hours_since_last",
+    "customers",
+    "pop",
+    "svi",
+    "svi_t1",
+    "svi_t2",
+    "svi_t3",
+    "svi_t4",
+    "utilities",
+    "past_events",
+    "past_dark_mean",
+    "past_dark_max",
+    "past_dark_share",
+    "out_prev1h",
+    "out_max_prev6h",
+    "out_prev1h_share",
+    "out_max_prev6h_share"
+   ],
+   "config": {
+    "num_leaves": 7,
+    "min_child_samples": 200,
+    "rounds": 100
+   },
+   "cvWithinEventSpearman": 0.30773186715968986,
+   "dev": {
+    "countyEvents": 19708,
+    "events": 309,
+    "maeHours": 2.4175308043391706,
+    "baselineMaeHours": 4.1264611472880635,
+    "zeroMaeHours": 2.296275624112036,
+    "withinEventSpearman": 0.3371540741930368,
+    "baselineWithinEventSpearman": 0.20986934772982901,
+    "withinEventSpearmanEvents": 178,
+    "top10Overlap": 0.4494419642857143,
+    "baselineTop10Overlap": 0.25579117063492063,
+    "top10Events": 160,
+    "top10Chance": 0.13505773935499144
+   }
+  }
+ },
+ "dev": {
+  "countyEvents": 19708,
+  "events": 309,
+  "maeHours": 2.5126950561902963,
+  "baselineMaeHours": 4.1264611472880635,
+  "zeroMaeHours": 2.296275624112036,
+  "withinEventSpearman": 0.33961224567648585,
+  "baselineWithinEventSpearman": 0.20986934772982901,
+  "withinEventSpearmanEvents": 178,
+  "top10Overlap": 0.44233134920634926,
+  "baselineTop10Overlap": 0.25579117063492063,
+  "top10Events": 160,
+  "top10Chance": 0.13505773935499144
+ }
+}
