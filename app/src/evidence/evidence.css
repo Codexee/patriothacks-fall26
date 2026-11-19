@@ -88,9 +88,11 @@
 
 /* v3: good at / not good at */
 .goodat { margin: 8px 0 36px; }
-.goodat .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 12px; }
+.goodat .cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 12px; }
 .goodat .card { background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--ok); border-radius: 8px; padding: 14px 16px; }
 .goodat .card.weak { border-top-color: var(--alert); }
+.goodat .card.fcst { border-top-color: var(--lit); }
+.goodat .card.fcst .verdict-tag { color: var(--lit); }
 .goodat .card h3 { font-size: 16px; margin: 2px 0 8px; }
 .goodat .card p { font-size: 14px; }
 .goodat .verdict-tag { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; margin: 0; color: var(--ok); font-weight: 600; }
@@ -127,3 +129,21 @@
 @media (max-width: 860px) {
   .goodat .cards, .detail-grid { grid-template-columns: 1fr; }
 }
+
+/* v4: comparison at equal false-alarm rates */
+.equal-rate { margin: 0 0 40px; }
+.equal-rate .matched { font-size: 16px; max-width: 85ch; }
+.tradeoff { margin: 12px 0 0; }
+.tradeoff .bar { margin-bottom: 4px; }
+.tradeoff-title { font-size: 14px; color: var(--text-dim); }
+.tradeoff svg { width: 100%; height: auto; display: block; font-variant-numeric: tabular-nums; }
+.tradeoff .grid { stroke: var(--line); }
+.tradeoff .tick { fill: var(--text-dim); font-size: 13px; }
+.tradeoff .axis-name { fill: var(--text-dim); font-size: 13px; }
+.tradeoff .rule-pt { fill: var(--text); }
+.tradeoff .rule-label { fill: var(--text); font-size: 13px; }
+.tradeoff .curve-label { font-size: 13.5px; font-weight: 600; }
+.tradeoff .curve-sub { font-weight: 400; font-size: 12px; }
+.evidence .mini th { font-size: 12px; white-space: normal; vertical-align: bottom; }
+.tradeoff .rule-lead { stroke: var(--text-faint); stroke-width: 1; }
+.tradeoff .rule-label { font-size: 12.5px; }
