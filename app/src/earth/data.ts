@@ -1,7 +1,9 @@
 // Loads the static data and prepares the map geometry. Everything here runs one time.
-import { feature, mesh } from 'topojson-client';
+import { feature } from 'topojson-client';
 import type { Topology, GeometryCollection } from 'topojson-specification';
 import type { MultiPolygon, Polygon, Position } from 'geojson';
+import { buildSurface } from './surface.ts';
+import type { Surface } from './surface.ts';
 import { dataUrl } from '../contracts.ts';
 import type { County, EventLibrary, EventReplay, EventRow, HeroSlug } from '../contracts.ts';
 
@@ -14,10 +16,8 @@ export interface Part {
 export interface Scene {
   counties: County[];
   index: Map<string, number>;   // fips -> index
-  parts: Part[];
+  surface: Surface;             // the smooth map surface: one mesh for all counties
   centroid: Float32Array;       // lng, lat per county
-  countyLines: Position[][];    // borders between counties
-  stateLines: Position[][];     // state borders and the coast
   library: EventLibrary;
 }
 
@@ -67,12 +67,10 @@ export function loadScene(): Promise<Scene> {
         if (area >= bestArea[ci]) { bestArea[ci] = area; centroid[ci * 2] = x; centroid[ci * 2 + 1] = y; }
       }
     }
-    // Lines only for the counties and states that are on the map (no territories).
-    const known = (g: { id?: string | number }) => index.has(String(g.id).padStart(5, '0'));
-    const knownState = (g: { id?: string | number }) => Number(g.id) <= 56;
-    const countyLines = mesh(topo, obj, (a, b) => a !== b && known(a) && known(b)).coordinates;
-    const stateLines = mesh(topo, topo.objects.states as GeometryCollection, (a, b) => knownState(a) || knownState(b)).coordinates;
-    return { counties, index, parts, centroid, countyLines, stateLines, library };
+    // No triangle edge longer than about 17 km; raster cells of about 7 km; each point blends the
+    // counties within about 30 km.
+    const surface = buildSurface(parts, counties.length, { maxEdge: 0.25, cell: 0.1, reach: 0.45 });
+    return { counties, index, surface, centroid, library };
   })();
   return scenePromise;
 }
