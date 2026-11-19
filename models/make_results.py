@@ -58,6 +58,62 @@ def verdict(name: str, T: dict) -> str:
     return "\n".join([head] + lines)
 
 
+RF_LABEL = {"warn_fcst_real": "(a) warn_fcst, real archived forecasts", "warn_fcst_observed": "(b) warn_fcst, observed weather (upper bound)",
+            "warn_full": "(c) warn_full", "warn_grid": "warn_grid", "rule_forecast_error": "(d) rule_forecast_error",
+            "rule_hand": "(d) rule_hand", "rule_record": "(d) rule_record"}
+
+
+def real_forecast_section() -> list[str]:
+    p = C.OUT / "real_forecast.json"
+    if not p.exists():
+        return []
+    rf = json.loads(p.read_text())
+    M = rf["models"]
+    rl, ob = M["warn_fcst_real"], M["warn_fcst_observed"]
+    sv = rf["survives"]
+    head = ["Method", "Events", "Warned ≥ 12 h", "Warned ≥ 24 h", "People recall 12 h (%)", "Median lead (h)",
+            "False alarms per BA-year", "PR-AUC"]
+    L = ["## warn_fcst on real archived forecasts (2024)\n",
+         "The v2 `warn_fcst` was trained with observed future weather standing in for a forecast (the \"perfect prog\" method). "
+         "Here the same frozen model, with its frozen v2 threshold, is fed REAL weather forecasts that were issued before each "
+         "scored hour: Open-Meteo Previous Runs API, default (best match) model. Nothing was refitted or retuned. This is one more "
+         "look at 2024 (inside the FINAL TEST) with frozen models, which the protocol allows.\n",
+         f"- Period: scored hours {rf['period'][0]} to {rf['period'][1]} UTC (the archive starts about 2024-01-19), {rf['bas']} BAs, "
+         f"{rf['scoredHours']:,} scored BA-hours. Events: the {rf['events']} events that start from {rf['eventsWindowFrom']} on, so their "
+         "whole 72 h warning window has forecasts.",
+         "- Lead rule: for the scored hour t and valid hour t + k, the value comes from `previous_day` d = ceil((k + 6) / 24): "
+         "k = 1–18 uses day 1, k = 19–42 day 2, k = 43–48 day 3. So every value was predicted at least 6 h before t "
+         "(the 6 h margin covers the delay before a model run is published).",
+         "- Stations and weights as in the feature table: weighted-mean temperature, max wind, max hourly precipitation, min "
+         "sea-level pressure; the same 24 h and 48 h windows. z-scores and the record-low difference use the same past-only "
+         "climatology as the feature table (rebuilt and checked: largest difference "
+         f"{max(rf['climatologyCheckMaxAbsDiff'].values()):.0e}). Grid and past-weather features are unchanged.\n",
+         "| " + " | ".join(head) + " |", "|" + "---|" * len(head)]
+    for n, b in M.items():
+        L.append(f"| {RF_LABEL[n]} | {b['testEvents']} | {b['warned12h']} | {b['warned24h']} | {pct(b['peopleRecall12h'])} | "
+                 f"{f(b['medianLeadHours'], 0)} | {f(b['falseAlarmsPerBaYear'])} | {f(b['aucPr'], 4)} |")
+    beats = [r for r in RULES if rl["warned12h"] > M[r]["warned12h"] and rl["falseAlarmsPerBaYear"] <= M[r]["falseAlarmsPerBaYear"]]
+    L += ["", f"**How much of the upper bound survives:** with real forecasts, warn_fcst warned {rl['warned12h']} events at least 12 h "
+          f"ahead against {ob['warned12h']} with observed weather ({pct(sv['warned12h'])}% survives), {rl['warned24h']} against "
+          f"{ob['warned24h']} at 24 h ({pct(sv['warned24h'])}%), people recall {pct(rl['peopleRecall12h'])}% against "
+          f"{pct(ob['peopleRecall12h'])}% ({pct(sv['peopleRecall12h'])}%), and PR-AUC {f(rl['aucPr'], 4)} against {f(ob['aucPr'], 4)} "
+          f"({pct(sv['aucPr'])}%). False alarms: {f(rl['falseAlarmsPerBaYear'])} per BA-year with real forecasts against "
+          f"{f(ob['falseAlarmsPerBaYear'])} with observed weather. warn_full warned {M['warn_full']['warned12h']} at "
+          f"{f(M['warn_full']['falseAlarmsPerBaYear'])}.",
+          f"In plain words: the events warned survive in full, but precision does not; false alarms rise by "
+          f"{100 * (rl['falseAlarmsPerBaYear'] / ob['falseAlarmsPerBaYear'] - 1):.0f}% and PR-AUC keeps {pct(sv['aucPr'])}% of the upper bound. "
+          f"With real forecasts, warn_fcst beats {len(beats)} of 3 rules at the same or fewer false alarms"
+          + (f" ({', '.join(beats)})." if beats else "."),
+          "",
+          "Forecast skill on the scored hours (forecast-based against observed fx_ features): "
+          + ", ".join(f"{c} r = {v['corr']:.2f}" for c, v in rf["featureAgreement"].items()) + ".\n",
+          "Forecast hourly precipitation runs about 50% higher than the station records (mean 0.26 against 0.17 mm per hour, "
+          "March-November 2024), which is one likely reason for the extra false alarms.\n",
+          "Limits: one forecast model (best match), one year, and the frozen threshold was set for observed weather, so the "
+          "false-alarm rate can move. Per-event leads: `models/out/real_forecast_events.csv`.\n"]
+    return L
+
+
 def main() -> None:
     w = json.loads((C.OUT / "warn_results.json").read_text())
     fin = json.loads((C.OUT / "warn_final.json").read_text())
@@ -75,7 +131,7 @@ def main() -> None:
          f"(at most {C.FA_LIMIT:g} false alarms per BA-year on TRAIN). v1 had already shown results for 2021-2024, so DEV was "
          "used openly to choose features and model design. The FINAL TEST was scored once, by `final_test.py`, with the frozen "
          f"models and thresholds (run at {fin['ranAt']}, frozen file hash `{fin['frozenSha256']}`).\n",
-         "\\* `warn_fcst` = " + C.FCST_LABEL + ".\n",
+         "\\* `warn_fcst` = " + C.FCST_LABEL + ".\n"] + real_forecast_section() + [
          "## Plain answer (FINAL TEST, 2023-2024)\n",
          "Does the model beat every baseline: more events warned at least 12 h ahead, with the same or fewer false alarms per BA-year?\n",
          verdict("warn_full", T), "", verdict("warn_fcst", T), "", verdict("warn_grid", T), "",

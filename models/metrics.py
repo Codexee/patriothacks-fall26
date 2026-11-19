@@ -38,6 +38,17 @@ def main() -> None:
                         "dark": d["importance"]},
          "split": {"train": ["2015-07-01", "2020-12-31"], "dev": ["2021-01-01", "2022-12-31"], "test": ["2023-01-01", "2024-12-31"]},
          "labels": {"warn_fcst": C.FCST_LABEL}}
+    rf_path = C.OUT / "real_forecast.json"
+    if rf_path.exists():
+        rf = json.loads(rf_path.read_text())
+        m["realForecast"] = {
+            "period": rf["period"], "eventsWindowFrom": rf["eventsWindowFrom"], "events": rf["events"],
+            "leadRule": rf["leadRule"], "source": rf["source"],
+            "note": "One more look at 2024 with frozen v2 models and thresholds; nothing refitted or retuned.",
+            "models": {n: {k: v[k] for k in ("testEvents", "warned12h", "warned24h", "recall12h", "peopleRecall12h",
+                                              "medianLeadHours", "falseAlarmsPerBaYear", "aucPr")}
+                       for n, v in rf["models"].items()},
+            "survives": rf["survives"]}
     C.APP_MODELS.mkdir(parents=True, exist_ok=True)
     (C.APP_MODELS / "metrics.json").write_text(json.dumps(m, indent=1))
     print("metrics.json written")
