@@ -7,8 +7,7 @@ To take an item: write your name after it, commit, push. Tick it when it is merg
 
 ## Running now (AI workers in Paradev; do not edit these folders until they merge)
 
-- [ ] **Cross-section layout polish** (`app/src/earth`, branch `ws/bda-map`): the level table overlaps its headers; the cutaway is small.
-- [ ] **Group numbers and a matched false-alarm comparison in `metrics.json`** (`models/`, branch `ws/bda-models`).
+- [ ] **Evidence page: comparison at equal false-alarm rates** (`app/src/evidence`, branch `ws/bda-brief`): a chart from `metrics.json` `curves`, and a clearer third card.
 
 ## Next (Thu morning)
 
@@ -37,6 +36,8 @@ To take an item: write your name after it, commit, push. Tick it when it is merg
 - [ ] **Fri 2:00 pm: final deploy.** Fri 6:00 pm: submit, with all 4 members entered.
 
 ## Known limits to say out loud
+
+- At equal false-alarm rates the forecast model is far ahead of every simple rule (real 2024 forecasts, about 5.3 false alarms per area per year: 35% of events and 56% of affected customers warned, against 9% and 7% for the rule). These operating points were read from the test period; the frozen-threshold result is the pre-registered one. Say both.
 
 - The storm warning without a weather forecast warns 13% of events 12 h ahead. No model beats every simple rule at the same false-alarm rate.
 - With real archived forecasts (2024, 212 events) the forecast model warned 51% of events 12 h ahead and 74% of affected customers, with about 11 false alarms per area per year (7.5 with observed weather). Earlier years still use observed weather as the forecast.
