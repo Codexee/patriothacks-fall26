@@ -76,3 +76,4 @@ Add one line per decision: date · decision · why · who. Newest last.
 - 2026-11-20 · The resident's phone becomes a home screen: one app per built module plus Report; alerts show as a banner (only when new or the ask goes up) and a badge that clears on open; Modules panel unchanged (.plans/phone-apps-spec.md) · Adarsh
 - 2026-11-20 · Problem #8 Family Check-In: check-ins hop phone to phone up to the first lit level (held when the whole Hollow is dark); silent dark sections get a neighbor check; families switched on in the sim and results regenerated (.plans/family-checkin-spec.md) · Adarsh
 - 2026-11-20 · Blackout Warning eases 7–10% of the request every 4 quiet days, slower after worse blackouts; accepted cost: test deaths 5,280 → 12,520 · Adarsh
+- 2026-11-20 · Added #2 Fair Share, #4 Water Safety (water world on), #7 Off-Network Messaging (network cuts from events only); #12 Food Sharing not shipped (food world starves every run) · Adarsh (Claude's design calls)

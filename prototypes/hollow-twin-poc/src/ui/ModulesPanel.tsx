@@ -53,6 +53,54 @@ function BlackoutWarningCard({ run }: CardProps) {
   );
 }
 
+/** Problem #2: Fair Share. */
+function FairShareCard({ run }: CardProps) {
+  const fs = run.log?.fairShare;
+  if (!fs) return <p className="muted">No power saving asked today (or no outage reports yet): nothing to share.</p>;
+  const relieved = fs.darkShare.filter((d) => d > 0).length;
+  return (
+    <>
+      <p>Blackout Warning asks for <b>{Math.round(fs.request * 100)}%</b> of non-essential load in total. Fair Share keeps that total and shares it by what each level lost yesterday.</p>
+      <p>Level 1 is asked for <b>{Math.round(fs.top * 100)}%</b>, level 50 for <b>{Math.round(fs.deep * 100)}%</b>.{relieved > 0 ? <> <b>{relieved}</b> levels that were dark yesterday are asked for less.</> : ' No level was dark yesterday, so everyone is asked for the same.'}</p>
+    </>
+  );
+}
+
+/** Problem #4: Water Safety. */
+function WaterSafetyCard({ run }: CardProps) {
+  const ws = run.log?.waterSafety;
+  if (!ws) return <p className="muted">Gathering data. Complaints are counted from the first day.</p>;
+  return ws.suspects.length
+    ? <p className="warn-text">Water complaints around the recycler{ws.suspects.length === 1 ? '' : 's'} on level {ws.suspects.join(', ')} are over 3 times the typical rate. Told those levels to boil their water{ws.crews ? `; sent ${ws.crews} repair crew${ws.crews === 1 ? '' : 's'}` : ' (a crew is already on it)'}.</p>
+    : <p className="good">No recycler stands out: complaints are at the typical rate ({ws.typical.toFixed(2)} per 1,000 residents in 2 days).</p>;
+}
+
+/** Problem #12: Food Sharing. */
+function FoodSharingCard({ run }: CardProps) {
+  const fd = run.log?.foodSharing;
+  if (!fd) return <p className="muted">Gathering data. The census counts food stores every day.</p>;
+  const low = fd.lowest[0];
+  return (
+    <>
+      <p>Least food: level <b>{low?.level}</b> with <b>{low?.runway.toFixed(1)}</b> days in store. {fd.needy} level{fd.needy === 1 ? ' is' : 's are'} running out.</p>
+      {fd.transfers.length ? <p className="warn-text">Asked for {fd.transfers.length} deliveries today: {fd.transfers.map((t) => `L${t.from} → L${t.to}`).join(', ')}.</p> : <p className="good">No deliveries needed today.</p>}
+      {fd.grow && <p>Building a grow-lamp farm on level <b>{fd.grow}</b>.</p>}
+    </>
+  );
+}
+
+/** Problem #7: Off-Network Messaging. */
+function OffNetworkCard({ run }: CardProps) {
+  const on = run.log?.offNetwork;
+  if (!on) return <p className="muted">Planning starts after the first day of reports.</p>;
+  return (
+    <>
+      <p>{on.networkDownHours > 0 ? <><b className="bad">The network was cut for {on.networkDownHours} h yesterday.</b> Alerts and check-ins went over the phone mesh.</> : 'The network was up yesterday.'}</p>
+      <p>Placed <b>{on.relays}</b> battery relays. If the network is cut today, the mesh reaches <b>{Math.round(on.reachAfter * 100)}%</b> of sections ({Math.round(on.reachBefore * 100)}% without them). {on.darkSections} sections were dark at the end of yesterday and cannot charge phones.</p>
+    </>
+  );
+}
+
 /** Problem #8: Family Check-In. */
 function FamilyCheckInCard({ run }: CardProps) {
   const fc = run.log?.familyCheckIn;
@@ -73,6 +121,22 @@ function FamilyCheckInCard({ run }: CardProps) {
 
 /** Each built module: its card, and what its info icon explains. */
 const MODULE_CARDS: Partial<Record<ToolKey, { card: (p: CardProps) => ReactNode; about: string }>> = {
+  fairShare: {
+    card: FairShareCard,
+    about: "Blackout Warning asks every level for the same cut. Fair Share keeps the same total saving, so the plants are protected just as much, but shares it by what each level lost yesterday (from outage reports): a level dark all day is asked for 40% of what a level that kept power is asked for. Residents do this themselves; it does not assume any control of the Directorate's power dispatch. The 40% is a design choice, not a measured number.",
+  },
+  snow: {
+    card: WaterSafetyCard,
+    about: "After John Snow's 1854 cholera map. The app counts residents' reports of bad water per 1,000 residents around each recycler the census lists, over 2 days. A recycler whose levels complain at 3 times the typical rate (and at least 6 reports) is the likely source: those levels are told to boil their water, and the residents' repair crew is sent (again after 4 days if complaints continue). Assumption: a recycler serves its own level and 2 levels above and below. No sensors or tap meters. In the test world a recycler starts failing on level 38, and recyclers without power make worse water.",
+  },
+  larder: {
+    card: FoodSharingCard,
+    about: "Section councils count the days of food in store every day (census). The app follows each level's count and how fast it falls. A level under 18 days and falling, or under 10 days, gets deliveries from levels with over 20 days and not falling (residents carry them, up to 3 a day), and the level that would run out first gets a grow-lamp farm. These thresholds are design choices, not measured values. In the test world the Directorate diverts the farms of levels 40–50 to the upper levels on day 12.",
+  },
+  lantern: {
+    card: OffNetworkCard,
+    about: "The brief says the Directorate controls the network and can shut it down. When it does, residents' phones still pass messages to phones in neighboring sections (on a level, and up and down the stairwell), but only where they can charge: dark sections (from outage reports) cannot relay. Every day, before any shutdown, the app places the council's battery relays where the mesh would break, so it still reaches every level from the council's base. Assumptions: phones in neighboring sections can reach each other; the council owns 40 relays (a guess). The brief gives no shutdown schedule, so the published results have no shutdowns: cut the network from the Test World panel to see it.",
+  },
   kin: {
     card: FamilyCheckInCard,
     about: "Households tap 'We're OK' in the app. A dark level's network relay has no power, so without the app its families go unheard until the power is back. With the app, check-ins hop phone to phone up to the first level with power (assumption: phones on adjacent levels can reach each other); if the whole Hollow is dark, they wait. A dark section where under 70% of families checked in counts as silent, and a household nearby that checked in OK is asked to knock on their door. In the test world that cuts deaths there by 25% for a day: a guess, no study gives this number. Families split across levels: one per 40 residents (also a guess).",

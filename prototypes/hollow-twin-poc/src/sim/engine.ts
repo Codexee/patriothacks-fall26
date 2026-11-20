@@ -28,11 +28,11 @@ export const WORLD = {
   power: true, // #1 blackouts (always on: the base of the Hollow)
   air: true, // #1 "the power or air cuts out": fans need power
   heat: false, // #3 deep levels get hotter
-  water: false, // #4 recyclers fail
+  water: true, // #4 recyclers fail (on since Nov 20: Water Safety)
   sickness: false, // #9 lung sickness
-  food: false, // #12 food runs out (and farms get diverted)
+  food: false, // #12 food runs out (and farms get diverted). Off: with it on every run starves by about day 44, partly because power saving switches off farm lamps (Nov 20). Food Sharing (product/foodSharing.ts) is not shipped.
   lies: false, // #9, #13 the Directorate's false bulletins
-  network: false, // #7 the Directorate cuts the network
+  network: true, // #7 the Directorate can cut the network (cuts come only from events: the brief gives no schedule)
   families: true, // #8 families split across levels (on since Nov 20: Family Check-In)
   surface: false, // #13 the "surface has healed" rumor
   census: false, // off: the Directorate publishes an accurate census. (On: it undercounts the deep levels; our assumption, not in the brief.)

@@ -152,3 +152,25 @@
 .fam-detail { font-size: 12.5px; color: var(--muted); line-height: 1.35; }
 .fam-pill.wait { background: var(--raise); color: var(--system); }
 .fam-row.wait { opacity: 0.8; }
+
+/* Fair Share app */
+.fs-bars { display: flex; align-items: flex-end; gap: 1px; height: 90px; padding: 6px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); }
+.fs-bar { flex: 1; border-radius: 2px 2px 0 0; background: linear-gradient(180deg, #ffd36b, #f08a24); opacity: 0.75; }
+.fs-bar.dark { background: linear-gradient(180deg, #8fd0ff, #3a7bd5); }
+.fs-bar.me { opacity: 1; box-shadow: 0 0 8px rgba(255, 255, 255, 0.7); }
+.fs-axis { display: flex; justify-content: space-between; margin: 2px 2px 0; font-size: 11px; color: var(--faint); }
+
+/* Off-Network Messaging app */
+.mesh-map { display: grid; grid-template-columns: repeat(8, 1fr); grid-auto-flow: row; gap: 1px; padding: 6px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); }
+.mesh-cell { height: 3px; border-radius: 1px; background: rgba(240, 101, 79, 0.55); }
+.mesh-cell.on { background: rgba(255, 167, 196, 0.85); }
+.mesh-cell.me { background: #fff; box-shadow: 0 0 6px #fff; }
+.pa-hero.net-down { box-shadow: inset 0 0 0 1px rgba(240, 101, 79, 0.45); }
+
+/* Water Safety app */
+.ws-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
+.ws-list li { display: grid; grid-template-columns: 92px 1fr 28px; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted); }
+.ws-list li.bad { color: var(--bad); font-weight: 600; }
+.ws-bar { height: 6px; border-radius: 3px; background: rgba(255, 255, 255, 0.06); overflow: hidden; }
+.ws-bar i { display: block; height: 100%; background: linear-gradient(90deg, #7fe3ff, #1f86c9); }
+.ws-list li.bad .ws-bar i { background: linear-gradient(90deg, #ff9a86, var(--bad)); }

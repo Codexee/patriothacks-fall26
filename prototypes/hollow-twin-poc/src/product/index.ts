@@ -7,6 +7,10 @@ import { LEVELS, SECTIONS_PER_LEVEL, type Observation, type Output, type ToolSet
 import type { ProductLog, ProductMemory, ProductStep } from './types.ts';
 import { blackoutWarning } from './earlyWarning.ts';
 import { familyCheckIn } from './familyCheckIn.ts';
+import { fairShare } from './fairShare.ts';
+import { offNetwork } from './offNetwork.ts';
+import { waterSafety } from './waterSafety.ts';
+import { foodSharing } from './foodSharing.ts';
 
 const HOURS = 24;
 const HOLLOW_DARK = 0.9; // share of levels dark at once that means a plant trip, not the usual deep-first cut
@@ -41,6 +45,11 @@ function lineOf(dark: boolean[]): { line: number; darkLevels: number } {
 function ingest(m: ProductMemory, obs: Observation[]): Record<string, number> {
   const seen: Record<string, number> = {};
   const outages: Extract<Observation, { kind: 'outage' }>[] = [];
+  let netDown = 0;
+  const waterToday = { day: -1, perLevel: new Array<number>(LEVELS).fill(0) };
+  const recyclers: number[] = [];
+  const farms: number[] = [];
+  const foodSum = new Array<number>(LEVELS).fill(0), foodN = new Array<number>(LEVELS).fill(0);
   for (const o of obs) {
     seen[o.kind] = (seen[o.kind] ?? 0) + 1;
     if (o.kind === 'census') {
@@ -48,6 +57,13 @@ function ingest(m: ProductMemory, obs: Observation[]): Record<string, number> {
       m.census.people[i] = o.people;
       m.census.demand[i] = o.demand;
       m.census.critical[i] = o.critical;
+      if (o.facilities.includes('recycler')) recyclers.push(i);
+      if (o.facilities.includes('farm')) farms.push(i);
+      foodSum[o.level - 1] += o.food; foodN[o.level - 1]++;
+    } else if (o.kind === 'reports' && o.topic === 'water') {
+      waterToday.day = o.day; waterToday.perLevel[o.level - 1] += o.count;
+    } else if (o.kind === 'network') {
+      if (!o.up) netDown++;
     } else if (o.kind === 'checkins') {
       (m.checkins ??= [])[(o.level - 1) * SECTIONS_PER_LEVEL + o.col] = { day: o.day, expected: o.expected, received: o.received };
     } else if (o.kind === 'selfCount') {
@@ -57,6 +73,16 @@ function ingest(m: ProductMemory, obs: Observation[]): Record<string, number> {
     } else if (o.kind === 'reports') {
       if (o.byUser) m.userReports.push({ day: o.day, level: o.level, col: o.col, text: o.text });
     }
+  }
+  if (obs.some((o) => o.kind === 'network')) m.networkDownHours = netDown;
+  if (recyclers.length) m.recyclerSections = recyclers;
+  if (farms.length || foodN.some((x) => x > 0)) m.farmSections = farms;
+  if (foodN.some((x) => x > 0)) {
+    m.runway ??= Array.from({ length: LEVELS }, () => []);
+    for (let l = 0; l < LEVELS; l++) if (foodN[l]) { m.runway[l].push(foodSum[l] / foodN[l]); if (m.runway[l].length > 4) m.runway[l].shift(); }
+  }
+  if (waterToday.day >= 0 || obs.some((o) => o.kind === 'census' && o.day > 0)) {
+    m.waterReports = [...(m.waterReports ?? []), waterToday].slice(-2);
   }
   // Replay the outage reports hour by hour to get yesterday's blackout line. The standing census before day 1
   // (day 0) has no yesterday, so it gives no line.
@@ -97,7 +123,26 @@ export function stepProduct(obs: Observation[], prev: ProductMemory, modules: To
   if (!obs.length) return { outputs, memory: m, log };
   if (modules.earlyWarning) {
     const bw = blackoutWarning(m, day);
-    if (bw) { outputs.push(...bw.outputs); log.blackoutWarning = bw.log; m.shed = bw.log.shed; }
+    if (bw) {
+      log.blackoutWarning = bw.log; m.shed = bw.log.shed;
+      // Fair Share replaces the one Hollow-wide save-power request with a request per level (same total).
+      const shed = bw.outputs.find((o): o is Extract<Output, { kind: 'alert' }> => o.kind === 'alert' && o.action === 'shed') ?? null;
+      const fs = modules.fairShare ? fairShare(m, day, shed) : null;
+      outputs.push(...(fs ? bw.outputs.filter((o) => o !== shed) : bw.outputs));
+      if (fs) { outputs.push(...fs.outputs); log.fairShare = fs.log; }
+    }
+  }
+  if (modules.snow) {
+    const ws = waterSafety(m, day);
+    if (ws) { outputs.push(...ws.outputs); log.waterSafety = ws.log; }
+  }
+  if (modules.larder) {
+    const fd = foodSharing(m, day);
+    if (fd) { outputs.push(...fd.outputs); log.foodSharing = fd.log; }
+  }
+  if (modules.lantern) {
+    const on = offNetwork(m, day);
+    if (on) { outputs.push(...on.outputs); log.offNetwork = on.log; }
   }
   if (modules.kin) {
     const fc = familyCheckIn(m, day);

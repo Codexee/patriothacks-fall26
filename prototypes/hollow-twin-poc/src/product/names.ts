@@ -4,7 +4,7 @@ import type { ToolKey } from '../sim/types.ts';
 
 export const MODULE_NAMES: Record<ToolKey, string> = {
   earlyWarning: 'Blackout Warning',
-  fairShare: 'Fair Rationing',
+  fairShare: 'Fair Share',
   ledger: 'Truth Check',
   snow: 'Water Safety',
   lantern: 'Off-Network Messaging',
@@ -15,17 +15,17 @@ export const MODULE_NAMES: Record<ToolKey, string> = {
 };
 
 /** Features built so far in the rebuild, in the order they were added. */
-export const BUILT: ToolKey[] = ['earlyWarning', 'kin'];
+export const BUILT: ToolKey[] = ['earlyWarning', 'fairShare', 'snow', 'lantern', 'kin'];
 
 /** The track's 15 problems, and the feature that answers each one once it is built. */
 export const PROBLEMS: { n: number; title: string; feature: ToolKey | null }[] = [
   { n: 1, title: 'Warn before the power or air cuts out', feature: 'earlyWarning' },
-  { n: 2, title: 'Share power, water and food fairly', feature: null },
+  { n: 2, title: 'Share power, water and food fairly', feature: 'fairShare' },
   { n: 3, title: 'Keep the deep levels livable (heat)', feature: null },
-  { n: 4, title: 'Catch bad water', feature: null },
+  { n: 4, title: 'Catch bad water', feature: 'snow' },
   { n: 5, title: 'Keep flooded tunnels safe', feature: null },
   { n: 6, title: 'Find or share space', feature: null },
-  { n: 7, title: 'Organize without the network', feature: null },
+  { n: 7, title: 'Organize without the network', feature: 'lantern' },
   { n: 8, title: 'Reconnect families', feature: 'kin' },
   { n: 9, title: 'Track the real outbreak', feature: null },
   { n: 10, title: 'Get care to people who cannot reach it', feature: null },

@@ -150,6 +150,9 @@ export function Panel(p: PanelProps) {
               {[1, 2, 3, 4, 5, 6].map((k) => <option key={k} value={k - 1}>Plant {k}</option>)}
             </select>
           </div>
+          <div className="row">
+            <button disabled={locked || !!state.end} onClick={() => p.onEvent({ type: 'cutNetwork', hours: 24 })}>Cut the network (24 h)</button>
+          </div>
           {p.queued.length > 0 && <ul className="queued">{p.queued.map((a, i) => <li key={i}>Next day: {describe(a)}</li>)}</ul>}
         </Section>
 

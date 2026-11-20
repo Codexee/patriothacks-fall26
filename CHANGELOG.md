@@ -2,6 +2,16 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-20 (32): Three more problems: Fair Share (#2), Water Safety (#4), Off-Network Messaging (#7)
+
+- **5 of 15 problems now have an app on the phone.** Every module starts switched on.
+- **#2 Fair Share** (`product/fairShare.ts`): keeps Blackout Warning's total saving but shares it by level. Levels that were dark yesterday (outage reports) are asked for less, upper levels for more. It assumes no control of the Directorate's dispatch. Deaths effect is mixed (Crowding down, Aging up), because deep-only blackout days are rare with Blackout Warning on.
+- **#4 Water Safety** (`product/waterSafety.ts`, the water world is now on): residents' bad-water reports per 1,000 around each recycler the census lists. At 3× the typical rate it tells those levels to boil water and sends a repair crew. In tests it finds the failing recycler on level 38 and fixes it by day 9; without it, 45,000–78,000 extra deaths per run.
+- **#7 Off-Network Messaging** (`product/offNetwork.ts`): places the council's 40 battery relays daily so the phone mesh reaches every level if the Directorate cuts the network. The brief gives no shutdown schedule, so the results have none. Use the new **"Cut the network (24 h)"** button in the Test World panel. In tests, a 48-hour cut without it means alerts reach no one.
+- **#12 Food Sharing was tried and not shipped.** With the food world on, every run starves by about day 44, partly because power saving switches off farm lamps. The code (`product/foodSharing.ts`) stays but is not built in.
+- **New results**, test seeds 11–20, "with" = all 5 modules: deaths **43,647,380 → 12,540**, 70/70 stable. The "without" number roughly doubled because failing recyclers now kill too. Families with no news per night 14,771 → 620.
+- **Teammates:** pull; redeploy Vercel; update the headline in slides and the video to 43.6 M → 12,540.
+
 ## 2026-11-20 (31): Gentler easing, scaled by how bad the last blackout was
 
 - **The power-saving request now eases by 7–10% of itself every 4 quiet days** (Adarsh's choice): 10% after a small deep-level blackout, 7% after a whole-Hollow plant trip, in between by the share of levels that went dark (`EASE.shareMild`, `EASE.shareSevere`, `m.troubleSeverity`). Residents get their power back sooner.

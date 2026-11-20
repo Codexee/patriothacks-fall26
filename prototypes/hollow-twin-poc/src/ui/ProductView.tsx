@@ -32,7 +32,7 @@ export function ProductView(p: ProductViewProps) {
             <span key={pr.n} className={`dot ${pr.feature && BUILT.includes(pr.feature) ? 'done' : ''}`} title={`#${pr.n} ${pr.title}${pr.feature ? ` — ${moduleName(pr.feature)}` : ' — not built yet'}`}>{pr.n}</span>
           ))}
         </div>
-        <p className="muted small">2 of 15 problems solved · #1 Blackout Warning, #8 Family Check-In.</p>
+        <p className="muted small">{BUILT.length} of 15 problems solved: {BUILT.map((k) => `#${PROBLEMS.find((p) => p.feature === k)?.n} ${moduleName(k)}`).join(', ')}.</p>
       </header>
       <Phone {...p} />
     </aside>
