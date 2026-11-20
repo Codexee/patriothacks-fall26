@@ -20,6 +20,7 @@ export interface ProductMemory {
   quietDays?: number; // days in a row with no blackout and no plant trip
   troubleShed?: number; // the request in effect the last time there was a blackout or trip
   troubleAge?: number; // quiet days since then
+  troubleSeverity?: number; // how bad the last trouble was, 0..1 (1 = plant trip); sets how fast the request eases
   userReports: { day: number; level: number; col: number; text: string }[];
   /** Per section, the last day's family check-ins in the app (Family Check-In). */
   checkins?: ({ day: number; expected: number; received: number } | null)[];

@@ -2,6 +2,12 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-20 (31): Gentler easing, scaled by how bad the last blackout was
+
+- **The power-saving request now eases by 7–10% of itself every 4 quiet days** (Adarsh's choice): 10% after a small deep-level blackout, 7% after a whole-Hollow plant trip, in between by the share of levels that went dark (`EASE.shareMild`, `EASE.shareSevere`, `m.troubleSeverity`). Residents get their power back sooner.
+- **The cost, measured on test seeds 11–20:** deaths 20,965,010 → **12,520** (was 5,280 with the old 5-points-every-5-days easing), 70/70 stable. The extra deaths are in Crowding (80 → 6,460) and Aging (2,760 → 5,170). Families with no news per night 15,283 → 607.
+- **Teammates:** the headline number is now 12,520. Update slides and the video script. Redeploy Vercel to publish.
+
 ## 2026-11-20 (30): Family Check-In (#8), day-1 blackout warning, new results
 
 - **Family Check-In is the second app** (`src/product/familyCheckIn.ts`, key `kin`). Households tap "We're OK". A dark level's network relay has no power, so without the app its families go unheard that night; with it, check-ins hop phone to phone up to the first lit level (held if the whole Hollow is dark). Silent dark sections get a neighbor who checked in OK to knock. On the phone, a relative on a dark level shows "Waiting" until their power is back. Spec: `.plans/family-checkin-spec.md` (locked).

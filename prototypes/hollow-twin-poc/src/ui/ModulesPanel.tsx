@@ -35,7 +35,7 @@ function BlackoutWarningCard({ run }: CardProps) {
         {bw.hollowDarkHours > 0 && <> The whole Hollow went dark for <b className="bad">{bw.hollowDarkHours} h</b> (plants tripped).</>}</p>
       {bw.supplyEstimate !== null && <p>So the plants made about <b>{fmt(bw.supplyEstimate)}</b> units at the worst hour, for a need of <b>{fmt(bw.demand)}</b>.</p>}
       {bw.shed > 0
-        ? <p className="warn-text">{bw.eased ? `No blackouts for ${bw.quietDays} days in a row: eased the request by 5 points.` : bw.lineWorst === null && bw.hollowDarkHours === 0 ? `Quiet for ${bw.quietDays} day${bw.quietDays === 1 ? '' : 's'}: keeping the request (it eases by 5 points after every 5 quiet days in a row).` : 'Plants are running at their limit.'} Asked everyone to switch off {Math.round(bw.shed * 100)}% of non-essential load today.</p>
+        ? <p className="warn-text">{bw.eased ? `No blackouts for ${bw.quietDays} days in a row: eased the request by 7–10% of itself.` : bw.lineWorst === null && bw.hollowDarkHours === 0 ? `Quiet for ${bw.quietDays} day${bw.quietDays === 1 ? '' : 's'}: keeping the request (it eases by 7–10% of itself after every 4 quiet days in a row: slower after a worse blackout).` : 'Plants are running at their limit.'} Asked everyone to switch off {Math.round(bw.shed * 100)}% of non-essential load today.</p>
         : <p className="good">No blackouts yesterday: no power saving needed.</p>}
       <h4>Blackouts predicted (today)</h4>
       {bw.blackouts.length === 0 ? <p className="muted">None.</p> : (
@@ -79,7 +79,7 @@ const MODULE_CARDS: Partial<Record<ToolKey, { card: (p: CardProps) => ReactNode;
   },
   earlyWarning: {
     card: BlackoutWarningCard,
-    about: "Power goes to the upper levels first, so the line where residents report blackouts shows how much power the plants make. Yesterday's line, and how it moved since the day before, predicts today's. Power needs come from residents' own head count. No plant meters, no forecast. On day 1, before any reports, it warns every level of the busiest hours, when a blackout is most likely; it makes no guess about the plants. The power-saving request keeps the plants under 82% of their output; after 5 quiet days in a row it eases by 5 points. In the test world, air harm starts at 5,000 ppm CO₂, the OSHA and NIOSH workplace limit (NIOSH Pocket Guide). How many residents follow an alert, and how much a warning saves, are still first guesses: no study gives comparable numbers.",
+    about: "Power goes to the upper levels first, so the line where residents report blackouts shows how much power the plants make. Yesterday's line, and how it moved since the day before, predicts today's. Power needs come from residents' own head count. No plant meters, no forecast. On day 1, before any reports, it warns every level of the busiest hours, when a blackout is most likely; it makes no guess about the plants. The power-saving request keeps the plants under 82% of their output; after 4 quiet days in a row it eases by 7–10% of itself: 10% after a small deep-level blackout, 7% after a whole-Hollow plant trip. In the test world, air harm starts at 5,000 ppm CO₂, the OSHA and NIOSH workplace limit (NIOSH Pocket Guide). How many residents follow an alert, and how much a warning saves, are still first guesses: no study gives comparable numbers.",
   },
 };
 

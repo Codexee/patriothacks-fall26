@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-20T22:54:59.538Z",
+ "generated": "2026-11-20T23:07:00.328Z",
  "set": "test",
  "seeds": [
   11,
@@ -67,19 +67,19 @@
    },
    "with": {
     "deaths": {
-     "mean": 212,
+     "mean": 57,
      "lo": 0,
-     "hi": 633
+     "hi": 169
     },
     "trips": {
-     "mean": 6.7,
-     "lo": 5.6,
-     "hi": 7.8
+     "mean": 6.4,
+     "lo": 5.3,
+     "hi": 7.5
     },
     "darkMh": {
-     "mean": 20.93,
-     "lo": 12.71,
-     "hi": 29.14
+     "mean": 19.07,
+     "lo": 14.08,
+     "hi": 24.06
     },
     "stableShare": 1,
     "endDay": {
@@ -87,17 +87,17 @@
      "lo": 18.8,
      "hi": 21.8
     },
-    "warnedPct": 42.1,
+    "warnedPct": 34.2,
     "noNewsPerNight": {
-     "mean": 1570,
-     "lo": 982,
-     "hi": 2159
+     "mean": 1390,
+     "lo": 940,
+     "hi": 1840
     }
    },
    "livesSaved": {
-    "mean": 288499,
-    "lo": 268702,
-    "hi": 308296
+    "mean": 288654,
+    "lo": 268818,
+    "hi": 308490
    },
    "daily": [
     {
@@ -140,803 +140,803 @@
      "withoutDeaths": 6830,
      "withDeaths": 8,
      "withoutDarkSections": 374.6,
-     "withDarkSections": 310.8
+     "withDarkSections": 293.8
     },
     {
      "day": 7,
      "withoutDeaths": 14454,
-     "withDeaths": 138,
+     "withDeaths": 57,
      "withoutDarkSections": 367.1,
-     "withDarkSections": 101.5
+     "withDarkSections": 86
     },
     {
      "day": 8,
      "withoutDeaths": 18535,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 377.1,
-     "withDarkSections": 37.5
+     "withDarkSections": 0
     },
     {
      "day": 9,
      "withoutDeaths": 21262,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 213.1,
      "withDarkSections": 0
     },
     {
      "day": 10,
      "withoutDeaths": 22694,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 186.6,
      "withDarkSections": 0
     },
     {
      "day": 11,
      "withoutDeaths": 23942,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 203.8,
      "withDarkSections": 0
     },
     {
      "day": 12,
      "withoutDeaths": 25440,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 183.2,
      "withDarkSections": 0
     },
     {
      "day": 13,
      "withoutDeaths": 25869,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 121.8,
      "withDarkSections": 0
     },
     {
      "day": 14,
      "withoutDeaths": 26368,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 94.4,
      "withDarkSections": 0
     },
     {
      "day": 15,
      "withoutDeaths": 26582,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 207.7,
      "withDarkSections": 0
     },
     {
      "day": 16,
      "withoutDeaths": 28717,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 224.5,
      "withDarkSections": 0
     },
     {
      "day": 17,
      "withoutDeaths": 31027,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 189.7,
      "withDarkSections": 0
     },
     {
      "day": 18,
      "withoutDeaths": 32926,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 156.3,
      "withDarkSections": 0
     },
     {
      "day": 19,
      "withoutDeaths": 34509,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 224.4,
      "withDarkSections": 0
     },
     {
      "day": 20,
      "withoutDeaths": 37157,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 202.4,
      "withDarkSections": 0
     },
     {
      "day": 21,
      "withoutDeaths": 38199,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 218.9,
      "withDarkSections": 0
     },
     {
      "day": 22,
      "withoutDeaths": 39472,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 228,
      "withDarkSections": 0
     },
     {
      "day": 23,
      "withoutDeaths": 41379,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 279.1,
      "withDarkSections": 0
     },
     {
      "day": 24,
      "withoutDeaths": 44075,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 254.2,
      "withDarkSections": 0
     },
     {
      "day": 25,
      "withoutDeaths": 45833,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 272.6,
      "withDarkSections": 0
     },
     {
      "day": 26,
      "withoutDeaths": 48207,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 253.7,
      "withDarkSections": 0
     },
     {
      "day": 27,
      "withoutDeaths": 50495,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 274.4,
      "withDarkSections": 0
     },
     {
      "day": 28,
      "withoutDeaths": 52148,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 295.5,
      "withDarkSections": 0
     },
     {
      "day": 29,
      "withoutDeaths": 53812,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 300.8,
      "withDarkSections": 0
     },
     {
      "day": 30,
      "withoutDeaths": 56270,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 266,
      "withDarkSections": 0
     },
     {
      "day": 31,
      "withoutDeaths": 57813,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 172.2,
      "withDarkSections": 0
     },
     {
      "day": 32,
      "withoutDeaths": 58950,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 153.2,
      "withDarkSections": 0
     },
     {
      "day": 33,
      "withoutDeaths": 59501,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 162.4,
      "withDarkSections": 0
     },
     {
      "day": 34,
      "withoutDeaths": 60512,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 189,
      "withDarkSections": 0
     },
     {
      "day": 35,
      "withoutDeaths": 62296,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 270.4,
      "withDarkSections": 0
     },
     {
      "day": 36,
      "withoutDeaths": 64074,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 182.3,
      "withDarkSections": 0
     },
     {
      "day": 37,
      "withoutDeaths": 64290,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 208.6,
      "withDarkSections": 0
     },
     {
      "day": 38,
      "withoutDeaths": 65701,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 274.4,
      "withDarkSections": 0
     },
     {
      "day": 39,
      "withoutDeaths": 66854,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 182.5,
      "withDarkSections": 0
     },
     {
      "day": 40,
      "withoutDeaths": 67391,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 291.3,
      "withDarkSections": 0
     },
     {
      "day": 41,
      "withoutDeaths": 70419,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 260.9,
      "withDarkSections": 0
     },
     {
      "day": 42,
      "withoutDeaths": 72739,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 225,
      "withDarkSections": 0
     },
     {
      "day": 43,
      "withoutDeaths": 75704,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 259.6,
      "withDarkSections": 0
     },
     {
      "day": 44,
      "withoutDeaths": 79146,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 281.4,
      "withDarkSections": 0
     },
     {
      "day": 45,
      "withoutDeaths": 82613,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 254,
      "withDarkSections": 0
     },
     {
      "day": 46,
      "withoutDeaths": 86299,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 214.2,
      "withDarkSections": 0
     },
     {
      "day": 47,
      "withoutDeaths": 89226,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 184.2,
      "withDarkSections": 0
     },
     {
      "day": 48,
      "withoutDeaths": 91193,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 235.6,
      "withDarkSections": 0
     },
     {
      "day": 49,
      "withoutDeaths": 93508,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 310.1,
      "withDarkSections": 0
     },
     {
      "day": 50,
      "withoutDeaths": 97839,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 309.2,
      "withDarkSections": 0
     },
     {
      "day": 51,
      "withoutDeaths": 102006,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 207.2,
      "withDarkSections": 0
     },
     {
      "day": 52,
      "withoutDeaths": 105095,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 271.5,
      "withDarkSections": 0
     },
     {
      "day": 53,
      "withoutDeaths": 108563,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 260.2,
      "withDarkSections": 0
     },
     {
      "day": 54,
      "withoutDeaths": 111708,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 280.7,
      "withDarkSections": 0
     },
     {
      "day": 55,
      "withoutDeaths": 113687,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 258.1,
      "withDarkSections": 0
     },
     {
      "day": 56,
      "withoutDeaths": 115091,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 201.6,
      "withDarkSections": 0
     },
     {
      "day": 57,
      "withoutDeaths": 116208,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 191.1,
      "withDarkSections": 0
     },
     {
      "day": 58,
      "withoutDeaths": 117263,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 192,
      "withDarkSections": 0
     },
     {
      "day": 59,
      "withoutDeaths": 119154,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 281,
      "withDarkSections": 0
     },
     {
      "day": 60,
      "withoutDeaths": 122023,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 262.7,
      "withDarkSections": 0
     },
     {
      "day": 61,
      "withoutDeaths": 125513,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 263.4,
      "withDarkSections": 0
     },
     {
      "day": 62,
      "withoutDeaths": 129401,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 283.3,
      "withDarkSections": 0
     },
     {
      "day": 63,
      "withoutDeaths": 131153,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 255.7,
      "withDarkSections": 0
     },
     {
      "day": 64,
      "withoutDeaths": 132441,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 256.3,
      "withDarkSections": 0
     },
     {
      "day": 65,
      "withoutDeaths": 134492,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 290.3,
      "withDarkSections": 0
     },
     {
      "day": 66,
      "withoutDeaths": 138433,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 290.7,
      "withDarkSections": 0
     },
     {
      "day": 67,
      "withoutDeaths": 141365,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 270.2,
      "withDarkSections": 0
     },
     {
      "day": 68,
      "withoutDeaths": 143349,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 239.8,
      "withDarkSections": 0
     },
     {
      "day": 69,
      "withoutDeaths": 144590,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 204.1,
      "withDarkSections": 0
     },
     {
      "day": 70,
      "withoutDeaths": 145781,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 193.6,
      "withDarkSections": 0
     },
     {
      "day": 71,
      "withoutDeaths": 147514,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 217.8,
      "withDarkSections": 0
     },
     {
      "day": 72,
      "withoutDeaths": 150067,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 207.3,
      "withDarkSections": 0
     },
     {
      "day": 73,
      "withoutDeaths": 152296,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 237.3,
      "withDarkSections": 0
     },
     {
      "day": 74,
      "withoutDeaths": 154144,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 195.1,
      "withDarkSections": 0
     },
     {
      "day": 75,
      "withoutDeaths": 156515,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 275.3,
      "withDarkSections": 0
     },
     {
      "day": 76,
      "withoutDeaths": 159657,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 247.7,
      "withDarkSections": 0
     },
     {
      "day": 77,
      "withoutDeaths": 161714,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 177.6,
      "withDarkSections": 0
     },
     {
      "day": 78,
      "withoutDeaths": 164029,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 260.4,
      "withDarkSections": 0
     },
     {
      "day": 79,
      "withoutDeaths": 165817,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 192.7,
      "withDarkSections": 0
     },
     {
      "day": 80,
      "withoutDeaths": 167249,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 194.2,
      "withDarkSections": 0
     },
     {
      "day": 81,
      "withoutDeaths": 169241,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 183.9,
      "withDarkSections": 0
     },
     {
      "day": 82,
      "withoutDeaths": 171304,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 206.3,
      "withDarkSections": 0
     },
     {
      "day": 83,
      "withoutDeaths": 173583,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 288.6,
      "withDarkSections": 0
     },
     {
      "day": 84,
      "withoutDeaths": 175779,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 294.8,
      "withDarkSections": 0
     },
     {
      "day": 85,
      "withoutDeaths": 178374,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 288.9,
      "withDarkSections": 0
     },
     {
      "day": 86,
      "withoutDeaths": 182264,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 291.3,
      "withDarkSections": 0
     },
     {
      "day": 87,
      "withoutDeaths": 185965,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 232.3,
      "withDarkSections": 0
     },
     {
      "day": 88,
      "withoutDeaths": 189219,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 222.2,
      "withDarkSections": 0
     },
     {
      "day": 89,
      "withoutDeaths": 191726,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 243.1,
      "withDarkSections": 0
     },
     {
      "day": 90,
      "withoutDeaths": 195062,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 326.1,
      "withDarkSections": 0
     },
     {
      "day": 91,
      "withoutDeaths": 197632,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 225.7,
      "withDarkSections": 0
     },
     {
      "day": 92,
      "withoutDeaths": 198784,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 169.6,
      "withDarkSections": 0
     },
     {
      "day": 93,
      "withoutDeaths": 200806,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 265.7,
      "withDarkSections": 0
     },
     {
      "day": 94,
      "withoutDeaths": 205200,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 320,
      "withDarkSections": 0
     },
     {
      "day": 95,
      "withoutDeaths": 210131,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 305,
      "withDarkSections": 0
     },
     {
      "day": 96,
      "withoutDeaths": 215391,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 333.9,
      "withDarkSections": 0
     },
     {
      "day": 97,
      "withoutDeaths": 220410,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 336.4,
      "withDarkSections": 0
     },
     {
      "day": 98,
      "withoutDeaths": 224182,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 197.4,
      "withDarkSections": 0
     },
     {
      "day": 99,
      "withoutDeaths": 225905,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 219,
      "withDarkSections": 0
     },
     {
      "day": 100,
      "withoutDeaths": 227717,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 323.7,
      "withDarkSections": 0
     },
     {
      "day": 101,
      "withoutDeaths": 230643,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 228.8,
      "withDarkSections": 0
     },
     {
      "day": 102,
      "withoutDeaths": 233211,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 292.5,
      "withDarkSections": 0
     },
     {
      "day": 103,
      "withoutDeaths": 236335,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 217.2,
      "withDarkSections": 0
     },
     {
      "day": 104,
      "withoutDeaths": 238971,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 207.6,
      "withDarkSections": 0
     },
     {
      "day": 105,
      "withoutDeaths": 241573,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 264.9,
      "withDarkSections": 0
     },
     {
      "day": 106,
      "withoutDeaths": 244346,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 267.5,
      "withDarkSections": 0
     },
     {
      "day": 107,
      "withoutDeaths": 246702,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 234.5,
      "withDarkSections": 0
     },
     {
      "day": 108,
      "withoutDeaths": 249245,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 290.6,
      "withDarkSections": 0
     },
     {
      "day": 109,
      "withoutDeaths": 253596,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 322.4,
      "withDarkSections": 0
     },
     {
      "day": 110,
      "withoutDeaths": 258370,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 247.5,
      "withDarkSections": 0
     },
     {
      "day": 111,
      "withoutDeaths": 261892,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 265,
      "withDarkSections": 0
     },
     {
      "day": 112,
      "withoutDeaths": 264666,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 290.9,
      "withDarkSections": 0
     },
     {
      "day": 113,
      "withoutDeaths": 267825,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 244.5,
      "withDarkSections": 0
     },
     {
      "day": 114,
      "withoutDeaths": 270459,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 311.3,
      "withDarkSections": 0
     },
     {
      "day": 115,
      "withoutDeaths": 273719,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 301.4,
      "withDarkSections": 0
     },
     {
      "day": 116,
      "withoutDeaths": 276400,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 297.5,
      "withDarkSections": 0
     },
     {
      "day": 117,
      "withoutDeaths": 279682,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 284.3,
      "withDarkSections": 0
     },
     {
      "day": 118,
      "withoutDeaths": 282811,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 268,
      "withDarkSections": 0
     },
     {
      "day": 119,
      "withoutDeaths": 285776,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 244.6,
      "withDarkSections": 0
     },
     {
      "day": 120,
      "withoutDeaths": 288711,
-     "withDeaths": 212,
+     "withDeaths": 57,
      "withoutDarkSections": 216.8,
      "withDarkSections": 0
     }
@@ -957,7 +957,7 @@
     {
      "seed": 13,
      "withoutDeaths": 299608,
-     "withDeaths": 1879,
+     "withDeaths": 497,
      "withStable": true
     },
     {
@@ -981,13 +981,13 @@
     {
      "seed": 17,
      "withoutDeaths": 272977,
-     "withDeaths": 0,
+     "withDeaths": 1,
      "withStable": true
     },
     {
      "seed": 18,
      "withoutDeaths": 288246,
-     "withDeaths": 165,
+     "withDeaths": 0,
      "withStable": true
     },
     {
@@ -999,7 +999,7 @@
     {
      "seed": 20,
      "withoutDeaths": 238618,
-     "withDeaths": 1,
+     "withDeaths": 0,
      "withStable": true
     }
    ]
@@ -1051,26 +1051,26 @@
      "hi": 22
     },
     "trips": {
-     "mean": 1.8,
+     "mean": 1.3,
      "lo": 0,
-     "hi": 3.9
+     "hi": 3.3
     },
     "darkMh": {
-     "mean": 4.71,
+     "mean": 3.76,
      "lo": 0,
-     "hi": 10.06
+     "hi": 9.12
     },
     "stableShare": 1,
     "endDay": {
-     "mean": 20.2,
-     "lo": 18.8,
-     "hi": 21.6
+     "mean": 19.3,
+     "lo": 18.2,
+     "hi": 20.4
     },
-    "warnedPct": 79.6,
+    "warnedPct": 99.6,
     "noNewsPerNight": {
-     "mean": 553,
+     "mean": 485,
      "lo": 0,
-     "hi": 1276
+     "hi": 1218
     }
    },
    "livesSaved": {
@@ -1119,14 +1119,14 @@
      "withoutDeaths": 4747,
      "withDeaths": 8,
      "withoutDarkSections": 369,
-     "withDarkSections": 0
+     "withDarkSections": 3.2
     },
     {
      "day": 7,
      "withoutDeaths": 8482,
      "withDeaths": 8,
      "withoutDarkSections": 330.7,
-     "withDarkSections": 42.3
+     "withDarkSections": 0
     },
     {
      "day": 8,
@@ -2035,17 +2035,17 @@
      "hi": 3.9
     },
     "darkMh": {
-     "mean": 4.55,
+     "mean": 4.59,
      "lo": 0,
-     "hi": 9.89
+     "hi": 9.93
     },
     "stableShare": 1,
     "endDay": {
-     "mean": 20.2,
-     "lo": 18.8,
-     "hi": 21.6
+     "mean": 23.8,
+     "lo": 21,
+     "hi": 26.6
     },
-    "warnedPct": 82.4,
+    "warnedPct": 81.7,
     "noNewsPerNight": {
      "mean": 545,
      "lo": 0,
@@ -2105,14 +2105,14 @@
      "withoutDeaths": 16910,
      "withDeaths": 8,
      "withoutDarkSections": 349.9,
-     "withDarkSections": 35.3
+     "withDarkSections": 1.6
     },
     {
      "day": 8,
      "withoutDeaths": 22672,
      "withDeaths": 8,
      "withoutDarkSections": 375.6,
-     "withDarkSections": 0
+     "withDarkSections": 32.7
     },
     {
      "day": 9,
@@ -2133,14 +2133,14 @@
      "withoutDeaths": 31526,
      "withDeaths": 8,
      "withoutDarkSections": 237.9,
-     "withDarkSections": 0
+     "withDarkSections": 0.7
     },
     {
      "day": 12,
      "withoutDeaths": 33297,
      "withDeaths": 8,
      "withoutDarkSections": 176.9,
-     "withDarkSections": 0
+     "withDarkSections": 4.2
     },
     {
      "day": 13,
@@ -3014,17 +3014,17 @@
      "hi": 3.3
     },
     "darkMh": {
-     "mean": 3.84,
+     "mean": 3.89,
      "lo": 0,
-     "hi": 9.16
+     "hi": 9.2
     },
     "stableShare": 1,
     "endDay": {
-     "mean": 20.1,
-     "lo": 18.7,
-     "hi": 21.5
+     "mean": 27.3,
+     "lo": 23.2,
+     "hi": 31.4
     },
-    "warnedPct": 97.7,
+    "warnedPct": 96.3,
     "noNewsPerNight": {
      "mean": 485,
      "lo": 0,
@@ -3084,7 +3084,7 @@
      "withoutDeaths": 10757,
      "withDeaths": 8,
      "withoutDarkSections": 235.8,
-     "withDarkSections": 8.9
+     "withDarkSections": 5.7
     },
     {
      "day": 8,
@@ -3147,7 +3147,7 @@
      "withoutDeaths": 34980,
      "withDeaths": 8,
      "withoutDarkSections": 219.6,
-     "withDarkSections": 0
+     "withDarkSections": 7.6
     },
     {
      "day": 17,
@@ -3983,37 +3983,37 @@
    },
    "with": {
     "deaths": {
-     "mean": 276,
+     "mean": 517,
      "lo": 0,
-     "hi": 677
+     "hi": 1354
     },
     "trips": {
-     "mean": 3.3,
-     "lo": 0.7,
-     "hi": 5.9
+     "mean": 3.9,
+     "lo": 0.6,
+     "hi": 7.2
     },
     "darkMh": {
-     "mean": 12.72,
-     "lo": 1.04,
-     "hi": 24.4
+     "mean": 15.92,
+     "lo": 1.15,
+     "hi": 30.68
     },
     "stableShare": 1,
     "endDay": {
-     "mean": 67.2,
-     "lo": 65.2,
-     "hi": 69.2
+     "mean": 64.6,
+     "lo": 61.3,
+     "hi": 67.9
     },
-    "warnedPct": 70,
+    "warnedPct": 79.1,
     "noNewsPerNight": {
-     "mean": 289,
-     "lo": 51,
-     "hi": 528
+     "mean": 382,
+     "lo": 43,
+     "hi": 722
     }
    },
    "livesSaved": {
-    "mean": 364479,
-    "lo": 349803,
-    "hi": 379154
+    "mean": 364237,
+    "lo": 349683,
+    "hi": 378792
    },
    "daily": [
     {
@@ -4084,21 +4084,21 @@
      "withoutDeaths": 7565,
      "withDeaths": 8,
      "withoutDarkSections": 210.9,
-     "withDarkSections": 0
+     "withDarkSections": 31.7
     },
     {
      "day": 11,
      "withoutDeaths": 8628,
      "withDeaths": 8,
      "withoutDarkSections": 183.5,
-     "withDarkSections": 31.7
+     "withDarkSections": 3.7
     },
     {
      "day": 12,
      "withoutDeaths": 10057,
      "withDeaths": 8,
      "withoutDarkSections": 166.8,
-     "withDarkSections": 13.7
+     "withDarkSections": 0
     },
     {
      "day": 13,
@@ -4231,628 +4231,628 @@
      "withoutDeaths": 47098,
      "withDeaths": 8,
      "withoutDarkSections": 156.5,
-     "withDarkSections": 0
+     "withDarkSections": 1.4
     },
     {
      "day": 32,
      "withoutDeaths": 48113,
      "withDeaths": 8,
      "withoutDarkSections": 186.6,
-     "withDarkSections": 0
+     "withDarkSections": 87.5
     },
     {
      "day": 33,
      "withoutDeaths": 50374,
-     "withDeaths": 8,
+     "withDeaths": 190,
      "withoutDarkSections": 287,
-     "withDarkSections": 4.2
+     "withDarkSections": 80
     },
     {
      "day": 34,
      "withoutDeaths": 51785,
-     "withDeaths": 8,
+     "withDeaths": 455,
      "withoutDarkSections": 252.1,
-     "withDarkSections": 0
+     "withDarkSections": 20.9
     },
     {
      "day": 35,
      "withoutDeaths": 53009,
-     "withDeaths": 8,
+     "withDeaths": 455,
      "withoutDarkSections": 191,
      "withDarkSections": 0
     },
     {
      "day": 36,
      "withoutDeaths": 53872,
-     "withDeaths": 8,
+     "withDeaths": 455,
      "withoutDarkSections": 214.8,
      "withDarkSections": 0
     },
     {
      "day": 37,
      "withoutDeaths": 54963,
-     "withDeaths": 8,
+     "withDeaths": 455,
      "withoutDarkSections": 215.6,
      "withDarkSections": 0
     },
     {
      "day": 38,
      "withoutDeaths": 55839,
-     "withDeaths": 8,
+     "withDeaths": 455,
      "withoutDarkSections": 224.4,
      "withDarkSections": 0
     },
     {
      "day": 39,
      "withoutDeaths": 58020,
-     "withDeaths": 8,
+     "withDeaths": 455,
      "withoutDarkSections": 294.8,
      "withDarkSections": 0
     },
     {
      "day": 40,
      "withoutDeaths": 62653,
-     "withDeaths": 8,
+     "withDeaths": 455,
      "withoutDarkSections": 310.7,
-     "withDarkSections": 0
+     "withDarkSections": 0.2
     },
     {
      "day": 41,
      "withoutDeaths": 66318,
-     "withDeaths": 8,
+     "withDeaths": 455,
      "withoutDarkSections": 245.3,
      "withDarkSections": 0
     },
     {
      "day": 42,
      "withoutDeaths": 69100,
-     "withDeaths": 8,
+     "withDeaths": 455,
      "withoutDarkSections": 292.3,
      "withDarkSections": 0
     },
     {
      "day": 43,
      "withoutDeaths": 72859,
-     "withDeaths": 8,
+     "withDeaths": 455,
      "withoutDarkSections": 218.2,
-     "withDarkSections": 0
+     "withDarkSections": 0.4
     },
     {
      "day": 44,
      "withoutDeaths": 75890,
-     "withDeaths": 8,
+     "withDeaths": 455,
      "withoutDarkSections": 261.4,
      "withDarkSections": 0
     },
     {
      "day": 45,
      "withoutDeaths": 80337,
-     "withDeaths": 8,
+     "withDeaths": 455,
      "withoutDarkSections": 192.3,
-     "withDarkSections": 0
+     "withDarkSections": 0.4
     },
     {
      "day": 46,
      "withoutDeaths": 84184,
-     "withDeaths": 8,
+     "withDeaths": 455,
      "withoutDarkSections": 255,
      "withDarkSections": 0
     },
     {
      "day": 47,
      "withoutDeaths": 87890,
-     "withDeaths": 8,
+     "withDeaths": 455,
      "withoutDarkSections": 309.6,
-     "withDarkSections": 0
+     "withDarkSections": 0.7
     },
     {
      "day": 48,
      "withoutDeaths": 92091,
-     "withDeaths": 8,
+     "withDeaths": 455,
      "withoutDarkSections": 335.7,
      "withDarkSections": 0
     },
     {
      "day": 49,
      "withoutDeaths": 97396,
-     "withDeaths": 8,
+     "withDeaths": 455,
      "withoutDarkSections": 249.2,
      "withDarkSections": 0
     },
     {
      "day": 50,
      "withoutDeaths": 100110,
-     "withDeaths": 8,
+     "withDeaths": 455,
      "withoutDarkSections": 259.9,
-     "withDarkSections": 0
+     "withDarkSections": 0.5
     },
     {
      "day": 51,
      "withoutDeaths": 103743,
-     "withDeaths": 8,
+     "withDeaths": 455,
      "withoutDarkSections": 303,
-     "withDarkSections": 0
+     "withDarkSections": 0.5
     },
     {
      "day": 52,
      "withoutDeaths": 107825,
-     "withDeaths": 8,
+     "withDeaths": 455,
      "withoutDarkSections": 280.3,
-     "withDarkSections": 1.6
+     "withDarkSections": 7.3
     },
     {
      "day": 53,
      "withoutDeaths": 111121,
-     "withDeaths": 8,
+     "withDeaths": 455,
      "withoutDarkSections": 243.1,
      "withDarkSections": 0
     },
     {
      "day": 54,
      "withoutDeaths": 113631,
-     "withDeaths": 8,
+     "withDeaths": 455,
      "withoutDarkSections": 275.5,
-     "withDarkSections": 83.5
+     "withDarkSections": 0
     },
     {
      "day": 55,
      "withoutDeaths": 115701,
-     "withDeaths": 176,
+     "withDeaths": 455,
      "withoutDarkSections": 203.5,
-     "withDarkSections": 80
+     "withDarkSections": 0
     },
     {
      "day": 56,
      "withoutDeaths": 116992,
-     "withDeaths": 276,
+     "withDeaths": 455,
      "withoutDarkSections": 234.1,
-     "withDarkSections": 19.6
+     "withDarkSections": 0
     },
     {
      "day": 57,
      "withoutDeaths": 119409,
-     "withDeaths": 276,
+     "withDeaths": 455,
      "withoutDarkSections": 331.1,
      "withDarkSections": 0
     },
     {
      "day": 58,
      "withoutDeaths": 123994,
-     "withDeaths": 276,
+     "withDeaths": 455,
      "withoutDarkSections": 298.3,
      "withDarkSections": 0
     },
     {
      "day": 59,
      "withoutDeaths": 128820,
-     "withDeaths": 276,
+     "withDeaths": 455,
      "withoutDarkSections": 252.7,
-     "withDarkSections": 0
+     "withDarkSections": 40
     },
     {
      "day": 60,
      "withoutDeaths": 131872,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 274.2,
-     "withDarkSections": 0
+     "withDarkSections": 40
     },
     {
      "day": 61,
      "withoutDeaths": 134449,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 229.4,
      "withDarkSections": 0
     },
     {
      "day": 62,
      "withoutDeaths": 137239,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 313.4,
      "withDarkSections": 0
     },
     {
      "day": 63,
      "withoutDeaths": 140668,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 256.5,
      "withDarkSections": 0
     },
     {
      "day": 64,
      "withoutDeaths": 143243,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 296.6,
      "withDarkSections": 0
     },
     {
      "day": 65,
      "withoutDeaths": 147119,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 291.6,
      "withDarkSections": 0
     },
     {
      "day": 66,
      "withoutDeaths": 149819,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 233.2,
      "withDarkSections": 0
     },
     {
      "day": 67,
      "withoutDeaths": 152569,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 235,
      "withDarkSections": 0
     },
     {
      "day": 68,
      "withoutDeaths": 155814,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 249.7,
      "withDarkSections": 0
     },
     {
      "day": 69,
      "withoutDeaths": 159921,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 227.6,
      "withDarkSections": 0
     },
     {
      "day": 70,
      "withoutDeaths": 163107,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 196.8,
      "withDarkSections": 0
     },
     {
      "day": 71,
      "withoutDeaths": 164976,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 280.4,
      "withDarkSections": 0
     },
     {
      "day": 72,
      "withoutDeaths": 168393,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 270.8,
      "withDarkSections": 0
     },
     {
      "day": 73,
      "withoutDeaths": 171715,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 232.5,
      "withDarkSections": 0
     },
     {
      "day": 74,
      "withoutDeaths": 174965,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 216.1,
      "withDarkSections": 0
     },
     {
      "day": 75,
      "withoutDeaths": 178669,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 195.6,
      "withDarkSections": 0
     },
     {
      "day": 76,
      "withoutDeaths": 181065,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 274.8,
      "withDarkSections": 0
     },
     {
      "day": 77,
      "withoutDeaths": 184090,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 184.4,
      "withDarkSections": 0
     },
     {
      "day": 78,
      "withoutDeaths": 186272,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 258,
      "withDarkSections": 0
     },
     {
      "day": 79,
      "withoutDeaths": 189330,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 238,
      "withDarkSections": 0
     },
     {
      "day": 80,
      "withoutDeaths": 192215,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 244.9,
      "withDarkSections": 0
     },
     {
      "day": 81,
      "withoutDeaths": 195842,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 267.5,
      "withDarkSections": 0
     },
     {
      "day": 82,
      "withoutDeaths": 199951,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 297.9,
      "withDarkSections": 0
     },
     {
      "day": 83,
      "withoutDeaths": 204654,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 318.7,
      "withDarkSections": 0
     },
     {
      "day": 84,
      "withoutDeaths": 209055,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 267.6,
      "withDarkSections": 0
     },
     {
      "day": 85,
      "withoutDeaths": 212848,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 212.9,
      "withDarkSections": 0
     },
     {
      "day": 86,
      "withoutDeaths": 216921,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 274.2,
      "withDarkSections": 0
     },
     {
      "day": 87,
      "withoutDeaths": 220710,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 273.7,
      "withDarkSections": 0
     },
     {
      "day": 88,
      "withoutDeaths": 224945,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 283.2,
      "withDarkSections": 0
     },
     {
      "day": 89,
      "withoutDeaths": 229024,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 241.1,
      "withDarkSections": 0
     },
     {
      "day": 90,
      "withoutDeaths": 232591,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 284.6,
      "withDarkSections": 0
     },
     {
      "day": 91,
      "withoutDeaths": 237624,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 296.2,
      "withDarkSections": 0
     },
     {
      "day": 92,
      "withoutDeaths": 242505,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 288,
      "withDarkSections": 0
     },
     {
      "day": 93,
      "withoutDeaths": 247998,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 372.9,
      "withDarkSections": 0
     },
     {
      "day": 94,
      "withoutDeaths": 253473,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 283.7,
      "withDarkSections": 0
     },
     {
      "day": 95,
      "withoutDeaths": 258959,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 310.9,
      "withDarkSections": 0
     },
     {
      "day": 96,
      "withoutDeaths": 263724,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 266,
      "withDarkSections": 0
     },
     {
      "day": 97,
      "withoutDeaths": 267113,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 222.3,
      "withDarkSections": 0
     },
     {
      "day": 98,
      "withoutDeaths": 269923,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 246.8,
      "withDarkSections": 0
     },
     {
      "day": 99,
      "withoutDeaths": 273376,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 317,
      "withDarkSections": 0
     },
     {
      "day": 100,
      "withoutDeaths": 278186,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 239.3,
      "withDarkSections": 0
     },
     {
      "day": 101,
      "withoutDeaths": 282084,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 213.7,
      "withDarkSections": 0
     },
     {
      "day": 102,
      "withoutDeaths": 285798,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 240.7,
      "withDarkSections": 0
     },
     {
      "day": 103,
      "withoutDeaths": 289623,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 289,
      "withDarkSections": 0
     },
     {
      "day": 104,
      "withoutDeaths": 293463,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 310.5,
      "withDarkSections": 0
     },
     {
      "day": 105,
      "withoutDeaths": 297490,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 267.7,
      "withDarkSections": 0
     },
     {
      "day": 106,
      "withoutDeaths": 302383,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 321,
      "withDarkSections": 0
     },
     {
      "day": 107,
      "withoutDeaths": 307743,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 279.4,
      "withDarkSections": 0
     },
     {
      "day": 108,
      "withoutDeaths": 312211,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 285.7,
      "withDarkSections": 0
     },
     {
      "day": 109,
      "withoutDeaths": 317233,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 280,
      "withDarkSections": 0
     },
     {
      "day": 110,
      "withoutDeaths": 321904,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 289.3,
      "withDarkSections": 0
     },
     {
      "day": 111,
      "withoutDeaths": 326048,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 296.8,
      "withDarkSections": 0
     },
     {
      "day": 112,
      "withoutDeaths": 330064,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 327.7,
      "withDarkSections": 0
     },
     {
      "day": 113,
      "withoutDeaths": 334364,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 327,
      "withDarkSections": 0
     },
     {
      "day": 114,
      "withoutDeaths": 338894,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 237,
      "withDarkSections": 0
     },
     {
      "day": 115,
      "withoutDeaths": 342598,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 267.1,
      "withDarkSections": 0
     },
     {
      "day": 116,
      "withoutDeaths": 346728,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 310.9,
      "withDarkSections": 0
     },
     {
      "day": 117,
      "withoutDeaths": 351208,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 312.5,
      "withDarkSections": 0
     },
     {
      "day": 118,
      "withoutDeaths": 356080,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 274.1,
      "withDarkSections": 0
     },
     {
      "day": 119,
      "withoutDeaths": 359969,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 332.3,
      "withDarkSections": 0
     },
     {
      "day": 120,
      "withoutDeaths": 364754,
-     "withDeaths": 276,
+     "withDeaths": 517,
      "withoutDarkSections": 298.4,
      "withDarkSections": 0
     }
@@ -4861,7 +4861,7 @@
     {
      "seed": 11,
      "withoutDeaths": 375613,
-     "withDeaths": 1397,
+     "withDeaths": 3742,
      "withStable": true
     },
     {
@@ -4885,7 +4885,7 @@
     {
      "seed": 15,
      "withoutDeaths": 380660,
-     "withDeaths": 1280,
+     "withDeaths": 735,
      "withStable": true
     },
     {
@@ -4909,7 +4909,7 @@
     {
      "seed": 19,
      "withoutDeaths": 395873,
-     "withDeaths": 66,
+     "withDeaths": 680,
      "withStable": true
     },
     {
@@ -4962,37 +4962,37 @@
    },
    "with": {
     "deaths": {
-     "mean": 8,
+     "mean": 646,
      "lo": 0,
-     "hi": 22
+     "hi": 1543
     },
     "trips": {
-     "mean": 1.8,
-     "lo": 0,
-     "hi": 3.9
+     "mean": 4.5,
+     "lo": 0.7,
+     "hi": 8.3
     },
     "darkMh": {
-     "mean": 5.1,
-     "lo": 0,
-     "hi": 10.49
+     "mean": 19.65,
+     "lo": 2.73,
+     "hi": 36.57
     },
     "stableShare": 1,
     "endDay": {
-     "mean": 61.4,
-     "lo": 59.3,
-     "hi": 63.5
+     "mean": 67.2,
+     "lo": 66,
+     "hi": 68.4
     },
-    "warnedPct": 73.6,
+    "warnedPct": 78.3,
     "noNewsPerNight": {
-     "mean": 155,
-     "lo": 0,
-     "hi": 340
+     "mean": 421,
+     "lo": 40,
+     "hi": 802
     }
    },
    "livesSaved": {
-    "mean": 287512,
-    "lo": 270362,
-    "hi": 304663
+    "mean": 286873,
+    "lo": 269842,
+    "hi": 303905
    },
    "daily": [
     {
@@ -5070,21 +5070,21 @@
      "withoutDeaths": 8679,
      "withDeaths": 8,
      "withoutDarkSections": 155.6,
-     "withDarkSections": 0
+     "withDarkSections": 32.4
     },
     {
      "day": 12,
      "withoutDeaths": 9971,
      "withDeaths": 8,
      "withoutDarkSections": 173.3,
-     "withDarkSections": 43.2
+     "withDarkSections": 4.7
     },
     {
      "day": 13,
      "withoutDeaths": 11096,
      "withDeaths": 8,
      "withoutDarkSections": 109.7,
-     "withDarkSections": 0.6
+     "withDarkSections": 0
     },
     {
      "day": 14,
@@ -5224,7 +5224,7 @@
      "withoutDeaths": 46479,
      "withDeaths": 8,
      "withoutDarkSections": 152.9,
-     "withDarkSections": 0
+     "withDarkSections": 6.3
     },
     {
      "day": 34,
@@ -5259,7 +5259,7 @@
      "withoutDeaths": 52696,
      "withDeaths": 8,
      "withoutDarkSections": 214.7,
-     "withDarkSections": 9.1
+     "withDarkSections": 0
     },
     {
      "day": 39,
@@ -5308,530 +5308,530 @@
      "withoutDeaths": 71339,
      "withDeaths": 8,
      "withoutDarkSections": 264.3,
-     "withDarkSections": 0
+     "withDarkSections": 0.1
     },
     {
      "day": 46,
      "withoutDeaths": 74732,
      "withDeaths": 8,
      "withoutDarkSections": 214.8,
-     "withDarkSections": 0
+     "withDarkSections": 0.1
     },
     {
      "day": 47,
      "withoutDeaths": 77828,
      "withDeaths": 8,
      "withoutDarkSections": 187,
-     "withDarkSections": 0
+     "withDarkSections": 40.3
     },
     {
      "day": 48,
      "withoutDeaths": 79978,
-     "withDeaths": 8,
+     "withDeaths": 58,
      "withoutDarkSections": 321.2,
-     "withDarkSections": 0
+     "withDarkSections": 40
     },
     {
      "day": 49,
      "withoutDeaths": 83385,
-     "withDeaths": 8,
+     "withDeaths": 58,
      "withoutDarkSections": 310,
      "withDarkSections": 0
     },
     {
      "day": 50,
      "withoutDeaths": 88073,
-     "withDeaths": 8,
+     "withDeaths": 58,
      "withoutDarkSections": 280.5,
      "withDarkSections": 0
     },
     {
      "day": 51,
      "withoutDeaths": 91503,
-     "withDeaths": 8,
+     "withDeaths": 58,
      "withoutDarkSections": 239.1,
-     "withDarkSections": 0
+     "withDarkSections": 40
     },
     {
      "day": 52,
      "withoutDeaths": 94099,
-     "withDeaths": 8,
+     "withDeaths": 141,
      "withoutDarkSections": 278.4,
-     "withDarkSections": 0
+     "withDarkSections": 120.9
     },
     {
      "day": 53,
      "withoutDeaths": 97014,
-     "withDeaths": 8,
+     "withDeaths": 374,
      "withoutDarkSections": 285.7,
-     "withDarkSections": 1.2
+     "withDarkSections": 80
     },
     {
      "day": 54,
      "withoutDeaths": 100297,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 274.4,
-     "withDarkSections": 0
+     "withDarkSections": 30.9
     },
     {
      "day": 55,
      "withoutDeaths": 101689,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 265.8,
      "withDarkSections": 0
     },
     {
      "day": 56,
      "withoutDeaths": 103718,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 218.1,
      "withDarkSections": 0
     },
     {
      "day": 57,
      "withoutDeaths": 104860,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 198.6,
      "withDarkSections": 0
     },
     {
      "day": 58,
      "withoutDeaths": 106547,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 237.1,
      "withDarkSections": 0
     },
     {
      "day": 59,
      "withoutDeaths": 108933,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 273.2,
      "withDarkSections": 0
     },
     {
      "day": 60,
      "withoutDeaths": 112038,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 277.3,
      "withDarkSections": 0
     },
     {
      "day": 61,
      "withoutDeaths": 116817,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 303.4,
      "withDarkSections": 0
     },
     {
      "day": 62,
      "withoutDeaths": 119275,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 227.1,
      "withDarkSections": 0
     },
     {
      "day": 63,
      "withoutDeaths": 120456,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 201.4,
      "withDarkSections": 0
     },
     {
      "day": 64,
      "withoutDeaths": 121907,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 255.4,
      "withDarkSections": 0
     },
     {
      "day": 65,
      "withoutDeaths": 124309,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 285.7,
      "withDarkSections": 0
     },
     {
      "day": 66,
      "withoutDeaths": 127064,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 243.9,
      "withDarkSections": 0
     },
     {
      "day": 67,
      "withoutDeaths": 130558,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 272.8,
      "withDarkSections": 0
     },
     {
      "day": 68,
      "withoutDeaths": 133249,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 217.4,
      "withDarkSections": 0
     },
     {
      "day": 69,
      "withoutDeaths": 134751,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 202,
      "withDarkSections": 0
     },
     {
      "day": 70,
      "withoutDeaths": 136504,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 228.5,
      "withDarkSections": 0
     },
     {
      "day": 71,
      "withoutDeaths": 139185,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 210,
      "withDarkSections": 0
     },
     {
      "day": 72,
      "withoutDeaths": 141786,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 185.4,
      "withDarkSections": 0
     },
     {
      "day": 73,
      "withoutDeaths": 143365,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 181.9,
      "withDarkSections": 0
     },
     {
      "day": 74,
      "withoutDeaths": 144978,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 255,
      "withDarkSections": 0
     },
     {
      "day": 75,
      "withoutDeaths": 148375,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 262.4,
      "withDarkSections": 0
     },
     {
      "day": 76,
      "withoutDeaths": 150683,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 244.8,
      "withDarkSections": 0
     },
     {
      "day": 77,
      "withoutDeaths": 153717,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 191,
      "withDarkSections": 0
     },
     {
      "day": 78,
      "withoutDeaths": 155580,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 213,
      "withDarkSections": 0
     },
     {
      "day": 79,
      "withoutDeaths": 156808,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 225.4,
      "withDarkSections": 0
     },
     {
      "day": 80,
      "withoutDeaths": 159172,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 177.4,
      "withDarkSections": 0
     },
     {
      "day": 81,
      "withoutDeaths": 161362,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 271.3,
      "withDarkSections": 0
     },
     {
      "day": 82,
      "withoutDeaths": 164012,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 241,
      "withDarkSections": 0
     },
     {
      "day": 83,
      "withoutDeaths": 166409,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 303.1,
      "withDarkSections": 0
     },
     {
      "day": 84,
      "withoutDeaths": 169008,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 243.6,
      "withDarkSections": 0
     },
     {
      "day": 85,
      "withoutDeaths": 171577,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 313.7,
      "withDarkSections": 0
     },
     {
      "day": 86,
      "withoutDeaths": 175664,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 281.6,
      "withDarkSections": 0
     },
     {
      "day": 87,
      "withoutDeaths": 179384,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 236.6,
      "withDarkSections": 0
     },
     {
      "day": 88,
      "withoutDeaths": 182177,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 250.1,
      "withDarkSections": 0
     },
     {
      "day": 89,
      "withoutDeaths": 184883,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 253.9,
      "withDarkSections": 0
     },
     {
      "day": 90,
      "withoutDeaths": 187991,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 267,
      "withDarkSections": 0
     },
     {
      "day": 91,
      "withoutDeaths": 190090,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 195.7,
      "withDarkSections": 0
     },
     {
      "day": 92,
      "withoutDeaths": 191216,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 252.1,
      "withDarkSections": 0
     },
     {
      "day": 93,
      "withoutDeaths": 194668,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 331.2,
      "withDarkSections": 0
     },
     {
      "day": 94,
      "withoutDeaths": 199866,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 315,
      "withDarkSections": 0
     },
     {
      "day": 95,
      "withoutDeaths": 205230,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 307,
      "withDarkSections": 0
     },
     {
      "day": 96,
      "withoutDeaths": 210272,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 384.8,
      "withDarkSections": 0
     },
     {
      "day": 97,
      "withoutDeaths": 215295,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 237.9,
      "withDarkSections": 0
     },
     {
      "day": 98,
      "withoutDeaths": 217837,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 213.6,
      "withDarkSections": 0
     },
     {
      "day": 99,
      "withoutDeaths": 220207,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 259.7,
      "withDarkSections": 0
     },
     {
      "day": 100,
      "withoutDeaths": 221966,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 254.2,
      "withDarkSections": 0
     },
     {
      "day": 101,
      "withoutDeaths": 224350,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 270.1,
      "withDarkSections": 0
     },
     {
      "day": 102,
      "withoutDeaths": 228099,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 239.6,
      "withDarkSections": 0
     },
     {
      "day": 103,
      "withoutDeaths": 231678,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 200.4,
      "withDarkSections": 0
     },
     {
      "day": 104,
      "withoutDeaths": 234898,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 275.5,
      "withDarkSections": 0
     },
     {
      "day": 105,
      "withoutDeaths": 237543,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 270.5,
      "withDarkSections": 0
     },
     {
      "day": 106,
      "withoutDeaths": 240756,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 299.3,
      "withDarkSections": 0
     },
     {
      "day": 107,
      "withoutDeaths": 243532,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 226.4,
      "withDarkSections": 0
     },
     {
      "day": 108,
      "withoutDeaths": 247159,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 332.1,
      "withDarkSections": 0
     },
     {
      "day": 109,
      "withoutDeaths": 252548,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 257.9,
      "withDarkSections": 0
     },
     {
      "day": 110,
      "withoutDeaths": 256379,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 230.9,
      "withDarkSections": 0
     },
     {
      "day": 111,
      "withoutDeaths": 259449,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 300.3,
      "withDarkSections": 0
     },
     {
      "day": 112,
      "withoutDeaths": 262697,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 261.9,
      "withDarkSections": 0
     },
     {
      "day": 113,
      "withoutDeaths": 265041,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 324.5,
      "withDarkSections": 0
     },
     {
      "day": 114,
      "withoutDeaths": 268073,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 346.3,
      "withDarkSections": 0
     },
     {
      "day": 115,
      "withoutDeaths": 271714,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 336.8,
      "withDarkSections": 0
     },
     {
      "day": 116,
      "withoutDeaths": 274871,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 224.7,
      "withDarkSections": 0
     },
     {
      "day": 117,
      "withoutDeaths": 277907,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 292.1,
      "withDarkSections": 0
     },
     {
      "day": 118,
      "withoutDeaths": 281475,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 266.2,
      "withDarkSections": 0
     },
     {
      "day": 119,
      "withoutDeaths": 285116,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 232.6,
      "withDarkSections": 0
     },
     {
      "day": 120,
      "withoutDeaths": 287520,
-     "withDeaths": 8,
+     "withDeaths": 646,
      "withoutDarkSections": 279.4,
      "withDarkSections": 0
     }
@@ -5840,7 +5840,7 @@
     {
      "seed": 11,
      "withoutDeaths": 291883,
-     "withDeaths": 0,
+     "withDeaths": 4031,
      "withStable": true
     },
     {
@@ -5858,13 +5858,13 @@
     {
      "seed": 14,
      "withoutDeaths": 275718,
-     "withDeaths": 12,
+     "withDeaths": 842,
      "withStable": true
     },
     {
      "seed": 15,
      "withoutDeaths": 302546,
-     "withDeaths": 0,
+     "withDeaths": 1020,
      "withStable": true
     },
     {
@@ -5888,7 +5888,7 @@
     {
      "seed": 19,
      "withoutDeaths": 326375,
-     "withDeaths": 65,
+     "withDeaths": 570,
      "withStable": true
     },
     {
@@ -5951,21 +5951,21 @@
      "hi": 3.9
     },
     "darkMh": {
-     "mean": 4.97,
+     "mean": 4.53,
      "lo": 0,
-     "hi": 10.4
+     "hi": 9.85
     },
     "stableShare": 1,
     "endDay": {
-     "mean": 24.2,
-     "lo": 21.3,
-     "hi": 27.1
+     "mean": 24.1,
+     "lo": 21.2,
+     "hi": 27
     },
-    "warnedPct": 75.5,
+    "warnedPct": 82.9,
     "noNewsPerNight": {
-     "mean": 565,
+     "mean": 539,
      "lo": 0,
-     "hi": 1289
+     "hi": 1262
     }
    },
    "livesSaved": {
@@ -6049,21 +6049,21 @@
      "withoutDeaths": 8656,
      "withDeaths": 8,
      "withoutDarkSections": 155.6,
-     "withDarkSections": 0
+     "withDarkSections": 32.4
     },
     {
      "day": 12,
      "withoutDeaths": 9943,
      "withDeaths": 8,
      "withoutDarkSections": 173.2,
-     "withDarkSections": 43.1
+     "withDarkSections": 4.2
     },
     {
      "day": 13,
      "withoutDeaths": 11062,
      "withDeaths": 8,
      "withoutDarkSections": 109.6,
-     "withDarkSections": 0.6
+     "withDarkSections": 0
     },
     {
      "day": 14,
