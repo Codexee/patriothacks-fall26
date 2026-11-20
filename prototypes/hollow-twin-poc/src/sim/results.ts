@@ -17,13 +17,15 @@ import { NO_TOOLS, type Frame, type ToolSet } from './types.ts';
 import { sim } from './index.ts';
 import { createRun, stepRun, type Run as ProductRun } from '../product/run.ts';
 import { TUNE } from '../product/earlyWarning.ts';
+import { BUILT } from '../product/names.ts';
 import type { Interval, RunStats, ScenarioResult, ScenariosFile } from '../site/contracts.ts';
 
 const SEEDS = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
 const DAYS = 120;
 const BLACKOUT = 0.5; // same line as the engine's BLACKOUT
 const HOLLOW_PEOPLE = 2_000_000_000;
-const WITH: ToolSet = { ...NO_TOOLS, earlyWarning: true };
+// "With" = every module built so far (Blackout Warning, Family Check-In).
+const WITH: ToolSet = { ...NO_TOOLS, ...Object.fromEntries(BUILT.map((k) => [k, true])) };
 
 /** What the site says about each scenario: its kind and the one-line real data behind it. */
 const META: Record<string, { kind: ScenarioResult['kind']; realData: string }> = {
@@ -38,7 +40,7 @@ const META: Record<string, { kind: ScenarioResult['kind']; realData: string }> =
 
 interface One {
   seed: number; deaths: number; trips: number; darkMh: number; blackoutMh: number; warnedMh: number;
-  stable: boolean; endDay: number; cumDeaths: number[]; darkSections: number[];
+  stable: boolean; endDay: number; cumDeaths: number[]; darkSections: number[]; noNewsPerNight: number;
 }
 
 function darkAtWorstHour(frames: Frame[]): number {
@@ -68,6 +70,7 @@ function runOnce(scenarioId: string, seed: number, tools: ToolSet): One {
   return {
     seed, deaths: t.deaths, trips, darkMh: t.blackoutPersonHours / 1e6, blackoutMh: t.blackoutPersonHours / 1e6,
     warnedMh: t.warnedPersonHours / 1e6, stable: r.sim.end!.kind === 'stable', endDay: r.sim.end!.day, cumDeaths, darkSections,
+    noNewsPerNight: (t.familyNightsNoNews ?? 0) / Math.max(1, r.sim.end!.day),
   };
 }
 
@@ -96,6 +99,7 @@ function stats(all: One[]): RunStats {
     stableShare: all.filter((x) => x.stable).length / all.length,
     endDay: interval(all.map((x) => x.endDay), 1),
     warnedPct: b > 0 ? round((w / b) * 100, 1) : null,
+    noNewsPerNight: interval(all.map((x) => x.noNewsPerNight), 0),
   };
 }
 

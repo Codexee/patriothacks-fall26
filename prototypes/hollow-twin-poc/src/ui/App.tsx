@@ -193,6 +193,7 @@ export function App() {
         open={modsOpen} onToggle={() => setModsOpen((v) => !v)}
       />
       <ProductView
+        darkNow={frame.sections.map((s) => !s.lost && s.lifeSupport < 0.5)}
         run={morning ?? run} modules={state.tools} hour={frame.hour} playing={playing} section={phoneSection} onPickSection={setPhoneSection}
         homeLocked={homeLocked} onToggleLock={() => setHomeLocked((v) => !v)}
         onReport={queueReport} queuedReports={queued.filter((a) => a.type === 'report').length}

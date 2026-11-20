@@ -21,6 +21,8 @@ export interface ProductMemory {
   troubleShed?: number; // the request in effect the last time there was a blackout or trip
   troubleAge?: number; // quiet days since then
   userReports: { day: number; level: number; col: number; text: string }[];
+  /** Per section, the last day's family check-ins in the app (Family Check-In). */
+  checkins?: ({ day: number; expected: number; received: number } | null)[];
 }
 
 /** A predicted blackout for a range of levels, worked out from residents' reports and the Directorate's rule. */
@@ -54,6 +56,15 @@ export interface ProductLog {
     deepRatio: number; // residents' count / census on the deepest level
     /** Day 1 only, before any outage reports: the riskiest hour, from the usual use (see firstDayForecast). */
     firstDay?: { peakHour: number; peakMult: number; from: number; to: number }; // to = end hour (exclusive)
+  };
+  familyCheckIn?: {
+    expected: number; // split families expected to check in yesterday
+    received: number; // check-ins that arrived
+    noNews: number; // expected − received
+    relayed: number; // check-ins that came from dark sections (phone to phone)
+    darkSections: number; // sections dark at the end of yesterday
+    silent: number[]; // dark sections where under 70% checked in
+    checks: number[]; // silent sections a neighbor was asked to check
   };
 }
 

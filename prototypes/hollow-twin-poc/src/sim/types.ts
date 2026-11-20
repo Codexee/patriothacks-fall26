@@ -167,6 +167,7 @@ export interface Totals {
   // PRODUCT BRANCH: world facts for problems 7, 8, 12, 13 (shown in the hidden-truth column, never read by modules)
   networkUp: boolean;
   familiesNoNews: number; // families split across levels who do not know if their relatives are okay
+  familyNightsNoNews?: number; // the sum of familiesNoNews over every night so far
   surfaceBelief: number; // 0..1 share of residents who believe the rumor that the surface has healed
   climbersLost: number; // residents who went up the closed way, believing the rumor, and died
   hungerDeaths: number;

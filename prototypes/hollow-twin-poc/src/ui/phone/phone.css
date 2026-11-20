@@ -127,3 +127,28 @@
   .ph-icon.ring, .ph-badge { animation: none; }
   .ph-home { transition: none; }
 }
+
+/* Family Check-In app */
+.fam-ok {
+  width: 100%; padding: 14px; border-radius: 16px; border: none; cursor: pointer; font: 700 18px/1 var(--cond); letter-spacing: 0.02em;
+  color: #04170f; background: linear-gradient(180deg, #6ff0bd, #2fbf86); box-shadow: 0 0 22px rgba(79, 209, 161, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  transition: transform 0.15s, filter 0.15s;
+}
+.fam-ok:hover { filter: brightness(1.06); }
+.fam-ok:active { transform: scale(0.97); }
+.fam-ok.done { background: linear-gradient(180deg, #2b3a48, #1e2a36); color: var(--good); box-shadow: inset 0 0 0 1px rgba(79, 209, 161, 0.5); }
+.sim-tag { margin-left: 6px; padding: 1px 6px; border-radius: 6px; font: 600 10px/1.5 var(--cond); letter-spacing: 0.06em; color: var(--measured); box-shadow: inset 0 0 0 1px rgba(184, 166, 255, 0.45); vertical-align: middle; }
+.fam-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.fam-row { display: flex; gap: 10px; padding: 10px; border-radius: 14px; background: rgba(255, 255, 255, 0.04); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07); }
+.fam-row.silent { background: rgba(240, 101, 79, 0.08); box-shadow: inset 0 0 0 1px rgba(240, 101, 79, 0.35); }
+.fam-av { flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font: 700 15px/1 var(--cond); color: #fff; background: linear-gradient(160deg, #b9a2ff, #6a4fe0); }
+.fam-main { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.fam-top { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.fam-pill { margin-left: auto; padding: 1px 8px; border-radius: 9px; font: 600 11.5px/1.5 var(--cond); }
+.fam-pill.ok { background: var(--good-bg); color: var(--good); }
+.fam-pill.relayed { background: var(--warn-bg); color: var(--warn); }
+.fam-pill.silent { background: var(--bad-bg); color: var(--bad); }
+.fam-pill.none { background: var(--raise); color: var(--muted); }
+.fam-detail { font-size: 12.5px; color: var(--muted); line-height: 1.35; }
+.fam-pill.wait { background: var(--raise); color: var(--system); }
+.fam-row.wait { opacity: 0.8; }

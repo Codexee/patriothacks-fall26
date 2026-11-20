@@ -2,6 +2,15 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-20 (30): Family Check-In (#8), day-1 blackout warning, new results
+
+- **Family Check-In is the second app** (`src/product/familyCheckIn.ts`, key `kin`). Households tap "We're OK". A dark level's network relay has no power, so without the app its families go unheard that night; with it, check-ins hop phone to phone up to the first lit level (held if the whole Hollow is dark). Silent dark sections get a neighbor who checked in OK to knock. On the phone, a relative on a dark level shows "Waiting" until their power is back. Spec: `.plans/family-checkin-spec.md` (locked).
+- **Families are switched on in the sim** (`WORLD.families`). The census now exists before day 1.
+- **Blackout Warning day 1:** before any reports it warns every level of the busiest hours (13:00–21:00), from the public hourly usage curve. No guess about the plants, no power-saving request. Alerts now appear at the start of the day, not after it.
+- **Easing unchanged** (5 points every 5 quiet days). A gentler version (10% every 4 days) was best on seeds 1–10 but doubled deaths on the test seeds, so it is off (`EASE.share` and `EASE.maxShed` stay in the code).
+- **New results** (`public/results/scenarios.json`, "with" = both modules), test seeds 11–20: deaths 20,965,010 → **5,280** (was 5,903), 70/70 stable; families with no news per night 15,283 → 595. The deaths effect of Family Check-In alone is under 0.1%: claim families reached, not lives.
+- **Teammates:** pull. Redeploy Vercel to publish. Update any script or slide that says 5,903.
+
 ## 2026-11-20 (29): The resident's phone is a home screen of apps
 
 - **Each built module is an app** on the phone in the Residents' System panel (`src/ui/phone/`). Today: Blackout Warning and Report. Tap an icon to open its screen; "‹ Home" or the bar at the bottom goes back.

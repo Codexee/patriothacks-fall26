@@ -19,6 +19,7 @@ export interface PhoneProps {
   onReport: (level: number, col: number, text: string) => void;
   queuedReports: number;
   locked: boolean;
+  darkNow?: boolean[];
 }
 
 const sig = (a: Alert) => `${a.action}:${a.from}-${a.to}`;
@@ -35,7 +36,7 @@ export function Phone(p: PhoneProps) {
   const prev = useRef<{ day: number; alerts: Alert[] }>({ day, alerts: [] });
   const screenRef = useRef<HTMLDivElement>(null);
 
-  const perApp = APPS.map((app) => ({ app, alerts: alertsFor(app, run.outputs, section.level) }));
+  const perApp = APPS.map((app) => ({ app, alerts: alertsFor(app, run, section.level) }));
   const openApp = perApp.find((x) => x.app.key === open) ?? null;
 
   // A new day: show a banner when an alert for your level is new, or the save-power ask went up. Reset clears all.
@@ -137,7 +138,7 @@ export function Phone(p: PhoneProps) {
               </header>
               <div className="pa-body">
                 <openApp.app.Screen run={run} modules={p.modules} section={section} alerts={openApp.alerts}
-                  onReport={p.onReport} queuedReports={p.queuedReports} locked={p.locked} />
+                  onReport={p.onReport} queuedReports={p.queuedReports} locked={p.locked} darkNow={p.darkNow} />
               </div>
             </section>
           )}

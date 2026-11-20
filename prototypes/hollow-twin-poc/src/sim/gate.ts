@@ -7,6 +7,7 @@ import { NO_TOOLS, type ToolSet } from './types.ts';
 import { sim } from './index.ts';
 import { createRun, stepRun, type Run as ProductRun } from '../product/run.ts';
 import { TUNE } from '../product/earlyWarning.ts';
+import { BUILT } from '../product/names.ts';
 
 interface Proc { argv: string[]; exit(code: number): never }
 const proc = (globalThis as unknown as { process: Proc }).process;
@@ -28,7 +29,7 @@ const SETS: Record<string, number[]> = {
   ...(argv.includes('--test') ? { test: [11, 12, 13, 14, 15, 16, 17, 18, 19, 20] } : {}),
 };
 
-interface One { deaths: number; trips: number; blackoutMh: number; warnedMh: number; stable: boolean; endDay: number }
+interface One { deaths: number; trips: number; blackoutMh: number; warnedMh: number; stable: boolean; endDay: number; noNews: number }
 
 function runOnce(scenarioId: string, seed: number, tools: ToolSet): One {
   let r: ProductRun = createRun(scenarioId, seed, tools);
@@ -42,12 +43,14 @@ function runOnce(scenarioId: string, seed: number, tools: ToolSet): One {
   return {
     deaths: t.deaths, trips, blackoutMh: t.blackoutPersonHours / 1e6, warnedMh: t.warnedPersonHours / 1e6,
     stable: r.sim.end!.kind === 'stable', endDay: r.sim.end!.day,
+    noNews: (t.familyNightsNoNews ?? 0) / Math.max(1, r.sim.end!.day),
   };
 }
 
-interface Row { set: string; scenario: string; run: string; deaths: number; trips: number; 'warned%': number; stable: string; meanEndDay: number }
+interface Row { set: string; scenario: string; run: string; deaths: number; trips: number; 'warned%': number; stable: string; meanEndDay: number; 'noNews/night': number }
 const rows: Row[] = [];
-const WITH = { ...NO_TOOLS, earlyWarning: true };
+// "With" = every module built so far (Blackout Warning, Family Check-In).
+const WITH = { ...NO_TOOLS, ...Object.fromEntries(BUILT.map((k) => [k, true])) };
 
 for (const [set, seeds] of Object.entries(SETS)) {
   for (const sc of sim.scenarios) {
@@ -62,13 +65,14 @@ for (const [set, seeds] of Object.entries(SETS)) {
         'warned%': b > 0 ? Math.round((w / b) * 100) : 0,
         stable: `${all.filter((x) => x.stable).length}/${all.length}`,
         meanEndDay: Math.round(all.reduce((a, x) => a + x.endDay, 0) / all.length),
+        'noNews/night': Math.round(all.reduce((a, x) => a + x.noNews, 0) / all.length),
       });
     }
   }
 }
 
 console.log(`TUNE ${JSON.stringify(TUNE)}`);
-console.log('Totals over each seed set (deaths and trips are sums; warned% = warned ÷ blackout person-hours).');
+console.log(`Totals over each seed set (deaths and trips are sums; warned% = warned ÷ blackout person-hours; noNews/night = split families with no news at the end of a night, mean per night). "with" = every built module: ${BUILT.join(', ')}.`);
 console.table(rows);
 for (const set of Object.keys(SETS)) {
   const w = rows.filter((r) => r.set === set && r.run === 'with');

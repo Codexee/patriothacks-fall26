@@ -6,6 +6,7 @@
 import { LEVELS, SECTIONS_PER_LEVEL, type Observation, type Output, type ToolSet } from '../sim/types.ts';
 import type { ProductLog, ProductMemory, ProductStep } from './types.ts';
 import { blackoutWarning } from './earlyWarning.ts';
+import { familyCheckIn } from './familyCheckIn.ts';
 
 const HOURS = 24;
 const HOLLOW_DARK = 0.9; // share of levels dark at once that means a plant trip, not the usual deep-first cut
@@ -47,6 +48,8 @@ function ingest(m: ProductMemory, obs: Observation[]): Record<string, number> {
       m.census.people[i] = o.people;
       m.census.demand[i] = o.demand;
       m.census.critical[i] = o.critical;
+    } else if (o.kind === 'checkins') {
+      (m.checkins ??= [])[(o.level - 1) * SECTIONS_PER_LEVEL + o.col] = { day: o.day, expected: o.expected, received: o.received };
     } else if (o.kind === 'selfCount') {
       m.selfCount[(o.level - 1) * SECTIONS_PER_LEVEL + o.col] = o.people;
     } else if (o.kind === 'outage') {
@@ -95,6 +98,10 @@ export function stepProduct(obs: Observation[], prev: ProductMemory, modules: To
   if (modules.earlyWarning) {
     const bw = blackoutWarning(m, day);
     if (bw) { outputs.push(...bw.outputs); log.blackoutWarning = bw.log; m.shed = bw.log.shed; }
+  }
+  if (modules.kin) {
+    const fc = familyCheckIn(m, day);
+    if (fc) { outputs.push(...fc.outputs); log.familyCheckIn = fc.log; }
   }
   return { outputs, memory: m, log };
 }

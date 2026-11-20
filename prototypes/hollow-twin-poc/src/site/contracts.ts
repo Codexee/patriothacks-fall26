@@ -16,6 +16,7 @@ export interface RunStats {
   stableShare: number; // share of runs that reached a stable Hollow (0..1)
   endDay: Interval; // day the run ended (stable or the 120-day cap)
   warnedPct: number | null; // warned ÷ blackout person-hours, all seeds pooled; null when there were no blackouts
+  noNewsPerNight?: Interval; // #8: split families with no news of their relatives at the end of a night, mean per night of the run
 }
 
 export interface DailyPoint {

@@ -35,11 +35,11 @@ export const TRIP_ZONE = 0.95; // above this, plants are close to tripping
 // 15% a day made the plants trip again). The request comes down only after several quiet days in a row, a small
 // step at a time, and never to the level where trouble last started (that memory fades after a while).
 export const EASE = {
-  afterQuietDays: 4, // quiet days in a row before each step down (Nov 20 test, seeds 1–10: 4 days + share 0.10 had the fewest deaths, all runs stable; 3 days caused extra trips)
+  afterQuietDays: 5, // quiet days in a row before each step down (tested: 3 days caused extra trips. Nov 20: 4 days + share 0.10 was best on seeds 1–10 but doubled deaths on the test seeds, so it was not kept)
   step: 0.05, // how much each step lowers the request
   floorMargin: 0.05, // stay this far above the request that was in effect the last time there was trouble
   floorDays: 7, // forget that trouble level after this many quiet days
-  share: 0.1, // each step lowers the request by this share of it (90% → 81% → 73% …), so big requests come down faster
+  share: 0, // if above 0, each step lowers the request by this share of it instead of a fixed step (off: see afterQuietDays)
   maxShed: 0.9, // the largest request, as a share of non-essential load
 };
 const HOURS = 24;

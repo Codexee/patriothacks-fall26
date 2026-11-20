@@ -33,7 +33,7 @@ export const WORLD = {
   food: false, // #12 food runs out (and farms get diverted)
   lies: false, // #9, #13 the Directorate's false bulletins
   network: false, // #7 the Directorate cuts the network
-  families: false, // #8 families split across levels
+  families: true, // #8 families split across levels (on since Nov 20: Family Check-In)
   surface: false, // #13 the "surface has healed" rumor
   census: false, // off: the Directorate publishes an accurate census. (On: it undercounts the deep levels; our assumption, not in the brief.)
 };
@@ -1093,17 +1093,31 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
   const known = new Array<number>(SECTION_COUNT).fill(0);
   const expected = new Array<number>(SECTION_COUNT).fill(0);
   let noNews = 0;
+  // A level has power at the end of the day when most of its sections have air and fans.
+  const levelLit = new Array<boolean>(LEVELS).fill(false);
+  for (let l = 0; l < LEVELS; l++) {
+    let lit = 0;
+    for (let c = 0; c < SECTIONS_PER_LEVEL; c++) { const i = l * SECTIONS_PER_LEVEL + c; if (!s.lost[i] && !s.outDark[i]) lit++; }
+    levelLit[l] = lit > SECTIONS_PER_LEVEL / 2;
+  }
+  const litAbove = new Array<boolean>(LEVELS).fill(false); // some level above this one has power
+  for (let l = 1; l < LEVELS; l++) litAbove[l] = litAbove[l - 1] || levelLit[l - 1];
   for (let i = 0; i < SECTION_COUNT; i++) {
     if (s.lost[i]) continue;
     expected[i] = Math.round(s.people[i] / FAMILY_SIZE);
     const sick = s.people[i] > 0 ? s.infected[i] / s.people[i] : 0;
     const distress = clamp(Math.max(0, s.wet[i] - 30) / 3 + Math.max(0, s.co2[i] - 2000) / 3000 + sick * 3 + (s.power[i] < 0.2 ? 0.3 : 0), 0, 0.9);
     // Network up: families call each other. Network down: only Kin check-ins over the Lantern mesh get through.
-    const path = netUpEnd ? 1 : state.tools.kin && state.tools.lantern ? reachEnd[i] : 0;
+    let path = netUpEnd ? 1 : state.tools.kin && state.tools.lantern ? reachEnd[i] : 0;
+    // A dark section's network relay has no power, so its check-ins cannot get out tonight (they arrive tomorrow).
+    // With Family Check-In, they hop phone to phone up to the first level with power. If the whole Hollow is dark,
+    // they wait. ASSUMPTION: phones on adjacent levels can reach each other.
+    if (WORLD.families && s.outDark[i]) path = state.tools.kin && litAbove[lvl(i) - 1] ? path : 0;
     known[i] = expected[i] * (1 - distress) * path;
     noNews += expected[i] - known[i];
   }
   state.totals.familiesNoNews = WORLD.families ? Math.round(noNews) : 0;
+  state.totals.familyNightsNoNews = (state.totals.familyNightsNoNews ?? 0) + state.totals.familiesNoNews;
   state.totals.networkUp = netUpEnd;
   state.totals.surfaceBelief = Math.round(s.belief * 1000) / 1000;
 

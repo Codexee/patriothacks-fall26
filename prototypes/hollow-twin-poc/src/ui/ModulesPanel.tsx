@@ -35,7 +35,7 @@ function BlackoutWarningCard({ run }: CardProps) {
         {bw.hollowDarkHours > 0 && <> The whole Hollow went dark for <b className="bad">{bw.hollowDarkHours} h</b> (plants tripped).</>}</p>
       {bw.supplyEstimate !== null && <p>So the plants made about <b>{fmt(bw.supplyEstimate)}</b> units at the worst hour, for a need of <b>{fmt(bw.demand)}</b>.</p>}
       {bw.shed > 0
-        ? <p className="warn-text">{bw.eased ? `No blackouts for ${bw.quietDays} days in a row: eased the request by a tenth.` : bw.lineWorst === null && bw.hollowDarkHours === 0 ? `Quiet for ${bw.quietDays} day${bw.quietDays === 1 ? '' : 's'}: keeping the request (it eases by a tenth after every 4 quiet days in a row).` : 'Plants are running at their limit.'} Asked everyone to switch off {Math.round(bw.shed * 100)}% of non-essential load today.</p>
+        ? <p className="warn-text">{bw.eased ? `No blackouts for ${bw.quietDays} days in a row: eased the request by 5 points.` : bw.lineWorst === null && bw.hollowDarkHours === 0 ? `Quiet for ${bw.quietDays} day${bw.quietDays === 1 ? '' : 's'}: keeping the request (it eases by 5 points after every 5 quiet days in a row).` : 'Plants are running at their limit.'} Asked everyone to switch off {Math.round(bw.shed * 100)}% of non-essential load today.</p>
         : <p className="good">No blackouts yesterday: no power saving needed.</p>}
       <h4>Blackouts predicted (today)</h4>
       {bw.blackouts.length === 0 ? <p className="muted">None.</p> : (
@@ -53,11 +53,33 @@ function BlackoutWarningCard({ run }: CardProps) {
   );
 }
 
+/** Problem #8: Family Check-In. */
+function FamilyCheckInCard({ run }: CardProps) {
+  const fc = run.log?.familyCheckIn;
+  if (!fc) return <p className="muted">Gathering data. The first check-ins arrive after the first night.</p>;
+  const levels = [...new Set(fc.checks.map((i) => Math.floor(i / 8) + 1))].sort((a, b) => a - b);
+  return (
+    <>
+      <p>Last night <b>{fmt(fc.received)}</b> of <b>{fmt(fc.expected)}</b> split families checked in{fc.noNews > 0 && <> (<b className="bad">{fmt(fc.noNews)}</b> with no news)</>}.</p>
+      <p>{fc.darkSections > 0
+        ? <><b>{fc.darkSections}</b> sections were dark at the end of the day. <b>{fmt(fc.relayed)}</b> check-ins from them hopped phone to phone up to a level with power.</>
+        : 'No section was dark at the end of the day.'}</p>
+      {fc.silent.length > 0
+        ? <p className="warn-text">{fc.silent.length} dark section{fc.silent.length === 1 ? '' : 's'} went silent (under 70% checked in). Neighbors who checked in OK were asked to knock on {fc.checks.length}{levels.length > 0 && <> (levels {levels.slice(0, 10).join(', ')}{levels.length > 10 ? '…' : ''})</>}.</p>
+        : <p className="good">No dark section went silent.</p>}
+    </>
+  );
+}
+
 /** Each built module: its card, and what its info icon explains. */
 const MODULE_CARDS: Partial<Record<ToolKey, { card: (p: CardProps) => ReactNode; about: string }>> = {
+  kin: {
+    card: FamilyCheckInCard,
+    about: "Households tap 'We're OK' in the app. A dark level's network relay has no power, so without the app its families go unheard until the power is back. With the app, check-ins hop phone to phone up to the first level with power (assumption: phones on adjacent levels can reach each other); if the whole Hollow is dark, they wait. A dark section where under 70% of families checked in counts as silent, and a household nearby that checked in OK is asked to knock on their door. In the test world that cuts deaths there by 25% for a day: a guess, no study gives this number. Families split across levels: one per 40 residents (also a guess).",
+  },
   earlyWarning: {
     card: BlackoutWarningCard,
-    about: "Power goes to the upper levels first, so the line where residents report blackouts shows how much power the plants make. Yesterday's line, and how it moved since the day before, predicts today's. Power needs come from residents' own head count. No plant meters, no forecast. On day 1, before any reports, it warns every level of the busiest hours, when a blackout is most likely; it makes no guess about the plants. The power-saving request keeps the plants under 82% of their output; after 4 quiet days in a row it eases by a tenth of itself. In the test world, air harm starts at 5,000 ppm CO₂, the OSHA and NIOSH workplace limit (NIOSH Pocket Guide). How many residents follow an alert, and how much a warning saves, are still first guesses: no study gives comparable numbers.",
+    about: "Power goes to the upper levels first, so the line where residents report blackouts shows how much power the plants make. Yesterday's line, and how it moved since the day before, predicts today's. Power needs come from residents' own head count. No plant meters, no forecast. On day 1, before any reports, it warns every level of the busiest hours, when a blackout is most likely; it makes no guess about the plants. The power-saving request keeps the plants under 82% of their output; after 5 quiet days in a row it eases by 5 points. In the test world, air harm starts at 5,000 ppm CO₂, the OSHA and NIOSH workplace limit (NIOSH Pocket Guide). How many residents follow an alert, and how much a warning saves, are still first guesses: no study gives comparable numbers.",
   },
 };
 

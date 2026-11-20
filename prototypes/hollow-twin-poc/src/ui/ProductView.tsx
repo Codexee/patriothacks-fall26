@@ -19,6 +19,7 @@ export interface ProductViewProps {
   onReport: (level: number, col: number, text: string) => void;
   queuedReports: number;
   locked: boolean;
+  darkNow?: boolean[];
 }
 
 export function ProductView(p: ProductViewProps) {
@@ -31,7 +32,7 @@ export function ProductView(p: ProductViewProps) {
             <span key={pr.n} className={`dot ${pr.feature && BUILT.includes(pr.feature) ? 'done' : ''}`} title={`#${pr.n} ${pr.title}${pr.feature ? ` — ${moduleName(pr.feature)}` : ' — not built yet'}`}>{pr.n}</span>
           ))}
         </div>
-        <p className="muted small">Step 1 of 15 · Problem #1: warn people before the power or air cuts out.</p>
+        <p className="muted small">2 of 15 problems solved · #1 Blackout Warning, #8 Family Check-In.</p>
       </header>
       <Phone {...p} />
     </aside>
