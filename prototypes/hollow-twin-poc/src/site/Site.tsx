@@ -21,8 +21,8 @@ const TITLES: Record<string, string> = {
   results: 'Results',
   disaster: 'Disaster',
   model: 'Check-first model',
-  demo: 'Watch it run',
-  demoClassic: 'Watch it run (2D cutaway)',
+  demo: 'Watch it run (3D)',
+  demoClassic: 'Watch it run',
   film: 'Film',
   missing: 'Page not found',
 };

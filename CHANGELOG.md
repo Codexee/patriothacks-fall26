@@ -2,6 +2,12 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-20 (28): "Watch it run" is the 2D cutaway again; Baseline is its default
+
+- **`#/demo` opens the 2D cutaway** (`#/demo/classic` still works). The 3D workstation moved to `#/demo/3d`; no site link points to it now. The Results, disaster-page, and hero-video links say "Watch it run".
+- **The cutaway starts on Baseline** instead of Cascade (`src/ui/App.tsx`). Pick a disaster with the Test World panel (`T`).
+- **The hero video on Results is still the 3D film.** Nothing for teammates to do; redeploy Vercel to publish.
+
 ## 2026-11-20 (27): Results site redesign (Results, disaster pages, Model)
 
 - **Full-width layout and new type:** IBM Plex Sans and Mono, hairline rules, numbered sections. The workstation (`src/twin3d/`) and its CSS tokens are unchanged.

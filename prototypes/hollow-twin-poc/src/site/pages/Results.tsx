@@ -95,7 +95,7 @@ export function Results({ data }: { data: SiteData }) {
             </p>
             <div className="hero-actions">
               <button type="button" className="btn primary" onClick={() => goTo('how')}>How it works</button>
-              <a className="btn" href={href.demo()}>Open the 3D twin</a>
+              <a className="btn" href={href.demoClassic()}>Watch it run</a>
             </div>
           </div>
           <div className="hero-media">

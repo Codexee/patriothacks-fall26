@@ -1,5 +1,5 @@
-// Hash router with no library. Routes: #/ · #/disaster/<id> · #/model · #/demo[?scenario=<id>] (3D twin) ·
-// #/demo/classic[?scenario=<id>] (the 2D cutaway) · #/film/<id> (a 1920×1080 frame for video capture)
+// Hash router with no library. Routes: #/ · #/disaster/<id> · #/model · #/demo[?scenario=<id>] (the 2D cutaway; #/demo/classic is the same page) ·
+// #/demo/3d[?scenario=<id>] (the 3D workstation) · #/film/<id> (a 1920×1080 frame for video capture)
 import { useEffect, useState } from 'react';
 
 export type Route =
@@ -18,7 +18,8 @@ export function parseHash(hash: string): Route {
   if (parts.length === 0) return { page: 'results' };
   if (parts[0] === 'disaster' && parts[1]) return { page: 'disaster', id: parts[1] };
   if (parts[0] === 'model' && parts.length === 1) return { page: 'model' };
-  if (parts[0] === 'demo' && parts.length === 1) return { page: 'demo', scenario: new URLSearchParams(query).get('scenario') };
+  if (parts[0] === 'demo' && parts.length === 1) return { page: 'demoClassic', scenario: new URLSearchParams(query).get('scenario') };
+  if (parts[0] === 'demo' && parts[1] === '3d' && parts.length === 2) return { page: 'demo', scenario: new URLSearchParams(query).get('scenario') };
   if (parts[0] === 'demo' && parts[1] === 'classic' && parts.length === 2) return { page: 'demoClassic', scenario: new URLSearchParams(query).get('scenario') };
   if (parts[0] === 'film' && parts[1] && parts.length === 2) return { page: 'film', id: parts[1] };
   return { page: 'missing', hash: raw };
@@ -28,8 +29,8 @@ export const href = {
   results: '#/',
   model: '#/model',
   disaster: (id: string) => `#/disaster/${encodeURIComponent(id)}`,
-  demo: (scenario?: string) => (scenario ? `#/demo?scenario=${encodeURIComponent(scenario)}` : '#/demo'),
-  demoClassic: (scenario?: string) => (scenario ? `#/demo/classic?scenario=${encodeURIComponent(scenario)}` : '#/demo/classic'),
+  demo: (scenario?: string) => (scenario ? `#/demo/3d?scenario=${encodeURIComponent(scenario)}` : '#/demo/3d'),
+  demoClassic: (scenario?: string) => (scenario ? `#/demo?scenario=${encodeURIComponent(scenario)}` : '#/demo'),
   film: (id: string) => `#/film/${encodeURIComponent(id)}`,
 };
 

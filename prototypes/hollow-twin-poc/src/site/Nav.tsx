@@ -6,7 +6,7 @@ export function Nav({ route, compact = false }: { route: Route; compact?: boolea
   const items: [string, string, string][] = [
     ['results', href.results, 'Results'],
     ['model', href.model, 'Model'],
-    ['demo', href.demo(), 'Watch it run'],
+    ['demo', href.demoClassic(), 'Watch it run'],
   ];
   return (
     <nav className={`site-nav${compact ? ' compact' : ''}`} aria-label="Main">

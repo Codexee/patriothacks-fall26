@@ -63,7 +63,7 @@ export function HeroVideo({ scenarios }: { scenarios: ScenarioResult[] }) {
         <button type="button" className="hv-play" onClick={toggle} aria-pressed={playing} disabled={failed}>
           {playing ? 'Pause' : 'Play'}
         </button>
-        <a className="hv-link" href={href.demo(id)}>Run it in 3D</a>
+        <a className="hv-link" href={href.demoClassic(id)}>Watch it run</a>
       </figcaption>
     </figure>
   );

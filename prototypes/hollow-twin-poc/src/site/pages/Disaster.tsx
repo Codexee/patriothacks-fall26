@@ -34,7 +34,7 @@ export function Disaster({ data, id }: { data: SiteData; id: string }) {
         <div className="head-grid">
         <div>
           <p className="lede">{s.summary}</p>
-          <a className="button" href={href.demo(s.id)}>Watch it run in 3D →</a>
+          <a className="button" href={href.demoClassic(s.id)}>Watch it run →</a>
         </div>
         <div>
         <dl className="spec page-spec">

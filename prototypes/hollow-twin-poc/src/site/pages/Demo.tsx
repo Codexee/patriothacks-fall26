@@ -1,4 +1,4 @@
-// #/demo/classic — the existing 2D cutaway App, unchanged, under a slim bar back to the results. (#/demo is the 3D twin.)
+// #/demo — the 2D cutaway App, unchanged, under a slim bar back to the results. (#/demo/3d is the 3D workstation.)
 import { Suspense, lazy, useEffect } from 'react';
 import type { SiteData } from '../data.ts';
 import { Nav } from '../Nav.tsx';
