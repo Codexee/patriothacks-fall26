@@ -2,6 +2,11 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-20 (26): "Watch it run" is a modeling workstation
+
+- **`#/demo`** is now a full-screen workstation: a toolbar (disaster, any seed 1–20 with its set, step day, view mode, a day scrubber with event marks), a model inspector (Blackout Warning's frozen settings, the disaster's real input curves, the EAGLE-I repair histogram, cited vs guessed constants, data provenance), the 3D twin with a clickable section card (real counties), telemetry charts, a plant table, depth heat strips, and tabs for the event log, the module's daily output, residents' observations and all 400 sections.
+- **Every value is real output** of the sim, the module or the data files, and carries a tag (SIM, MODULE, REAL DATA, GUESS, CITED, TUNED, HAND-SET, DERIVED). No decorative data.
+
 ## 2026-11-20 (25): 3D twin and homepage films
 
 - **`#/demo` is now a 3D twin** (react-three-fiber): two Hollow shafts, without and with Blackout Warning, on the same disaster and a typical held-out seed, synced day by day, with a disaster dropdown, play/pause, a day scrubber and speed. The old 2D cutaway is at `#/demo/classic`.
