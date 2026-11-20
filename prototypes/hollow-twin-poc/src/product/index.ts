@@ -55,8 +55,10 @@ function ingest(m: ProductMemory, obs: Observation[]): Record<string, number> {
       if (o.byUser) m.userReports.push({ day: o.day, level: o.level, col: o.col, text: o.text });
     }
   }
-  // Replay the outage reports hour by hour to get yesterday's blackout line.
-  if (outages.length || m.census.people.length) {
+  // Replay the outage reports hour by hour to get yesterday's blackout line. The standing census before day 1
+  // (day 0) has no yesterday, so it gives no line.
+  const standing = obs.every((o) => 'day' in o && o.day === 0);
+  if (!standing && (outages.length || m.census.people.length)) {
     outages.sort((a, b) => a.hour - b.hour);
     const dark = m.outDark.slice();
     const line: number[] = [], hollowDark: boolean[] = [];

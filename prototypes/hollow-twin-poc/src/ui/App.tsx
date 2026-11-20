@@ -27,6 +27,9 @@ export function App() {
   const [seed, setSeed] = useState(1);
   const [pendingTools, setPendingTools] = useState<ToolSet>(NO_TOOLS);
   const [run, setRun] = useState<Run>(() => createRun(DEFAULT_SCENARIO, 1, NO_TOOLS));
+  // While a day plays, the phone and the Modules panel already show that day's alerts: they arrive in the morning,
+  // before the day's blackouts, not after it.
+  const [morning, setMorning] = useState<Run | null>(null);
   const [frame, setFrame] = useState<Frame>(run.sim.lastFrame);
   const [events, setEvents] = useState<string[]>([]);
   const [queued, setQueued] = useState<Action[]>([]); // a person's events and reports for the next day
@@ -46,6 +49,7 @@ export function App() {
   const reset = useCallback((id: string, s: number, tools: ToolSet) => {
     const fresh = createRun(id, s, tools);
     setRun(fresh);
+    setMorning(null);
     setFrame(fresh.sim.lastFrame);
     setEvents([]);
     setQueued([]);
@@ -79,6 +83,7 @@ export function App() {
     const d = stepRun(run, pendingTools, queued);
     setQueued([]);
     setPlaying(true);
+    setMorning(d.run);
     skipRef.current = false;
     for (const f of d.frames) {
       if (skipRef.current) break;
@@ -86,6 +91,7 @@ export function App() {
       await sleep(FRAME_MS);
     }
     setRun(d.run);
+    setMorning(null);
     setFrame(d.run.sim.lastFrame);
     setEvents((prev) => [...[...d.events].reverse(), ...prev]);
     setPlaying(false);
@@ -182,12 +188,12 @@ export function App() {
         {DEBUG && <DebugHover onHover={onHover} />}
       </main>
       <ModulesPanel
-        run={run} running={state.tools} pending={pendingTools} locked={playing || busy !== null}
+        run={morning ?? run} running={state.tools} pending={pendingTools} locked={playing || busy !== null}
         onToggleModule={toggleModule} onReset={() => reset(scenarioId, seed, pendingTools)}
         open={modsOpen} onToggle={() => setModsOpen((v) => !v)}
       />
       <ProductView
-        run={run} modules={state.tools} hour={frame.hour} playing={playing} section={phoneSection} onPickSection={setPhoneSection}
+        run={morning ?? run} modules={state.tools} hour={frame.hour} playing={playing} section={phoneSection} onPickSection={setPhoneSection}
         homeLocked={homeLocked} onToggleLock={() => setHomeLocked((v) => !v)}
         onReport={queueReport} queuedReports={queued.filter((a) => a.type === 'report').length}
         locked={playing || busy !== null || !!state.end}

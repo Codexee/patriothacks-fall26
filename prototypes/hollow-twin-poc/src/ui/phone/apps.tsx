@@ -64,7 +64,9 @@ function BlackoutWarningScreen({ run, modules, section, alerts }: AppScreenProps
     <>
       <section className="pa-hero">
         <h3>Next blackout on level {section.level}</h3>
-        {mine ? (
+        {bw?.firstDay ? (
+          <p className="big-line bad">Possible today, most likely {clock(bw.firstDay.from)}–{clock(bw.firstDay.to % 24)}.</p>
+        ) : mine ? (
           <p className="big-line bad">Today from about {clock(mine.startClock)}, lasting about {mine.hours} h.</p>
         ) : bw ? (
           <p className="big-line good">None expected today.</p>

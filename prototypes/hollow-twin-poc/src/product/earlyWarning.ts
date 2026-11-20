@@ -15,10 +15,13 @@
 //  3. Compares the line with the day before: is it moving up (less power each day) or down?
 //  4. Predicts today's line hour by hour (yesterday's line + the trend), so it can say which levels go dark, at
 //     what time, and for how long.
+//  0. Day 1 only (no reports yet): warns every level of the riskiest hour, from the usual use. No guess about the
+//     plants and no power saving (see firstDayForecast at the end).
 //  5. Asks everyone to switch off enough non-essential load that the plants stop running at their limit. Plants at
 //     their limit trip and black out the whole Hollow, not only the deep levels.
 import { LEVELS, SECTIONS_PER_LEVEL, type Output } from '../sim/types.ts';
 import type { PredictedBlackout, ProductLog, ProductMemory } from './types.ts';
+import { grid } from '../data/real/index.ts';
 
 /** The 4 guessed constants that the gate tunes (npm run gate -- --set safeLoad=0.9). Defaults = first guesses. */
 export const TUNE = {
@@ -32,10 +35,12 @@ export const TRIP_ZONE = 0.95; // above this, plants are close to tripping
 // 15% a day made the plants trip again). The request comes down only after several quiet days in a row, a small
 // step at a time, and never to the level where trouble last started (that memory fades after a while).
 export const EASE = {
-  afterQuietDays: 5, // quiet days in a row before each step down (tested: 3 days caused extra trips)
+  afterQuietDays: 4, // quiet days in a row before each step down (Nov 20 test, seeds 1–10: 4 days + share 0.10 had the fewest deaths, all runs stable; 3 days caused extra trips)
   step: 0.05, // how much each step lowers the request
   floorMargin: 0.05, // stay this far above the request that was in effect the last time there was trouble
   floorDays: 7, // forget that trouble level after this many quiet days
+  share: 0.1, // each step lowers the request by this share of it (90% → 81% → 73% …), so big requests come down faster
+  maxShed: 0.9, // the largest request, as a share of non-essential load
 };
 const HOURS = 24;
 
@@ -43,12 +48,13 @@ const sum = (a: number[]) => a.reduce((s, v) => s + (v || 0), 0);
 
 export function blackoutWarning(m: ProductMemory, day: number):
   { outputs: Output[]; log: NonNullable<ProductLog['blackoutWarning']> } | null {
-  if (!m.census.demand.length || !m.lines.length) return null;
+  if (!m.census.demand.length) return null;
 
   // Power needs per section: the census ration, scaled up where residents counted more people than the census.
   const ratio = m.census.people.map((p, i) => (p > 0 && m.selfCount[i] > 0 ? m.selfCount[i] / p : 1));
   const demand = m.census.demand.map((v, i) => (v || 0) * ratio[i]);
   const critical = m.census.critical.map((v, i) => (v || 0) * ratio[i]);
+  if (!m.lines.length) return firstDayForecast(m, day, demand);
   const levelNeed = (l: number, shed: number) => { // l = 0-based level
     let s = 0;
     for (let c = 0; c < SECTIONS_PER_LEVEL; c++) {
@@ -90,15 +96,16 @@ export function blackoutWarning(m: ProductMemory, day: number):
   if (quiet) { m.quietDays = (m.quietDays ?? 0) + 1; m.troubleAge = (m.troubleAge ?? 0) + 1; }
   else { m.quietDays = 0; m.troubleAge = 0; m.troubleShed = y.shed; } // the request that was in effect when trouble came
   if (sMin !== null) {
-    shed = Math.max(0, Math.min(0.9, (D - TUNE.safeLoad * sMin) / Math.max(1, D - C) / TUNE.assumedCompliance));
+    shed = Math.max(0, Math.min(EASE.maxShed, (D - TUNE.safeLoad * sMin) / Math.max(1, D - C) / TUNE.assumedCompliance));
     if (shed > 0) shed = Math.max(0.05, shed);
   } else if (hollowDarkHours > 0) {
-    shed = Math.min(0.9, m.shed + TUNE.tripStep); // the plants tripped: they were overloaded, by an unknown amount
+    shed = Math.min(EASE.maxShed, m.shed + TUNE.tripStep); // the plants tripped: they were overloaded, by an unknown amount
   } else {
     shed = m.shed; // no blackouts yesterday: keep the request, and ease it only after several quiet days (see EASE)
     if (EASE.afterQuietDays > 0 && m.quietDays > 0 && m.quietDays % EASE.afterQuietDays === 0) {
       const floor = (m.troubleAge ?? 0) <= EASE.floorDays ? (m.troubleShed ?? 0) + EASE.floorMargin : 0;
-      shed = Math.min(m.shed, Math.max(floor, m.shed - EASE.step));
+      const step = EASE.share > 0 ? Math.max(0.01, m.shed * EASE.share) : EASE.step;
+      shed = Math.min(m.shed, Math.max(floor, m.shed - step));
     }
     if (shed < 0.03) shed = 0;
   }
@@ -197,6 +204,56 @@ export function blackoutWarning(m: ProductMemory, day: number):
       supplyEstimate: sMin, demand: D, hollowDarkHours, shed, blackouts, darkNow, tripRisk,
       quietDays: m.quietDays ?? 0, eased: shed < m.shed - 1e-9,
       censusPeople: censusTotal, selfPeople: selfTotal, deepRatio: c50 > 0 ? r50 / c50 : 1,
+    },
+  };
+}
+
+// ---------- Day 1: before any outage report ----------
+// With no reports yet, the blackout line says nothing, and residents cannot see the plants: nobody knows how much
+// power they can make. So day 1 makes no guess about the plants and asks for no power saving. It only says WHEN a
+// blackout is most likely, from what residents do know about use:
+//  - the census ration and the residents' own count (how much each section uses);
+//  - use rises and falls through the day like a real grid's: the public hourly demand curve (EIA-930, ERCOT 2023
+//    calm weeks), for today's day of the week.
+// Plants trip when they are pushed hardest, so the busiest hour is the riskiest. From day 2, the outage reports
+// show what the plants really made, and the module predicts and prevents as usual.
+function firstDayForecast(m: ProductMemory, day: number, demand: number[]):
+  { outputs: Output[]; log: NonNullable<ProductLog['blackoutWarning']> } | null {
+  const curve = grid?.demandWeek;
+  if (!curve || curve.length < 168) return null;
+  const D = sum(demand);
+  const d0 = ((day - 1) % 7) * HOURS;
+  let peakHour = 0;
+  for (let h = 1; h < HOURS; h++) if (curve[d0 + h] > curve[d0 + peakHour]) peakHour = h;
+  const peakMult = curve[d0 + peakHour];
+  // The busy window: the hours when use is within 5 points of the peak (13:00–21:00 on a weekday).
+  let from = peakHour, to = peakHour;
+  while (from > 0 && curve[d0 + from - 1] >= peakMult - 0.05) from--;
+  while (to < HOURS - 1 && curve[d0 + to + 1] >= peakMult - 0.05) to++;
+
+  const fmt = (x: number) => Math.round(x).toLocaleString('en-US');
+  const clock = (h: number) => `${String(h % 24).padStart(2, '0')}:00`;
+  const above = Math.round((peakMult - 1) * 100);
+  const outputs: Output[] = [{
+    kind: 'alert', id: `bw-first-${day}`, module: 'earlyWarning', action: 'prepare', from: 1, to: LEVELS, hours: 24,
+    text: `First day: no outage reports yet, and nobody can see how much power the plants make. If a blackout comes today, it is most likely between ${clock(from)} and ${clock(to + 1)}, when the Hollow uses the most power (the most at about ${clock(peakHour)}). Every level: before ${clock(from)}, charge lights, store water, and plan where children, the elderly and the sick will go for air.`,
+    evidence: [
+      `Everyone together normally uses about ${fmt(D)} units (census ration, scaled by the residents' own count)`,
+      `On this day of the week, use is highest between ${clock(from)} and ${clock(to + 1)}, most at about ${clock(peakHour)} (${above}% above normal) (public hourly grid data, EIA-930)`,
+      `Plants trip when they are pushed hardest, so the busiest hour is the riskiest`,
+      `How much the plants can make is unknown until the first outage reports come in tomorrow`,
+    ],
+  }];
+  const censusTotal = sum(m.census.people), selfTotal = sum(m.selfCount);
+  let c50 = 0, r50 = 0;
+  for (let i = (LEVELS - 1) * SECTIONS_PER_LEVEL; i < LEVELS * SECTIONS_PER_LEVEL; i++) { c50 += m.census.people[i] || 0; r50 += m.selfCount[i] || 0; }
+  return {
+    outputs,
+    log: {
+      lineWorst: null, lineWorstHour: peakHour, trend: 0, supplyEstimate: null, demand: D, hollowDarkHours: 0, shed: 0,
+      blackouts: [], darkNow: [], tripRisk: true, quietDays: 0, eased: false,
+      censusPeople: censusTotal, selfPeople: selfTotal, deepRatio: c50 > 0 ? r50 / c50 : 1,
+      firstDay: { peakHour, peakMult, from, to: to + 1 },
     },
   };
 }

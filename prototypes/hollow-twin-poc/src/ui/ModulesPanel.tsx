@@ -16,6 +16,15 @@ interface CardProps { run: Run }
 function BlackoutWarningCard({ run }: CardProps) {
   const bw = run.log?.blackoutWarning;
   if (!bw) return <p className="muted">Gathering data. The first forecast comes after the first day.</p>;
+  if (bw.firstDay) {
+    return (
+      <>
+        <p>First day: no outage reports yet. Residents cannot see the plants, so nobody knows how much power they can make.</p>
+        <p>Use is highest between <b>{clock(bw.firstDay.from)}</b> and <b>{clock(bw.firstDay.to % 24)}</b> today, most at about {clock(bw.firstDay.peakHour)} ({Math.round((bw.firstDay.peakMult - 1) * 100)}% above normal, public hourly grid data). Plants trip when they are pushed hardest, so the module <b className="warn-text">warned every level</b> that a blackout is most likely then.</p>
+        <p className="muted">No power saving asked yet. From tomorrow, the outage reports show what the plants really made.</p>
+      </>
+    );
+  }
   return (
     <>
       <p>Head count: the Directorate's census says <b>{fmt(bw.censusPeople)}</b>; residents counted <b>{fmt(bw.selfPeople)}</b> in the app
@@ -26,7 +35,7 @@ function BlackoutWarningCard({ run }: CardProps) {
         {bw.hollowDarkHours > 0 && <> The whole Hollow went dark for <b className="bad">{bw.hollowDarkHours} h</b> (plants tripped).</>}</p>
       {bw.supplyEstimate !== null && <p>So the plants made about <b>{fmt(bw.supplyEstimate)}</b> units at the worst hour, for a need of <b>{fmt(bw.demand)}</b>.</p>}
       {bw.shed > 0
-        ? <p className="warn-text">{bw.eased ? `No blackouts for ${bw.quietDays} days in a row: eased the request by 5 points.` : bw.lineWorst === null && bw.hollowDarkHours === 0 ? `Quiet for ${bw.quietDays} day${bw.quietDays === 1 ? '' : 's'}: keeping the request (it eases by 5 points after every 5 quiet days in a row).` : 'Plants are running at their limit.'} Asked everyone to switch off {Math.round(bw.shed * 100)}% of non-essential load today.</p>
+        ? <p className="warn-text">{bw.eased ? `No blackouts for ${bw.quietDays} days in a row: eased the request by a tenth.` : bw.lineWorst === null && bw.hollowDarkHours === 0 ? `Quiet for ${bw.quietDays} day${bw.quietDays === 1 ? '' : 's'}: keeping the request (it eases by a tenth after every 4 quiet days in a row).` : 'Plants are running at their limit.'} Asked everyone to switch off {Math.round(bw.shed * 100)}% of non-essential load today.</p>
         : <p className="good">No blackouts yesterday: no power saving needed.</p>}
       <h4>Blackouts predicted (today)</h4>
       {bw.blackouts.length === 0 ? <p className="muted">None.</p> : (
@@ -48,7 +57,7 @@ function BlackoutWarningCard({ run }: CardProps) {
 const MODULE_CARDS: Partial<Record<ToolKey, { card: (p: CardProps) => ReactNode; about: string }>> = {
   earlyWarning: {
     card: BlackoutWarningCard,
-    about: "Power goes to the upper levels first, so the line where residents report blackouts shows how much power the plants make. Yesterday's line, and how it moved since the day before, predicts today's. Power needs come from residents' own head count. No plant meters, no forecast. The power-saving request keeps the plants under 88% of their output; after 5 quiet days in a row it eases by 5 points. In the test world, air harm starts at 5,000 ppm CO₂, the OSHA and NIOSH workplace limit (NIOSH Pocket Guide). How many residents follow an alert, and how much a warning saves, are still first guesses: no study gives comparable numbers.",
+    about: "Power goes to the upper levels first, so the line where residents report blackouts shows how much power the plants make. Yesterday's line, and how it moved since the day before, predicts today's. Power needs come from residents' own head count. No plant meters, no forecast. On day 1, before any reports, it warns every level of the busiest hours, when a blackout is most likely; it makes no guess about the plants. The power-saving request keeps the plants under 82% of their output; after 4 quiet days in a row it eases by a tenth of itself. In the test world, air harm starts at 5,000 ppm CO₂, the OSHA and NIOSH workplace limit (NIOSH Pocket Guide). How many residents follow an alert, and how much a warning saves, are still first guesses: no study gives comparable numbers.",
   },
 };
 

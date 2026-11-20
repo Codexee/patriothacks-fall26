@@ -52,6 +52,8 @@ export interface ProductLog {
     censusPeople: number; // the Directorate's census total
     selfPeople: number; // residents' own count total
     deepRatio: number; // residents' count / census on the deepest level
+    /** Day 1 only, before any outage reports: the riskiest hour, from the usual use (see firstDayForecast). */
+    firstDay?: { peakHour: number; peakMult: number; from: number; to: number }; // to = end hour (exclusive)
   };
 }
 

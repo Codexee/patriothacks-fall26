@@ -332,8 +332,22 @@ export function createState(scenario: Scenario, seed: number, tools: ToolSet): S
     verdictReach: 0,
   };
   const startPopulation = startPeople.reduce((a, b) => a + b, 0);
+  // The standing census exists before day 1: the Directorate's count and the ration it sets for normal use, and the
+  // residents' own count. No noise, so the world's random numbers are the same as before.
+  const standing: Observation[] = [];
+  for (let i = 0; i < n; i++) {
+    const level = lvl(i), col = i % SECTIONS_PER_LEVEL, counted = censusShare(level);
+    const res = resLoad(startPeople[i]);
+    let c = res * CRITICAL_RES_SHARE, nc = res * (1 - CRITICAL_RES_SHARE);
+    for (const k of structures[i]) { if (k === 'farm') nc += LOAD.farm; else c += LOAD[k]; }
+    standing.push({
+      kind: 'census', level, col, day: 0, people: Math.round((startPeople[i] * counted) / 10) * 10,
+      demand: Math.round((c + nc) * counted), critical: Math.round(c * counted), facilities: structures[i].slice(), food: 20,
+    });
+    standing.push({ kind: 'selfCount', level, col, day: 0, people: Math.round(startPeople[i]) });
+  }
   const state: SimState = {
-    seed, scenario, day: 0, tools: { ...tools }, trust: 0.7, systemTrust: 0.7, observations: [],
+    seed, scenario, day: 0, tools: { ...tools }, trust: 0.7, systemTrust: 0.7, observations: standing,
     lies: WORLD.lies ? DEFAULT_LIES.map((l) => ({ ...l })) : [],
     totals: {
       population: startPopulation, startPopulation, deaths: 0, sectionsLost: 0, hoursDarkDeepest: 0,
