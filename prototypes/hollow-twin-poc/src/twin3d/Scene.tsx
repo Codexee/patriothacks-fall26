@@ -3,7 +3,7 @@
 // One instanced mesh for the rock blocks, one for the lit rooms, one for the 6 plants. Colors come from the day
 // frames (compute.ts) and are interpolated between days; this component never calls setState per frame.
 import { useEffect, useLayoutEffect, useMemo, useRef, type ReactNode } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useFrame, useThree, type ThreeEvent } from '@react-three/fiber';
 import { Html, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import { LEVELS, SECTIONS_PER_LEVEL, SECTION_COUNT } from '../sim/types.ts';
@@ -22,6 +22,7 @@ export const SHAFT_H = LEVELS * PITCH;
 const GAP = 3.4; // between the two shafts' axes and the center
 const PLANT_LEVELS = [8, 18, 27, 34, 41, 47];
 export const SHAFT_X = R + GAP / 2 + 0.6; // axis of each shaft from the center
+const RULER = [1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50];
 const LABEL_Y = 1.6; // the bottom of each HTML label (above the surface ruins)
 const LABEL_PX = 92; // room kept above LABEL_Y for the label, in screen pixels
 
@@ -55,6 +56,9 @@ function useResources() {
     const crust = new THREE.RingGeometry(R + DEPTH / 2 + 0.06, R + 2.2, 48, 1, 0, Math.PI * 2);
     const rim = new THREE.TorusGeometry(R - DEPTH / 2 - 0.02, 0.03, 6, 64, ARC);
     const ruin = new THREE.BoxGeometry(1, 1, 1);
+    const outline = new THREE.EdgesGeometry(new THREE.BoxGeometry(CHORD * 0.98, BLOCK_H * 1.25, DEPTH * 1.1));
+    const selectMat = new THREE.LineBasicMaterial({ color: '#ffd479', toneMapped: false });
+    const hoverMat = new THREE.LineBasicMaterial({ color: '#ebe6dc', toneMapped: false, transparent: true, opacity: 0.7 });
     const rockMat = new THREE.MeshStandardMaterial({ color: COLORS.rock, roughness: 0.92, metalness: 0, emissive: COLORS.rockDeep, emissiveIntensity: 0.6 });
     const haloMat = new THREE.MeshBasicMaterial({ toneMapped: false, transparent: true, opacity: 0.12, blending: THREE.AdditiveBlending, depthWrite: false });
     const wallMat = new THREE.MeshStandardMaterial({ color: COLORS.rockDeep, roughness: 1, side: THREE.BackSide });
@@ -63,7 +67,7 @@ function useResources() {
     const plantMat = new THREE.MeshBasicMaterial({ toneMapped: false });
     const rimWithout = new THREE.MeshBasicMaterial({ color: COLORS.without, toneMapped: false });
     const rimWith = new THREE.MeshBasicMaterial({ color: COLORS.with, toneMapped: false });
-    return { block, room, halo, haloMat, plantCore, plantPad, wall, crust, rim, ruin, rockMat, wallMat, crustMat, roomMat, plantMat, rimWithout, rimWith };
+    return { outline, selectMat, hoverMat, block, room, halo, haloMat, plantCore, plantPad, wall, crust, rim, ruin, rockMat, wallMat, crustMat, roomMat, plantMat, rimWithout, rimWith };
   }, []);
   useEffect(() => () => { for (const r of Object.values(res)) r.dispose(); }, [res]);
   return res;
@@ -119,7 +123,13 @@ const blockMatrices = (() => {
   return { blocks, rooms, halos, plants, pads, ruins };
 })();
 
-function StaticInstances({ geometry, material, matrices }: { geometry: THREE.BufferGeometry; material: THREE.Material; matrices: THREE.Matrix4[] }) {
+type PickHandlers = {
+  onPointerMove?: (e: ThreeEvent<PointerEvent>) => void;
+  onPointerOut?: (e: ThreeEvent<PointerEvent>) => void;
+  onClick?: (e: ThreeEvent<MouseEvent>) => void;
+};
+
+function StaticInstances({ geometry, material, matrices, pick }: { geometry: THREE.BufferGeometry; material: THREE.Material; matrices: THREE.Matrix4[]; pick?: PickHandlers }) {
   const ref = useRef<THREE.InstancedMesh>(null);
   useLayoutEffect(() => {
     const mesh = ref.current!;
@@ -127,11 +137,11 @@ function StaticInstances({ geometry, material, matrices }: { geometry: THREE.Buf
     mesh.instanceMatrix.needsUpdate = true;
     mesh.computeBoundingSphere();
   }, [matrices]);
-  return <instancedMesh ref={ref} args={[geometry, material, matrices.length]} frustumCulled={false} />;
+  return <instancedMesh ref={ref} args={[geometry, material, matrices.length]} frustumCulled={false} {...pick} />;
 }
 
 /** The lit rooms and plants of one shaft; their colors follow the clock. */
-function LiveInstances({ side, days, clock, res }: { side: SideData; days: number; clock: React.MutableRefObject<Clock>; res: Res }) {
+function LiveInstances({ side, days, clock, res, pick }: { side: SideData; days: number; clock: React.MutableRefObject<Clock>; res: Res; pick?: PickHandlers }) {
   const rooms = useRef<THREE.InstancedMesh>(null);
   const plants = useRef<THREE.InstancedMesh>(null);
   const halos = useRef<THREE.InstancedMesh>(null);
@@ -182,21 +192,37 @@ function LiveInstances({ side, days, clock, res }: { side: SideData; days: numbe
 
   return (
     <>
-      <instancedMesh ref={rooms} args={[res.room, res.roomMat, SECTION_COUNT]} frustumCulled={false} />
+      <instancedMesh ref={rooms} args={[res.room, res.roomMat, SECTION_COUNT]} frustumCulled={false} {...pick} />
       <instancedMesh ref={halos} args={[res.halo, res.haloMat, SECTION_COUNT]} frustumCulled={false} renderOrder={1} />
       <instancedMesh ref={plants} args={[res.plantCore, res.plantMat, PLANTS]} frustumCulled={false} />
     </>
   );
 }
 
-function Shaft({ x, side, days, clock, res, accent, label }: {
-  x: number; side: SideData; days: number; clock: React.MutableRefObject<Clock>; res: Res; accent: 'without' | 'with'; label?: ReactNode;
+export type SideKey = 'without' | 'with';
+export interface Pick { side: SideKey; index: number }
+
+function Shaft({ x, side, days, clock, res, accent, label, onPick, selected, hovered, ruler }: {
+  x: number; side: SideData; days: number; clock: React.MutableRefObject<Clock>; res: Res; accent: SideKey; label?: ReactNode;
+  onPick?: (p: Pick | null, kind: 'hover' | 'click') => void; selected?: number | null; hovered?: number | null; ruler?: boolean;
 }) {
+  const pick = useMemo<PickHandlers | undefined>(() => onPick && {
+    onPointerMove: (e) => { e.stopPropagation(); if (e.instanceId !== undefined) onPick({ side: accent, index: e.instanceId }, 'hover'); },
+    onPointerOut: () => onPick(null, 'hover'),
+    onClick: (e) => { e.stopPropagation(); if (e.instanceId !== undefined) onPick({ side: accent, index: e.instanceId }, 'click'); },
+  }, [onPick, accent]);
   return (
     <group position={[x, 0, 0]}>
-      <StaticInstances geometry={res.block} material={res.rockMat} matrices={blockMatrices.blocks} />
+      <StaticInstances geometry={res.block} material={res.rockMat} matrices={blockMatrices.blocks} pick={pick} />
       <StaticInstances geometry={res.plantPad} material={res.rockMat} matrices={blockMatrices.pads} />
-      <LiveInstances side={side} days={days} clock={clock} res={res} />
+      <LiveInstances side={side} days={days} clock={clock} res={res} pick={pick} />
+      {hovered != null && <lineSegments geometry={res.outline} material={res.hoverMat} matrix={blockMatrices.blocks[hovered]} matrixAutoUpdate={false} />}
+      {selected != null && <lineSegments geometry={res.outline} material={res.selectMat} matrix={blockMatrices.blocks[selected]} matrixAutoUpdate={false} />}
+      {ruler && RULER.map((level) => (
+        <Html key={level} position={[R * 0.97 + 0.55, levelY(level), -0.2]} zIndexRange={[3, 0]} className="ws-ruler-tick">
+          <span>L{level}</span>
+        </Html>
+      ))}
       <mesh geometry={res.wall} material={res.wallMat} position={[0, -SHAFT_H / 2 + 0.1, 0]} />
       {/* The surface: a crust around the shaft mouth, with a few ruins. */}
       <mesh geometry={res.crust} material={res.crustMat} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]} />
@@ -220,14 +246,14 @@ function frameBox(film: boolean, extraTop = 0) {
 }
 
 /** Puts the camera at a fixed three-quarter view that fits both shafts in the canvas. */
-function CameraFit({ film, push = 0 }: { film: boolean; push?: number }) {
+function CameraFit({ film, push = 0, single = false }: { film: boolean; push?: number; single?: boolean }) {
   const camera = useThree((s) => s.camera) as THREE.PerspectiveCamera;
   const size = useThree((s) => s.size);
   const invalidate = useThree((s) => s.invalidate);
   const controls = useThree((s) => s.controls) as unknown as { target: THREE.Vector3; update: () => void } | null;
   useLayoutEffect(() => {
     const aspect = size.width / Math.max(1, size.height);
-    const halfW = SHAFT_X + R + 1.4;
+    const halfW = single ? R + 2.4 : SHAFT_X + R + 1.4;
     const fov = 28;
     const t = Math.tan(((fov / 2) * Math.PI) / 180);
     // Fit the box; in the demo, grow the top until LABEL_PX pixels fit above the labels' anchor (2 passes converge).
@@ -254,17 +280,27 @@ function CameraFit({ film, push = 0 }: { film: boolean; push?: number }) {
     if (controls?.target) { controls.target.copy(orbitTarget); controls.update(); }
     camera.updateProjectionMatrix();
     invalidate();
-  }, [camera, size, film, push, invalidate, controls]);
+  }, [camera, size, film, push, invalidate, controls, single]);
   return null;
 }
 
 // The orbit target follows the fitted view's center (set by CameraFit).
 const orbitTarget = new THREE.Vector3(0, frameBox(false).cy, -R * 0.4);
 
-export function TwinScene({ data, clock, film = false, push = 0, labels, controls = false }: {
+export function TwinScene({ data, clock, film = false, push = 0, labels, controls = false, view = 'both', onPick, selected, hovered, ruler = false }: {
   data: TwinData; clock: React.MutableRefObject<Clock>; film?: boolean; push?: number;
   labels?: { without: ReactNode; with: ReactNode }; controls?: boolean;
+  /** Which shafts to draw (the workstation's view mode). */
+  view?: 'both' | SideKey;
+  onPick?: (p: Pick | null, kind: 'hover' | 'click') => void;
+  selected?: Pick | null;
+  hovered?: Pick | null;
+  /** Level ticks (L1 … L50) beside each shaft. */
+  ruler?: boolean;
 }) {
+  const xOf = (side: SideKey) => (view === 'both' ? (side === 'without' ? -SHAFT_X : SHAFT_X) : 0);
+  const sel = (side: SideKey) => (selected?.side === side ? selected.index : null);
+  const hov = (side: SideKey) => (hovered?.side === side ? hovered.index : null);
   const res = useResources();
   return (
     <>
@@ -273,9 +309,15 @@ export function TwinScene({ data, clock, film = false, push = 0, labels, control
       <ambientLight intensity={0.55} />
       <hemisphereLight args={['#c9d3e0', '#2a2520', 0.6]} />
       <directionalLight position={[-6, 10, 14]} intensity={1.3} />
-      <CameraFit film={film} push={push} />
-      <Shaft x={-SHAFT_X} side={data.without} days={data.days} clock={clock} res={res} accent="without" label={labels?.without} />
-      <Shaft x={SHAFT_X} side={data.with} days={data.days} clock={clock} res={res} accent="with" label={labels?.with} />
+      <CameraFit film={film} push={push} single={view !== 'both'} />
+      {view !== 'with' && (
+        <Shaft x={xOf('without')} side={data.without} days={data.days} clock={clock} res={res} accent="without" label={labels?.without}
+          onPick={onPick} selected={sel('without')} hovered={hov('without')} ruler={ruler} />
+      )}
+      {view !== 'without' && (
+        <Shaft x={xOf('with')} side={data.with} days={data.days} clock={clock} res={res} accent="with" label={labels?.with}
+          onPick={onPick} selected={sel('with')} hovered={hov('with')} ruler={ruler} />
+      )}
       {controls && (
         <OrbitControls
           makeDefault
