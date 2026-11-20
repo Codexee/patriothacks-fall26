@@ -16,6 +16,8 @@ import './styles.css';
 
 /** Baseline is the default: the calm run before any disaster. Pick a disaster in the Test World panel (T). */
 const DEFAULT_SCENARIO = sim.scenarios.find((x) => x.id === 'baseline')?.id ?? sim.scenarios[0].id;
+/** Every built module starts switched on (switch them off in the Modules panel, or press S). */
+const ALL_ON: ToolSet = { ...NO_TOOLS, ...Object.fromEntries(BUILT.map((k) => [k, true])) };
 const FRAME_MS = 170; // 24 frames ≈ 4 s per day
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 const DEBUG = typeof location !== 'undefined' && new URLSearchParams(location.search).has('debug');
@@ -25,8 +27,8 @@ const PIXEL = typeof location !== 'undefined' && new URLSearchParams(location.se
 export function App() {
   const [scenarioId, setScenarioId] = useState(DEFAULT_SCENARIO);
   const [seed, setSeed] = useState(1);
-  const [pendingTools, setPendingTools] = useState<ToolSet>(NO_TOOLS);
-  const [run, setRun] = useState<Run>(() => createRun(DEFAULT_SCENARIO, 1, NO_TOOLS));
+  const [pendingTools, setPendingTools] = useState<ToolSet>(ALL_ON);
+  const [run, setRun] = useState<Run>(() => createRun(DEFAULT_SCENARIO, 1, ALL_ON));
   // While a day plays, the phone and the Modules panel already show that day's alerts: they arrive in the morning,
   // before the day's blackouts, not after it.
   const [morning, setMorning] = useState<Run | null>(null);
