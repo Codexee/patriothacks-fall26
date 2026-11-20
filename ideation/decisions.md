@@ -73,3 +73,4 @@ Add one line per decision: date · decision · why · who. Newest last.
 - 2026-11-20 · The product is the statistical models (Blackout Warning + residents-only check-first LightGBM); the simulation is a demo page · Neil
 - 2026-11-20 · 3 more real-shaped plant-loss disasters (Elliott TVA, TVA+CPLE, SPP Feb 2021); Two Plants leads the results page as the hard case · Neil (order: Claude)
 - 2026-11-20 · Results site lands on results first; cutaway at #/demo · Neil
+- 2026-11-20 · The resident's phone becomes a home screen: one app per built module plus Report; alerts show as a banner (only when new or the ask goes up) and a badge that clears on open; Modules panel unchanged (.plans/phone-apps-spec.md) · Adarsh

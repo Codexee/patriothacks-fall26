@@ -2,6 +2,13 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-20 (29): The resident's phone is a home screen of apps
+
+- **Each built module is an app** on the phone in the Residents' System panel (`src/ui/phone/`). Today: Blackout Warning and Report. Tap an icon to open its screen; "‹ Home" or the bar at the bottom goes back.
+- **Alerts work like a phone:** a banner slides down when a new alert reaches your level or the save-power ask goes up, and the icon gets a red badge that clears when you open the app.
+- **Your home** (level, section, lock) is the "L39·S3" chip in the status bar.
+- **Adding a module:** put it in `BUILT` (`product/names.ts`) and it appears as an app with a default screen. For its own icon and screen, add an entry to `CUSTOM` in `src/ui/phone/apps.tsx`. The Modules panel is unchanged. Spec: `.plans/phone-apps-spec.md` (locked).
+
 ## 2026-11-20 (28): "Watch it run" is the 2D cutaway again; Baseline is its default
 
 - **`#/demo` opens the 2D cutaway** (`#/demo/classic` still works). The 3D workstation moved to `#/demo/3d`; no site link points to it now. The Results, disaster-page, and hero-video links say "Watch it run".

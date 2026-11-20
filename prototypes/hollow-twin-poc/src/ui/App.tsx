@@ -187,7 +187,7 @@ export function App() {
         open={modsOpen} onToggle={() => setModsOpen((v) => !v)}
       />
       <ProductView
-        run={run} modules={state.tools} section={phoneSection} onPickSection={setPhoneSection}
+        run={run} modules={state.tools} hour={frame.hour} playing={playing} section={phoneSection} onPickSection={setPhoneSection}
         homeLocked={homeLocked} onToggleLock={() => setHomeLocked((v) => !v)}
         onReport={queueReport} queuedReports={queued.filter((a) => a.type === 'report').length}
         locked={playing || busy !== null || !!state.end}
