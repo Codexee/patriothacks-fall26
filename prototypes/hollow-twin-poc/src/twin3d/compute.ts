@@ -7,6 +7,7 @@ import { NO_TOOLS, SECTION_COUNT, type Frame, type ToolSet } from '../sim/types.
 import { createRun, stepRun } from '../product/run.ts';
 import { plantStatus } from '../sim/engine.ts';
 import { sectionColor, plantColor, STATE } from './palette.ts';
+import { carryDetail, collectDay, createDetail, finishDetail, type SideDetail } from './detail.ts';
 
 export const BLACKOUT = 0.5; // the engine's blackout line for life support
 export const AIR_DANGER = 5000; // ppm, the engine's air danger line (OSHA PEL / NIOSH REL)
@@ -33,6 +34,8 @@ export interface SideData {
   dark: number[]; // dark sections at the day's worst hour (not counting lost sections), length D+1
   endDay: number | null; // the day the run ended (stable or lost), if within D
   endKind: 'stable' | 'lost' | null;
+  /** Workstation detail (#/demo only; the film does not collect it). */
+  detail?: SideDetail;
 }
 
 export interface TwinData {
@@ -50,7 +53,7 @@ function darkCount(f: Frame): number {
   return n;
 }
 
-function runSide(id: string, seed: number, tools: ToolSet, withSide: boolean, D: number): SideData {
+function runSide(id: string, seed: number, tools: ToolSet, withSide: boolean, D: number, withDetail: boolean): SideData {
   const N = SECTION_COUNT;
   const out: SideData = {
     color: new Float32Array((D + 1) * N * 3),
@@ -63,6 +66,8 @@ function runSide(id: string, seed: number, tools: ToolSet, withSide: boolean, D:
     endDay: null,
     endKind: null,
   };
+  const det = withDetail ? createDetail(D) : null;
+  if (det) out.detail = det;
   let run = createRun(id, seed, tools);
   const rgb: [number, number, number] = [0, 0, 0];
 
@@ -90,6 +95,7 @@ function runSide(id: string, seed: number, tools: ToolSet, withSide: boolean, D:
   for (let i = 0; i < N; i++) co0[i] = f0.sections[i].co2;
   write(0, f0, co0, f0.sections.map((s) => s.lost), new Set());
   out.dark.push(darkCount(f0));
+  if (det) collectDay(det, 0, run, null, f0, f0.hour, []);
 
   let lastDay = 0;
   for (let d = 1; d <= D && !run.sim.end; d++) {
@@ -111,6 +117,7 @@ function runSide(id: string, seed: number, tools: ToolSet, withSide: boolean, D:
     const end = r.frames[r.frames.length - 1];
     write(d, worst, co2Max, end.sections.map((s) => s.lost), tripped);
     out.dark.push(Math.max(0, worstN));
+    if (det) collectDay(det, d, run, r.frames, worst, worst.hour, r.events);
     lastDay = d;
     if (run.sim.end) { out.endDay = run.sim.end.day; out.endKind = run.sim.end.kind; }
   }
@@ -125,13 +132,14 @@ function runSide(id: string, seed: number, tools: ToolSet, withSide: boolean, D:
     // A stable Hollow has no dark sections; a lost run keeps its last count.
     out.dark.push(out.dark[lastDay]);
   }
+  if (det) { carryDetail(det, lastDay); finishDetail(det); }
   return out;
 }
 
-export function computeTwin(id: string, seed: number, D = daysFor(id)): TwinData {
+export function computeTwin(id: string, seed: number, D = daysFor(id), detail = false): TwinData {
   const t0 = Date.now();
-  const without = runSide(id, seed, NO_TOOLS, false, D);
-  const withSide = runSide(id, seed, WITH_TOOLS, true, D);
+  const without = runSide(id, seed, NO_TOOLS, false, D, detail);
+  const withSide = runSide(id, seed, WITH_TOOLS, true, D, detail);
   return { id, seed, days: D, without, with: withSide, ms: Date.now() - t0 };
 }
 

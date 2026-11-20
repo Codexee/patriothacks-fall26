@@ -1271,3 +1271,49 @@ export function plantStatus(state: SimState): { level: number; online: boolean; 
   const h = Math.max(0, s.hour - 1);
   return s.plants.map((p, k) => ({ level: p.level, online: s.hour >= p.offlineUntil, capacity: p.health * lossF(state.scenario, k, h) }));
 }
+
+/**
+ * Read-only probe for the 3D twin's workstation panels: plant details, available capacity and full demand at the last
+ * simulated hour (same formulas as the hourly dispatch, before any saving, plan or general response), residents per
+ * section now and at the start, and cumulative dark-hour equivalents per level. It changes nothing in the world.
+ */
+export function twinProbe(state: SimState): {
+  hour: number;
+  plants: { level: number; nominal: number; health: number; loss: number; online: boolean; offlineUntil: number }[];
+  capacity: number;
+  demand: number;
+  normal: number;
+  people: number[];
+  startPeople: number[];
+  darkLevel: number[];
+} {
+  const s = state.internal as Internal;
+  const scen = state.scenario;
+  const h = Math.max(0, s.hour - 1);
+  const costF = 1 - TOOL_POWER_COST * ((state.tools.earlyWarning ? 1 : 0) + (state.tools.ledger ? 1 : 0));
+  const supply = scenarioAt(scen.supply, h);
+  let capacity = 0;
+  const plants = s.plants.map((p, k) => {
+    const online = s.hour >= p.offlineUntil;
+    const loss = lossF(scen, k, h);
+    if (online) capacity += p.nominal * p.health * supply * costF * loss;
+    return { level: p.level, nominal: p.nominal, health: p.health, loss, online, offlineUntil: p.offlineUntil };
+  });
+  const mult = scenarioAt(scen.demand, h);
+  let demand = 0;
+  for (let i = 0; i < SECTION_COUNT; i++) {
+    if (s.lost[i]) continue;
+    demand += (resLoad(s.people[i]) + s.structures[i].reduce((a, k) => a + LOAD[k], 0)) * mult;
+  }
+  const normal = (s.plants.reduce((a, p) => a + p.nominal, 0)) / CAPACITY_MARGIN;
+  return { hour: h, plants, capacity, demand, normal, people: s.people.slice(), startPeople: s.startPeople.slice(), darkLevel: s.darkLevel.slice() };
+}
+
+/** Read-only: the engine's constants that the workstation lists (guessed or cited). */
+export const ENGINE_CONSTANTS = {
+  airDanger: AIR_DANGER, airDeath: AIR_DEATH, preparedSave: PREPARED_SAVE, volPerPerson: VOL_PER_PERSON,
+  followBase: cited(realAir.followBase, 0.5), followTrust: cited(realAir.followTrust, 0.5),
+  stressTrip: STRESS_TRIP, agingPerDay: AGING_PER_DAY, capacityMargin: CAPACITY_MARGIN, toolPowerCost: TOOL_POWER_COST,
+  criticalResShare: CRITICAL_RES_SHARE, blackout: BLACKOUT, maxDays: MAX_DAYS, stableDays: STABLE_DAYS,
+  plantLevels: PLANT_LEVELS, repairSampleSize: REPAIR_SAMPLE.length,
+} as const;

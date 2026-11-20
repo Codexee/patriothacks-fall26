@@ -27,7 +27,7 @@ export const TUNE = {
   maxTrend: 0.1, // the supply trend is capped at ±10% a day
   tripStep: 0.15, // after a Hollow-wide blackout with no other clue, ask for this much more saving
 };
-const TRIP_ZONE = 0.95; // above this, plants are close to tripping
+export const TRIP_ZONE = 0.95; // above this, plants are close to tripping
 // Easing off, carefully. Residents cannot see the plants, so one quiet day is no proof the power is back (easing
 // 15% a day made the plants trip again). The request comes down only after several quiet days in a row, a small
 // step at a time, and never to the level where trouble last started (that memory fades after a while).

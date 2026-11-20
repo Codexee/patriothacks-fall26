@@ -21,20 +21,52 @@ export async function seedFor(id: string): Promise<number> {
 
 const cache = new Map<string, Promise<TwinData>>();
 
+function runWorker(req: TwinRequest): Promise<TwinData> {
+  return new Promise<TwinData>((resolve, reject) => {
+    const w = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
+    w.onmessage = (e: MessageEvent<TwinData>) => { resolve(e.data); w.terminate(); };
+    w.onerror = (e) => { reject(new Error(e.message || 'The simulation worker failed')); w.terminate(); };
+    w.postMessage(req);
+  });
+}
+
+/** The film's data: the typical held-out seed, no workstation detail. */
 export function loadTwin(id: string): Promise<TwinData> {
   let p = cache.get(id);
   if (!p) {
-    p = seedFor(id).then((seed) => new Promise<TwinData>((resolve, reject) => {
-      const w = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
-      w.onmessage = (e: MessageEvent<TwinData>) => { resolve(e.data); w.terminate(); };
-      w.onerror = (e) => { reject(new Error(e.message || 'The simulation worker failed')); w.terminate(); };
-      const req: TwinRequest = { id, seed, days: daysFor(id) };
-      w.postMessage(req);
-    }));
+    p = seedFor(id).then((seed) => runWorker({ id, seed, days: daysFor(id) }));
     p.catch(() => cache.delete(id));
     cache.set(id, p);
   }
   return p;
+}
+
+/** The workstation's data: any seed, with per-day detail. Cached per disaster and seed. */
+export function loadTwinDetail(id: string, seed: number): Promise<TwinData> {
+  const key = `${id}:${seed}:detail`;
+  let p = cache.get(key);
+  if (!p) {
+    p = runWorker({ id, seed, days: daysFor(id), detail: true });
+    p.catch(() => cache.delete(key));
+    cache.set(key, p);
+  }
+  return p;
+}
+
+/** Loads the workstation data for a disaster and seed (null while it runs). */
+export function useTwinDetail(id: string, seed: number | null): { data: TwinData | null; error: string | null } {
+  const key = `${id}:${seed}`;
+  const [state, setState] = useState<{ key: string; data: TwinData | null; error: string | null }>({ key, data: null, error: null });
+  useEffect(() => {
+    if (seed === null) return;
+    let live = true;
+    loadTwinDetail(id, seed).then(
+      (data) => { if (live) setState({ key, data, error: null }); },
+      (e: unknown) => { if (live) setState({ key, data: null, error: e instanceof Error ? e.message : String(e) }); },
+    );
+    return () => { live = false; };
+  }, [id, seed, key]);
+  return state.key === key ? state : { data: null, error: null };
 }
 
 export function useTwin(id: string): { data: TwinData | null; error: string | null } {
