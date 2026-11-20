@@ -3,8 +3,9 @@ import type { MetricRow } from '../contracts.ts';
 import type { SiteData } from '../data.ts';
 import { href } from '../router.ts';
 import { num } from '../format.ts';
-import { MetricBars, ShareBars } from '../charts.tsx';
-import { Generated, SourceLink } from '../parts.tsx';
+import { BigMetric, ShareBars } from '../charts.tsx';
+import { Generated, SourceLink, metricName } from '../parts.tsx';
+import { Limits } from './Results.tsx';
 
 export function Model({ data }: { data: SiteData }) {
   const m = data.checkfirst.data;
@@ -12,9 +13,10 @@ export function Model({ data }: { data: SiteData }) {
   return (
     <>
       <header className="page-head">
-        <h1 tabIndex={-1}>{m.name}</h1>
+        <p className="eyebrow">Model 2 · residents’ data only · tested on real US outages</p>
+        <h1 tabIndex={-1}>{m.name.replace(/\s*\(.*\)\s*$/, '')}</h1>
         <p className="lede">{m.task}</p>
-        <dl className="facts">
+        <dl className="facts spec">
           <div><dt>Method</dt><dd>{m.method}</dd></div>
           <div><dt>Train</dt><dd>{m.periods.train}</dd></div>
           <div><dt>Choose (dev)</dt><dd>{m.periods.dev}</dd></div>
@@ -24,21 +26,50 @@ export function Model({ data }: { data: SiteData }) {
       </header>
 
       <section aria-labelledby="h-test" className="block">
-        <h2 id="h-test">Test result</h2>
-        <p className="lede">
-          {num(m.test.events)} real outage events and {num(m.test.areaEvents)} area-events the model never saw during training or choice.
-          “History” ranks each area by its own past mean dark hours. “Chance” is a random ranking.
-        </p>
-        <MetricBars rows={m.test.rows} />
-        <MetricTable caption={`Test set, ${m.periods.test}`} rows={m.test.rows} />
-        <MetricTable caption={`Dev set, ${m.periods.dev} (${num(m.dev.events)} events, ${num(m.dev.areaEvents)} area-events), used to choose the model`} rows={m.dev.rows} />
+        <div className="block-head">
+          <h2 id="h-test">Test result</h2>
+          <p>{num(m.test.events)} real outage events ({num(m.test.areaEvents)} area-events) never seen in training. History ranks areas by their own past dark hours; chance is random.</p>
+        </div>
+        <div className="cf-metrics model-metrics">{m.test.rows.map((r) => <BigMetric key={r.metric} r={r} />)}</div>
+        <details className="more">
+          <summary>Table view</summary>
+          <MetricTable caption={`Test set, ${m.periods.test}`} rows={m.test.rows} />
+        </details>
+        <details className="more">
+          <summary>Dev set, used to choose the model</summary>
+          <MetricTable caption={`Dev set, ${m.periods.dev} (${num(m.dev.events)} events, ${num(m.dev.areaEvents)} area-events)`} rows={m.dev.rows} />
+        </details>
+      </section>
+
+      {m.comparison && (
+        <section aria-labelledby="h-cmp" className="block">
+          <div className="block-head">
+            <h2 id="h-cmp">Against a model with weather</h2>
+            <p>The same model given weather and grid-operator data, same test period. The difference is the cost of using residents’ data only.</p>
+          </div>
+          <CompareTable residents={m.test.rows} weather={m.comparison.rows} />
+        </section>
+      )}
+
+      <div className="pair">
+      <section aria-labelledby="h-imp" className="block">
+        <div className="block-head">
+          <h2 id="h-imp">What it relies on</h2>
+          <p>Share of total tree gain, top inputs.</p>
+        </div>
+        <ShareBars items={m.importance.map((i) => ({ label: i.feature, share: i.share, note: plainOf.get(i.feature) }))} />
       </section>
 
       <section aria-labelledby="h-inputs" className="block">
-        <h2 id="h-inputs">Inputs, and what residents would use in the Hollow</h2>
+        <div className="block-head">
+          <h2 id="h-inputs">Inputs</h2>
+          <p>{m.inputs.length} inputs, each with a source residents have in the Hollow.</p>
+        </div>
+        <details className="more">
+          <summary>All {m.inputs.length} inputs, with their Hollow equivalent</summary>
         <div className="table-wrap">
           <table className="inputs-table">
-            <caption>Every input the model reads. Each one has a source that residents control.</caption>
+            <caption className="sr-only">Every input the model reads, with its Hollow equivalent.</caption>
             <thead><tr><th scope="col">Input</th><th scope="col">In the real data</th><th scope="col">In the Hollow</th></tr></thead>
             <tbody>
               {m.inputs.map((i) => (
@@ -47,32 +78,23 @@ export function Model({ data }: { data: SiteData }) {
             </tbody>
           </table>
         </div>
-        <h3>Excluded, because residents do not have it</h3>
+        </details>
+        <h3>Excluded: residents do not have it</h3>
         <ul className="limits">{m.excluded.map((e) => <li key={e}>{e}</li>)}</ul>
       </section>
 
-      {m.comparison && (
-        <section aria-labelledby="h-cmp" className="block">
-          <h2 id="h-cmp">For reference: the model with weather</h2>
-          <p className="lede">{m.comparison.label}. Same test period. The difference is the cost of using residents’ data only.</p>
-          <MetricBars rows={m.comparison.rows} labels={['With weather', 'History', 'Chance']} />
-          <CompareTable residents={m.test.rows} weather={m.comparison.rows} />
-        </section>
-      )}
+      </div>
 
-      <section aria-labelledby="h-imp" className="block">
-        <h2 id="h-imp">What the model uses most</h2>
-        <p className="lede">Share of the total gain in the trees, for the top inputs.</p>
-        <ShareBars items={m.importance.map((i) => ({ label: i.feature, share: i.share, note: plainOf.get(i.feature) }))} />
-      </section>
-
+      <div className="pair">
       {m.example && (
         <section aria-labelledby="h-ex" className="block">
-          <h2 id="h-ex">Example: {m.example.event}, {m.example.date}</h2>
-          <p className="lede">The model’s first areas to check, in its order, with the real dark hours.</p>
+          <div className="block-head">
+            <h2 id="h-ex">Example: {m.example.event.split(/[,(]/)[0].trim()} <span className="h-note">{m.example.date}</span></h2>
+            <p>{m.example.event}</p>
+          </div>
           <div className="table-wrap">
             <table className="seed-table ex-table">
-              <caption>Predicted and actual hours without power, top areas by the model’s rank.</caption>
+              <caption className="sr-only">Predicted and actual hours without power, top areas by the model’s rank.</caption>
               <thead><tr><th scope="col">Rank</th><th scope="col">Area</th><th scope="col">Predicted hours</th><th scope="col">Actual hours</th></tr></thead>
               <tbody>
                 {m.example.topAreas.map((a, i) => (
@@ -85,10 +107,11 @@ export function Model({ data }: { data: SiteData }) {
       )}
 
       <section aria-labelledby="h-lim" className="block">
-        <h2 id="h-lim">Limits</h2>
-        <ul className="limits">{m.limits.map((l) => <li key={l}>{l}</li>)}</ul>
-        <p><a className="text-link" href={href.results}>Back to the disaster results</a></p>
+        <div className="block-head"><h2 id="h-lim">Limits</h2></div>
+        <Limits items={m.limits} shown={3} />
+        <p><a className="text-link" href={href.results}>← Back to the results</a></p>
       </section>
+      </div>
       <Generated file={m} label="Model results" />
     </>
   );
@@ -105,7 +128,7 @@ function MetricTable({ caption, rows }: { caption: string; rows: MetricRow[] }) 
         <thead><tr><th scope="col">Metric</th><th scope="col">Model</th><th scope="col">History</th><th scope="col">Chance</th><th scope="col">Better</th></tr></thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.metric}><th scope="row">{r.metric}</th><td>{cell(r.model)}</td><td>{cell(r.history)}</td><td>{cell(r.chance)}</td><td>{r.better}</td></tr>
+            <tr key={r.metric}><th scope="row" title={r.metric}>{metricName(r.metric)}</th><td>{cell(r.model)}</td><td>{cell(r.history)}</td><td>{cell(r.chance)}</td><td>{r.better}</td></tr>
           ))}
         </tbody>
       </table>
@@ -116,13 +139,24 @@ function MetricTable({ caption, rows }: { caption: string; rows: MetricRow[] }) 
 function CompareTable({ residents, weather }: { residents: MetricRow[]; weather: MetricRow[] }) {
   return (
     <div className="table-wrap">
-      <table className="seed-table">
-        <caption>Test set: residents-only model against the model with weather and grid-operator inputs.</caption>
-        <thead><tr><th scope="col">Metric</th><th scope="col">Residents-only</th><th scope="col">With weather</th></tr></thead>
+      <table className="seed-table cmp-table">
+        <caption className="sr-only">Test set: residents-only model against the model with weather and grid-operator inputs.</caption>
+        <thead><tr><th scope="col">Metric</th><th scope="col">Residents-only</th><th scope="col">With weather</th><th scope="col">Difference</th><th scope="col">History</th></tr></thead>
         <tbody>
           {residents.map((r) => {
             const w = weather.find((x) => x.metric === r.metric);
-            return <tr key={r.metric}><th scope="row">{r.metric}</th><td>{cell(r.model)}</td><td>{w ? cell(w.model) : 'n/a'}</td></tr>;
+            const d = w ? r.model - w.model : null;
+            // Positive = residents-only is better, whichever direction the metric runs.
+            const better = d == null ? null : r.better === 'higher' ? d : -d;
+            return (
+              <tr key={r.metric}>
+                <th scope="row" title={r.metric}>{metricName(r.metric)}</th>
+                <td className="with">{cell(r.model)}</td>
+                <td>{w ? cell(w.model) : 'n/a'}</td>
+                <td className={better == null ? '' : better >= 0 ? 'ok' : 'bad'}>{d == null ? 'n/a' : `${d >= 0 ? '+' : '−'}${num(Math.abs(d), digits(r.model))}`}</td>
+                <td>{cell(r.history)}</td>
+              </tr>
+            );
           })}
         </tbody>
       </table>

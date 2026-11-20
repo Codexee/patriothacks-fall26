@@ -11,8 +11,9 @@ export function Nav({ route, compact = false }: { route: Route; compact?: boolea
   return (
     <nav className={`site-nav${compact ? ' compact' : ''}`} aria-label="Main">
       <a className="brand" href={href.results}>
-        <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M2 17h16M4 17V9l6-5 6 5v8M8 17v-4h4v4" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" /></svg>
+        <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M3 1.5v13M13 1.5v13M3 5h10M3 8h10M3 11h10" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" /></svg>
         <span>Residents’ System</span>
+        <small aria-hidden="true">THE HOLLOW · 2087</small>
       </a>
       <ul>
         {items.map(([key, to, label]) => (

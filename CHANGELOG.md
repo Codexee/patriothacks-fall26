@@ -2,6 +2,14 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-20 (27): Results site redesign (Results, disaster pages, Model)
+
+- **Full-width layout and new type:** IBM Plex Sans and Mono, hairline rules, numbered sections. The workstation (`src/twin3d/`) and its CSS tokens are unchanged.
+- **Results (`#/`):** headline deaths 20,965,011 → 5,903 with the film, a KPI row (deaths avoided with 95% CI, stable at day 120, plant trips, hours without air), the all-runs daily chart, a 5-step Blackout Warning pipeline with a shaft figure (`src/site/Pipeline.tsx`), the disaster table, and Method (protocol, data sources with links, limits).
+- **Shorter pages, no repeats:** Results no longer shows the check-first model (the Model tab covers it) or the constants table (Watch it run covers it). Disaster and Model pages use side-by-side layouts; secondary tables sit in "Table view" and similar details.
+- **Model (`#/model`):** large test metrics against history and chance, a residents-only vs. with-weather comparison table, inputs and exclusions, and the Hurricane Beryl example.
+- **Every number still comes from `public/results/*.json`.** New styles are in `src/site/landing.css`. Nothing for teammates to do; redeploy Vercel to publish.
+
 ## 2026-11-20 (26): "Watch it run" is a modeling workstation
 
 - **`#/demo`** is now a full-screen workstation: a toolbar (disaster, any seed 1–20 with its set, step day, view mode, a day scrubber with event marks), a model inspector (Blackout Warning's frozen settings, the disaster's real input curves, the EAGLE-I repair histogram, cited vs guessed constants, data provenance), the 3D twin with a clickable section card (real counties), telemetry charts, a plant table, depth heat strips, and tabs for the event log, the module's daily output, residents' observations and all 400 sections.

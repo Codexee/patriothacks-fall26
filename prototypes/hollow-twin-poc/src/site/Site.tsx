@@ -11,6 +11,7 @@ import { Model } from './pages/Model.tsx';
 import { Demo } from './pages/Demo.tsx';
 import { href } from './router.ts';
 import './site.css';
+import './landing.css';
 
 // The 3D twin and its film frame load three.js, so they are split into their own chunks.
 const Twin3D = lazy(() => import('../twin3d/Twin3D.tsx'));
@@ -57,21 +58,21 @@ export function Site() {
       <Nav route={route} />
       <main id="main" className="site-main">
         {!data ? (
-          <p className="loading" role="status">Loading the results…</p>
+          <p className="loading wrap" role="status">Loading the results…</p>
         ) : (
           <>
-            <SampleBanner data={data} />
+            <div className="wrap"><SampleBanner data={data} /></div>
             <div key={key} className="route-enter">
             {route.page === 'results' && <Results data={data} />}
-            {route.page === 'disaster' && <Disaster data={data} id={route.id} />}
-            {route.page === 'model' && <Model data={data} />}
+            {route.page === 'disaster' && <div className="wrap page"><Disaster data={data} id={route.id} /></div>}
+            {route.page === 'model' && <div className="wrap page"><Model data={data} /></div>}
             {route.page === 'demo' && (
               <Suspense fallback={<p className="loading" role="status">Loading the 3D view…</p>}>
                 <Twin3D data={data} scenario={route.scenario} />
               </Suspense>
             )}
             {route.page === 'missing' && (
-              <section className="block">
+              <section className="block wrap page">
                 <h1 tabIndex={-1}>No page at “{route.hash}”</h1>
                 <p><a className="text-link" href={href.results}>Go to the results</a></p>
               </section>
@@ -81,7 +82,7 @@ export function Site() {
         )}
       </main>
       <footer className="site-foot">
-        <p>Patriot HackFest Fall 2026, track “Life underground”. Simulated deaths are test-world results, not forecasts of real deaths.</p>
+        <p className="wrap">Patriot HackFest Fall 2026 · Life underground. Deaths are simulated test-world results, not forecasts.</p>
       </footer>
     </div>
   );

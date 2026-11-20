@@ -14,7 +14,7 @@ export function Stat({ label, value, digits = 0, count = true, tone, children }:
       <dt>{label}</dt>
       <dd>
         <span className="stat-num">{m}</span>
-        <span className="stat-ci">95% interval {rangeText(lo, hi)}</span>
+        <span className="stat-ci">95% CI {rangeText(lo, hi)}</span>
         {children}
       </dd>
     </div>
@@ -62,7 +62,7 @@ export function Generated({ file, label }: { file: { generated: string }; label:
 
 export function scaleNote(f: ScenariosFile): string {
   const per = f.scale.hollowPeople / Math.max(1, f.scale.simPeople);
-  return `Each run simulates about ${(f.scale.simPeople / 1e6).toFixed(1)} million people, who stand for the Hollow’s ${(f.scale.hollowPeople / 1e9).toFixed(0)} billion (1 simulated person ≈ ${Math.round(per).toLocaleString('en-US')}). Deaths are in simulated people.`;
+  return `Each run simulates ${(f.scale.simPeople / 1e6).toFixed(1)} million people standing for the Hollow’s ${(f.scale.hollowPeople / 1e9).toFixed(0)} billion (1 ≈ ${Math.round(per).toLocaleString('en-US')}). Deaths are in simulated people.`;
 }
 
 /** The part of a scenario name before a colon or a parenthesis: "Aging plants (4 years …)" → "Aging plants". */
@@ -82,4 +82,18 @@ const DISPLAY: Record<string, string> = {
 };
 export function displayName(s: { id: string; name: string }): string {
   return DISPLAY[s.id] ?? shortName(s.name);
+}
+
+/** A metric label without its parenthetical: "Top-10 overlap (share of …)" → "Top-10 overlap". A short unit such as "(h)" stays. */
+export function metricName(m: string): string {
+  const i = m.indexOf(' (');
+  if (i < 0) return m;
+  return metricNote(m) == null ? m : m.slice(0, i);
+}
+/** The explanatory parenthetical of a metric label, or null when there is none (or it is only a unit). */
+export function metricNote(m: string): string | null {
+  const i = m.indexOf(' (');
+  if (i < 0) return null;
+  const note = m.slice(i + 2).replace(/\)$/, '');
+  return note.length <= 4 ? null : note;
 }

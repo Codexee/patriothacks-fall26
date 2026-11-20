@@ -2,6 +2,7 @@
 import { useEffect, useId, useMemo, useRef, useState, type PointerEvent } from 'react';
 import type { DailyPoint, MetricRow } from './contracts.ts';
 import { compact, num } from './format.ts';
+import { metricName, metricNote } from './parts.tsx';
 
 function niceTicks(max: number, count = 4): number[] {
   if (max <= 0) return [0];
@@ -34,8 +35,8 @@ type Key = 'withoutDeaths' | 'withDeaths' | 'withoutDarkSections' | 'withDarkSec
 
 /** Two-line daily chart (without vs with). `log` plots log10(1 + value) so the small "with" line is visible. */
 export function DailyChart({
-  daily, keys, unit, log = false, title,
-}: { daily: DailyPoint[]; keys: [Key, Key]; unit: string; log?: boolean; title: string }) {
+  daily, keys, unit, log = false, title, height,
+}: { daily: DailyPoint[]; keys: [Key, Key]; unit: string; log?: boolean; title: string; height?: number }) {
   const id = useId();
   // The SVG is drawn at the container's own width, so the labels keep their real size on a phone.
   const box = useRef<HTMLElement>(null);
@@ -48,7 +49,7 @@ export function DailyChart({
     return () => ro.disconnect();
   }, []);
   const W = Math.max(280, cw), narrow = W < 520;
-  const H = narrow ? 240 : 300, L = narrow ? 42 : 56, R = narrow ? 64 : 92, T = 14, B = 34;
+  const H = narrow ? 240 : (height ?? 300), L = narrow ? 42 : 56, R = narrow ? 64 : 92, T = 14, B = 34;
   const [hover, setHover] = useState<number | null>(null);
   const f = (v: number) => (log ? Math.log10(1 + Math.max(0, v)) : v);
   const maxRaw = Math.max(1, ...daily.map((d) => Math.max(d[keys[0]], d[keys[1]])));
@@ -131,7 +132,8 @@ export function MetricBars({ rows, labels = ['Model', 'History', 'Chance'] }: { 
         const digits = Math.max(...vals.map(([, v]) => v ?? 0)) > 1.5 ? 2 : 3;
         return (
           <div className="mb-group" key={r.metric}>
-            <p className="mb-metric">{r.metric} <span className="mb-better">{r.better === 'higher' ? 'Higher is better.' : 'Lower is better.'}</span></p>
+            <p className="mb-metric">{metricName(r.metric)} <span className="mb-better">{r.better === 'higher' ? '↑ better' : '↓ better'}</span></p>
+            <p className="mb-note">{metricNote(r.metric) ?? ''}</p>
             <dl className="mb-rows">
               {vals.filter(([, v]) => v != null).map(([name, v, cls]) => (
                 <div className="mb-row" key={name}>
@@ -157,7 +159,7 @@ export function ShareBars({ items }: { items: { label: string; share: number; no
     <dl className="share-bars">
       {items.map((i) => (
         <div className="sb-row" key={i.label}>
-          <dt><code>{i.label}</code>{i.note && <span className="sb-note">{i.note}</span>}</dt>
+          <dt><span className={/\s/.test(i.label) ? 'sb-label' : 'sb-label code'}>{i.label}</span>{i.note && <span className="sb-note">{i.note}</span>}</dt>
           <dd>
             <span className="mb-track"><span className="mb-bar b-model" style={{ width: `${(i.share / max) * 100}%` }} /></span>
             <span className="mb-val">{(i.share * 100).toFixed(1)}%</span>
@@ -165,5 +167,32 @@ export function ShareBars({ items }: { items: { label: string; share: number; no
         </div>
       ))}
     </dl>
+  );
+}
+
+/** One test metric at display size, with the model against its baselines on one scale. */
+export function BigMetric({ r, labels = ['Model', 'History', 'Chance'] }: { r: MetricRow; labels?: [string, string, string] }) {
+  const vals: [string, number | null, string][] = [[labels[0], r.model, 'b-model'], [labels[1], r.history, 'b-history'], [labels[2], r.chance, 'b-chance']];
+  const shown = vals.filter(([, v]) => v != null) as [string, number, string][];
+  const max = Math.max(1e-9, ...shown.map(([, v]) => Math.abs(v)));
+  const digits = Math.max(...shown.map(([, v]) => v)) > 1.5 ? 2 : 3;
+  const note = metricNote(r.metric);
+  return (
+    <figure className="bm">
+      <figcaption>
+        <span className="bm-name">{metricName(r.metric)}</span>
+        <span className="bm-better">{r.better === 'higher' ? '↑ higher is better' : '↓ lower is better'}</span>
+      </figcaption>
+      <p className="bm-num">{num(r.model, digits)}</p>
+      {note && <p className="bm-note">{note}</p>}
+      <dl className="bm-rows">
+        {shown.map(([name, v, cls]) => (
+          <div key={name}>
+            <dt>{name}</dt>
+            <dd><span className="mb-track"><span className={`mb-bar ${cls}`} style={{ width: `${(Math.abs(v) / max) * 100}%` }} /></span><span className="mb-val">{num(v, digits)}</span></dd>
+          </div>
+        ))}
+      </dl>
+    </figure>
   );
 }
