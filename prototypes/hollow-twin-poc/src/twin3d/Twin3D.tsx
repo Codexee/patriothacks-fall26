@@ -13,6 +13,8 @@ import { SECTION_COUNT } from '../sim/types.ts';
 import { loadResults, useTwinDetail } from './data.ts';
 import { typicalSeed, type TwinData } from './compute.ts';
 import { PhoneDock } from './ws/PhoneDock.tsx';
+import { TestWorld } from './ws/TestWorld.tsx';
+import type { Plan } from './compute.ts';
 import { TwinScene, type Clock, type Pick, type SideKey } from './Scene.tsx';
 import { COLORS } from './palette.ts';
 import { Inspector } from './ws/Inspector.tsx';
@@ -66,7 +68,14 @@ export default function Twin3D({ data: site, scenario }: { data: SiteData | null
   const [seedChoice, setSeedChoice] = useState<{ id: string; seed: number } | null>(null);
   const seed = seedChoice?.id === id ? seedChoice.seed : typical;
 
-  const { data, error } = useTwinDetail(id, seed);
+  // The person's changes from the settings panel (⚙). A new disaster or seed starts with none.
+  const [plan, setPlan] = useState<Plan>([]);
+  const [settings, setSettings] = useState(false);
+  const planFor = useRef(`${id}:${seed}`);
+  if (planFor.current !== `${id}:${seed}`) { planFor.current = `${id}:${seed}`; if (plan.length) setPlan([]); }
+  const { data, error, pending } = useTwinDetail(id, seed, plan);
+  // After a plan change, the new run continues from the same day (the days before it do not change).
+  const resume = useRef<{ day: number; playing: boolean } | null>(null)
   const reduced = useReducedMotion();
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(2);
@@ -88,12 +97,15 @@ export default function Twin3D({ data: site, scenario }: { data: SiteData | null
     return () => { document.documentElement.classList.remove('ws-mode'); window.removeEventListener('resize', set); };
   }, []);
 
-  // New data (disaster or seed): back to day 0 and play (not with reduced motion).
+  // New data. After a settings change: stay on the same day and keep playing if it was playing. A new disaster or
+  // seed: back to day 0 and play (not with reduced motion). Autoplay stays the default.
   useEffect(() => {
     if (!data) return;
-    clock.current.day = 0;
-    setDay(0);
-    setPlaying(!reduced);
+    const r = resume.current;
+    resume.current = null;
+    clock.current.day = r ? Math.min(r.day, data.days) : 0;
+    setDay(Math.floor(clock.current.day));
+    setPlaying(r ? r.playing : !reduced);
     invalidateRef.current?.();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
@@ -151,6 +163,7 @@ export default function Twin3D({ data: site, scenario }: { data: SiteData | null
         playing={playing} ready={!!data} atEnd={clock.current.day >= D} onPlay={togglePlay} onStep={stepDay}
         onRestart={() => { seek(0); setPlaying(!reduced); }} speed={speed} onSpeed={setSpeed} view={view} onView={setView}
         day={shown} D={D} onSeek={(d) => { setPlaying(false); seek(d); }} data={data}
+        settings={settings} changes={plan.length} onSettings={() => setSettings((v) => !v)}
       />
       <div className="ws-main">
         <aside className="ws-dock ws-left" aria-label={leftTab === 'phone' ? "Resident's phone" : 'Model inspector'}>
@@ -159,10 +172,14 @@ export default function Twin3D({ data: site, scenario }: { data: SiteData | null
             <button type="button" role="tab" aria-selected={leftTab === 'model'} onClick={() => setLeftTab('model')}>Model inspector</button>
           </div>
           {leftTab === 'phone'
-            ? <PhoneDock id={id} seed={seed} day={shown} pick={selected ? selected.index : null} />
+            ? <PhoneDock id={id} seed={seed} day={shown} pick={selected ? selected.index : null} plan={plan} />
             : <Inspector scenario={scen} seedNote={seedNote} />}
         </aside>
         <div className="ws-view">
+          {settings && (
+            <TestWorld plan={plan} day={shown} D={D} pending={pending} onClose={() => setSettings(false)}
+              onPlan={(p) => { resume.current = { day: clock.current.day, playing: resume.current?.playing ?? playing }; setPlaying(false); setPlan(p); }} />
+          )}
           {data ? (
             <Viewport data={data} clock={clock} invalidateRef={invalidateRef} view={view} day={shown} seed={seed!} selected={selected}
               onSelect={onSelect} onClose={() => setSelected(null)} />
@@ -197,6 +214,7 @@ function Toolbar(p: {
   playing: boolean; ready: boolean; atEnd: boolean; onPlay: () => void; onStep: () => void; onRestart: () => void;
   speed: number; onSpeed: (s: number) => void; view: View; onView: (v: View) => void;
   day: number; D: number; onSeek: (d: number) => void; data: TwinData | null;
+  settings: boolean; changes: number; onSettings: () => void;
 }) {
   const seeds = (from: number, to: number) => Array.from({ length: to - from + 1 }, (_, k) => from + k);
   return (
@@ -225,6 +243,8 @@ function Toolbar(p: {
         </select>
       </label>
       <Scrubber day={p.day} D={p.D} onSeek={p.onSeek} data={p.data} scenId={p.id} />
+      <button type="button" className={`ws-btn ws-gear${p.settings ? ' on' : ''}`} onClick={p.onSettings} aria-pressed={p.settings}
+        title="Test world: switch apps on or off, break things" aria-label="Test world settings">⚙{p.changes > 0 && <span className="ws-gear-n">{p.changes}</span>}</button>
     </div>
   );
 }

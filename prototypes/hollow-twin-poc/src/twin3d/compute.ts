@@ -4,7 +4,7 @@
 // src/sim/results.ts uses for its dark-section counts; CO2 is the day's highest; deaths and "lost" are at the day's end.
 // A run that ends before day D (stable or lost) keeps its last day.
 import { BUILT } from '../product/names.ts';
-import { NO_TOOLS, SECTION_COUNT, type Frame, type ToolSet } from '../sim/types.ts';
+import { NO_TOOLS, SECTION_COUNT, type Action, type Frame, type ToolSet, type WorldEvent } from '../sim/types.ts';
 import { createRun, stepRun } from '../product/run.ts';
 import { plantStatus } from '../sim/engine.ts';
 import { sectionColor, plantColor, STATE } from './palette.ts';
@@ -15,6 +15,26 @@ export const AIR_DANGER = 5000; // ppm, the engine's air danger line (OSHA PEL /
 export const PLANTS = 6;
 /** Every built module, the same set the results file (src/sim/gate.ts) calls "with". */
 export const WITH_TOOLS: ToolSet = { ...NO_TOOLS, ...Object.fromEntries(BUILT.map((k) => [k, true])) };
+
+/**
+ * A person's changes to the test world, from the settings panel: switch apps on or off from a day on (the "with"
+ * side only), or break something on a day (both sides, so the comparison stays fair). The apps are not told; they
+ * have to notice from residents' data. An empty plan is the default run.
+ */
+export interface PlanStep { day: number; tools?: ToolSet; event?: WorldEvent }
+export type Plan = PlanStep[];
+
+/** The apps switched on for the "with" side on a day: the last tools change on or before it. */
+export function toolsAt(plan: Plan, day: number): ToolSet {
+  let t = WITH_TOOLS;
+  for (const p of plan) if (p.tools && p.day <= day) t = p.tools;
+  return t;
+}
+
+/** The person's events for one day, as engine actions. */
+export function eventsAt(plan: Plan, day: number): Action[] {
+  return plan.filter((p) => p.event && p.day === day).map((p) => ({ type: 'event' as const, event: p.event! }));
+}
 
 /** Days shown per disaster: 30, or 60 for the slow ones that cannot end before day 60. */
 export function daysFor(id: string): number {
@@ -55,7 +75,7 @@ function darkCount(f: Frame): number {
   return n;
 }
 
-function runSide(id: string, seed: number, tools: ToolSet, withSide: boolean, D: number, withDetail: boolean): SideData {
+function runSide(id: string, seed: number, tools: ToolSet, withSide: boolean, D: number, withDetail: boolean, plan: Plan = []): SideData {
   const N = SECTION_COUNT;
   const out: SideData = {
     color: new Float32Array((D + 1) * N * 3),
@@ -101,7 +121,7 @@ function runSide(id: string, seed: number, tools: ToolSet, withSide: boolean, D:
 
   let lastDay = 0;
   for (let d = 1; d <= D && !run.sim.end; d++) {
-    const r = stepRun(run, tools);
+    const r = stepRun(run, withSide ? toolsAt(plan, d) : tools, eventsAt(plan, d));
     run = r.run;
     let worst = r.frames[0];
     let worstN = -1;
@@ -138,10 +158,10 @@ function runSide(id: string, seed: number, tools: ToolSet, withSide: boolean, D:
   return out;
 }
 
-export function computeTwin(id: string, seed: number, D = daysFor(id), detail = false): TwinData {
+export function computeTwin(id: string, seed: number, D = daysFor(id), detail = false, plan: Plan = []): TwinData {
   const t0 = Date.now();
-  const without = runSide(id, seed, NO_TOOLS, false, D, detail);
-  const withSide = runSide(id, seed, WITH_TOOLS, true, D, detail);
+  const without = runSide(id, seed, NO_TOOLS, false, D, detail, plan);
+  const withSide = runSide(id, seed, WITH_TOOLS, true, D, detail, plan);
   return { id, seed, days: D, without, with: withSide, ms: Date.now() - t0 };
 }
 
