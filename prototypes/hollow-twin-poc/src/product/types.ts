@@ -26,6 +26,12 @@ export interface ProductMemory {
   repairsSent?: Record<string, number>; // recycler level → day a crew was last sent
   runway?: number[][]; // per level: days of food in store (census), the last 4 days
   farmSections?: number[]; // sections with a farm (census facilities)
+  hotReports?: { day: number; perLevel: number[] }[]; // residents' heat reports per level, last 2 days
+  coughReports?: { day: number; perLevel: number[] }[]; // residents' cough reports per level, last 2 days
+  clinicCases?: { day: number; perLevel: number[] }[]; // cases the clinics saw per level, last 2 days
+  officialCases?: number; // the Directorate's public case count
+  fanCount?: number[]; // per section: fans (census facilities)
+  fanReceivers?: number[]; // levels that received a fan (they never give one away)
   troubleSeverity?: number; // how bad the last trouble was, 0..1 (1 = plant trip); sets how fast the request eases
   userReports: { day: number; level: number; col: number; text: string }[];
   /** Per section, the last day's family check-ins in the app (Family Check-In). */
@@ -83,6 +89,19 @@ export interface ProductLog {
     transfers: { from: number; to: number; days: number }[]; // deliveries asked for today
     grow: number | null; // level where a grow-lamp farm is built today
     needy: number; // levels running out
+  };
+  cooling?: {
+    hot: { level: number; per1000: number }[]; // overheating levels, hottest first
+    moves: { from: number; to: number }[]; // fan moves today
+    received: number; // levels that have received a fan so far
+  };
+  outbreak?: {
+    hotspots: number[]; // levels where coughs run at 3× the typical rate
+    top: { level: number; reports: number; clinic: number; per1000: number }[];
+    typical: number;
+    residentsCount: number; // cough reports in 2 days
+    clinicCount: number; // clinic cases in 2 days
+    official: number | null; // the Directorate's case count
   };
   fairShare?: {
     request: number; // Blackout Warning's Hollow-wide request

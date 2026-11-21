@@ -11,6 +11,8 @@ import { fairShare } from './fairShare.ts';
 import { offNetwork } from './offNetwork.ts';
 import { waterSafety } from './waterSafety.ts';
 import { foodSharing } from './foodSharing.ts';
+import { cooling } from './cooling.ts';
+import { outbreak } from './outbreak.ts';
 
 const HOURS = 24;
 const HOLLOW_DARK = 0.9; // share of levels dark at once that means a plant trip, not the usual deep-first cut
@@ -47,6 +49,11 @@ function ingest(m: ProductMemory, obs: Observation[]): Record<string, number> {
   const outages: Extract<Observation, { kind: 'outage' }>[] = [];
   let netDown = 0;
   const waterToday = { day: -1, perLevel: new Array<number>(LEVELS).fill(0) };
+  const hotToday = { day: -1, perLevel: new Array<number>(LEVELS).fill(0) };
+  const coughToday = { day: -1, perLevel: new Array<number>(LEVELS).fill(0) };
+  const clinicToday = { day: -1, perLevel: new Array<number>(LEVELS).fill(0) };
+  const fans = new Array<number>(LEVELS * SECTIONS_PER_LEVEL).fill(0);
+  let sawFacilities = false;
   const recyclers: number[] = [];
   const farms: number[] = [];
   const foodSum = new Array<number>(LEVELS).fill(0), foodN = new Array<number>(LEVELS).fill(0);
@@ -59,7 +66,15 @@ function ingest(m: ProductMemory, obs: Observation[]): Record<string, number> {
       m.census.critical[i] = o.critical;
       if (o.facilities.includes('recycler')) recyclers.push(i);
       if (o.facilities.includes('farm')) farms.push(i);
+      fans[i] = o.facilities.filter((f) => f === 'fan').length; sawFacilities = true;
       foodSum[o.level - 1] += o.food; foodN[o.level - 1]++;
+    } else if (o.kind === 'reports' && (o.topic === 'hot' || o.topic === 'cough')) {
+      const t = o.topic === 'hot' ? hotToday : coughToday;
+      t.day = o.day; t.perLevel[o.level - 1] += o.count;
+    } else if (o.kind === 'clinic') {
+      clinicToday.day = o.day; clinicToday.perLevel[o.level - 1] += o.cases;
+    } else if (o.kind === 'bulletin') {
+      m.officialCases = o.officialCases;
     } else if (o.kind === 'reports' && o.topic === 'water') {
       waterToday.day = o.day; waterToday.perLevel[o.level - 1] += o.count;
     } else if (o.kind === 'network') {
@@ -76,6 +91,13 @@ function ingest(m: ProductMemory, obs: Observation[]): Record<string, number> {
   }
   if (obs.some((o) => o.kind === 'network')) m.networkDownHours = netDown;
   if (recyclers.length) m.recyclerSections = recyclers;
+  if (sawFacilities) m.fanCount = fans;
+  const daily = !obs.every((o) => 'day' in o && o.day === 0); // a real day (not the standing census before day 1)
+  if (daily) {
+    m.hotReports = [...(m.hotReports ?? []), hotToday].slice(-2);
+    m.coughReports = [...(m.coughReports ?? []), coughToday].slice(-2);
+    m.clinicCases = [...(m.clinicCases ?? []), clinicToday].slice(-2);
+  }
   if (farms.length || foodN.some((x) => x > 0)) m.farmSections = farms;
   if (foodN.some((x) => x > 0)) {
     m.runway ??= Array.from({ length: LEVELS }, () => []);
@@ -135,6 +157,14 @@ export function stepProduct(obs: Observation[], prev: ProductMemory, modules: To
   if (modules.snow) {
     const ws = waterSafety(m, day);
     if (ws) { outputs.push(...ws.outputs); log.waterSafety = ws.log; }
+  }
+  if (modules.layout) {
+    const co = cooling(m, day);
+    if (co) { outputs.push(...co.outputs); log.cooling = co.log; }
+  }
+  if (modules.ledger) {
+    const ob = outbreak(m, day);
+    if (ob) { outputs.push(...ob.outputs); log.outbreak = ob.log; }
   }
   if (modules.larder) {
     const fd = foodSharing(m, day);

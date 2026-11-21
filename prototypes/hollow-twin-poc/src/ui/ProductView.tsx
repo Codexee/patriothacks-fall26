@@ -3,7 +3,7 @@
 // comes from the test world's hidden state. The council reasoning of each module is in the Modules panel.
 import { type ToolSet } from '../sim/types.ts';
 import type { Run } from '../product/run.ts';
-import { BUILT, PROBLEMS, moduleName } from '../product/names.ts';
+
 import { Info } from './Info.tsx';
 import { Phone } from './phone/Phone.tsx';
 
@@ -27,12 +27,6 @@ export function ProductView(p: ProductViewProps) {
     <aside className="product" aria-label="HollowGuard">
       <header className="pv-head">
         <h1>HollowGuard <Info label="About HollowGuard">The app residents run for themselves. It sees only what residents have: their outage reports, their own head count and the Directorate's census. Never the hidden truth. Each solved problem becomes an app on the phone.</Info></h1>
-        <div className="progress" aria-label="Progress through the 15 problems">
-          {PROBLEMS.map((pr) => (
-            <span key={pr.n} className={`dot ${pr.feature && BUILT.includes(pr.feature) ? 'done' : ''}`} title={`#${pr.n} ${pr.title}${pr.feature ? ` — ${moduleName(pr.feature)}` : ' — not built yet'}`}>{pr.n}</span>
-          ))}
-        </div>
-        <p className="muted small">{BUILT.length} of 15 problems solved: {BUILT.map((k) => `#${PROBLEMS.find((p) => p.feature === k)?.n} ${moduleName(k)}`).join(', ')}.</p>
       </header>
       <Phone {...p} />
     </aside>

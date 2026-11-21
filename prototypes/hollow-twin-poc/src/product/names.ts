@@ -5,7 +5,7 @@ import type { ToolKey } from '../sim/types.ts';
 export const MODULE_NAMES: Record<ToolKey, string> = {
   earlyWarning: 'Blackout Warning',
   fairShare: 'Fair Share',
-  ledger: 'Truth Check',
+  ledger: 'Outbreak Tracker',
   snow: 'Water Safety',
   lantern: 'Off-Network Messaging',
   kin: 'Family Check-In',
@@ -15,7 +15,7 @@ export const MODULE_NAMES: Record<ToolKey, string> = {
 };
 
 /** Features built so far in the rebuild, in the order they were added. */
-export const BUILT: ToolKey[] = ['earlyWarning', 'fairShare', 'snow', 'lantern', 'kin'];
+export const BUILT: ToolKey[] = ['earlyWarning', 'fairShare', 'snow', 'lantern', 'kin', 'ledger', 'larder']; // Cooling ('layout') is built but not shipped: no measurable effect (Nov 20)
 
 /** The track's 15 problems, and the feature that answers each one once it is built. */
 export const PROBLEMS: { n: number; title: string; feature: ToolKey | null }[] = [
@@ -27,10 +27,10 @@ export const PROBLEMS: { n: number; title: string; feature: ToolKey | null }[] =
   { n: 6, title: 'Find or share space', feature: null },
   { n: 7, title: 'Organize without the network', feature: 'lantern' },
   { n: 8, title: 'Reconnect families', feature: 'kin' },
-  { n: 9, title: 'Track the real outbreak', feature: null },
+  { n: 9, title: 'Track the real outbreak', feature: 'ledger' },
   { n: 10, title: 'Get care to people who cannot reach it', feature: null },
   { n: 11, title: 'Life without sunlight', feature: null },
-  { n: 12, title: 'Grow and share food', feature: null },
+  { n: 12, title: 'Grow and share food', feature: 'larder' },
   { n: 13, title: 'Prove whether the surface is safe', feature: null },
   { n: 14, title: 'Decide who goes up first, and how', feature: null },
   { n: 15, title: 'Plan the move up', feature: null },

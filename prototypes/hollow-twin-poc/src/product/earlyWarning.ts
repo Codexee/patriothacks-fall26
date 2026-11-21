@@ -35,14 +35,14 @@ export const TRIP_ZONE = 0.95; // above this, plants are close to tripping
 // 15% a day made the plants trip again). The request comes down only after several quiet days in a row, a small
 // step at a time, and never to the level where trouble last started (that memory fades after a while).
 export const EASE = {
-  afterQuietDays: 4, // quiet days in a row before each step down (3 days caused extra trips; Nov 20: gentle easing chosen by Adarsh)
+  afterQuietDays: 5, // quiet days in a row before each step down. 2d branch (heat, sickness and food on): the gentle 4-day, 7–10% easing let late plant trips through, and with heat each trip kills thousands, so this branch uses 5 points every 5 quiet days (Baseline seeds 1–10: 40,224 deaths, 10/10 stable, vs 72,388 and 7/10)
   step: 0.05, // how much each step lowers the request
   floorMargin: 0.05, // stay this far above the request that was in effect the last time there was trouble
   floorDays: 7, // forget that trouble level after this many quiet days
   // Each step lowers the request by a share of itself, set by how bad the last trouble was (Adarsh, Nov 20): 10% after
   // a small deep-level blackout, down to 7% after a whole-Hollow plant trip (or a blackout reaching every level).
-  shareMild: 0.10,
-  shareSevere: 0.07,
+  shareMild: 0, // 0 = fixed 5-point steps (main uses 0.10)
+  shareSevere: 0, // (main uses 0.07)
   maxShed: 0.9, // the largest request, as a share of non-essential load
 };
 const HOURS = 24;

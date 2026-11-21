@@ -314,6 +314,59 @@ function FoodScreen({ run, modules, section }: AppScreenProps) {
   );
 }
 
+// ---------- Cooling (problem #3) ----------
+function CoolingScreen({ run, modules, section }: AppScreenProps) {
+  if (!modules.layout) return <p className="phone-empty">Cooling is off. The fans stay where the Directorate put them, and the deep levels keep heating up.</p>;
+  const co = run.log?.cooling;
+  if (!co) return <p className="muted">Heat reports are counted from the first day.</p>;
+  const mine = co.hot.find((h) => h.level === section.level);
+  const coming = co.moves.find((mv) => mv.to === section.level);
+  return (
+    <>
+      <section className={`pa-hero ${mine ? 'net-down' : ''}`}>
+        <h3>Heat on level {section.level}</h3>
+        <p className={`big-line ${mine ? 'bad' : 'good'}`}>{mine ? 'Too hot' : 'OK'}</p>
+        <p className="muted small">{coming ? `A crew is bringing a fan from level ${coming.from} today.` : mine ? `${mine.per1000.toFixed(1)} heat reports per 1,000 residents in 2 days.` : 'Report "too hot to sleep" in the Report app: heat reports decide where fans go.'}</p>
+      </section>
+      <h3>Hottest levels (heat reports)</h3>
+      {co.hot.length ? (
+        <ul className="ws-list">
+          {co.hot.map((h) => (
+            <li key={h.level} className="bad"><span>Level {h.level}</span><span className="ws-bar"><i style={{ width: `${Math.min(100, h.per1000 * 20)}%` }} /></span><span>{h.per1000.toFixed(1)}</span></li>
+          ))}
+        </ul>
+      ) : <p className="good">No level is overheating.</p>}
+      <p className="muted small">{co.moves.length ? `Fan moves today: ${co.moves.map((mv) => `L${mv.from} → L${mv.to}`).join(', ')}.` : 'No fan moves today.'}</p>
+    </>
+  );
+}
+
+// ---------- Outbreak Tracker (problem #9) ----------
+function OutbreakScreen({ run, modules, section, alerts }: AppScreenProps) {
+  if (!modules.ledger) return <p className="phone-empty">Outbreak Tracker is off. You only have the Directorate's numbers.</p>;
+  const ob = run.log?.outbreak;
+  if (!ob) return <p className="muted">Cough reports are counted from the first day.</p>;
+  const iso = alerts.find((a) => a.action === 'isolateSick');
+  return (
+    <>
+      <section className={`pa-hero ${iso ? 'net-down' : ''}`}>
+        <h3>Level {section.level}</h3>
+        <p className={`big-line ${iso ? 'bad' : 'good'}`}>{iso ? 'Isolate the sick' : 'No outbreak here'}</p>
+        <p className="muted small">{iso ? iso.text : 'Report coughing in the Report app: reports show where the sickness really is.'}</p>
+      </section>
+      <h3>What residents see vs. what the Directorate says</h3>
+      <p>Residents reported <b>{ob.residentsCount.toLocaleString('en-US')}</b> coughs and clinics saw <b>{ob.clinicCount.toLocaleString('en-US')}</b> cases in 2 days. The Directorate counts <b>{ob.official === null ? 'nothing yet' : ob.official.toLocaleString('en-US')}</b> sick.</p>
+      <h3>Most coughs per 1,000 residents</h3>
+      <ul className="ws-list">
+        {ob.top.map((r) => (
+          <li key={r.level} className={ob.hotspots.includes(r.level) ? 'bad' : ''}><span>Level {r.level}</span><span className="ws-bar"><i style={{ width: `${Math.min(100, (r.per1000 / Math.max(0.01, ob.typical * 6)) * 100)}%` }} /></span><span>{r.reports}</span></li>
+        ))}
+      </ul>
+      {iso && <Evidence items={iso.evidence} />}
+    </>
+  );
+}
+
 function DefaultScreen({ alerts }: AppScreenProps) {
   return (<><h3>Alerts for your level</h3><AlertList alerts={alerts} /></>);
 }
@@ -325,12 +378,16 @@ const Scale = <svg viewBox="0 0 24 24" aria-hidden><g fill="none" stroke="curren
 const Antenna = <svg viewBox="0 0 24 24" aria-hidden><g fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="2" fill="currentColor" /><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2" /></g></svg>;
 const Drop = <svg viewBox="0 0 24 24" aria-hidden><path d="M12 2.5c-3.6 4.6-6.5 8.3-6.5 11.8a6.5 6.5 0 0 0 13 0C18.5 10.8 15.6 7.1 12 2.5z" fill="currentColor" /></svg>;
 const Sprout = <svg viewBox="0 0 24 24" aria-hidden><g fill="currentColor"><path d="M11 21v-8.5C11 8.4 7.9 5.5 3.5 5.5c0 4.3 3 7.4 7.5 7.4" /><path d="M13 21v-6.3c0-3.4 2.6-6 6.5-6 0 3.6-2.6 6.3-6.5 6.3" /><rect x="10.5" y="11" width="3" height="10.5" rx="1.2" /></g></svg>;
+const Fan = <svg viewBox="0 0 24 24" aria-hidden><g fill="currentColor"><circle cx="12" cy="12" r="2.2" /><path d="M12 9.8c-.6-3.4.6-6.3 3.6-6.6 2.3-.2 3 2.6.6 4.1-1.4.9-2.8 1.6-4.2 2.5zM14.2 12c3.4-.6 6.3.6 6.6 3.6.2 2.3-2.6 3-4.1.6-.9-1.4-1.6-2.8-2.5-4.2zM12 14.2c.6 3.4-.6 6.3-3.6 6.6-2.3.2-3-2.6-.6-4.1 1.4-.9 2.8-1.6 4.2-2.5zM9.8 12c-3.4.6-6.3-.6-6.6-3.6-.2-2.3 2.6-3 4.1-.6.9 1.4 1.6 2.8 2.5 4.2z" /></g></svg>;
+const Lungs = <svg viewBox="0 0 24 24" aria-hidden><g fill="currentColor"><path d="M11 3h2v8l3 2.5V9.5c0-1 1.6-1.6 2.7-.4C20.5 11 21.5 15 21 18.6c-.3 2-2.3 2.6-4 1.7-1.4-.7-3-1.8-3-4v-1.6L12 13l-2 1.7v1.6c0 2.2-1.6 3.3-3 4-1.7.9-3.7.3-4-1.7C2.5 15 3.5 11 5.3 9.1c1.1-1.2 2.7-.6 2.7.4v4l3-2.5z" /></g></svg>;
 const Grid = <svg viewBox="0 0 24 24" aria-hidden><g fill="currentColor"><rect x="4" y="4" width="7" height="7" rx="2" /><rect x="13" y="4" width="7" height="7" rx="2" /><rect x="4" y="13" width="7" height="7" rx="2" /><rect x="13" y="13" width="7" height="7" rx="2" /></g></svg>;
 
 /** Modules with their own icon and screen. */
 const CUSTOM: Partial<Record<ToolKey, Omit<AppDef, 'key' | 'name' | 'module'>>> = {
   earlyWarning: { short: 'Blackout', glyph: Bolt, colors: ['#ffd36b', '#f08a24'], Screen: BlackoutWarningScreen },
   fairShare: { short: 'Fair Share', glyph: Scale, colors: ['#7ee0c3', '#1f9a7a'], Screen: FairShareScreen },
+  layout: { short: 'Cooling', glyph: Fan, colors: ['#9fdcff', '#4a7fe0'], Screen: CoolingScreen },
+  ledger: { short: 'Outbreak', glyph: Lungs, colors: ['#ffb08a', '#e0573a'], Screen: OutbreakScreen },
   snow: { short: 'Water', glyph: Drop, colors: ['#7fe3ff', '#1f86c9'], Screen: WaterScreen },
   lantern: { short: 'Mesh', glyph: Antenna, colors: ['#ffa7c4', '#d4467a'], Screen: OffNetworkScreen },
   larder: { short: 'Food', glyph: Sprout, colors: ['#c2f27a', '#5aa82a'], Screen: FoodScreen },

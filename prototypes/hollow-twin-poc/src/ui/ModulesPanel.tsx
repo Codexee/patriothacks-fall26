@@ -35,7 +35,7 @@ function BlackoutWarningCard({ run }: CardProps) {
         {bw.hollowDarkHours > 0 && <> The whole Hollow went dark for <b className="bad">{bw.hollowDarkHours} h</b> (plants tripped).</>}</p>
       {bw.supplyEstimate !== null && <p>So the plants made about <b>{fmt(bw.supplyEstimate)}</b> units at the worst hour, for a need of <b>{fmt(bw.demand)}</b>.</p>}
       {bw.shed > 0
-        ? <p className="warn-text">{bw.eased ? `No blackouts for ${bw.quietDays} days in a row: eased the request by 7–10% of itself.` : bw.lineWorst === null && bw.hollowDarkHours === 0 ? `Quiet for ${bw.quietDays} day${bw.quietDays === 1 ? '' : 's'}: keeping the request (it eases by 7–10% of itself after every 4 quiet days in a row: slower after a worse blackout).` : 'Plants are running at their limit.'} Asked everyone to switch off {Math.round(bw.shed * 100)}% of non-essential load today.</p>
+        ? <p className="warn-text">{bw.eased ? `No blackouts for ${bw.quietDays} days in a row: eased the request by 5 points.` : bw.lineWorst === null && bw.hollowDarkHours === 0 ? `Quiet for ${bw.quietDays} day${bw.quietDays === 1 ? '' : 's'}: keeping the request (it eases by 5 points after every 5 quiet days in a row).` : 'Plants are running at their limit.'} Asked everyone to switch off {Math.round(bw.shed * 100)}% of non-essential load today.</p>
         : <p className="good">No blackouts yesterday: no power saving needed.</p>}
       <h4>Blackouts predicted (today)</h4>
       {bw.blackouts.length === 0 ? <p className="muted">None.</p> : (
@@ -73,6 +73,30 @@ function WaterSafetyCard({ run }: CardProps) {
   return ws.suspects.length
     ? <p className="warn-text">Water complaints around the recycler{ws.suspects.length === 1 ? '' : 's'} on level {ws.suspects.join(', ')} are over 3 times the typical rate. Told those levels to boil their water{ws.crews ? `; sent ${ws.crews} repair crew${ws.crews === 1 ? '' : 's'}` : ' (a crew is already on it)'}.</p>
     : <p className="good">No recycler stands out: complaints are at the typical rate ({ws.typical.toFixed(2)} per 1,000 residents in 2 days).</p>;
+}
+
+/** Problem #3: Cooling. */
+function CoolingCard({ run }: CardProps) {
+  const co = run.log?.cooling;
+  if (!co) return <p className="muted">Heat reports are counted from the first day.</p>;
+  return (
+    <>
+      <p>{co.hot.length ? <>Overheating (heat reports per 1,000 in 2 days): {co.hot.map((h) => `L${h.level} (${h.per1000.toFixed(1)})`).join(', ')}.</> : 'No level is overheating.'}</p>
+      <p>{co.moves.length ? <>Crews moved {co.moves.length} fan{co.moves.length === 1 ? '' : 's'} today: {co.moves.map((mv) => `L${mv.from} → L${mv.to}`).join(', ')}.</> : 'No fan moves today.'} {co.received} levels have received a fan so far.</p>
+    </>
+  );
+}
+
+/** Problem #9: Outbreak Tracker. */
+function OutbreakCard({ run }: CardProps) {
+  const ob = run.log?.outbreak;
+  if (!ob) return <p className="muted">Cough reports are counted from the first day.</p>;
+  return (
+    <>
+      <p>In 2 days residents reported <b>{fmt(ob.residentsCount)}</b> coughs; clinics saw <b>{fmt(ob.clinicCount)}</b> cases. The Directorate counts <b>{ob.official === null ? '—' : fmt(ob.official)}</b> sick.</p>
+      {ob.hotspots.length ? <p className="warn-text">Hot spots: level {ob.hotspots.join(', ')}. Told them and the levels next to them to isolate the sick.</p> : <p className="good">No hot spot: coughs are at the typical rate.</p>}
+    </>
+  );
 }
 
 /** Problem #12: Food Sharing. */
@@ -129,6 +153,14 @@ const MODULE_CARDS: Partial<Record<ToolKey, { card: (p: CardProps) => ReactNode;
     card: WaterSafetyCard,
     about: "After John Snow's 1854 cholera map. The app counts residents' reports of bad water per 1,000 residents around each recycler the census lists, over 2 days. A recycler whose levels complain at 3 times the typical rate (and at least 6 reports) is the likely source: those levels are told to boil their water, and the residents' repair crew is sent (again after 4 days if complaints continue). Assumption: a recycler serves its own level and 2 levels above and below. No sensors or tap meters. In the test world a recycler starts failing on level 38, and recyclers without power make worse water.",
   },
+  layout: {
+    card: CoolingCard,
+    about: "The deep levels are closer to hot rock, and cooling runs on power, so blackouts and power saving make them hotter. Above a wet-bulb of 31 °C people start to die (Vecellio et al. 2022). The app counts residents' 'too hot' reports per 1,000 residents by level (2 days), and sends crews to move a fan from a level with no heat reports to the hottest level, at most 2 a day. No temperature sensors. Thresholds are design choices.",
+  },
+  ledger: {
+    card: OutbreakCard,
+    about: "A lung sickness spreads faster in crowded and dark (unventilated) sections and is deadlier far from a clinic. The app puts residents' cough reports and clinic counts side by side per level, next to the Directorate's public number. Levels where coughs run at 3 times the typical rate (and at least 8 reports) and the levels next to them are told to isolate the sick. Thresholds are design choices.",
+  },
   larder: {
     card: FoodSharingCard,
     about: "Section councils count the days of food in store every day (census). The app follows each level's count and how fast it falls. A level under 18 days and falling, or under 10 days, gets deliveries from levels with over 20 days and not falling (residents carry them, up to 3 a day), and the level that would run out first gets a grow-lamp farm. These thresholds are design choices, not measured values. In the test world the Directorate diverts the farms of levels 40–50 to the upper levels on day 12.",
@@ -143,7 +175,7 @@ const MODULE_CARDS: Partial<Record<ToolKey, { card: (p: CardProps) => ReactNode;
   },
   earlyWarning: {
     card: BlackoutWarningCard,
-    about: "Power goes to the upper levels first, so the line where residents report blackouts shows how much power the plants make. Yesterday's line, and how it moved since the day before, predicts today's. Power needs come from residents' own head count. No plant meters, no forecast. On day 1, before any reports, it warns every level of the busiest hours, when a blackout is most likely; it makes no guess about the plants. The power-saving request keeps the plants under 82% of their output; after 4 quiet days in a row it eases by 7–10% of itself: 10% after a small deep-level blackout, 7% after a whole-Hollow plant trip. In the test world, air harm starts at 5,000 ppm CO₂, the OSHA and NIOSH workplace limit (NIOSH Pocket Guide). How many residents follow an alert, and how much a warning saves, are still first guesses: no study gives comparable numbers.",
+    about: "Power goes to the upper levels first, so the line where residents report blackouts shows how much power the plants make. Yesterday's line, and how it moved since the day before, predicts today's. Power needs come from residents' own head count. No plant meters, no forecast. On day 1, before any reports, it warns every level of the busiest hours, when a blackout is most likely; it makes no guess about the plants. The power-saving request keeps the plants under 82% of their output; after 5 quiet days in a row it eases by 5 points. In the test world, air harm starts at 5,000 ppm CO₂, the OSHA and NIOSH workplace limit (NIOSH Pocket Guide). How many residents follow an alert, and how much a warning saves, are still first guesses: no study gives comparable numbers.",
   },
 };
 
@@ -162,7 +194,6 @@ export interface ModulesPanelProps {
 export function ModulesPanel(p: ModulesPanelProps) {
   const [collapsed, setCollapsed] = useState<Partial<Record<ToolKey, boolean>>>({});
   const changed = BUILT.some((k) => p.pending[k] !== p.running[k]);
-  const solved = PROBLEMS.filter((pr) => pr.feature && BUILT.includes(pr.feature)).length;
 
   if (!p.open) {
     return (
@@ -193,7 +224,6 @@ export function ModulesPanel(p: ModulesPanelProps) {
         <h1>Solution modules <Info label="About the solution modules">The features of HollowGuard, one per Hollow problem. Switch each one on or off here; the change applies from the next day, and Reset starts the Hollow over with your choice. Each card shows what the module worked out from today's data.</Info></h1>
         <button className="ghost" onClick={p.onToggle} title="Minimize (M)">Minimize</button>
       </header>
-      <p className="mods-progress">{solved} of 15 Hollow problems solved</p>
       {changed && (
         <p className="mods-pending">Your changes apply from the next day. <button onClick={p.onReset} disabled={p.locked}>Reset to start over with them</button></p>
       )}

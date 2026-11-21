@@ -19,6 +19,22 @@ Newest first. Add an entry whenever you change shared context, skills, or the wo
 - **Films:** re-rendered with "Without/With HollowGuard" labels and the 5-module run.
 - **README.md is now for judges.** The old team README is `docs/team-setup.md`.
 - **Teammates:** pull, then redeploy Vercel. Use 12,563 (not 12,540) in slides, the video and Devpost.
+## 2026-11-20 (Adarsh, branch hollow-earth-rebuild-2d, merged into main in entry 35): Baseline fixes for the harder world
+
+- **Heat was the main killer.** In a blackout a deep level's cooling stops and it climbs to about 37 °C wet-bulb (limit 31). With heat switched off, Baseline deaths on seeds 1–10 fall from 160,162 to 9,630.
+- **Fixes:**
+  1. Residents warned by Blackout Warning, who move to an upper section or a powered shelter for air, now also escape the heat (the same share is spared).
+  2. Fair Share asks overheating levels (residents' heat reports) for 10% of the usual share and never more than 30%, because their cooling runs on that power.
+  3. Easing goes back to 5 points every 5 quiet days in this branch: with heat, every late plant trip kills thousands. `main` keeps the gentle easing.
+- **Baseline, seeds 1–10:** 158,480 deaths, 8/10 stable → **40,224, 10/10 stable**. On the test seeds 11–20: 79,313, 7/10 stable. Baseline deaths are now driven by random whole-Hollow plant trips, so they swing a lot between seed sets.
+- **All disasters, test seeds 11–20:** 35,323,040 → **772,220** deaths (was 2,061,500), 74% of runs stable (was 66%).
+
+## 2026-11-20 (Adarsh, branch hollow-earth-rebuild-2d, merged into main in entry 35): Cooling (#3), Outbreak Tracker (#9), Food Sharing (#12)
+
+- **This is on the `hollow-earth-rebuild-2d` branch, not `main`.** `main` keeps 5 problems and the 43.6 M → 12,540 headline.
+- **8 of 15 problems:** adds Cooling (`product/cooling.ts`: residents' heat reports → crews move fans to the hottest levels), Outbreak Tracker (`product/outbreak.ts`: cough reports + clinic counts vs the Directorate's number → isolate-the-sick alerts on hot spots) and Food Sharing (`product/foodSharing.ts`, now shipped).
+- **World:** heat, sickness and food are on. Farm lamps now count as essential power, so power saving never switches them off (that is what made every run starve before).
+- **Results (test seeds 11–20, all 8 modules):** deaths **35,323,040 → 2,061,500** (94% fewer), but only 66% of runs end stable (Aging 0/10, Two Plants and Crowding 5/10). Food Sharing alone prevents about 380,000 starvation deaths per run; Outbreak Tracker helps a lot on Baseline, mixed on Two Plants; Cooling has almost no measurable effect.
 
 ## 2026-11-20 (32): Three more problems: Fair Share (#2), Water Safety (#4), Off-Network Messaging (#7)
 
