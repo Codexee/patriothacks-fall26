@@ -20,6 +20,7 @@ export interface PhoneProps {
   queuedReports: number;
   locked: boolean;
   darkNow?: boolean[];
+  lockedNote?: string;
 }
 
 const sig = (a: Alert) => `${a.action}:${a.from}-${a.to}`;
@@ -137,7 +138,7 @@ export function Phone(p: PhoneProps) {
               </header>
               <div className="pa-body">
                 <openApp.app.Screen run={run} modules={p.modules} section={section} alerts={openApp.alerts}
-                  onReport={p.onReport} queuedReports={p.queuedReports} locked={p.locked} darkNow={p.darkNow} />
+                  onReport={p.onReport} queuedReports={p.queuedReports} locked={p.locked} lockedNote={p.lockedNote} darkNow={p.darkNow} />
               </div>
             </section>
           )}

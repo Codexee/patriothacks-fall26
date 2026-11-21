@@ -79,7 +79,7 @@ export function TestWorld({ plan, day, D, pending, onPlan, onClose }: {
           <>
             <ol className="ws-tw-log">
               {plan.map((p, i) => (
-                <li key={i}>Day {p.day}: {p.event ? describe(p.event) : `apps on: ${BUILT.filter((k) => p.tools?.[k]).map(moduleName).join(', ') || 'none'}`}</li>
+                <li key={i}>Day {p.day}: {p.event ? describe(p.event) : p.report ? `report from level ${p.report.level}: “${p.report.text.slice(0, 40)}${p.report.text.length > 40 ? '…' : ''}”` : `apps on: ${BUILT.filter((k) => p.tools?.[k]).map(moduleName).join(', ') || 'none'}`}</li>
               ))}
             </ol>
             <button type="button" className="ws-btn" onClick={() => onPlan([])}>Undo all</button>

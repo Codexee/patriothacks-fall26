@@ -15,7 +15,7 @@ export const MODULE_NAMES: Record<ToolKey, string> = {
 };
 
 /** Features built so far in the rebuild, in the order they were added. */
-export const BUILT: ToolKey[] = ['earlyWarning', 'fairShare', 'snow', 'lantern', 'kin', 'ledger', 'larder']; // Cooling ('layout') is built but not shipped: no measurable effect (Nov 20)
+export const BUILT: ToolKey[] = ['earlyWarning', 'fairShare', 'snow', 'kin', 'ledger', 'larder']; // Not shipped: Cooling ('layout', no measurable effect) and Off-Network Messaging ('lantern', cut as feature bloat), Nov 20
 
 /** The track's 15 problems, and the feature that answers each one once it is built. */
 export const PROBLEMS: { n: number; title: string; feature: ToolKey | null }[] = [
@@ -25,7 +25,7 @@ export const PROBLEMS: { n: number; title: string; feature: ToolKey | null }[] =
   { n: 4, title: 'Catch bad water', feature: 'snow' },
   { n: 5, title: 'Keep flooded tunnels safe', feature: null },
   { n: 6, title: 'Find or share space', feature: null },
-  { n: 7, title: 'Organize without the network', feature: 'lantern' },
+  { n: 7, title: 'Organize without the network', feature: null },
   { n: 8, title: 'Reconnect families', feature: 'kin' },
   { n: 9, title: 'Track the real outbreak', feature: 'ledger' },
   { n: 10, title: 'Get care to people who cannot reach it', feature: null },

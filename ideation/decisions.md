@@ -82,3 +82,4 @@ Add one line per decision: date · decision · why · who. Newest last.
 - 2026-11-20 · Merge Adarsh's hollow-earth-rebuild-2d (frozen at c615334): harder world (heat, sickness, food on) becomes the headline; his 5-point easing; Cooling dropped (no measurable effect) → 7 apps, 7 problems; stable count shown honestly; cut-off 9:30 pm, else fall back to backup/hollowguard-site-2026-11-20. Spec: .plans/adarsh-integration-spec.md · Neil
 - 2026-11-20 · Team is Neil, Adarsh and Richard (rphan09); Anish and Darryl left · Neil
 - 2026-11-20 · Site URL is https://hollowguard.vercel.app (Vercel project renamed; no GitHub Pages because the repo is private) · Neil
+- 2026-11-20 · Off-Network Messaging (#7) not shipped (feature bloat; no measured effect): 6 apps, 6 problems · Neil

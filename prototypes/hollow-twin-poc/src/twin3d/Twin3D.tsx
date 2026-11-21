@@ -75,7 +75,7 @@ export default function Twin3D({ data: site, scenario }: { data: SiteData | null
   if (planFor.current !== `${id}:${seed}`) { planFor.current = `${id}:${seed}`; if (plan.length) setPlan([]); }
   const { data, error, pending } = useTwinDetail(id, seed, plan);
   // After a plan change, the new run continues from the same day (the days before it do not change).
-  const resume = useRef<{ day: number; playing: boolean } | null>(null)
+  const resume = useRef<{ day: number; playing: boolean } | null>(null);
   const reduced = useReducedMotion();
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(2);
@@ -110,6 +110,8 @@ export default function Twin3D({ data: site, scenario }: { data: SiteData | null
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
+  // Apply a change from the settings panel or the phone's Report app: rerun with it, same day, same play state.
+  const changePlan = (p: Plan) => { resume.current = { day: clock.current.day, playing: resume.current?.playing ?? playing }; setPlaying(false); setPlan(p); };
   const D = data?.days ?? 30;
 
   useEffect(() => {
@@ -172,13 +174,14 @@ export default function Twin3D({ data: site, scenario }: { data: SiteData | null
             <button type="button" role="tab" aria-selected={leftTab === 'model'} onClick={() => setLeftTab('model')}>Model inspector</button>
           </div>
           {leftTab === 'phone'
-            ? <PhoneDock id={id} seed={seed} day={shown} pick={selected ? selected.index : null} plan={plan} />
+            ? <PhoneDock id={id} seed={seed} day={shown} pick={selected ? selected.index : null} plan={plan}
+                onReport={shown < D ? (level, col, text) => changePlan([...plan, { day: shown + 1, report: { level, col, text } }]) : undefined} />
             : <Inspector scenario={scen} seedNote={seedNote} />}
         </aside>
         <div className="ws-view">
           {settings && (
             <TestWorld plan={plan} day={shown} D={D} pending={pending} onClose={() => setSettings(false)}
-              onPlan={(p) => { resume.current = { day: clock.current.day, playing: resume.current?.playing ?? playing }; setPlaying(false); setPlan(p); }} />
+              onPlan={changePlan} />
           )}
           {data ? (
             <Viewport data={data} clock={clock} invalidateRef={invalidateRef} view={view} day={shown} seed={seed!} selected={selected}

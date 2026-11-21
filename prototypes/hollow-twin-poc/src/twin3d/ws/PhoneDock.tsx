@@ -38,7 +38,11 @@ function useRuns(id: string, seed: number | null, day: number, plan: Plan): Run 
   return runs.length ? runs[Math.min(day, runs.length - 1)] : null;
 }
 
-export function PhoneDock({ id, seed, day, pick, note, plan = [] }: { id: string; seed: number | null; day: number; pick: number | null; note?: string | null; plan?: Plan }) {
+export function PhoneDock({ id, seed, day, pick, note, plan = [], onReport }: {
+  id: string; seed: number | null; day: number; pick: number | null; note?: string | null; plan?: Plan;
+  /** Sends a resident's report into the run (the 3D view). Without it, Report is read-only here. */
+  onReport?: (level: number, col: number, text: string) => void;
+}) {
   const run = useRuns(id, seed, day, plan);
   const [section, setSection] = useState({ level: 39, col: 2 });
   const [locked, setLocked] = useState(false);
@@ -51,7 +55,9 @@ export function PhoneDock({ id, seed, day, pick, note, plan = [] }: { id: string
       {note !== null && <p className="ph-host-note">{note ?? `Level ${section.level}, day ${day}. Click a section to move in.`}</p>}
       {run ? (
         <Phone run={run} modules={toolsAt(plan, day)} hour={7} playing={false} section={section} onPickSection={setSection}
-          homeLocked={locked} onToggleLock={() => setLocked((v) => !v)} onReport={() => {}} queuedReports={0} locked />
+          homeLocked={locked} onToggleLock={() => setLocked((v) => !v)}
+          onReport={onReport ?? (() => {})} queuedReports={plan.filter((p) => p.report && p.day === day + 1).length}
+          locked={!onReport} lockedNote="Open Watch it run to send a report into the test world." />
       ) : <p className="ph-host-note">Loading…</p>}
     </div>
   );

@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-21T01:07:12.566Z",
+  "generated": "2026-11-21T02:58:35.595Z",
   "set": "test",
   "seeds": [
     11,
@@ -48,16 +48,6 @@
       "tripsAvoidedPerRun": 0.8,
       "darkMhAvoidedPerRun": 4.02,
       "noNewsPerNightWithoutApp": 2564
-    },
-    {
-      "key": "lantern",
-      "name": "Off-Network Messaging",
-      "problem": 7,
-      "deathsWithoutApp": 861761,
-      "deathsAvoided": 0,
-      "tripsAvoidedPerRun": 0,
-      "darkMhAvoidedPerRun": 0,
-      "noNewsPerNightWithoutApp": 612
     },
     {
       "key": "kin",

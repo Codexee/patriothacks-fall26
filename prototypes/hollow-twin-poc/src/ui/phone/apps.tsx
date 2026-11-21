@@ -19,6 +19,8 @@ export interface AppScreenProps {
   onReport: (level: number, col: number, text: string) => void;
   queuedReports: number;
   locked: boolean;
+  /** Shown in Report when sending is off here (for example on the results page). */
+  lockedNote?: string;
 }
 
 export interface AppDef {
@@ -86,7 +88,7 @@ function BlackoutWarningScreen({ run, modules, section, alerts }: AppScreenProps
   );
 }
 
-function ReportScreen({ run, section, onReport, queuedReports, locked }: AppScreenProps) {
+function ReportScreen({ run, section, onReport, queuedReports, locked, lockedNote }: AppScreenProps) {
   const [text, setText] = useState('');
   const day = run.sim.day;
   useEffect(() => { setText(''); }, [day]); // a new day starts with an empty report box (also after Reset)
@@ -98,7 +100,8 @@ function ReportScreen({ run, section, onReport, queuedReports, locked }: AppScre
           placeholder={`Describe what is happening on level ${section.level}`} />
         <button type="submit" disabled={locked || !text.trim()}>Send report</button>
       </form>
-      {queuedReports > 0 && <p className="muted small">{queuedReports} report(s) queued for tomorrow's data.</p>}
+      {locked && lockedNote && <p className="muted small">{lockedNote}</p>}
+      {queuedReports > 0 && <p className="muted small">{queuedReports === 1 ? 'Your report is' : `${queuedReports} reports are`} in tomorrow's data. Watch what the apps do with it.</p>}
     </>
   );
 }

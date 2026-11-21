@@ -10,7 +10,7 @@ Shorter (one breath): "Tested on real outages, it found 7 of Hurricane Beryl's 1
 
 HollowGuard is a phone app for the two billion people who live in the Hollow. It uses only what residents can see: which levels lost power, how many people live in each section, their own reports of bad water, coughs and food stocks, and the Directorate's census.
 
-It has seven apps for seven of the brief's problems. Blackout Warning tells each level before its power goes out, and asks everyone to save power so the plants do not overload. Fair Share makes sure the deep levels are not always the ones cut. Water Safety finds a failing recycler and tells those levels to boil their water. Off-Network Messaging keeps alerts moving when the Directorate cuts the network. Family Check-In tells you that a relative on another level is OK. Outbreak Tracker shows where the sickness really is. Food Sharing sends spare food to levels that are running out.
+It has six apps for six of the brief's problems. Blackout Warning tells each level before its power goes out, and asks everyone to save power so the plants do not overload. Fair Share makes sure the deep levels are not always the ones cut. Water Safety finds a failing recycler and tells those levels to boil their water. Family Check-In tells you that a relative on another level is OK. Outbreak Tracker shows where the sickness really is. Food Sharing sends spare food to levels that are running out.
 
 We tested HollowGuard on seven disasters copied from real US power plant failures, ten held-out runs each. Without it, 35.3 million people die and no run ends stable. With it, 861,761 die (97.6% fewer), and 49 of 70 runs end stable.
 
@@ -28,7 +28,7 @@ The site uses React, Vite and three.js, with a Web Worker, deployed on Vercel.
 
 The brief describes people who cannot trust the official numbers and cannot see the systems that keep them alive. We asked a simple question: what can residents do with only what they can see? A blackout answered it. Residents cannot see the plants, but they can see which levels went dark, and power reaches the top first. So the line between dark and lit levels shows the supply. If residents share their outage reports, they can forecast the next blackout without the Directorate.
 
-From there we added one app per problem. Each app had to use residents' data only and had to show a measured effect. We did not want a demo that only looks good, so we tested on runs we never tuned on, copied real disasters, and published the results that go against us. Cooling showed no measurable effect, so we did not ship it. Off-Network Messaging shows zero in our tests because the brief gives no network-cut schedule, and we say so.
+From there we added one app per problem. Each app had to use residents' data only and had to show a measured effect. We did not want a demo that only looks good, so we tested on runs we never tuned on, copied real disasters, and published the results that go against us. Cooling showed no measurable effect, so we did not ship it.
 
 The brief rewards one connected solution, so every app shares the same phone, the same residents' reports and the same test.
 
@@ -36,7 +36,7 @@ The brief rewards one connected solution, so every app shares the same phone, th
 
 Neil built the real-data pipeline (EIA-930, EAGLE-I and CDC SVI), the residents-only check-first model, and Blackout Warning's tuning and testing. He also built the 3D workstation, the guided tour, the per-app impact measurement and the final integration, and he deployed the site.
 
-Adarsh built the resident's phone and six of its apps: Fair Share, Water Safety, Off-Network Messaging, Family Check-In, Outbreak Tracker and Food Sharing. He also built Blackout Warning's power-saving easing, the 2D cutaway and the harder test world with heat, sickness and food.
+Adarsh built the resident's phone and five of its apps: Fair Share, Water Safety, Family Check-In, Outbreak Tracker and Food Sharing. He also built Blackout Warning's power-saving easing, the 2D cutaway and the harder test world with heat, sickness and food.
 
 Richard redesigned the results site: the full-width layout, the type and the pipeline figure.
 

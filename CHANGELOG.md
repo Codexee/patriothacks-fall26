@@ -2,6 +2,13 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-20 (37): Off-Network Messaging removed (6 apps)
+
+- **Off-Network Messaging (#7) is not shipped** (Neil: feature bloat). It had no measured effect, because the test runs have no network cut. HollowGuard now has **6 apps for 6 problems**: #1, #2, #4, #8, #9, #12. `offNetwork.ts` stays in the code.
+- **The results do not change:** 35,323,038 → 861,761 deaths, 49/70 stable. `impact.json` is regenerated for the 6 apps. The films stay valid.
+- README, pitch, video script, Devpost and form answers no longer mention it. The test world's "Cut the network" break is still there.
+- **Everyone:** say "six apps, six problems" in the video and on the form.
+
 ## 2026-11-20 (36): The site is at hollowguard.vercel.app
 
 - **The Vercel project is renamed `hollowguard`**, and the site is live at **https://hollowguard.vercel.app**. The old URL, hollow-twin-poc.vercel.app, still works.

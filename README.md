@@ -38,7 +38,6 @@ HollowGuard has one app per problem from the brief. Each app reads residents' da
 | 1 | Blackout Warning | Warns each level before its power goes out, and asks all levels to save power so the plants do not trip. | 33,237,724 deaths avoided; 60 fewer plant trips per run |
 | 2 | Fair Share | Asks levels that were dark yesterday, or that are overheating, to save less, so the deep levels do not always lose. | 142,869 deaths avoided |
 | 4 | Water Safety | Counts bad-water reports per recycler. Tells those levels to boil water and calls a repair crew. | 4,201,744 deaths avoided |
-| 7 | Off-Network Messaging | Places 40 battery relays each day, so alerts reach every level when the network is cut. | None measured: the test runs have no network cut |
 | 8 | Family Check-In | "We're OK" taps pass phone to phone to relatives on other levels. | Split families with no news per night: 635 → 612 |
 | 9 | Outbreak Tracker | Compares cough reports and clinic counts with the Directorate's number, and tells hot spots to isolate the sick. | 101,164 deaths avoided |
 | 12 | Food Sharing | Finds levels running out of food from the councils' stock counts, and asks levels with spare food to send it. | 23,123,020 deaths avoided |

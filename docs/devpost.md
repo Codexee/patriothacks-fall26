@@ -6,14 +6,13 @@ Live site: https://hollowguard.vercel.app · Code: https://github.com/Codexee/pa
 In the Hollow, the deep levels lose first. Blackouts come without warning, recyclers fail, and the Directorate's numbers do not match what people see. Residents cannot see the power plants, but they can see which levels are dark. We wanted to find out how much residents can do with only what they can see.
 
 ## What it does
-HollowGuard is a phone app for residents. It has 7 apps for 7 of the brief's 15 problems:
+HollowGuard is a phone app for residents. It has 6 apps for 6 of the brief's 15 problems:
 
 | # | App | What it does |
 | --- | --- | --- |
 | 1 | Blackout Warning | Warns each level before its power goes out, and asks all levels to save power so the plants do not trip. |
 | 2 | Fair Share | Asks levels that were dark yesterday, or that are overheating, to save less. |
 | 4 | Water Safety | Counts bad-water reports per recycler. Tells those levels to boil water and calls a repair crew. |
-| 7 | Off-Network Messaging | Places 40 battery relays each day, so alerts reach every level when the network is cut. |
 | 8 | Family Check-In | Passes "We're OK" taps phone to phone to relatives on other levels. |
 | 9 | Outbreak Tracker | Compares cough reports and clinic counts with the Directorate's number, and tells hot spots to isolate the sick. |
 | 12 | Food Sharing | Finds levels running out of food and asks levels with spare food to send it. |
@@ -43,6 +42,5 @@ A second model, the check-first model, ranks which areas will stay dark longest 
 - Fixing one problem exposes the next. With heat on, every late plant trip killed thousands, so we had to slow the power-saving easing.
 
 ## What's next
-- Test runs with network cuts, so Off-Network Messaging gets a measured number.
 - More of the 15 problems (Cooling did not help enough to ship).
 - Field tests of the outage-report forecast on real crowd-reported outages.

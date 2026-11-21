@@ -21,7 +21,7 @@ export const WITH_TOOLS: ToolSet = { ...NO_TOOLS, ...Object.fromEntries(BUILT.ma
  * side only), or break something on a day (both sides, so the comparison stays fair). The apps are not told; they
  * have to notice from residents' data. An empty plan is the default run.
  */
-export interface PlanStep { day: number; tools?: ToolSet; event?: WorldEvent }
+export interface PlanStep { day: number; tools?: ToolSet; event?: WorldEvent; report?: { level: number; col: number; text: string } }
 export type Plan = PlanStep[];
 
 /** The apps switched on for the "with" side on a day: the last tools change on or before it. */
@@ -31,9 +31,15 @@ export function toolsAt(plan: Plan, day: number): ToolSet {
   return t;
 }
 
-/** The person's events for one day, as engine actions. */
+/** The person's events and typed reports for one day, as engine actions. */
 export function eventsAt(plan: Plan, day: number): Action[] {
-  return plan.filter((p) => p.event && p.day === day).map((p) => ({ type: 'event' as const, event: p.event! }));
+  const out: Action[] = [];
+  for (const p of plan) {
+    if (p.day !== day) continue;
+    if (p.event) out.push({ type: 'event', event: p.event });
+    if (p.report) out.push({ type: 'report', ...p.report }); // a resident's typed report joins that day's data
+  }
+  return out;
 }
 
 /** Days shown per disaster: 30, or 60 for the slow ones that cannot end before day 60. */
