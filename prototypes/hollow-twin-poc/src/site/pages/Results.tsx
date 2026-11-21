@@ -61,6 +61,8 @@ const APP_LINE: Record<string, string> = {
   snow: 'Counts bad-water reports per recycler. Tells those levels to boil water and calls a repair crew.',
   lantern: 'Places 40 battery relays each day, so alerts reach every level when the network is cut.',
   kin: '“We’re OK” taps pass phone to phone to relatives on other levels.',
+  ledger: 'Compares cough reports and clinic counts with the Directorate’s number, and tells hot spots to isolate the sick.',
+  larder: 'Finds levels running out of food from the councils’ stock counts, and asks levels with spare food to send it.',
 };
 
 /** Sources behind the test world and the check-first model. URLs are the ones cited in the data files. */
@@ -105,7 +107,7 @@ export function Results({ data }: { data: SiteData }) {
               <span className="hl-to">to <span className="with">{num(wi.mean)}</span>.</span>
             </h1>
             <p className="hero-lede">
-              HollowGuard is a phone app for the Hollow. It reads only what residents can see, and warns them before power, air and water fail.
+              HollowGuard is a phone app for the Hollow. It reads only what residents can see, and warns them before power, air, water and food fail.
             </p>
             <p className="hero-real"><Tag kind="real" /> Four disasters copy real US plant losses, hour by hour. The others use real demand, aging and census data.</p>
             <div className="hero-actions">
@@ -155,7 +157,6 @@ export function Results({ data }: { data: SiteData }) {
                 );
               })}
             </ol>
-            <p className="note">{15 - BUILT.length} of the 15 problems have no app yet.</p>
           </div>
           <div className="app-phone">
             <PhoneDock id={PHONE_ID} seed={phoneSeed} day={phoneDay} pick={null} note={null} />
@@ -259,15 +260,15 @@ function AppImpact({ impact, k }: { impact: ImpactFile; k: string }) {
   const r = impact.apps.find((a) => a.key === k);
   if (!r) return null;
   const top = Math.max(1, ...impact.apps.map((a) => a.deathsAvoided));
-  const share = Math.max(0, r.deathsAvoided) / top;
+  const share = Math.abs(r.deathsAvoided) < 10 ? 0 : Math.max(0, r.deathsAvoided) / top;
   let extra: string | null = null;
   if (k === 'kin') extra = `Split families with no news per night: ${num(r.noNewsPerNightWithoutApp)} with this app off, ${num(impact.all.noNewsPerNight)} with it on`;
-  else if (k === 'lantern' && r.deathsAvoided <= 0) extra = 'The test runs have no network cut, so this app has nothing to do in them.';
+  else if (k === 'lantern' && Math.abs(r.deathsAvoided) < 10) extra = 'The test runs have no network cut, so this app has nothing to do in them.';
   else if (r.tripsAvoidedPerRun >= 0.5) extra = `${num(r.tripsAvoidedPerRun, 1)} fewer plant trips per run`;
   return (
     <span className="app-impact">
       <span className="ai-bar" aria-hidden="true"><i style={{ width: `${Math.max(r.deathsAvoided > 0 ? 1 : 0, share * 100)}%` }} /></span>
-      <span className="ai-num">{r.deathsAvoided > 0 ? `${num(r.deathsAvoided)} deaths avoided` : r.deathsAvoided < 0 ? `${num(-r.deathsAvoided)} more deaths` : 'No change in deaths'}</span>
+      <span className="ai-num">{Math.abs(r.deathsAvoided) < 10 ? 'No change in deaths' : r.deathsAvoided > 0 ? `${num(r.deathsAvoided)} deaths avoided` : `${num(-r.deathsAvoided)} more deaths`}</span>
       {extra && <span className="ai-extra">{extra}</span>}
     </span>
   );

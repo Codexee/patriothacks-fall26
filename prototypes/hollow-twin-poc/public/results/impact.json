@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-21T00:20:26.078Z",
+  "generated": "2026-11-21T01:07:12.566Z",
   "set": "test",
   "seeds": [
     11,
@@ -15,59 +15,79 @@
   ],
   "runs": 70,
   "all": {
-    "deaths": 12563,
-    "noNewsPerNight": 620
+    "deaths": 861761,
+    "noNewsPerNight": 612
   },
   "apps": [
     {
       "key": "earlyWarning",
       "name": "Blackout Warning",
       "problem": 1,
-      "deathsWithoutApp": 43967726,
-      "deathsAvoided": 43955163,
-      "tripsAvoidedPerRun": 219.2,
-      "darkMhAvoidedPerRun": 1283.41,
-      "noNewsPerNightWithoutApp": 14621
+      "deathsWithoutApp": 34099485,
+      "deathsAvoided": 33237724,
+      "tripsAvoidedPerRun": 60,
+      "darkMhAvoidedPerRun": 284.9,
+      "noNewsPerNightWithoutApp": 8608
     },
     {
       "key": "fairShare",
       "name": "Fair Share",
       "problem": 2,
-      "deathsWithoutApp": 12764,
-      "deathsAvoided": 201,
-      "tripsAvoidedPerRun": -0.2,
-      "darkMhAvoidedPerRun": -0.47,
-      "noNewsPerNightWithoutApp": 607
+      "deathsWithoutApp": 1004630,
+      "deathsAvoided": 142869,
+      "tripsAvoidedPerRun": 0.2,
+      "darkMhAvoidedPerRun": 0.12,
+      "noNewsPerNightWithoutApp": 636
     },
     {
       "key": "snow",
       "name": "Water Safety",
       "problem": 4,
-      "deathsWithoutApp": 4235492,
-      "deathsAvoided": 4222929,
-      "tripsAvoidedPerRun": 1.4,
-      "darkMhAvoidedPerRun": 6.88,
-      "noNewsPerNightWithoutApp": 3472
+      "deathsWithoutApp": 5063505,
+      "deathsAvoided": 4201744,
+      "tripsAvoidedPerRun": 0.8,
+      "darkMhAvoidedPerRun": 4.02,
+      "noNewsPerNightWithoutApp": 2564
     },
     {
       "key": "lantern",
       "name": "Off-Network Messaging",
       "problem": 7,
-      "deathsWithoutApp": 12563,
+      "deathsWithoutApp": 861761,
       "deathsAvoided": 0,
       "tripsAvoidedPerRun": 0,
       "darkMhAvoidedPerRun": 0,
-      "noNewsPerNightWithoutApp": 620
+      "noNewsPerNightWithoutApp": 612
     },
     {
       "key": "kin",
       "name": "Family Check-In",
       "problem": 8,
-      "deathsWithoutApp": 12563,
-      "deathsAvoided": 0,
+      "deathsWithoutApp": 861762,
+      "deathsAvoided": 1,
       "tripsAvoidedPerRun": 0,
       "darkMhAvoidedPerRun": 0,
-      "noNewsPerNightWithoutApp": 657
+      "noNewsPerNightWithoutApp": 635
+    },
+    {
+      "key": "ledger",
+      "name": "Outbreak Tracker",
+      "problem": 9,
+      "deathsWithoutApp": 962925,
+      "deathsAvoided": 101164,
+      "tripsAvoidedPerRun": -1.2,
+      "darkMhAvoidedPerRun": -4.22,
+      "noNewsPerNightWithoutApp": 772
+    },
+    {
+      "key": "larder",
+      "name": "Food Sharing",
+      "problem": 12,
+      "deathsWithoutApp": 23984781,
+      "deathsAvoided": 23123020,
+      "tripsAvoidedPerRun": -2.1,
+      "darkMhAvoidedPerRun": -8.56,
+      "noNewsPerNightWithoutApp": 441
     }
   ]
 }

@@ -126,7 +126,6 @@ export function Phone(p: PhoneProps) {
                 );
               })}
             </ul>
-            <p className="ph-more">More apps arrive as more of the 15 problems are solved.</p>
           </div>
 
           {openApp && (

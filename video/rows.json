@@ -7,8 +7,8 @@
       "footage": "assets/footage/twoplants.mp4",
       "event": "Plants 4 and 5 lose output",
       "eventDay": 5,
-      "endWithout": "641,013",
-      "endWith": "57",
+      "endWithout": "517,616",
+      "endWith": "20,144",
       "endNote": "Mean deaths per run, held-out seeds 11–20.",
       "source": "EIA-930, TVA and CPLE coal, Dec 2022"
     },
@@ -19,8 +19,8 @@
       "footage": "assets/footage/elliott.mp4",
       "event": "Plant 4 loses output",
       "eventDay": 5,
-      "endWithout": "613,262",
-      "endWith": "7",
+      "endWithout": "500,867",
+      "endWith": "4,619",
       "endNote": "Mean deaths per run, held-out seeds 11–20.",
       "source": "EIA-930, TVA coal, Dec 2022"
     },
@@ -31,8 +31,8 @@
       "footage": "assets/footage/cascade.mp4",
       "event": "Plant 2 loses output",
       "eventDay": 5,
-      "endWithout": "631,696",
-      "endWith": "7",
+      "endWithout": "519,448",
+      "endWith": "5,058",
       "endNote": "Mean deaths per run, held-out seeds 11–20.",
       "source": "EIA-930, ERCOT generation, Feb 2021"
     },
@@ -43,8 +43,8 @@
       "footage": "assets/footage/slowloss.mp4",
       "event": "Plant 6 loses output for two weeks",
       "eventDay": 5,
-      "endWithout": "616,360",
-      "endWith": "7",
+      "endWithout": "499,080",
+      "endWith": "4,425",
       "endNote": "Mean deaths per run, held-out seeds 11–20.",
       "source": "EIA-930, SPP wind, Feb 2021"
     },
@@ -55,8 +55,8 @@
       "footage": "assets/footage/aging.mp4",
       "event": "Every plant wears out (4 real years in 120 days)",
       "eventDay": 1,
-      "endWithout": "617,341",
-      "endWith": "559",
+      "endWithout": "497,495",
+      "endWith": "21,225",
       "endNote": "Mean deaths per run, held-out seeds 11–20.",
       "source": "The Geysers decline, Foulger et al. 1997"
     },
@@ -67,8 +67,8 @@
       "footage": "assets/footage/crowding.mp4",
       "event": "Sections grow (4 real years in 120 days)",
       "eventDay": 1,
-      "endWithout": "627,248",
-      "endWith": "610",
+      "endWithout": "500,070",
+      "endWith": "17,815",
       "endNote": "Mean deaths per run, held-out seeds 11–20.",
       "source": "Census county growth 2020–2024"
     },
@@ -79,8 +79,8 @@
       "footage": "assets/footage/baseline.mp4",
       "event": "Normal weekly demand, no extra failure",
       "eventDay": 1,
-      "endWithout": "617,818",
-      "endWith": "7",
+      "endWithout": "497,728",
+      "endWith": "12,890",
       "endNote": "Mean deaths per run, held-out seeds 11–20.",
       "source": "EIA-930, ERCOT demand, 2023"
     }

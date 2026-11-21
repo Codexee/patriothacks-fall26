@@ -2,6 +2,15 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-20 (35): Adarsh's harder world merged into main: 7 apps, new headline
+
+- **Merged `hollow-earth-rebuild-2d` at `c615334`** (spec: `.plans/adarsh-integration-spec.md`, locked). Heat, sickness and food are on; farm lamps are essential; Adarsh's 5-point easing; Fair Share protects overheating levels.
+- **7 apps, 7 problems:** #1, #2, #4, #7, #8, #9 Outbreak Tracker, #12 Food Sharing. Cooling (#3) is not shipped (no measurable effect); `cooling.ts` stays because Fair Share reads its heat rates.
+- **New headline, test seeds 11–20:** deaths **35,323,038 → 861,761** (97.6% fewer), **49/70** runs stable (0/70 without), plant trips 53 → 5 per run, families with no news per night 11,473 → 612.
+- **Impact per app (one app off, the rest on):** Blackout Warning 33,237,724; Food Sharing 23,123,020; Water Safety 4,201,744; Fair Share 142,869; Outbreak Tracker 101,164; Off-Network 0; Family Check-In 0 deaths (635 → 612 families with no news).
+- Films re-rendered. "N of 15 problems" text removed (Adarsh's choice). The old site is kept on `backup/hollowguard-site-2026-11-20`.
+- **Adarsh:** `hollow-earth-rebuild-2d` is frozen; work on `main` from now on. **Everyone:** use 861,761 and 49/70 in slides, the video and Devpost.
+
 ## 2026-11-20 (34): Real data and each app's impact on the homepage
 
 - **"Built on real-world data" section** (`src/site/RealData.tsx`): the three real EIA-930 hourly plant losses drawn as curves, with the disaster each one shapes, plus ERCOT demand, EAGLE-I repairs, the 1,457 real counties and the check-first model's real-outage score. "Real data" and "Simulated" tags in the hero.
