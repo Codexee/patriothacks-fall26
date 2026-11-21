@@ -22,11 +22,11 @@
   color: var(--chalk); background: var(--seam-2); border: 1px solid var(--line);
   transition: background-color 120ms var(--ease-out), transform 120ms var(--ease-out);
 }
-.twin-btn:hover:not(:disabled) { background: #2f353e; }
-.twin-btn:active:not(:disabled) { transform: scale(0.97); }
+@media (hover: hover) { .twin-btn:hover:not(:disabled) { background: #2f353e; } }
+.twin-btn:active:not(:disabled) { transform: scale(0.96); }
 .twin-btn:disabled { opacity: 0.5; cursor: default; }
 .twin-btn.primary { background: #23415f; border-color: #3b6a96; min-width: 104px; }
-.twin-btn.primary:hover:not(:disabled) { background: #2a4d70; }
+@media (hover: hover) { .twin-btn.primary:hover:not(:disabled) { background: #2a4d70; } }
 
 .twin-stage {
   position: relative; width: 100%; height: min(76vh, 760px); min-height: 420px;

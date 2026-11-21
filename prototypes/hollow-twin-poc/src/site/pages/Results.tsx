@@ -1,6 +1,6 @@
 // #/ — the results landing page. Full-bleed bands, in order: hero (the result), the app (the resident's phone),
 // the result over time, how Blackout Warning works, disaster by disaster, method and sources.
-import { useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import type { DailyPoint, Interval, ScenarioResult, ScenariosFile } from '../contracts.ts';
 import type { SiteData } from '../data.ts';
 import { href } from '../router.ts';
@@ -93,6 +93,16 @@ export function Results({ data }: { data: SiteData }) {
   const phoneRow = f.scenarios.find((s) => s.id === PHONE_ID);
   const phoneSeed = typicalSeed(phoneRow?.perSeed, phoneRow?.with.deaths.mean);
   const [phoneDay, setPhoneDay] = useState(10);
+  // The impact bars grow once, when the app list first scrolls into view.
+  const appList = useRef<HTMLOListElement>(null);
+  useEffect(() => {
+    const el = appList.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === 'undefined') { el.classList.add('in'); return; }
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { el.classList.add('in'); io.disconnect(); } }, { threshold: 0.15 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   return (
     <>
@@ -146,11 +156,11 @@ export function Results({ data }: { data: SiteData }) {
         <div className="wrap app-grid">
           <div>
             <SectionHead n="01" id="h-app" title="The app and its impact" note={data.impact ? `Each app’s impact: the ${data.impact.runs} test runs with all apps, against the same runs with that one app off.` : 'One app per problem solved. Each reads residents’ data only.'} />
-            <ol className="app-list">
+            <ol className="app-list" ref={appList}>
               {BUILT.map((k) => {
                 const pr = PROBLEMS.find((x) => x.feature === k);
                 return (
-                  <li key={k}>
+                  <li key={k} style={{ '--i': BUILT.indexOf(k) } as CSSProperties}>
                     <span className="app-n">#{pr?.n}</span><b>{moduleName(k)}</b><span>{APP_LINE[k]}</span>
                     {data.impact && <AppImpact impact={data.impact} k={k} />}
                   </li>

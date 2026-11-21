@@ -91,7 +91,7 @@ export function Tour() {
   return (
     <div className="tour" role="dialog" aria-label="Guided tour" aria-live="polite">
       <div className="tour-bar" aria-hidden="true"><span style={{ transform: `scaleX(${done})` }} /></div>
-      <p className="tour-cap">{s.caption}</p>
+      <p className="tour-cap" key={i}>{s.caption}</p>
       <div className="tour-ctl">
         <span className="tour-n">{i + 1} / {STEPS.length}</span>
         <button type="button" onClick={() => go(Math.max(0, i - 1))} disabled={i === 0}>Back</button>
