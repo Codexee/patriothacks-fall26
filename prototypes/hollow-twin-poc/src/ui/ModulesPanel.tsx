@@ -1,4 +1,4 @@
-// UI branch: the Modules panel. One card per feature of the Residents' System, with what it worked out today. It can be
+// UI branch: the Modules panel. One card per feature of HollowGuard, with what it worked out today. It can be
 // minimized to a slim tab. To add a module as more problems are solved: build it in src/product/, add its key to
 // BUILT (product/names.ts), and add a card component to MODULE_CARDS below.
 import { type ReactNode, useState } from 'react';
@@ -190,7 +190,7 @@ export function ModulesPanel(p: ModulesPanelProps) {
   return (
     <aside className="modules" aria-label="Solution modules">
       <header className="mods-head">
-        <h1>Solution modules <Info label="About the solution modules">The features of the Residents' System, one per Hollow problem. Switch each one on or off here; the change applies from the next day, and Reset starts the Hollow over with your choice. Each card shows what the module worked out from today's data.</Info></h1>
+        <h1>Solution modules <Info label="About the solution modules">The features of HollowGuard, one per Hollow problem. Switch each one on or off here; the change applies from the next day, and Reset starts the Hollow over with your choice. Each card shows what the module worked out from today's data.</Info></h1>
         <button className="ghost" onClick={p.onToggle} title="Minimize (M)">Minimize</button>
       </header>
       <p className="mods-progress">{solved} of 15 Hollow problems solved</p>

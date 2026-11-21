@@ -79,7 +79,7 @@ function ModuleOutput({ data, day }: { data: TwinData; day: number }) {
   const log = x.log[d];
   const alerts = x.alerts[d] ?? [];
   const seen = x.seen[d];
-  if (!log) return <p className="ws-dim ws-pad">Blackout Warning has not run yet (it runs at 00:00 of day 1, on day 0’s observations).</p>;
+  if (!log) return <p className="ws-dim ws-pad">HollowGuard has not run yet. It runs at 00:00 on day 1.</p>;
   const ended = d < day;
   return (
     <div className="ws-module">

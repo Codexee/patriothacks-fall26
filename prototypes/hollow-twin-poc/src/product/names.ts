@@ -1,4 +1,4 @@
-// REBUILD: the names people see for each feature of the Residents' System, and the step-by-step progress through
+// REBUILD: the names people see for each feature of HollowGuard, and the step-by-step progress through
 // the track's 15 problems. The code keys (earlyWarning, …) stay the same; only these labels appear on screen.
 import type { ToolKey } from '../sim/types.ts';
 

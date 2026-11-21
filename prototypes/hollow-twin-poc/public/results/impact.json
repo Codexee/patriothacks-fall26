@@ -1,0 +1,73 @@
+{
+  "generated": "2026-11-21T00:20:26.078Z",
+  "set": "test",
+  "seeds": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20
+  ],
+  "runs": 70,
+  "all": {
+    "deaths": 12563,
+    "noNewsPerNight": 620
+  },
+  "apps": [
+    {
+      "key": "earlyWarning",
+      "name": "Blackout Warning",
+      "problem": 1,
+      "deathsWithoutApp": 43967726,
+      "deathsAvoided": 43955163,
+      "tripsAvoidedPerRun": 219.2,
+      "darkMhAvoidedPerRun": 1283.41,
+      "noNewsPerNightWithoutApp": 14621
+    },
+    {
+      "key": "fairShare",
+      "name": "Fair Share",
+      "problem": 2,
+      "deathsWithoutApp": 12764,
+      "deathsAvoided": 201,
+      "tripsAvoidedPerRun": -0.2,
+      "darkMhAvoidedPerRun": -0.47,
+      "noNewsPerNightWithoutApp": 607
+    },
+    {
+      "key": "snow",
+      "name": "Water Safety",
+      "problem": 4,
+      "deathsWithoutApp": 4235492,
+      "deathsAvoided": 4222929,
+      "tripsAvoidedPerRun": 1.4,
+      "darkMhAvoidedPerRun": 6.88,
+      "noNewsPerNightWithoutApp": 3472
+    },
+    {
+      "key": "lantern",
+      "name": "Off-Network Messaging",
+      "problem": 7,
+      "deathsWithoutApp": 12563,
+      "deathsAvoided": 0,
+      "tripsAvoidedPerRun": 0,
+      "darkMhAvoidedPerRun": 0,
+      "noNewsPerNightWithoutApp": 620
+    },
+    {
+      "key": "kin",
+      "name": "Family Check-In",
+      "problem": 8,
+      "deathsWithoutApp": 12563,
+      "deathsAvoided": 0,
+      "tripsAvoidedPerRun": 0,
+      "darkMhAvoidedPerRun": 0,
+      "noNewsPerNightWithoutApp": 657
+    }
+  ]
+}

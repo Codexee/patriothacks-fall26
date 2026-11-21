@@ -1,4 +1,4 @@
-// PROTOTYPE contract for the Hollow Twin proof of concept. Every workstream codes against this file.
+// PROTOTYPE contract for HollowGuard proof of concept. Every workstream codes against this file.
 // Change it only by agreement: it is the shared interface between sim/, world/ and ui/.
 
 export const LEVELS = 50;

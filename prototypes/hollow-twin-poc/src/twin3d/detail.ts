@@ -71,7 +71,7 @@ export function createDetail(D: number): SideDetail {
 const STAMP = /^Day (\d+) (\d\d):00 · (.*)$/;
 function typeOf(text: string): EventType {
   if (/tripped/.test(text)) return 'trip';
-  if (/Blackout Warning →/.test(text)) return 'alert';
+  if (/ → L\d/.test(text)) return 'alert'; // any module's alert: "Water Safety → L36–40: …"
   if (/Level \d+ lost/.test(text)) return 'level';
   return 'other';
 }

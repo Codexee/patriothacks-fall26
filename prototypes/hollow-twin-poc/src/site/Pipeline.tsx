@@ -3,11 +3,11 @@
 // own comments; the constant values come from scenarios.json (`tune`), never from this file.
 
 const STEPS: { title: string; body: string; param?: string }[] = [
-  { title: 'Read the blackout line', body: 'From yesterday’s outage reports, find how many levels from the top had power, hour by hour.' },
-  { title: 'Infer plant output', body: 'Power reaches upper levels first, so the line implies the supply: the needs of every level above it.' },
-  { title: 'Measure the trend', body: 'Compare with the day before at the same hours. Is supply rising or falling?', param: 'maxTrend' },
-  { title: 'Forecast today', body: 'Yesterday’s line plus the trend gives today’s line, hour by hour: which levels go dark, when, for how long.' },
-  { title: 'Ask for a load cut', body: 'Request enough non-essential saving that plants stop running at their limit, where they trip.', param: 'safeLoad' },
+  { title: 'Read the blackout line', body: 'Yesterday’s outage reports show the deepest level with power, hour by hour.' },
+  { title: 'Infer plant output', body: 'Power reaches the top first, so that line gives the supply.' },
+  { title: 'Measure the trend', body: 'Compare with the day before. Is supply falling?', param: 'maxTrend' },
+  { title: 'Forecast today', body: 'Which levels go dark today, when, and for how long.' },
+  { title: 'Ask to save power', body: 'Enough that plants stay below the load where they trip.', param: 'safeLoad' },
 ];
 
 const asPct = (k: string, v: number) => (k === 'safeLoad' || k === 'assumedCompliance' ? `${Math.round(v * 100)}%` : k === 'maxTrend' ? `±${Math.round(v * 100)}%/day` : `+${Math.round(v * 100)}%`);
@@ -34,17 +34,15 @@ export function Pipeline({ tune }: { tune: Record<string, number> }) {
         ))}
         <li className="flow-io out">
           <span className="flow-k">Output</span>
-          <p>Plants stay under {tune.safeLoad != null ? asPct('safeLoad', tune.safeLoad) : 'their limit'} of output. No trip, no Hollow-wide blackout.</p>
+          <p>Plants stay under {tune.safeLoad != null ? asPct('safeLoad', tune.safeLoad) : 'their limit'} of output. No trip.</p>
         </li>
       </ol>
 
       <figure className="shaft-fig">
         <ShaftIllustration />
         <figcaption>
-          <span className="eyebrow">Illustration · why residents’ reports are enough</span>
-          Residents cannot see the plants, but they can see which levels are dark. Power reaches the upper levels first,
-          so the deepest lit level tells them how much power the plants are making. When that line rises day over day,
-          supply is falling, and the levels between the two lines are next.
+          <span className="eyebrow">Illustration</span>
+          When the line moves up, supply is falling. The levels between the two lines are next.
         </figcaption>
       </figure>
     </>

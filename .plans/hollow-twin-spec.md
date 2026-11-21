@@ -1,10 +1,10 @@
-# Hollow Twin — Master Spec
+# HollowGuard — Master Spec
 Status: superseded by `.plans/before-during-after-spec.md` (locked Nov 18; was: locked v2)   ·   Last updated: 2026-11-18   ·   Owner: Neil
 
 v2 replaces v1 (Nov 17). v1 described 4 checkbox tools. v2 follows the product design on `prototype/hollow-twin-product` (Adarsh) and adds a real-world impact act and a visual effects pass. The evaluation behind v2 is in `.plans/hollow-twin-evaluation.md`.
 
 ## One-liner
-Hollow Twin is a residents' system: 9 software modules that read only what residents can know (meter readings, reports, official bulletins) and send alerts, power plans and findings. We prove the modules on real disasters on Earth (Texas 2021, Flint 2015, Wuhan 2020), then run them in the Hollow, a pixel-art city of 2 billion people under a Directorate that lies.
+HollowGuard is a residents' system: 9 software modules that read only what residents can know (meter readings, reports, official bulletins) and send alerts, power plans and findings. We prove the modules on real disasters on Earth (Texas 2021, Flint 2015, Wuhan 2020), then run them in the Hollow, a pixel-art city of 2 billion people under a Directorate that lies.
 
 ## The winning demo (30-second scene)
 1. **Earth (0–10 s).** A real map of Texas. The counties go dark hour by hour, Feb 14–18, 2021, from real outage data. A counter shows customers without power. A marker appears: "ERCOT emergency order, Feb 15, 1:25 am."

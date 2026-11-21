@@ -169,7 +169,7 @@ export function App() {
   const onHover = useCallback((t: { level: number; col: number } | null) => {
     if (t) { setHover(t); if (!lockRef.current) setPhoneSection(t); }
   }, []);
-  useEffect(() => { document.title = `Day ${state.day} · Residents' System (rebuild)`; }, [state.day]);
+  useEffect(() => { document.title = `Day ${state.day} · HollowGuard (rebuild)`; }, [state.day]);
 
   return (
     <div className={`app ${panelOpen ? 'panel-open' : 'panel-min'} ${modsOpen ? 'mods-open' : 'mods-min'}`}>

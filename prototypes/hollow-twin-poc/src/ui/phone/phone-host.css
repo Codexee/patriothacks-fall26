@@ -1,0 +1,44 @@
+/* Hosts the resident's phone outside the 2D cutaway (the 3D workstation and the results page).
+   Gives the phone its tokens and the app-screen styles it shares with src/ui/styles.css, scoped to .ph-host. */
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap');
+
+.ph-host {
+  --text: #e4e8ed; --muted: #98a2ae; --faint: #6f7987; --raise: #2a323d; --line: #313945; --panel-2: #232a34;
+  --system: #6cb6ff; --bad: #f0654f; --bad-bg: #2c1714; --warn: #f5b041; --warn-bg: #2c2312;
+  --good: #4fd1a1; --good-bg: #12291f; --measured: #b8a6ff;
+  --cond: 'Barlow Semi Condensed', 'Barlow', system-ui, sans-serif;
+  font-family: 'Barlow', system-ui, sans-serif; font-size: 14px; line-height: 1.45; color: var(--text);
+  padding: 8px 10px 4px; letter-spacing: 0; text-transform: none; font-variant-numeric: normal;
+}
+.ph-host .ph { margin: 6px auto 8px; }
+.ph-host .ph-screen { height: clamp(460px, calc(100dvh - 440px), 600px); }
+.ph-host-note { margin: 0; font-size: 12.5px; color: var(--muted); text-align: center; }
+.ph-host p { margin: 0 0 6px; }
+.ph-host h2 { font-family: var(--cond); font-size: 16px; font-weight: 600; margin: 0; color: var(--text); }
+.ph-host h3, .ph-host h4 { font-family: var(--cond); font-size: 14px; font-weight: 600; margin: 8px 0 4px; color: var(--muted); }
+.ph-host button, .ph-host input, .ph-host textarea { font: inherit; color: inherit; }
+.ph-host input, .ph-host textarea { background: var(--panel-2); border: 1px solid var(--line); padding: 5px 8px; border-radius: 5px; }
+.ph-host button { border-radius: 5px; cursor: pointer; }
+.ph-host button:disabled { opacity: 0.45; cursor: not-allowed; }
+.ph-host .muted { color: var(--muted); margin: 0; }
+.ph-host .small { font-size: 12.5px; margin-top: 4px; }
+.ph-host .good { color: var(--good); }
+.ph-host .bad { color: var(--bad); }
+.ph-host .warn-text { color: var(--warn); }
+.ph-host .phone-empty { color: var(--warn); }
+.ph-host .big-line { font-family: var(--cond); font-size: 20px; font-weight: 600; line-height: 1.25; margin: 0 0 4px; font-variant-numeric: tabular-nums; }
+.ph-host .big-line.bad { text-shadow: 0 0 16px rgba(240, 101, 79, 0.35); }
+.ph-host .big-line.good { text-shadow: 0 0 16px rgba(79, 209, 161, 0.3); }
+.ph-host .alerts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.ph-host .alert { display: flex; flex-direction: column; gap: 4px; padding: 8px 10px; border-radius: 6px; background: var(--warn-bg); border-left: 3px solid var(--warn); box-shadow: 0 0 18px rgba(245, 176, 65, 0.08); }
+.ph-host .alert.prepare { background: var(--bad-bg); border-left-color: var(--bad); }
+.ph-host .tag { display: inline-block; align-self: flex-start; font-family: var(--cond); font-size: 12px; font-weight: 600; padding: 1px 7px; border-radius: 10px; background: var(--raise); color: var(--muted); }
+.ph-host .alert .tag { margin: 0; }
+.ph-host .alert.shed .tag, .ph-host .tag.warn { background: var(--warn); color: #261a03; }
+.ph-host .alert.prepare .tag, .ph-host .tag.bad { background: var(--bad); color: #250805; }
+.ph-host .evidence summary { cursor: pointer; color: var(--system); font-size: 12.5px; }
+.ph-host .evidence ul { margin: 4px 0 0; padding-left: 18px; font-size: 12.5px; color: var(--muted); }
+.ph-host .report { display: flex; flex-direction: column; gap: 6px; }
+.ph-host .report button { align-self: flex-start; background: var(--raise); border: 1px solid var(--line); padding: 6px 12px; }
+.ph-host .bar { flex: 1; height: 8px; background: var(--panel-2); border-radius: 4px; overflow: hidden; }
+.ph-host .bar > div { height: 100%; background: var(--system); }

@@ -134,7 +134,7 @@ const TAG_TEXT: Record<TagKind, string> = { sim: 'SIM', real: 'REAL DATA', modul
 const TAG_TITLE: Record<TagKind, string> = {
   sim: 'Output of the simulation (the hidden test world)',
   real: 'Value from a real dataset',
-  module: "Blackout Warning's own output (it reads only residents' data)",
+  module: "HollowGuard's own output (it reads only residents' data)",
   guess: 'A guessed constant: no published value maps to it',
   cited: 'A constant taken from a published limit',
   tuned: 'Chosen on tuning seeds 1–5, checked on 6–10, then frozen',

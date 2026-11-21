@@ -1,5 +1,5 @@
-// REBUILD: the right panel = the TEST WORLD (Hollow Twin). It is not the product: it runs a simulated Hollow so we
-// can show the Residents' System working. Step 1: only blackouts and air exist in the world.
+// REBUILD: the right panel = the TEST WORLD (HollowGuard). It is not the product: it runs a simulated Hollow so we
+// can show HollowGuard working. Step 1: only blackouts and air exist in the world.
 import { useState, type ReactNode } from 'react';
 import { sim } from '../sim/index.ts';
 import type { Action, Frame, Score, SimState, ToolSet, WorldEvent } from '../sim/types.ts';
@@ -80,7 +80,7 @@ export function Panel(p: PanelProps) {
       </button>
       <div className="panel-body">
         <header className="p-head">
-          <h1>Test world <Info label="About the test world">A simulated Hollow that proves the Residents' System works. It knows the hidden truth; the system does not. Right now it has one problem: blackouts, and the air that goes bad when the fans stop.</Info></h1>
+          <h1>Test world <Info label="About the test world">A simulated Hollow that proves HollowGuard works. It knows the hidden truth; the system does not. Right now it has one problem: blackouts, and the air that goes bad when the fans stop.</Info></h1>
           <button className="ghost" onClick={p.onMinimize} title="Minimize to the demo bar (T)">Minimize</button>
         </header>
 
@@ -156,7 +156,7 @@ export function Panel(p: PanelProps) {
           {p.queued.length > 0 && <ul className="queued">{p.queued.map((a, i) => <li key={i}>Next day: {describe(a)}</li>)}</ul>}
         </Section>
 
-        <Section title="Hidden truth" hint="Only the test world knows this. The Residents' System never reads it." extra={<SourceInfo source={sim.sourceFor('directorate')} label="Directorate" />}>
+        <Section title="Hidden truth" hint="Only the test world knows this. HollowGuard never reads it." extra={<SourceInfo source={sim.sourceFor('directorate')} label="Directorate" />}>
           <div className="two-col">
             <div>
               <h3>Directorate says</h3>

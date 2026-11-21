@@ -34,7 +34,7 @@ export function Disaster({ data, id }: { data: SiteData; id: string }) {
         <div className="head-grid">
         <div>
           <p className="lede">{s.summary}</p>
-          <a className="button" href={href.demoClassic(s.id)}>Watch it run →</a>
+          <a className="button" href={href.demo(s.id)}>Watch it run in 3D →</a>
         </div>
         <div>
         <dl className="spec page-spec">
@@ -81,21 +81,21 @@ export function Disaster({ data, id }: { data: SiteData; id: string }) {
           </div>
         </div>
         {!log && s.with.deaths.mean < s.without.deaths.mean / 100 && (
-          <p className="chart-note">The “with” line sits near zero on this scale. Switch to Log to see its shape.</p>
+          <p className="chart-note">Use Log to see the “with” line.</p>
         )}
         <DailyChart daily={s.daily} keys={['withoutDeaths', 'withDeaths']} unit="deaths" log={log} title={`Cumulative deaths per day, ${displayName(s)}`} />
         <Legend />
       </section>
 
       <section aria-labelledby="h-dark" className="block">
-        <div className="block-head"><h2 id="h-dark">Dark sections</h2><p>Sections without air and fans at each day’s worst hour, of 400 (50 levels × 8). Mean of {n} seeds.</p></div>
+        <div className="block-head"><h2 id="h-dark">Dark sections</h2><p>Of 400, at each day’s worst hour. Mean of {n} seeds.</p></div>
         <DailyChart daily={s.daily} keys={['withoutDarkSections', 'withDarkSections']} unit="dark sections" title={`Dark sections per day, ${displayName(s)}`} />
         <Legend />
       </section>
       </div>
 
       <section aria-labelledby="h-seeds" className="block">
-        <div className="block-head"><h2 id="h-seeds">Every seed</h2><p>A seed fixes the random events, so both sides see the same disaster.</p></div>
+        <div className="block-head"><h2 id="h-seeds">Every seed</h2><p>Both sides get the same random events.</p></div>
         <div className="table-wrap">
           <table className="seed-table">
             <caption className="sr-only">Deaths per run for each held-out seed.</caption>
@@ -127,8 +127,8 @@ export function Disaster({ data, id }: { data: SiteData; id: string }) {
 function Legend() {
   return (
     <p className="legend-line">
-      <span className="key without"><i aria-hidden="true" />Without Blackout Warning</span>
-      <span className="key with"><i aria-hidden="true" />With Blackout Warning</span>
+      <span className="key without"><i aria-hidden="true" />Without HollowGuard</span>
+      <span className="key with"><i aria-hidden="true" />With HollowGuard</span>
     </p>
   );
 }

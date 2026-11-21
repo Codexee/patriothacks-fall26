@@ -12,6 +12,7 @@ import { sim } from '../sim/index.ts';
 import { SECTION_COUNT } from '../sim/types.ts';
 import { loadResults, useTwinDetail } from './data.ts';
 import { typicalSeed, type TwinData } from './compute.ts';
+import { PhoneDock } from './ws/PhoneDock.tsx';
 import { TwinScene, type Clock, type Pick, type SideKey } from './Scene.tsx';
 import { COLORS } from './palette.ts';
 import { Inspector } from './ws/Inspector.tsx';
@@ -72,6 +73,7 @@ export default function Twin3D({ data: site, scenario }: { data: SiteData | null
   const [view, setView] = useState<View>('both');
   const [day, setDay] = useState(0);
   const [selected, setSelected] = useState<Pick | null>(null);
+  const [leftTab, setLeftTab] = useState<'phone' | 'model'>('phone');
   const clock = useRef<Clock>({ day: 0, pulseT: 0, pulse: !reduced, hold: 0.85 });
   const invalidateRef = useRef<(() => void) | null>(null);
   clock.current.pulse = !reduced;
@@ -135,7 +137,7 @@ export default function Twin3D({ data: site, scenario }: { data: SiteData | null
   const set = seed !== null ? seedSet(seed) : null;
   const perSeed = resultRow?.perSeed.find((p) => p.seed === seed);
   const seedNote = data && seed !== null && (
-    <>Seed {seed} ({SET_TEXT[seedSet(seed)]}{seed === typical ? ', the typical held-out seed: its deaths with Blackout Warning are closest to the mean of seeds 11–20' : ''}).
+    <>Seed {seed} ({SET_TEXT[seedSet(seed)]}{seed === typical ? ', the typical held-out seed: its deaths with HollowGuard are closest to the mean of seeds 11–20' : ''}).
       {' '}This run, day {data.days}: without {fmtNum(data.without.deaths[data.days])}, with {fmtNum(data.with.deaths[data.days])} deaths.
       {perSeed ? <> The results file (120 days) has without {fmtNum(perSeed.withoutDeaths)}, with {fmtNum(perSeed.withDeaths)}.</> : null}</>
   );
@@ -151,16 +153,21 @@ export default function Twin3D({ data: site, scenario }: { data: SiteData | null
         day={shown} D={D} onSeek={(d) => { setPlaying(false); seek(d); }} data={data}
       />
       <div className="ws-main">
-        <aside className="ws-dock ws-left" aria-label="Model inspector">
-          <h2 className="ws-dock-h">Model inspector</h2>
-          <Inspector scenario={scen} seedNote={seedNote} />
+        <aside className="ws-dock ws-left" aria-label={leftTab === 'phone' ? "Resident's phone" : 'Model inspector'}>
+          <div className="ws-dock-h ws-tabs" role="tablist">
+            <button type="button" role="tab" aria-selected={leftTab === 'phone'} onClick={() => setLeftTab('phone')}>Resident’s phone</button>
+            <button type="button" role="tab" aria-selected={leftTab === 'model'} onClick={() => setLeftTab('model')}>Model inspector</button>
+          </div>
+          {leftTab === 'phone'
+            ? <PhoneDock id={id} seed={seed} day={shown} pick={selected ? selected.index : null} />
+            : <Inspector scenario={scen} seedNote={seedNote} />}
         </aside>
         <div className="ws-view">
           {data ? (
             <Viewport data={data} clock={clock} invalidateRef={invalidateRef} view={view} day={shown} seed={seed!} selected={selected}
               onSelect={onSelect} onClose={() => setSelected(null)} />
           ) : (
-            <p className="ws-loading" role="status">{error ? `The simulation did not run: ${error}` : `Running ${nameOf(id)}${seed !== null ? `, seed ${seed}` : ''}: ${D} days, twice (without and with Blackout Warning)…`}</p>
+            <p className="ws-loading" role="status">{error ? `The simulation did not run: ${error}` : `Running ${nameOf(id)}${seed !== null ? `, seed ${seed}` : ''}: ${D} days, twice (without and with HollowGuard)…`}</p>
           )}
         </div>
         <aside className="ws-dock ws-right" aria-label="Telemetry">
@@ -177,7 +184,7 @@ export default function Twin3D({ data: site, scenario }: { data: SiteData | null
         <span>compute <b>{data ? `${fmtNum(data.ms)} ms` : '…'}</b> (worker)</span>
         <span>scenarios.json {results ? new Date(results.generated).toISOString().slice(0, 16).replace('T', ' ') : '–'} UTC</span>
         <span>build {__BUILD_COMMIT__}</span>
-        <span className="ws-status-claim">Same seed, same disaster: the only difference is Blackout Warning.</span>
+        <span className="ws-status-claim">Same disaster, same seed. The only difference is HollowGuard.</span>
         <a className="ws-status-link" href={href.demoClassic(id)}>2D cutaway</a>
       </footer>
     </section>

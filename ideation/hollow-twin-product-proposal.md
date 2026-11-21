@@ -1,9 +1,9 @@
-# Proposal: make Hollow Twin a product, not only a simulation
+# Proposal: make HollowGuard a product, not only a simulation
 
 Status: proposal for the team sync · Author: Adarsh (with Claude) · Wed Nov 18, 2026
 Applies to: `.plans/hollow-twin-spec.md` (draft) and the prototype on branch `prototype/hollow-twin-poc`
 
-> **Summary.** Keep Hollow Twin. Change one thing: the 4 tools become **real software modules** that read the information residents could really get (reports, meter readings, bulletins) and produce real outputs (alerts, ration schedules, routes). The simulation becomes the **test world** that produces that information, keeps the hidden truth, applies the tools' outputs, and scores the result. We keep most of Neil's work. The change makes our answer to the track ("build something that helps the people of the Hollow survive") a product that judges can see working.
+> **Summary.** Keep HollowGuard. Change one thing: the 4 tools become **real software modules** that read the information residents could really get (reports, meter readings, bulletins) and produce real outputs (alerts, ration schedules, routes). The simulation becomes the **test world** that produces that information, keeps the hidden truth, applies the tools' outputs, and scores the result. We keep most of Neil's work. The change makes our answer to the track ("build something that helps the people of the Hollow survive") a product that judges can see working.
 
 ---
 

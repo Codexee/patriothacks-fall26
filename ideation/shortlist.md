@@ -2,7 +2,7 @@
 
 ## Round 17 (Wed Nov 18, night): Earth is the product
 
-Scores /30: Wow, Track fit, Feasible by Thu noon, Remote-OK, Live-demo-able, **Applicable** (replaces Team fit). Details: `ideation/ideas.md` → Round 17. The project stays unnamed (another team already uses "Hollow Twin").
+Scores /30: Wow, Track fit, Feasible by Thu noon, Remote-OK, Live-demo-able, **Applicable** (replaces Team fit). Details: `ideation/ideas.md` → Round 17. The project stays unnamed (another team already uses "HollowGuard").
 
 | Rank | Idea | 30-second moment | Problems | **/30** |
 | --- | --- | --- | --- | --- |
@@ -15,9 +15,9 @@ Scores /30: Wow, Track fit, Feasible by Thu noon, Remote-OK, Live-demo-able, **A
 
 ---
 
-> **Chosen (Neil, Nov 17): Hollow Twin.** Software only. Spec: `.plans/hollow-twin-spec.md`. See "Neil's round 14 table" below.
+> **Chosen (Neil, Nov 17): HollowGuard.** Software only. Spec: `.plans/hollow-twin-spec.md`. See "Neil's round 14 table" below.
 
-> **Merge note (Nov 17):** Adarsh ran rounds 14–16 in parallel with Neil, before seeing the Hollow Twin choice. They are kept here as input for the sync, and they have not been reconciled with Hollow Twin yet. Many of the 15 one-problem ideas (Fair Share, Flicker, Snow, Truthcount) could become tools inside Hollow Twin.
+> **Merge note (Nov 17):** Adarsh ran rounds 14–16 in parallel with Neil, before seeing HollowGuard choice. They are kept here as input for the sync, and they have not been reconciled with HollowGuard yet. Many of the 15 one-problem ideas (Fair Share, Flicker, Snow, Truthcount) could become tools inside HollowGuard.
 
 ## Adarsh's round 15 (Tue Nov 17, evening): one idea per problem
 
@@ -76,7 +76,7 @@ Scores are /25: Wow, Problems covered, Active loop, Feasible by Thu night, Demo-
 
 ## Neil's round 14 table
 
-> **Chosen (Neil, Nov 17): Hollow Twin.** Software only. Spec: `.plans/hollow-twin-spec.md`. Earshot and Canary are dropped (unknowns and hardware).
+> **Chosen (Neil, Nov 17): HollowGuard.** Software only. Spec: `.plans/hollow-twin-spec.md`. Earshot and Canary are dropped (unknowns and hardware).
 
 Scores are /25: Wow, Cover (Hollow problems), Feasible, Real-world, Video. Details: `ideation/ideas.md` → Round 14 and `ideation/hollow-pivot.md`.
 

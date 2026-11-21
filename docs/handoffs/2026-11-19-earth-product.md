@@ -10,7 +10,7 @@ All code is on `main` and pushed. Start with `git pull`.
 | File | What it gives you |
 | --- | --- |
 | `TODO.md` | What is left, what is done, the limits to state |
-| `.plans/before-during-after-spec.md` | The locked spec (replaces the Hollow Twin spec) |
+| `.plans/before-during-after-spec.md` | The locked spec (replaces HollowGuard spec) |
 | `models/RESULTS.md` | Every model number. Read it before you write any claim |
 | `contracts/README.md` | Who owns which folders, the data and model file formats, the change log |
 | `data/README.md` | The data pipeline, its sources, its known limits |
@@ -32,7 +32,7 @@ All code is on `main` and pushed. Start with `git pull`.
 cd app && npm install && npm run dev
 ```
 
-Open `http://localhost:5180`. Routes: `#/` · `#/event/ERCO-2021021501` · `#/hollow/ERCO-2021021501` · `#/?story=texas2021` · `#/evidence` · `#/brief/48201` · `#/live` · `#/legacy` (the old Hollow Twin screen, frozen).
+Open `http://localhost:5180`. Routes: `#/` · `#/event/ERCO-2021021501` · `#/hollow/ERCO-2021021501` · `#/?story=texas2021` · `#/evidence` · `#/brief/48201` · `#/live` · `#/legacy` (the old HollowGuard screen, frozen).
 
 Checks: `npm run typecheck`, `npm test` (32 tests), `npm run build`.
 

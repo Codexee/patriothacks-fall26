@@ -1,4 +1,4 @@
-// PROTOTYPE engine for Hollow Twin. Deterministic, seeded, hourly ticks over 50 levels × 8 sections.
+// PROTOTYPE engine for HollowGuard. Deterministic, seeded, hourly ticks over 50 levels × 8 sections.
 // Rough on purpose: it proves the core loop (grounded models + the lies of the Directorate).
 // Runs under Vite and plain Node type-stripping: relative .ts imports, no enums, no parameter properties.
 //
@@ -46,7 +46,7 @@ const HOLLOW_POPULATION = 2_000_000_000; // the brief's figure; the sim's ~1.6 m
 /**
  * Data the brief does not give residents: the Directorate's plant and switchyard meters, a weather/grid outlook,
  * and sensor boxes (not part of the solution yet). The sim still makes them (so the random streams and results stay
- * comparable) but the Residents' System never receives them.
+ * comparable) but HollowGuard never receives them.
  */
 const NOT_FOR_RESIDENTS = new Set<Observation['kind']>(['plantMeter', 'feeder', 'outlook', 'sensor']);
 const residentsOnly = (obs: Observation[]) => obs.filter((o) => !NOT_FOR_RESIDENTS.has(o.kind));

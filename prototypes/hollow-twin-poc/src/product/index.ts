@@ -1,4 +1,4 @@
-// REBUILD: the Residents' System. One call per day:
+// REBUILD: HollowGuard. One call per day:
 //   observations of yesterday (from the test world) + memory → outputs for today + a log for the console.
 // It reads nothing else from the sim. Step 1: one feature, Blackout Warning (problem #1).
 // Inputs are only what the brief gives residents, or what this app collects: the Directorate's census, residents'
@@ -110,7 +110,7 @@ function ingest(m: ProductMemory, obs: Observation[]): Record<string, number> {
 }
 
 /**
- * Runs one day of the Residents' System.
+ * Runs one day of HollowGuard.
  * @param obs yesterday's observations (SimState.observations)
  * @param day the day about to be simulated (outputs apply to it)
  */

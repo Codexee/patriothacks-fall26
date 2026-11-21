@@ -1,5 +1,5 @@
 /* UI branch: a dark control-room look. One family (Barlow; its semi-condensed cut for headings and numbers).
-   Color means something: blue = the Residents' System, red = blackout and deaths, amber = warnings and power
+   Color means something: blue = HollowGuard, red = blackout and deaths, amber = warnings and power
    saving, green = good, warm lamp = rooms with power. Everything else is slate. */
 @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap');
 
@@ -12,7 +12,7 @@
   --text: #e4e8ed;
   --muted: #98a2ae;
   --faint: #6f7987;
-  --system: #6cb6ff; /* the Residents' System */
+  --system: #6cb6ff; /* HollowGuard */
   --system-bg: #13253a;
   --bad: #f0654f;
   --bad-bg: #2c1714;
@@ -92,7 +92,7 @@ button.primary:hover:not(:disabled) { background: #fff; }
 .advanced { margin-top: 8px; }
 .advanced summary { cursor: pointer; color: var(--muted); font-size: 12.5px; }
 
-/* ---------- Residents' System (the product, blue) ---------- */
+/* ---------- HollowGuard (the product, blue) ---------- */
 .product {
   position: fixed; top: 0; bottom: 0; right: var(--panel-w); width: var(--product-w);
   background: var(--panel); border-left: 1px solid var(--line); overflow-y: auto; padding: 16px 18px 28px; z-index: 9;
@@ -406,7 +406,7 @@ kbd:first-child { margin-left: 0; }
 }
 
 /* ---------- Modules panel (one card per feature; minimizable) ---------- */
-/* Column widths for each combination: Test World panel (t), Modules (m), Residents' System (p). */
+/* Column widths for each combination: Test World panel (t), Modules (m), HollowGuard (p). */
 .app.panel-min.mods-open { --t-w: 0px; --m-w: 360px; --p-w: 400px; }
 .app.panel-min.mods-min { --t-w: 0px; --m-w: 34px; --p-w: 520px; }
 .app.panel-open.mods-open { --t-w: var(--panel-w); --m-w: 340px; --p-w: 380px; }

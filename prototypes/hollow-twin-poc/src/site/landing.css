@@ -266,3 +266,76 @@
 @media (prefers-reduced-motion: reduce) {
   .ws-preview img { transition: none; }
 }
+
+/* ---------- Play the tour button ---------- */
+.btn.play { background: var(--with); color: #06121f; border-color: var(--with); font-weight: 600; }
+.btn.play::before { content: ''; width: 0; height: 0; border-left: 9px solid currentColor; border-top: 6px solid transparent; border-bottom: 6px solid transparent; }
+.btn.play::after { content: none; }
+@media (hover: hover) { .btn.play:hover { background: #9ccfff; border-color: #9ccfff; color: #06121f; } }
+
+/* ---------- 01 The app ---------- */
+.app-grid { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 48px; align-items: start; }
+.app-list { list-style: none; margin: 8px 0 12px; padding: 0; border-top: 1px solid var(--line); }
+.app-list li { display: grid; grid-template-columns: 44px minmax(0, 190px) minmax(0, 1fr); gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--hair); align-items: baseline; }
+.app-list .app-n { font-family: var(--mono-r); font-size: 12px; color: var(--faint); }
+.app-list b { font-weight: 600; color: var(--chalk); }
+.app-list span:last-child { color: var(--dust); }
+.app-phone { display: flex; flex-direction: column; align-items: stretch; }
+.app-phone .ph-host { padding: 0; }
+.app-day { display: flex; align-items: center; gap: 12px; font-family: var(--mono-r); font-size: 12px; color: var(--dust); margin: 4px 0; }
+.app-day input { flex: 1; accent-color: var(--with); }
+@media (max-width: 900px) {
+  .app-grid { grid-template-columns: 1fr; gap: 24px; }
+  .app-list li { grid-template-columns: 36px 1fr; }
+  .app-list span:last-child { grid-column: 2; }
+}
+
+/* ---------- Guided tour ---------- */
+.tour {
+  position: fixed; z-index: 50; left: 50%; bottom: 20px; transform: translateX(-50%); width: min(640px, calc(100vw - 32px));
+  background: #0f1216; color: var(--chalk); border: 1px solid var(--line); border-radius: 6px; overflow: hidden;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.55); animation: tour-in 220ms var(--ease-out);
+}
+@keyframes tour-in { from { opacity: 0; transform: translate(-50%, 8px); } }
+.tour-bar { height: 3px; background: var(--seam); }
+.tour-bar span { display: block; height: 100%; background: var(--with); transform-origin: left; }
+.tour-cap { margin: 0; padding: 14px 18px 10px; font-size: 16px; line-height: 1.45; }
+.tour-ctl { display: flex; align-items: center; gap: 6px; padding: 0 12px 12px 18px; }
+.tour-n { font-family: var(--mono-r); font-size: 12px; color: var(--faint); margin-right: auto; }
+.tour-ctl button { background: var(--seam); color: var(--chalk); border: 1px solid var(--line); border-radius: 3px; padding: 5px 12px; font: 500 13px var(--sans); cursor: pointer; }
+.tour-ctl button:disabled { opacity: 0.4; cursor: default; }
+.tour-ctl .tour-x { padding: 5px 9px; }
+.tour-lit { outline: 2px solid var(--with) !important; outline-offset: 6px; border-radius: 4px; transition: outline-color 200ms; }
+@media (prefers-reduced-motion: reduce) { .tour { animation: none; } }
+
+/* ---------- Real data / simulated tags ---------- */
+.dtag { display: inline-block; vertical-align: 1px; padding: 1px 6px; border-radius: 2px; font: 600 10.5px/1.5 var(--mono-r); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+.dtag.real { color: #0c1a10; background: #7fd8a4; }
+.hero-real { color: var(--dust); font-size: 13.5px; line-height: 1.8; margin: -14px 0 24px !important; max-width: 52ch; }
+
+/* ---------- 01 Impact per app ---------- */
+.app-impact { grid-column: 2 / -1; display: grid; grid-template-columns: minmax(80px, 190px) auto; gap: 4px 12px; align-items: center; margin-top: 2px; }
+.ai-bar { height: 8px; background: var(--seam); border-radius: 1px; overflow: hidden; }
+.ai-bar i { display: block; height: 100%; background: var(--with); }
+.ai-num { font-family: var(--mono-r); font-size: 12.5px; color: var(--chalk); }
+.ai-extra { grid-column: 1 / -1; font-size: 12.5px; color: var(--faint); }
+
+/* ---------- 02 Built on real-world data ---------- */
+.rd-curves { list-style: none; margin: 8px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.rd-curves li { border-top: 1px solid var(--line); padding-top: 14px; }
+.rd-curves h3 { margin: 8px 0 10px; font-size: 15px; font-weight: 600; color: var(--chalk); }
+.rd-curve { display: block; width: 100%; height: 64px; }
+.rd-curve polygon { fill: rgba(240, 101, 79, 0.18); }
+.rd-curve polyline { fill: none; stroke: var(--without); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.rd-stat { margin: 8px 0 2px !important; font-size: 13px; color: var(--dust); }
+.rd-stat b { color: var(--chalk); font-weight: 600; }
+.rd-used { margin: 0 !important; font-size: 13px; color: var(--with); }
+.rd-facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; margin: 32px 0 0; }
+.rd-facts div { border-top: 1px solid var(--line); padding-top: 12px; }
+.rd-facts dt { font-weight: 600; color: var(--chalk); display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+.rd-facts dd { margin: 0; font-size: 13.5px; color: var(--dust); line-height: 1.5; }
+.rd-facts b { color: var(--with); }
+@media (max-width: 900px) {
+  .rd-curves, .rd-facts { grid-template-columns: 1fr; }
+  .app-impact { grid-column: 2; }
+}

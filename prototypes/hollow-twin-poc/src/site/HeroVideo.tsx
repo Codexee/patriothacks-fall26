@@ -48,7 +48,7 @@ export function HeroVideo({ scenarios }: { scenarios: ScenarioResult[] }) {
             playsInline
             autoPlay={playing}
             preload="metadata"
-            aria-label={`Film, 15 seconds, no sound: ${displayName(s)}. Left, the Hollow without Blackout Warning; right, with it. Same disaster, same seed.`}
+            aria-label={`Film, 15 seconds, no sound: ${displayName(s)}. Left, the Hollow without HollowGuard; right, with it. Same disaster, same seed.`}
             onError={() => setFailed(true)}
           />
         )}
@@ -63,7 +63,7 @@ export function HeroVideo({ scenarios }: { scenarios: ScenarioResult[] }) {
         <button type="button" className="hv-play" onClick={toggle} aria-pressed={playing} disabled={failed}>
           {playing ? 'Pause' : 'Play'}
         </button>
-        <a className="hv-link" href={href.demoClassic(id)}>Watch it run</a>
+        <a className="hv-link" href={href.demo(id)}>Run it in 3D</a>
       </figcaption>
     </figure>
   );

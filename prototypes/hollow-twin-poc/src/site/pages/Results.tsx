@@ -1,5 +1,5 @@
-// #/ — the results landing page. Full-bleed bands, in order: hero (the result), the result over time,
-// how Blackout Warning works, disaster by disaster, the check-first model, the 3D workstation, method and sources.
+// #/ — the results landing page. Full-bleed bands, in order: hero (the result), the app (the resident's phone),
+// the result over time, how Blackout Warning works, disaster by disaster, method and sources.
 import { useState, type ReactNode } from 'react';
 import type { DailyPoint, Interval, ScenarioResult, ScenariosFile } from '../contracts.ts';
 import type { SiteData } from '../data.ts';
@@ -10,6 +10,12 @@ import { DailyChart, Sparkline } from '../charts.tsx';
 import { HeroVideo } from '../HeroVideo.tsx';
 import { Pipeline } from '../Pipeline.tsx';
 import { Generated, displayName, seedRange } from '../parts.tsx';
+import { startTour } from '../Tour.tsx';
+import { RealData, Tag } from '../RealData.tsx';
+import type { ImpactFile } from '../contracts.ts';
+import { PhoneDock } from '../../twin3d/ws/PhoneDock.tsx';
+import { typicalSeed } from '../../twin3d/compute.ts';
+import { BUILT, PROBLEMS, moduleName } from '../../product/names.ts';
 
 /** Total deaths over every run (all disasters × all seeds), with a 95% interval from the per-seed totals. */
 function totals(f: ScenariosFile, side: 'withoutDeaths' | 'withDeaths', stat: 'without' | 'with'): Interval {
@@ -48,6 +54,15 @@ function allRunsDaily(f: ScenariosFile): DailyPoint[] {
   });
 }
 
+/** One line per app: what it does for a resident. */
+const APP_LINE: Record<string, string> = {
+  earlyWarning: 'Warns each level before its power goes out, and asks all levels to save power so plants do not trip.',
+  fairShare: 'Asks levels that were dark yesterday to save less, so the deep levels stop losing every time.',
+  snow: 'Counts bad-water reports per recycler. Tells those levels to boil water and calls a repair crew.',
+  lantern: 'Places 40 battery relays each day, so alerts reach every level when the network is cut.',
+  kin: '“We’re OK” taps pass phone to phone to relatives on other levels.',
+};
+
 /** Sources behind the test world and the check-first model. URLs are the ones cited in the data files. */
 const SOURCES: { name: string; use: string; url: string }[] = [
   { name: 'EIA-930 hourly grid data', use: 'Demand and the shape of every plant loss (ERCOT, TVA, CPLE, SPP)', url: 'https://www.eia.gov/electricity/gridmonitor/' },
@@ -71,11 +86,11 @@ export function Results({ data }: { data: SiteData }) {
   const tripsWi = f.scenarios.reduce((a, s) => a + s.with.trips.mean, 0) / Math.max(1, nS);
   const darkWo = f.scenarios.reduce((a, s) => a + s.without.darkMh.mean, 0) / Math.max(1, nS);
   const darkWi = f.scenarios.reduce((a, s) => a + s.with.darkMh.mean, 0) / Math.max(1, nS);
-  // Scroll to a section and move keyboard focus to its heading, so the next Tab continues from there.
-  const goTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
-    document.querySelector<HTMLElement>(`#${id} h2`)?.focus({ preventScroll: true });
-  };
+  // The phone shows the typical held-out seed of one disaster, on the day picked under it.
+  const PHONE_ID = 'twoplants';
+  const phoneRow = f.scenarios.find((s) => s.id === PHONE_ID);
+  const phoneSeed = typicalSeed(phoneRow?.perSeed, phoneRow?.with.deaths.mean);
+  const [phoneDay, setPhoneDay] = useState(10);
 
   return (
     <>
@@ -83,19 +98,19 @@ export function Results({ data }: { data: SiteData }) {
       <header className="band hero">
         <div className="wrap hero-grid">
           <div className="hero-copy">
-            <p className="eyebrow">Blackout Warning · test results · {nS} disasters × {nSeeds} held-out seeds</p>
+            <p className="eyebrow">HollowGuard · {BUILT.length} apps · {nS} real-data disasters × {nSeeds} held-out seeds</p>
             <h1 tabIndex={-1} className="hero-line">
               <span className="hl-pre">Deaths fell from</span>
               <span className="hl-num without">{num(wo.mean)}</span>
               <span className="hl-to">to <span className="with">{num(wi.mean)}</span>.</span>
             </h1>
             <p className="hero-lede">
-              A forecasting model that reads only what residents of the Hollow can see, predicts which plants will overload,
-              and asks sections to cut load before they trip. Tested on runs it was never tuned on.
+              HollowGuard is a phone app for the Hollow. It reads only what residents can see, and warns them before power, air and water fail.
             </p>
+            <p className="hero-real"><Tag kind="real" /> Four disasters copy real US plant losses, hour by hour. The others use real demand, aging and census data.</p>
             <div className="hero-actions">
-              <button type="button" className="btn primary" onClick={() => goTo('how')}>How it works</button>
-              <a className="btn" href={href.demoClassic()}>Watch it run</a>
+              <button type="button" className="btn play" onClick={startTour}>Play the 90-second tour</button>
+              <a className="btn" href={href.demo()}>Watch it run</a>
             </div>
           </div>
           <div className="hero-media">
@@ -106,7 +121,7 @@ export function Results({ data }: { data: SiteData }) {
           <dl className="kpis">
             <div className="kpi">
               <dt>Deaths avoided</dt>
-              <dd><span className="kpi-num saved">{pct(cut, cut > 0.99 ? 2 : 1)}</span><span className="kpi-sub" title="95% interval of total deaths, without → with Blackout Warning">95% CI <span className="without">{ciShort(wo)}</span> → <span className="with">{ciShort(wi)}</span></span></dd>
+              <dd><span className="kpi-num saved">{pct(cut, cut > 0.99 ? 2 : 1)}</span><span className="kpi-sub" title="95% interval of total deaths, without → with HollowGuard">95% CI <span className="without">{ciShort(wo)}</span> → <span className="with">{ciShort(wi)}</span></span></dd>
             </div>
             <div className="kpi">
               <dt>Stable at day 120</dt>
@@ -124,11 +139,47 @@ export function Results({ data }: { data: SiteData }) {
         </div>
       </header>
 
-      {/* ---------- 01 The result over time ---------- */}
+      {/* ---------- 01 The app ---------- */}
+      <section aria-labelledby="h-app" className="band" id="app">
+        <div className="wrap app-grid">
+          <div>
+            <SectionHead n="01" id="h-app" title="The app and its impact" note={data.impact ? `Each app’s impact: the ${data.impact.runs} test runs with all apps, against the same runs with that one app off.` : 'One app per problem solved. Each reads residents’ data only.'} />
+            <ol className="app-list">
+              {BUILT.map((k) => {
+                const pr = PROBLEMS.find((x) => x.feature === k);
+                return (
+                  <li key={k}>
+                    <span className="app-n">#{pr?.n}</span><b>{moduleName(k)}</b><span>{APP_LINE[k]}</span>
+                    {data.impact && <AppImpact impact={data.impact} k={k} />}
+                  </li>
+                );
+              })}
+            </ol>
+            <p className="note">{15 - BUILT.length} of the 15 problems have no app yet.</p>
+          </div>
+          <div className="app-phone">
+            <PhoneDock id={PHONE_ID} seed={phoneSeed} day={phoneDay} pick={null} note={null} />
+            <label className="app-day">Day {phoneDay}
+              <input type="range" min={1} max={30} value={phoneDay} onChange={(e) => setPhoneDay(+e.target.value)} aria-label="Day of the run" />
+            </label>
+            <p className="note">{displayName(phoneRow ?? { id: PHONE_ID, name: PHONE_ID })}, seed {phoneSeed}.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- 02 Real data ---------- */}
+      <section aria-labelledby="h-real" className="band alt" id="real">
+        <div className="wrap">
+          <SectionHead n="02" id="h-real" title="Built on real-world data" note="Every disaster is built from real records. The second model is tested on real outages." />
+          <RealData checkfirst={data.checkfirst.data} />
+        </div>
+      </section>
+
+      {/* ---------- 03 The result over time ---------- */}
       <section aria-labelledby="h-res" className="band">
         <div className="wrap">
-          <SectionHead n="01" id="h-res" title="Every run, day by day"
-            note={`Cumulative deaths summed over all ${runs} runs per side. Same disasters, same seeds; the only difference is Blackout Warning.`}>
+          <SectionHead n="03" id="h-res" title="Every run, day by day"
+            note={`Total deaths over all ${runs} test runs. Same disasters, same seeds. Only HollowGuard differs.`}>
             <div className="toggle" role="group" aria-label="Vertical scale">
               <button type="button" aria-pressed={!log} onClick={() => setLog(false)}>Linear</button>
               <button type="button" aria-pressed={log} onClick={() => setLog(true)}>Log</button>
@@ -136,13 +187,12 @@ export function Results({ data }: { data: SiteData }) {
           </SectionHead>
           <DailyChart daily={allRunsDaily(f)} keys={['withoutDeaths', 'withDeaths']} unit="deaths" log={log} height={300} title="Cumulative deaths, all disasters and seeds" />
           <p className="legend-line">
-            <span className="key without"><i aria-hidden="true" />Without Blackout Warning</span>
-            <span className="key with"><i aria-hidden="true" />With Blackout Warning</span>
+            <span className="key without"><i aria-hidden="true" />Without HollowGuard</span>
+            <span className="key with"><i aria-hidden="true" />With HollowGuard</span>
           </p>
           <Strata f={f} />
           <p className="footnote">
-            95% CI from the {nSeeds} per-seed totals, Student t ({nSeeds - 1} df, t = {tCrit(nSeeds - 1).toFixed(3)}). Each run simulates
-            {' '}{(f.scale.simPeople / 1e6).toFixed(1)} M people standing for {(f.scale.hollowPeople / 1e9).toFixed(0)} billion (1 ≈ {num(f.scale.hollowPeople / Math.max(1, f.scale.simPeople))}).
+            95% CI: Student t over {nSeeds} seeds (t = {tCrit(nSeeds - 1).toFixed(3)}). One run = {(f.scale.simPeople / 1e6).toFixed(1)} M simulated people.
           </p>
         </div>
       </section>
@@ -150,8 +200,8 @@ export function Results({ data }: { data: SiteData }) {
       {/* ---------- 02 How it works ---------- */}
       <section aria-labelledby="h-how" className="band alt" id="how">
         <div className="wrap">
-          <SectionHead n="02" id="h-how" title="How Blackout Warning works"
-            note="Once a day, from residents’ data only. No plant meters, no weather, no grid forecast." />
+          <SectionHead n="04" id="h-how" title="How Blackout Warning works"
+            note="Once a day, from residents’ reports only. No plant meters." />
           <Pipeline tune={f.tune} />
         </div>
       </section>
@@ -159,8 +209,8 @@ export function Results({ data }: { data: SiteData }) {
       {/* ---------- 03 Disaster by disaster ---------- */}
       <section aria-labelledby="h-dis" className="band">
         <div className="wrap">
-          <SectionHead n="03" id="h-dis" title="Disaster by disaster"
-            note={`Each is shaped by a real grid failure. Mean of ${nSeeds} runs per side; select a row for daily charts and every seed.`} />
+          <SectionHead n="05" id="h-dis" title="Disaster by disaster"
+            note={`Each copies a real grid failure. Mean of ${nSeeds} runs.`} />
           <div className="dz-head" aria-hidden="true">
             <span>Disaster</span><span>Deaths without</span><span>Deaths with</span><span>Plant trips</span><span>Stable</span><span>Cumulative deaths</span>
           </div>
@@ -173,17 +223,16 @@ export function Results({ data }: { data: SiteData }) {
       {/* ---------- 04 Method, sources, limits ---------- */}
       <section aria-labelledby="h-test" className="band alt">
         <div className="wrap">
-          <SectionHead n="04" id="h-test" title="Method" note="Only held-out test runs appear on this page." />
+          <SectionHead n="06" id="h-test" title="Method" />
           <div className="meta-grid three">
             <div>
               <h3 className="eyebrow">Protocol</h3>
               <ol className="proto">
-                <li><b>Write</b>Rules are hand-written from what residents can observe. Nothing is trained.</li>
-                <li><b>Tune</b>Its {Object.keys(f.tune).length} constants change one at a time on seeds 1–5.</li>
-                <li><b>Check</b>A change is kept only if seeds 6–10 are no worse.</li>
-                <li><b>Test once</b>Seeds {seedRange(f.seeds)}, after every choice is frozen. Only these runs are shown.</li>
+                <li><b>Tune</b>Seeds 1–5.</li>
+                <li><b>Check</b>Seeds 6–10. Keep a change only if they are no worse.</li>
+                <li><b>Test once</b>Seeds {seedRange(f.seeds)}, all settings frozen. This page shows only these.</li>
               </ol>
-              <p className="note">The simulation is the test world, not the product. Real data sets its demand, repair times, sections and plant losses.</p>
+              <p className="note">The simulation is the test world, not the product. Real data sets its demand, repairs and plant losses.</p>
             </div>
             <div>
               <h3 className="eyebrow">Data sources</h3>
@@ -205,6 +254,25 @@ export function Results({ data }: { data: SiteData }) {
   );
 }
 
+/** One app's measured impact: deaths avoided over the test runs, as a bar scaled to the largest app, plus its own measure. */
+function AppImpact({ impact, k }: { impact: ImpactFile; k: string }) {
+  const r = impact.apps.find((a) => a.key === k);
+  if (!r) return null;
+  const top = Math.max(1, ...impact.apps.map((a) => a.deathsAvoided));
+  const share = Math.max(0, r.deathsAvoided) / top;
+  let extra: string | null = null;
+  if (k === 'kin') extra = `Split families with no news per night: ${num(r.noNewsPerNightWithoutApp)} with this app off, ${num(impact.all.noNewsPerNight)} with it on`;
+  else if (k === 'lantern' && r.deathsAvoided <= 0) extra = 'The test runs have no network cut, so this app has nothing to do in them.';
+  else if (r.tripsAvoidedPerRun >= 0.5) extra = `${num(r.tripsAvoidedPerRun, 1)} fewer plant trips per run`;
+  return (
+    <span className="app-impact">
+      <span className="ai-bar" aria-hidden="true"><i style={{ width: `${Math.max(r.deathsAvoided > 0 ? 1 : 0, share * 100)}%` }} /></span>
+      <span className="ai-num">{r.deathsAvoided > 0 ? `${num(r.deathsAvoided)} deaths avoided` : r.deathsAvoided < 0 ? `${num(-r.deathsAvoided)} more deaths` : 'No change in deaths'}</span>
+      {extra && <span className="ai-extra">{extra}</span>}
+    </span>
+  );
+}
+
 function SectionHead({ n, id, title, note, children }: { n: string; id: string; title: string; note?: string; children?: ReactNode }) {
   return (
     <div className="sec-head">
@@ -218,20 +286,9 @@ function SectionHead({ n, id, title, note, children }: { n: string; id: string; 
   );
 }
 
-/** The first few limits in full; the rest behind one disclosure, so the page stays short but nothing is hidden. */
+/** The limits list: only the first `shown` items, so the page stays short. */
 export function Limits({ items, shown }: { items: string[]; shown: number }) {
-  const head = items.slice(0, shown), rest = items.slice(shown);
-  return (
-    <>
-      <ul className="limits">{head.map((l) => <li key={l}>{l}</li>)}</ul>
-      {rest.length > 0 && (
-        <details className="more">
-          <summary>{rest.length} more</summary>
-          <ul className="limits">{rest.map((l) => <li key={l}>{l}</li>)}</ul>
-        </details>
-      )}
-    </>
-  );
+  return <ul className="limits">{items.slice(0, shown).map((l) => <li key={l}>{l}</li>)}</ul>;
 }
 
 function DisasterRow({ s, i }: { s: ScenarioResult; i: number }) {
@@ -274,7 +331,7 @@ function Strata({ f }: { f: ScenariosFile }) {
   const total = Math.max(1, parts.reduce((a, p) => a + p.wo, 0));
   const withTotal = parts.reduce((a, p) => a + p.wi, 0);
   return (
-    <figure className={reveal ? 'strata reveal' : 'strata'} aria-label={`Bar chart. Deaths without Blackout Warning, by disaster: ${parts.map((p) => `${p.name} ${num(p.wo)}`).join('; ')}. Deaths with it: ${num(withTotal)}, ${pct(withTotal / total, 2)} of the bar above.`}>
+    <figure className={reveal ? 'strata reveal' : 'strata'} aria-label={`Bar chart. Deaths without HollowGuard, by disaster: ${parts.map((p) => `${p.name} ${num(p.wo)}`).join('; ')}. Deaths with it: ${num(withTotal)}, ${pct(withTotal / total, 2)} of the bar above.`}>
       <div className="strata-row">
         <span className="strata-label">Without</span>
         <div className="strata-bar">
@@ -301,7 +358,7 @@ function simLimits(f: ScenariosFile): string[] {
   const warned = f.scenarios.map((s) => s.with.warnedPct).filter((x): x is number => x != null);
   const out: string[] = [
     `The intervals cover seed-to-seed variation (${f.seeds.length} seeds), not error in the simulation itself.`,
-    'Blackout Warning keeps plants under 82% of output. The simulation does not count the cost of saving that much power.',
+    'Blackout Warning keeps plants under 82% of output. The simulation does not count the cost of that saving.',
     'Several constants are guesses (air death rate, deaths a warning avoids, air per person, alert follow rate, trip chance at full load), each stated in src/data/real/airParams.ts.',
   ];
   if (warned.length) {
@@ -309,7 +366,7 @@ function simLimits(f: ScenariosFile): string[] {
     out.push(`Warned share is a weak measure: only ${pctPoints(lo)}–${pctPoints(hi)} of remaining blackout hours were warned, because most blackouts are prevented and the rest are short and sudden.`);
   }
   out.push(
-    'Without Blackout Warning no scenario stabilizes: real peak demand (1.17 × mean) exceeds the plants’ margin (1.1 × mean).',
+    'Without HollowGuard no disaster stabilizes: real peak demand (1.17 × mean) is above the plants’ margin (1.1 × mean).',
     'Aging and Crowding play 4 real years in 120 days. The aging rate (about 10% a year, The Geysers after its peak) is steep; plants today lose 1–2% a year.',
     'Real county growth is small (median about +0.5% a year), so Crowding changes little.',
     'Repair times come from EAGLE-I customer restorations after mostly wire damage. They stand in for plant repair time; they do not measure it.',

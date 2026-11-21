@@ -1,12 +1,12 @@
 // Loads the two result files from public/results/. If a file is missing or does not look like the contract, the
 // site uses the sample fixture for that file and marks it, so the page can show a "sample data" banner.
 import { useEffect, useState } from 'react';
-import type { CheckFirstFile, ScenariosFile } from './contracts.ts';
+import type { CheckFirstFile, ImpactFile, ScenariosFile } from './contracts.ts';
 import { sampleScenarios } from './fixtures/scenarios.ts';
 import { sampleCheckFirst } from './fixtures/checkfirst.ts';
 
 export interface Loaded<T> { data: T; sample: boolean; path: string; reason?: string }
-export interface SiteData { scenarios: Loaded<ScenariosFile>; checkfirst: Loaded<CheckFirstFile> }
+export interface SiteData { scenarios: Loaded<ScenariosFile>; checkfirst: Loaded<CheckFirstFile>; impact: ImpactFile | null }
 
 const isScenarios = (x: unknown): x is ScenariosFile =>
   !!x && typeof x === 'object' && Array.isArray((x as ScenariosFile).scenarios) && (x as ScenariosFile).scenarios.length > 0 &&
@@ -36,7 +36,12 @@ export function loadSiteData(): Promise<SiteData> {
   cache ??= Promise.all([
     load('results/scenarios.json', isScenarios, sampleScenarios),
     load('results/checkfirst.json', isCheckFirst, sampleCheckFirst),
-  ]).then(([scenarios, checkfirst]) => ({ scenarios, checkfirst }));
+    // Optional: each app's leave-one-out impact (`npm run impact`). Without it the app list shows no impact column.
+    fetch(import.meta.env.BASE_URL + 'results/impact.json', { cache: 'no-cache' })
+      .then((r) => (r.ok && (r.headers.get('content-type') ?? '').includes('json') ? r.json() : null))
+      .then((x: ImpactFile | null) => (x && Array.isArray(x.apps) ? x : null))
+      .catch(() => null),
+  ]).then(([scenarios, checkfirst, impact]) => ({ scenarios, checkfirst, impact }));
   return cache;
 }
 

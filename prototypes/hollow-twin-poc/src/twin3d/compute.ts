@@ -3,6 +3,7 @@
 // Per day, the section snapshot is the day's worst hour (the hour with the most dark sections), the same line
 // src/sim/results.ts uses for its dark-section counts; CO2 is the day's highest; deaths and "lost" are at the day's end.
 // A run that ends before day D (stable or lost) keeps its last day.
+import { BUILT } from '../product/names.ts';
 import { NO_TOOLS, SECTION_COUNT, type Frame, type ToolSet } from '../sim/types.ts';
 import { createRun, stepRun } from '../product/run.ts';
 import { plantStatus } from '../sim/engine.ts';
@@ -12,7 +13,8 @@ import { carryDetail, collectDay, createDetail, finishDetail, type SideDetail } 
 export const BLACKOUT = 0.5; // the engine's blackout line for life support
 export const AIR_DANGER = 5000; // ppm, the engine's air danger line (OSHA PEL / NIOSH REL)
 export const PLANTS = 6;
-export const WITH_TOOLS: ToolSet = { ...NO_TOOLS, earlyWarning: true };
+/** Every built module, the same set the results file (src/sim/gate.ts) calls "with". */
+export const WITH_TOOLS: ToolSet = { ...NO_TOOLS, ...Object.fromEntries(BUILT.map((k) => [k, true])) };
 
 /** Days shown per disaster: 30, or 60 for the slow ones that cannot end before day 60. */
 export function daysFor(id: string): number {

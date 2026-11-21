@@ -1,4 +1,4 @@
-// The results site: the product is the models and their measured results; the cutaway is the "Watch it run" page.
+// The results site: the product is HollowGuard (the phone apps and their models) and its measured results.
 // Spec: .plans/results-site-spec.md. Every number comes from public/results/*.json (or a marked sample fixture).
 import { Suspense, lazy, useEffect, useRef } from 'react';
 import { useRoute } from './router.ts';
@@ -10,6 +10,7 @@ import { Disaster } from './pages/Disaster.tsx';
 import { Model } from './pages/Model.tsx';
 import { Demo } from './pages/Demo.tsx';
 import { href } from './router.ts';
+import { Tour } from './Tour.tsx';
 import './site.css';
 import './landing.css';
 
@@ -21,8 +22,8 @@ const TITLES: Record<string, string> = {
   results: 'Results',
   disaster: 'Disaster',
   model: 'Check-first model',
-  demo: 'Watch it run (3D)',
-  demoClassic: 'Watch it run',
+  demo: 'Watch it run',
+  demoClassic: 'Watch it run (2D cutaway, archived)',
   film: 'Film',
   missing: 'Page not found',
 };
@@ -46,7 +47,7 @@ export function Site() {
     const name = route.page === 'disaster'
       ? (() => { const s = data?.scenarios.data.scenarios.find((x) => x.id === route.id); return s ? displayName(s) : TITLES.disaster; })()
       : TITLES[route.page];
-    document.title = `${name}: Residents’ System`;
+    document.title = `${name}: HollowGuard`;
   }, [route, data]);
 
   if (route.page === 'film') return <Suspense fallback={null}><Film id={route.id} /></Suspense>;
@@ -82,8 +83,9 @@ export function Site() {
         )}
       </main>
       <footer className="site-foot">
-        <p className="wrap">Patriot HackFest Fall 2026 · Life underground. Deaths are simulated test-world results, not forecasts.</p>
+        <p className="wrap">Patriot HackFest Fall 2026 · Life underground. All deaths are simulated.</p>
       </footer>
+      <Tour />
     </div>
   );
 }

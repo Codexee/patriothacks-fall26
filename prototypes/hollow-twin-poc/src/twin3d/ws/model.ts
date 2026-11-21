@@ -5,7 +5,7 @@ import type { SideDetail } from '../detail.ts';
 import type { SideKey } from '../Scene.tsx';
 
 export const SIDES: SideKey[] = ['without', 'with'];
-export const SIDE_NAME: Record<SideKey, string> = { without: 'Without Blackout Warning', with: 'With Blackout Warning' };
+export const SIDE_NAME: Record<SideKey, string> = { without: 'Without HollowGuard', with: 'With HollowGuard' };
 export const SIDE_SHORT: Record<SideKey, string> = { without: 'Without', with: 'With' };
 export const SIDE_COLOR: Record<SideKey, string> = { without: '#f0654f', with: '#6cb6ff' };
 

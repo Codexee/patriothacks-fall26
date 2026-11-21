@@ -1,5 +1,5 @@
 {
-  "name": "hollow-twin-poc",
+  "name": "hollowguard",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,7 +10,8 @@
     "sim": "node --experimental-strip-types src/sim/cli.ts",
     "gate": "node --experimental-strip-types src/sim/gate.ts",
     "results": "node --experimental-strip-types src/sim/results.ts",
-    "films": "node scripts/capture-films.mjs"
+    "films": "node scripts/capture-films.mjs",
+    "impact": "node --experimental-strip-types src/sim/impact.ts"
   },
   "dependencies": {
     "@react-three/drei": "^9.122.0",

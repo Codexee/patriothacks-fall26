@@ -80,7 +80,7 @@ export function DailyChart({
       <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} role="img" aria-labelledby={`${id}-t ${id}-d`} className="chart-svg">
         <title id={`${id}-t`}>{title}</title>
         <desc id={`${id}-d`}>
-          {last ? `On day ${last.day}: without Blackout Warning ${num(last[keys[0]])} ${unit}; with Blackout Warning ${num(last[keys[1]])} ${unit}.` : 'No data.'}
+          {last ? `On day ${last.day}: without HollowGuard ${num(last[keys[0]])} ${unit}; with HollowGuard ${num(last[keys[1]])} ${unit}.` : 'No data.'}
           {log ? ' The vertical scale is logarithmic.' : ''}
         </desc>
         {yTicks.map((t) => (

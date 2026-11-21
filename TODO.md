@@ -13,7 +13,7 @@ No AI worker is running. Everything is merged to `main`. Start with `docs/handof
 
 - [ ] **Get an EIA API key** (free, 2 minutes): https://www.eia.gov/opendata/register.php. Put it in `.env.local` as `EIA_API_KEY` and in the Vercel project settings. — needs a person
 - [ ] **Deploy to Vercel.** Steps and the after-deploy checklist are in `docs/deploy.md`. Needs a person with a Vercel account and the EIA key.
-- [ ] **Pick the project name.** "Hollow Twin" is taken by another team. Working name: "Before, During, After".
+- [x] **Pick the project name.** HollowGuard (Neil, Nov 20). "Hollow Twin" is taken by another team, and "hollow-watch" by a third.
 - [ ] **Ask at the Thu check-in** (JC Room C, 10:00 am–1:30 pm): the judging criteria, the video length, what the submission form needs.
 
 ## Stretch ladder (each step only if the one before it passed)

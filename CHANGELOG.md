@@ -2,6 +2,24 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-20 (34): Real data and each app's impact on the homepage
+
+- **"Built on real-world data" section** (`src/site/RealData.tsx`): the three real EIA-930 hourly plant losses drawn as curves, with the disaster each one shapes, plus ERCOT demand, EAGLE-I repairs, the 1,457 real counties and the check-first model's real-outage score. "Real data" and "Simulated" tags in the hero.
+- **Each app's impact, measured** (`npm run impact` → `public/results/impact.json`): the 70 test runs with all apps, against the same runs with one app off. Blackout Warning 43,955,163 deaths avoided, Water Safety 4,222,929, Fair Share 201, Off-Network Messaging 0 (no network cut in the test runs), Family Check-In 0 deaths and 657 → 620 families with no news per night. Shown as bars in "01 The app and its impact" and in the README.
+- **Tour:** a step for the real data (8 steps, still 90 s).
+- **Teammates:** redeploy Vercel. Water Safety's 4.2 M is a strong slide.
+
+## 2026-11-20 (33): HollowGuard: phone back in the demo, guided tour, shorter site, judge README
+
+- **The name is HollowGuard.** The site brand, page titles and docs say HollowGuard. The folder `prototypes/hollow-twin-poc` and the Vercel URL keep the old slug.
+- **`#/demo` is the 3D workstation again, with the resident's phone** in its left dock ("Resident's phone" tab; "Model inspector" is the other tab). The phone replays the "with" run for the day on screen. Click a section to move the phone there. The 2D cutaway is archived at `#/demo/classic`.
+- **The 3D "with" side now runs all 5 built modules** (`WITH_TOOLS` in `src/twin3d/compute.ts`), the same set as the results file. Before, it ran only Blackout Warning, so its numbers did not match.
+- **Homepage:** a "Play the 90-second tour" button (`src/site/Tour.tsx`, 7 captioned steps across Results, Watch it run and Model), a new "01 The app" section with the phone and one line per app, and much less text on every page.
+- **The numbers:** the correct totals are **43,647,368 → 12,563** deaths (sums of the per-seed totals in `scenarios.json`). Entry 32's 43,647,380 → 12,540 came from rounded means. Families with no news per night: 14,771 → 620.
+- **Films:** re-rendered with "Without/With HollowGuard" labels and the 5-module run.
+- **README.md is now for judges.** The old team README is `docs/team-setup.md`.
+- **Teammates:** pull, then redeploy Vercel. Use 12,563 (not 12,540) in slides, the video and Devpost.
+
 ## 2026-11-20 (32): Three more problems: Fair Share (#2), Water Safety (#4), Off-Network Messaging (#7)
 
 - **5 of 15 problems now have an app on the phone.** Every module starts switched on.
@@ -103,13 +121,13 @@ Newest first. Add an entry whenever you change shared context, skills, or the wo
 
 - **Data:** `data/` builds 1,477 real outage events (2015–2024) from EAGLE-I and EIA-930. Set up: `brew install uv libomp`, then `cd data && uv sync`. Raw files (about 12 GB) stay in `data/raw/`, which git ignores; see `data/README.md` to fetch them.
 - **Models v2:** trained on 2015–2020, designed on 2021–2022, tested once on 2023–2024. Read `models/RESULTS.md` before you write any claim. Short version: 13% of events warned 12 h ahead without a weather forecast; 51% with one, as an upper bound; Texas 2021 alert 13 h before the first outage (19 h before the load-shed order) with the forecast model.
-- **App:** `cd app && npm install && npm run dev`. Story mode: `#/?story=texas2021`. The old Hollow Twin screen is at `#/legacy`.
+- **App:** `cd app && npm install && npm run dev`. Story mode: `#/?story=texas2021`. The old HollowGuard screen is at `#/legacy`.
 - **Rules for parallel work:** `contracts/README.md` says who owns which directories. Do not edit `app/package.json` or the contracts in a workstream branch.
 - **Action for everyone:** `git pull`, read `models/RESULTS.md` and the spec, then pick an open item from "Next" in `AGENTS.md`. The live page needs `EIA_API_KEY` (see `.env.example`).
 
 ## 2026-11-18 (18): Pivot to Earth as the product (spec locked, project unnamed)
 
-- **`.plans/before-during-after-spec.md` is locked** and replaces `.plans/hollow-twin-spec.md`. The working name is "Before, During, After"; the project is unnamed because another team (anudeep-bonagiri/hollow-twin) already uses "Hollow Twin".
+- **`.plans/before-during-after-spec.md` is locked** and replaces `.plans/hollow-twin-spec.md`. The working name is "Before, During, After"; the project is unnamed because another team (anudeep-bonagiri/hollow-twin) already uses "HollowGuard".
 - **What changes:** two models trained on real US outages since 2015 (a 48-hour grid warning from EIA-930, and who stays dark longest from EAGLE-I with CDC SVI and HHS emPOWER), tested on 2021 onward. A deck.gl county map where counties sink by vulnerability (the Hollow's "deep levels"), a county brief, an evidence view, and a live page. Gated stretch ladder: heat → true count → air → water.
 - **What leaves the demo path:** the PixiJS cutaway and the 9 hand-written modules (`app/src/world`, `app/src/product`, `app/src/sim`). Do not delete them.
 - **Why:** `ideation/ideas.md` → Round 17 (6 competing repos; none uses real disaster data).
@@ -125,7 +143,7 @@ Newest first. Add an entry whenever you change shared context, skills, or the wo
 - **`prototype/hollow-twin-product` is merged into `main`, and the app moved from `prototypes/hollow-twin-poc/` to `app/`.** The launch config is now named `hollow-twin`.
 - **Action for everyone:** `git pull` on `main`, then `cd app && npm install`. Read the spec's "Step-by-step plan" and pick the next open step. Roles are not fixed. Stay inside the directories that the step's workstream owns.
 
-## 2026-11-17 (16): New direction: Hollow Twin (software only)
+## 2026-11-17 (16): New direction: HollowGuard (software only)
 
 - **The track is the Hollow** (`context/track.md`). Off the Record is on hold. Hardware is out (no parts in time). Earshot is dropped (too many unknowns).
 - **New spec: `.plans/hollow-twin-spec.md`** (draft). A pixel-art cutaway of the Hollow (50 levels × 8 sections) that runs real-world data as the Hollow: Texas 2021 power, Chicago 1995 heat, Wuhan 2020 delays, Flint water.

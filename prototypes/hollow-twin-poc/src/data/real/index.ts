@@ -1,5 +1,5 @@
 // Real data for the hidden test world (spec: .plans/hollow-real-data-spec.md, workstream 0 contract).
-// The Residents' System never imports this file. Only the engine, the scenarios and the UI's hover cards do.
+// HollowGuard never imports this file. Only the engine, the scenarios and the UI's hover cards do.
 // Each generated file (grid.ts, outages.ts, sections.ts, airParams.ts) exports `null` until its workstream fills
 // it. When a value is null, the engine uses its old guessed value, so the sim always runs.
 import type { Source } from '../../sim/types.ts';

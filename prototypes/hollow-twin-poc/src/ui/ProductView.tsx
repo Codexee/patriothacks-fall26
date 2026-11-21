@@ -1,4 +1,4 @@
-// REBUILD: the product view — the Residents' System. A resident's phone for one section: a home screen with one app
+// REBUILD: the product view — HollowGuard. A resident's phone for one section: a home screen with one app
 // per built module (src/ui/phone/). Everything here comes from the system's own outputs, memory and log; none of it
 // comes from the test world's hidden state. The council reasoning of each module is in the Modules panel.
 import { type ToolSet } from '../sim/types.ts';
@@ -24,9 +24,9 @@ export interface ProductViewProps {
 
 export function ProductView(p: ProductViewProps) {
   return (
-    <aside className="product" aria-label="Residents' System">
+    <aside className="product" aria-label="HollowGuard">
       <header className="pv-head">
-        <h1>Residents' System <Info label="About the Residents' System">The app residents run for themselves. It sees only what residents have: their outage reports, their own head count and the Directorate's census. Never the hidden truth. Each solved problem becomes an app on the phone.</Info></h1>
+        <h1>HollowGuard <Info label="About HollowGuard">The app residents run for themselves. It sees only what residents have: their outage reports, their own head count and the Directorate's census. Never the hidden truth. Each solved problem becomes an app on the phone.</Info></h1>
         <div className="progress" aria-label="Progress through the 15 problems">
           {PROBLEMS.map((pr) => (
             <span key={pr.n} className={`dot ${pr.feature && BUILT.includes(pr.feature) ? 'done' : ''}`} title={`#${pr.n} ${pr.title}${pr.feature ? ` — ${moduleName(pr.feature)}` : ' — not built yet'}`}>{pr.n}</span>

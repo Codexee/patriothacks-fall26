@@ -13,7 +13,7 @@ export function Model({ data }: { data: SiteData }) {
   return (
     <>
       <header className="page-head">
-        <p className="eyebrow">Model 2 · residents’ data only · tested on real US outages</p>
+        <p className="eyebrow">Model 2 · residents’ data only · real US outages</p>
         <h1 tabIndex={-1}>{m.name.replace(/\s*\(.*\)\s*$/, '')}</h1>
         <p className="lede">{m.task}</p>
         <dl className="facts spec">
@@ -28,7 +28,7 @@ export function Model({ data }: { data: SiteData }) {
       <section aria-labelledby="h-test" className="block">
         <div className="block-head">
           <h2 id="h-test">Test result</h2>
-          <p>{num(m.test.events)} real outage events ({num(m.test.areaEvents)} area-events) never seen in training. History ranks areas by their own past dark hours; chance is random.</p>
+          <p>{num(m.test.events)} real outages the model never saw. History: each area’s own past. Chance: random order.</p>
         </div>
         <div className="cf-metrics model-metrics">{m.test.rows.map((r) => <BigMetric key={r.metric} r={r} />)}</div>
         <details className="more">
@@ -45,7 +45,7 @@ export function Model({ data }: { data: SiteData }) {
         <section aria-labelledby="h-cmp" className="block">
           <div className="block-head">
             <h2 id="h-cmp">Against a model with weather</h2>
-            <p>The same model given weather and grid-operator data, same test period. The difference is the cost of using residents’ data only.</p>
+            <p>The same model with weather and grid data. The gap is the cost of using residents’ data only.</p>
           </div>
           <CompareTable residents={m.test.rows} weather={m.comparison.rows} />
         </section>
@@ -55,7 +55,7 @@ export function Model({ data }: { data: SiteData }) {
       <section aria-labelledby="h-imp" className="block">
         <div className="block-head">
           <h2 id="h-imp">What it relies on</h2>
-          <p>Share of total tree gain, top inputs.</p>
+          <p>Share of model gain.</p>
         </div>
         <ShareBars items={m.importance.map((i) => ({ label: i.feature, share: i.share, note: plainOf.get(i.feature) }))} />
       </section>
@@ -63,10 +63,9 @@ export function Model({ data }: { data: SiteData }) {
       <section aria-labelledby="h-inputs" className="block">
         <div className="block-head">
           <h2 id="h-inputs">Inputs</h2>
-          <p>{m.inputs.length} inputs, each with a source residents have in the Hollow.</p>
         </div>
         <details className="more">
-          <summary>All {m.inputs.length} inputs, with their Hollow equivalent</summary>
+          <summary>All {m.inputs.length} inputs and their Hollow source</summary>
         <div className="table-wrap">
           <table className="inputs-table">
             <caption className="sr-only">Every input the model reads, with its Hollow equivalent.</caption>
@@ -79,8 +78,10 @@ export function Model({ data }: { data: SiteData }) {
           </table>
         </div>
         </details>
-        <h3>Excluded: residents do not have it</h3>
-        <ul className="limits">{m.excluded.map((e) => <li key={e}>{e}</li>)}</ul>
+        <details className="more">
+          <summary>{m.excluded.length} inputs left out: residents do not have them</summary>
+          <ul className="limits">{m.excluded.map((e) => <li key={e}>{e}</li>)}</ul>
+        </details>
       </section>
 
       </div>
@@ -108,7 +109,7 @@ export function Model({ data }: { data: SiteData }) {
 
       <section aria-labelledby="h-lim" className="block">
         <div className="block-head"><h2 id="h-lim">Limits</h2></div>
-        <Limits items={m.limits} shown={3} />
+        <Limits items={m.limits} shown={2} />
         <p><a className="text-link" href={href.results}>← Back to the results</a></p>
       </section>
       </div>

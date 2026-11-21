@@ -159,7 +159,7 @@ export function Phone(p: PhoneProps) {
                   </label>
                 </div>
                 <button type="button" className={`ph-lock ${p.homeLocked ? 'on' : ''}`} onClick={p.onToggleLock} aria-pressed={p.homeLocked}>
-                  {p.homeLocked ? 'Locked: hovering the cutaway does not move your home' : 'Unlocked: hovering the cutaway moves your home'}
+                  {p.homeLocked ? 'Locked: picking a section does not move your home' : 'Unlocked: picking a section moves your home'}
                 </button>
                 <button type="button" className="ph-done" onClick={() => setSheet(false)}>Done</button>
               </div>

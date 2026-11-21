@@ -75,3 +75,23 @@ export interface CheckFirstFile {
   limits: string[];
   source: Source;
 }
+
+/** public/results/impact.json ← `npm run impact` (src/sim/impact.ts): each app's impact, measured by leaving it out. */
+export interface ImpactRow {
+  key: string;
+  name: string;
+  problem: number; // the brief's problem number
+  deathsWithoutApp: number; // all 70 test runs, every other app on
+  deathsAvoided: number; // deathsWithoutApp − deaths with all apps
+  tripsAvoidedPerRun: number;
+  darkMhAvoidedPerRun: number; // million person-hours without air and fans, per run
+  noNewsPerNightWithoutApp: number; // split families with no news, mean per night
+}
+export interface ImpactFile {
+  generated: string;
+  set: 'test';
+  seeds: number[];
+  runs: number;
+  all: { deaths: number; noNewsPerNight: number };
+  apps: ImpactRow[];
+}

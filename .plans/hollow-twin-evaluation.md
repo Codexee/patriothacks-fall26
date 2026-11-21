@@ -1,4 +1,4 @@
-# Hollow Twin: evaluation on Wed Nov 18
+# HollowGuard: evaluation on Wed Nov 18
 
 Status: input to the spec revision · Branch checked: `prototype/hollow-twin-product` (`6605924`) · Author: Neil (with Claude)
 

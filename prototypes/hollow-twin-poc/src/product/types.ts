@@ -1,4 +1,4 @@
-// REBUILD: the Residents' System ("the product"). Its features read ONLY Observations (sim/types.ts) and produce
+// REBUILD: HollowGuard ("the product"). Its features read ONLY Observations (sim/types.ts) and produce
 // Outputs. They never read the engine's hidden state. We add one feature per Hollow problem, step by step.
 import type { Output } from '../sim/types.ts';
 
