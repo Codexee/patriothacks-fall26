@@ -75,6 +75,30 @@ function WaterSafetyCard({ run }: CardProps) {
     : <p className="good">No recycler stands out: complaints are at the typical rate ({ws.typical.toFixed(2)} per 1,000 residents in 2 days).</p>;
 }
 
+/** Problem #3: Cooling. */
+function CoolingCard({ run }: CardProps) {
+  const co = run.log?.cooling;
+  if (!co) return <p className="muted">Heat reports are counted from the first day.</p>;
+  return (
+    <>
+      <p>{co.hot.length ? <>Overheating (heat reports per 1,000 in 2 days): {co.hot.map((h) => `L${h.level} (${h.per1000.toFixed(1)})`).join(', ')}.</> : 'No level is overheating.'}</p>
+      <p>{co.moves.length ? <>Crews moved {co.moves.length} fan{co.moves.length === 1 ? '' : 's'} today: {co.moves.map((mv) => `L${mv.from} → L${mv.to}`).join(', ')}.</> : 'No fan moves today.'} {co.received} levels have received a fan so far.</p>
+    </>
+  );
+}
+
+/** Problem #9: Outbreak Tracker. */
+function OutbreakCard({ run }: CardProps) {
+  const ob = run.log?.outbreak;
+  if (!ob) return <p className="muted">Cough reports are counted from the first day.</p>;
+  return (
+    <>
+      <p>In 2 days residents reported <b>{fmt(ob.residentsCount)}</b> coughs; clinics saw <b>{fmt(ob.clinicCount)}</b> cases. The Directorate counts <b>{ob.official === null ? '—' : fmt(ob.official)}</b> sick.</p>
+      {ob.hotspots.length ? <p className="warn-text">Hot spots: level {ob.hotspots.join(', ')}. Told them and the levels next to them to isolate the sick.</p> : <p className="good">No hot spot: coughs are at the typical rate.</p>}
+    </>
+  );
+}
+
 /** Problem #12: Food Sharing. */
 function FoodSharingCard({ run }: CardProps) {
   const fd = run.log?.foodSharing;
@@ -128,6 +152,14 @@ const MODULE_CARDS: Partial<Record<ToolKey, { card: (p: CardProps) => ReactNode;
   snow: {
     card: WaterSafetyCard,
     about: "After John Snow's 1854 cholera map. The app counts residents' reports of bad water per 1,000 residents around each recycler the census lists, over 2 days. A recycler whose levels complain at 3 times the typical rate (and at least 6 reports) is the likely source: those levels are told to boil their water, and the residents' repair crew is sent (again after 4 days if complaints continue). Assumption: a recycler serves its own level and 2 levels above and below. No sensors or tap meters. In the test world a recycler starts failing on level 38, and recyclers without power make worse water.",
+  },
+  layout: {
+    card: CoolingCard,
+    about: "The deep levels are closer to hot rock, and cooling runs on power, so blackouts and power saving make them hotter. Above a wet-bulb of 31 °C people start to die (Vecellio et al. 2022). The app counts residents' 'too hot' reports per 1,000 residents by level (2 days), and sends crews to move a fan from a level with no heat reports to the hottest level, at most 2 a day. No temperature sensors. Thresholds are design choices.",
+  },
+  ledger: {
+    card: OutbreakCard,
+    about: "A lung sickness spreads faster in crowded and dark (unventilated) sections and is deadlier far from a clinic. The app puts residents' cough reports and clinic counts side by side per level, next to the Directorate's public number. Levels where coughs run at 3 times the typical rate (and at least 8 reports) and the levels next to them are told to isolate the sick. Thresholds are design choices.",
   },
   larder: {
     card: FoodSharingCard,

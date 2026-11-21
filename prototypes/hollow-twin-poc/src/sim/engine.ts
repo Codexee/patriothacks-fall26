@@ -27,10 +27,10 @@ import { outages as realOutages, sections as realSections, air as realAir, cited
 export const WORLD = {
   power: true, // #1 blackouts (always on: the base of the Hollow)
   air: true, // #1 "the power or air cuts out": fans need power
-  heat: false, // #3 deep levels get hotter
+  heat: true, // #3 deep levels get hotter (on since Nov 20: Cooling)
   water: true, // #4 recyclers fail (on since Nov 20: Water Safety)
-  sickness: false, // #9 lung sickness
-  food: false, // #12 food runs out (and farms get diverted). Off: with it on every run starves by about day 44, partly because power saving switches off farm lamps (Nov 20). Food Sharing (product/foodSharing.ts) is not shipped.
+  sickness: true, // #9 lung sickness (on since Nov 20: Outbreak Tracker)
+  food: true, // #12 food runs out (and farms get diverted). Farm lamps count as essential power (Nov 20), so power saving never switches them off.
   lies: false, // #9, #13 the Directorate's false bulletins
   network: true, // #7 the Directorate can cut the network (cuts come only from events: the brief gives no schedule)
   families: true, // #8 families split across levels (on since Nov 20: Family Check-In)
@@ -339,7 +339,7 @@ export function createState(scenario: Scenario, seed: number, tools: ToolSet): S
     const level = lvl(i), col = i % SECTIONS_PER_LEVEL, counted = censusShare(level);
     const res = resLoad(startPeople[i]);
     let c = res * CRITICAL_RES_SHARE, nc = res * (1 - CRITICAL_RES_SHARE);
-    for (const k of structures[i]) { if (k === 'farm') nc += LOAD.farm; else c += LOAD[k]; }
+    for (const k of structures[i]) { c += LOAD[k]; } // farm lamps are essential (food), like air and water
     standing.push({
       kind: 'census', level, col, day: 0, people: Math.round((startPeople[i] * counted) / 10) * 10,
       demand: Math.round((c + nc) * counted), critical: Math.round(c * counted), facilities: structures[i].slice(), food: 20,
@@ -383,7 +383,7 @@ function warmupObservations(state: SimState, s: Internal): Observation[] {
     for (let i = 0; i < SECTION_COUNT; i++) {
       const res = resLoad(s.people[i]);
       let c = res * CRITICAL_RES_SHARE, nc = res * (1 - CRITICAL_RES_SHARE);
-      for (const k of s.structures[i]) { if (k === 'farm') nc += LOAD.farm; else c += LOAD[k]; }
+      for (const k of s.structures[i]) { c += LOAD[k]; } // farm lamps are essential (food), like air and water
       fullC[i] = c * mult; fullN[i] = nc * mult; D += fullC[i] + fullN[i];
     }
     let cap = 0;
@@ -812,7 +812,7 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
       if (s.lost[i]) { fullC[i] = fullN[i] = reqC[i] = reqN[i] = 0; continue; }
       const res = resLoad(s.people[i]);
       let c = res * CRITICAL_RES_SHARE, nc = res * (1 - CRITICAL_RES_SHARE);
-      for (const k of s.structures[i]) { if (k === 'farm') nc += LOAD.farm; else c += LOAD[k]; }
+      for (const k of s.structures[i]) { c += LOAD[k]; } // farm lamps are essential (food), like air and water
       fullC[i] = c * mult;
       fullN[i] = nc * mult;
       // A section follows the plan only if the plan reached it; otherwise it draws all it needs.
@@ -942,7 +942,7 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
       // Grow-lamp farms that residents build later are theirs, not diverted.
       const diverted = s.diversions.some((d) => h >= d.start && d.farms.includes(i));
       farmLevels.push(lvl(i));
-      farmPow.push(s.lost[i] ? 0 : nonFrac[i] * count(s.structures[i], 'farm') * (diverted ? DIVERT_SHARE : 1));
+      farmPow.push(s.lost[i] ? 0 : critFrac[i] * count(s.structures[i], 'farm') * (diverted ? DIVERT_SHARE : 1));
     }
     const clinicLevels: number[] = [];
     for (let i = 0; i < SECTION_COUNT; i++) if (s.structures[i].includes('clinic') && !s.lost[i]) clinicLevels.push(lvl(i));

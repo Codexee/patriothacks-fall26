@@ -2,6 +2,13 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-20 (33, branch hollow-earth-rebuild-2d only): Cooling (#3), Outbreak Tracker (#9), Food Sharing (#12)
+
+- **This is on the `hollow-earth-rebuild-2d` branch, not `main`.** `main` keeps 5 problems and the 43.6 M → 12,540 headline.
+- **8 of 15 problems:** adds Cooling (`product/cooling.ts`: residents' heat reports → crews move fans to the hottest levels), Outbreak Tracker (`product/outbreak.ts`: cough reports + clinic counts vs the Directorate's number → isolate-the-sick alerts on hot spots) and Food Sharing (`product/foodSharing.ts`, now shipped).
+- **World:** heat, sickness and food are on. Farm lamps now count as essential power, so power saving never switches them off (that is what made every run starve before).
+- **Results (test seeds 11–20, all 8 modules):** deaths **35,323,040 → 2,061,500** (94% fewer), but only 66% of runs end stable (Aging 0/10, Two Plants and Crowding 5/10). Food Sharing alone prevents about 380,000 starvation deaths per run; Outbreak Tracker helps a lot on Baseline, mixed on Two Plants; Cooling has almost no measurable effect.
+
 ## 2026-11-20 (32): Three more problems: Fair Share (#2), Water Safety (#4), Off-Network Messaging (#7)
 
 - **5 of 15 problems now have an app on the phone.** Every module starts switched on.
