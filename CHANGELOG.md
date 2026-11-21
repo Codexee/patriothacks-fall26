@@ -2,6 +2,12 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-20 (36): The site is at hollowguard.vercel.app
+
+- **The Vercel project is renamed `hollowguard`**, and the site is live at **https://hollowguard.vercel.app**. The old URL, hollow-twin-poc.vercel.app, still works.
+- GitHub Pages is not used: the repository is private, and Pages on a private repository needs a paid plan.
+- **Everyone:** use https://hollowguard.vercel.app in the video, Devpost and the submission form. Deploy as before: `cd prototypes/hollow-twin-poc && npx vercel deploy --prod`.
+
 ## 2026-11-20 (35): Adarsh's harder world merged into main: 7 apps, new headline
 
 - **Merged `hollow-earth-rebuild-2d` at `c615334`** (spec: `.plans/adarsh-integration-spec.md`, locked). Heat, sickness and food are on; farm lamps are essential; Adarsh's 5-point easing; Fair Share protects overheating levels.

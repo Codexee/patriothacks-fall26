@@ -6,7 +6,7 @@ Every disaster we test is built from real records. Four copy real US plant losse
 
 Patriot HackFest Fall 2026 · Life underground track.
 
-**Live site: https://hollow-twin-poc.vercel.app**
+**Live site: https://hollowguard.vercel.app**
 
 ## Judge it in 2 minutes
 

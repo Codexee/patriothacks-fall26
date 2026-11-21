@@ -1,6 +1,6 @@
 # HollowGuard (Devpost draft)
 
-Live site: https://hollow-twin-poc.vercel.app · Code: https://github.com/Codexee/patriothacks-fall26
+Live site: https://hollowguard.vercel.app · Code: https://github.com/Codexee/patriothacks-fall26
 
 ## Inspiration
 In the Hollow, the deep levels lose first. Blackouts come without warning, recyclers fail, and the Directorate's numbers do not match what people see. Residents cannot see the power plants, but they can see which levels are dark. We wanted to find out how much residents can do with only what they can see.

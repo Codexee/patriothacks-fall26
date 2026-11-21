@@ -81,3 +81,4 @@ Add one line per decision: date · decision · why · who. Newest last.
 - 2026-11-20 · HollowGuard is presented as one product: the phone apps plus the check-first model. #/demo is the 3D workstation with the phone; the 2D cutaway is archived at #/demo/classic. The 3D "with" side runs all built modules, so it matches the results file. Headline 43,647,368 → 12,563 (per-seed sums) · Neil
 - 2026-11-20 · Merge Adarsh's hollow-earth-rebuild-2d (frozen at c615334): harder world (heat, sickness, food on) becomes the headline; his 5-point easing; Cooling dropped (no measurable effect) → 7 apps, 7 problems; stable count shown honestly; cut-off 9:30 pm, else fall back to backup/hollowguard-site-2026-11-20. Spec: .plans/adarsh-integration-spec.md · Neil
 - 2026-11-20 · Team is Neil, Adarsh and Richard (rphan09); Anish and Darryl left · Neil
+- 2026-11-20 · Site URL is https://hollowguard.vercel.app (Vercel project renamed; no GitHub Pages because the repo is private) · Neil

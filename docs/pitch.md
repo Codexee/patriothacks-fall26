@@ -1,6 +1,6 @@
 # HollowGuard: talking points
 
-Live site: https://hollow-twin-poc.vercel.app · Video script: `docs/demo-video.md` · Numbers: `README.md` (test seeds 11–20).
+Live site: https://hollowguard.vercel.app · Video script: `docs/demo-video.md` · Numbers: `README.md` (test seeds 11–20).
 
 Story order: dystopia → victim → tool → live demo → how it works → what's next.
 

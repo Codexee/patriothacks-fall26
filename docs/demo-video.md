@@ -1,6 +1,6 @@
 # Demo video: shot list and script
 
-Length: **about 2:45** (the limit is not published; stay under 3:00). One continuous screen recording of the live site, https://hollow-twin-poc.vercel.app, with a voice-over. Do not cut during the 3D beat (0:55–1:35).
+Length: **about 2:45** (the limit is not published; stay under 3:00). One continuous screen recording of the live site, https://hollowguard.vercel.app, with a voice-over. Do not cut during the 3D beat (0:55–1:35).
 
 **Before you record:**
 - Use a 1920×1080 browser window, zoom at 100%, dark mode. Close other tabs and turn off notifications.
@@ -18,7 +18,7 @@ All numbers come from `public/results/scenarios.json` and `impact.json` (test se
 | **1:35–1:55** Impact | Back to the homepage, "The app and its impact". Point at the bars. | "We measured every app by switching it off and rerunning the same 70 tests. Blackout Warning avoids 33 million deaths. Food Sharing avoids 23 million. Water Safety, 4.2 million. Off-Network Messaging shows zero, because our test runs have no network cut, and we say so." |
 | **1:55–2:15** Real data | Scroll to "02 Built on real-world data". Point at the three loss curves, then at the check-first tile. | "The disasters are not made up. Four copy real US plant losses, hour by hour, from EIA-930. Our second model ranks which areas to check first. We tested it once, on real 2023–2024 outages it never saw: top-10 overlap 0.459, against 0.278 for history." |
 | **2:15–2:35** How it works | Scroll to "How Blackout Warning works" (the 5 steps and the shaft figure). | "How do residents forecast a blackout without seeing a plant? Power reaches the top levels first, so the deepest lit level tells you the supply. When that line moves up day over day, supply is falling, and the levels between the two lines are next. We tuned on seeds 1 to 5, checked on 6 to 10, and tested once on 11 to 20." |
-| **2:35–2:50** Close | Back to the hero. The cursor rests on "Play the 90-second tour". | "HollowGuard: seven problems, one phone, and every number measured. 49 of 70 runs end stable with it, and none without. Try the 90-second tour at hollow-twin-poc.vercel.app." |
+| **2:35–2:50** Close | Back to the hero. The cursor rests on "Play the 90-second tour". | "HollowGuard: seven problems, one phone, and every number measured. 49 of 70 runs end stable with it, and none without. Try the 90-second tour at hollowguard.vercel.app." |
 
 ## The wow beat (0:55–1:35)
 The moment the left shaft goes dark while the right one stays blue, and the phone banner arrives. Record this part in one take. If the 3D view stutters on the recording machine, set Speed to 1 d/s before you start.
