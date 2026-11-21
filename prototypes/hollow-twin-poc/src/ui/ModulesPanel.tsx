@@ -194,7 +194,6 @@ export interface ModulesPanelProps {
 export function ModulesPanel(p: ModulesPanelProps) {
   const [collapsed, setCollapsed] = useState<Partial<Record<ToolKey, boolean>>>({});
   const changed = BUILT.some((k) => p.pending[k] !== p.running[k]);
-  const solved = PROBLEMS.filter((pr) => pr.feature && BUILT.includes(pr.feature)).length;
 
   if (!p.open) {
     return (
@@ -225,7 +224,6 @@ export function ModulesPanel(p: ModulesPanelProps) {
         <h1>Solution modules <Info label="About the solution modules">The features of the Residents' System, one per Hollow problem. Switch each one on or off here; the change applies from the next day, and Reset starts the Hollow over with your choice. Each card shows what the module worked out from today's data.</Info></h1>
         <button className="ghost" onClick={p.onToggle} title="Minimize (M)">Minimize</button>
       </header>
-      <p className="mods-progress">{solved} of 15 Hollow problems solved</p>
       {changed && (
         <p className="mods-pending">Your changes apply from the next day. <button onClick={p.onReset} disabled={p.locked}>Reset to start over with them</button></p>
       )}
