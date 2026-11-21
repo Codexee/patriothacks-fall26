@@ -14,6 +14,18 @@ const HOT_PER_1000 = 1; // heat reports per 1,000 residents in 2 days: this leve
 const MOVES = 2; // fan moves a day (crews)
 const TARGET_COL = 3;
 
+/** Heat reports per 1,000 residents over the last 2 days, per level (index 0 = level 1). */
+export function heatRates(m: ProductMemory): number[] {
+  const days = m.hotReports ?? [];
+  return Array.from({ length: LEVELS }, (_, k) => {
+    let p = 0;
+    for (let c = 0; c < SECTIONS_PER_LEVEL; c++) { const i = k * SECTIONS_PER_LEVEL + c; p += m.selfCount[i] || m.census.people[i] || 0; }
+    const r = days.reduce((a, d) => a + (d.perLevel[k] || 0), 0);
+    return p > 0 ? (r / p) * 1000 : 0;
+  });
+}
+export { HOT_PER_1000 };
+
 export function cooling(m: ProductMemory, day: number): { outputs: Output[]; log: NonNullable<ProductLog['cooling']> } | null {
   const days = m.hotReports ?? [];
   if (!days.length || !m.census.people.length) return null;

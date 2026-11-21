@@ -11,9 +11,7 @@
 import { LEVELS, SECTIONS_PER_LEVEL, type Output } from '../sim/types.ts';
 import type { ProductLog, ProductMemory } from './types.ts';
 
-const MIN_REPORTS = 8;
-const RATE_FACTOR = 3;
-const SPREAD = 1; // also warn the level above and below
+export const OB = { minReports: 8, rateFactor: 3, spread: 1 }; // design choices (tuned on Baseline, Nov 20)
 
 export function outbreak(m: ProductMemory, day: number): { outputs: Output[]; log: NonNullable<ProductLog['outbreak']> } | null {
   const days = m.coughReports ?? [];
@@ -28,10 +26,10 @@ export function outbreak(m: ProductMemory, day: number): { outputs: Output[]; lo
   });
   const sorted = rows.map((r) => r.per1000).sort((a, b) => a - b);
   const typical = sorted[Math.floor(sorted.length / 2)];
-  const hotspots = rows.filter((r) => r.reports >= MIN_REPORTS && r.per1000 > RATE_FACTOR * typical + 0.05).map((r) => r.level);
+  const hotspots = rows.filter((r) => r.reports >= OB.minReports && r.per1000 > OB.rateFactor * typical + 0.05).map((r) => r.level);
   // Group hot spots (± SPREAD) into level ranges.
   const covered = new Set<number>();
-  for (const l of hotspots) for (let k = l - SPREAD; k <= l + SPREAD; k++) if (k >= 1 && k <= LEVELS) covered.add(k);
+  for (const l of hotspots) for (let k = l - OB.spread; k <= l + OB.spread; k++) if (k >= 1 && k <= LEVELS) covered.add(k);
   const levels = [...covered].sort((a, b) => a - b);
   const outputs: Output[] = [];
   for (let a = 0; a < levels.length;) {

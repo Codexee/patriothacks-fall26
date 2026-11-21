@@ -2,6 +2,16 @@
 
 Newest first. Add an entry whenever you change shared context, skills, or the workflow. Each teammate's AI shows the top entry at the start of every session (`scripts/hooks/sync_check.sh`).
 
+## 2026-11-20 (34, branch hollow-earth-rebuild-2d only): Baseline fixes for the harder world
+
+- **Heat was the main killer.** In a blackout a deep level's cooling stops and it climbs to about 37 °C wet-bulb (limit 31). With heat switched off, Baseline deaths on seeds 1–10 fall from 160,162 to 9,630.
+- **Fixes:**
+  1. Residents warned by Blackout Warning, who move to an upper section or a powered shelter for air, now also escape the heat (the same share is spared).
+  2. Fair Share asks overheating levels (residents' heat reports) for 10% of the usual share and never more than 30%, because their cooling runs on that power.
+  3. Easing goes back to 5 points every 5 quiet days in this branch: with heat, every late plant trip kills thousands. `main` keeps the gentle easing.
+- **Baseline, seeds 1–10:** 158,480 deaths, 8/10 stable → **40,224, 10/10 stable**. On the test seeds 11–20: 79,313, 7/10 stable. Baseline deaths are now driven by random whole-Hollow plant trips, so they swing a lot between seed sets.
+- **All disasters, test seeds 11–20:** 35,323,040 → **772,220** deaths (was 2,061,500), 74% of runs stable (was 66%).
+
 ## 2026-11-20 (33, branch hollow-earth-rebuild-2d only): Cooling (#3), Outbreak Tracker (#9), Food Sharing (#12)
 
 - **This is on the `hollow-earth-rebuild-2d` branch, not `main`.** `main` keeps 5 problems and the 43.6 M → 12,540 headline.

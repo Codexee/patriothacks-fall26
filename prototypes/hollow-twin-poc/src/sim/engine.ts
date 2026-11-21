@@ -1007,7 +1007,9 @@ export function stepDay(prev: SimState, actions: Action[]): DayResult {
 
       // Other deaths: heat above the wet-bulb limit, very high CO₂, bad water, starvation.
       let rate = 0;
-      if (WORLD.heat && s.wet[i] > WETBULB_LIMIT) rate += HEAT_DEATH * (s.wet[i] - WETBULB_LIMIT);
+      // Heat (#3). Residents who were warned in time move to an upper section or a powered shelter for air (see bad
+      // air below): the same move takes them out of the heat, so the same share of them is spared.
+      if (WORLD.heat && s.wet[i] > WETBULB_LIMIT) rate += HEAT_DEATH * (s.wet[i] - WETBULB_LIMIT) * (1 - PREPARED_SAVE * prepA[i]);
       // Bad air (#1): with the fans off, CO2 builds up. Residents who were warned in time get to better air
       // (an upper section, a powered shelter, battery fans), so far fewer of them die.
       if (WORLD.air && s.co2[i] > AIR_DANGER) {

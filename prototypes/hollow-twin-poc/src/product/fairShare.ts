@@ -11,9 +11,12 @@
 import { LEVELS, SECTIONS_PER_LEVEL, type Output } from '../sim/types.ts';
 import type { ProductLog, ProductMemory } from './types.ts';
 import { EASE } from './earlyWarning.ts';
+import { heatRates, HOT_PER_1000 } from './cooling.ts';
 
 export const FAIR = {
   darkRelief: 0.6, // a level dark all of yesterday gets (1 − 0.6) = 40% of the weight of a level that kept power
+  hotCap: 0.3, // and never more than 30%
+  hotWeight: 0.1, // an overheating level (residents' heat reports) is asked for 10% of the usual share: its cooling runs on that power
 };
 
 type Shed = Extract<Output, { kind: 'alert' }>;
@@ -36,14 +39,18 @@ export function fairShare(m: ProductMemory, day: number, shed: Shed | null):
     if (y.hollowDark[h]) continue;
     for (let l = y.line[h]; l < LEVELS; l++) darkShare[l] += 1 / 24;
   }
-  const w = darkShare.map((d) => 1 - FAIR.darkRelief * d);
+  const heat = heatRates(m);
+  const hot = heat.map((r) => r >= HOT_PER_1000 / 2); // starting to overheat
+  const w = darkShare.map((d, l) => (hot[l] ? FAIR.hotWeight : 1 - FAIR.darkRelief * d));
 
   // Same total: find k so that Σ min(max, k·w_l)·N_l = request × ΣN_l.
   const total = shed.amount * non.reduce((a, b) => a + b, 0);
   const used = (k: number) => non.reduce((s, n, l) => s + Math.min(EASE.maxShed, k * w[l]) * n, 0);
   let lo = 0, hi = 10;
   for (let it = 0; it < 40; it++) { const mid = (lo + hi) / 2; if (used(mid) < total) lo = mid; else hi = mid; }
-  const amount = w.map((wl) => Math.round(Math.min(EASE.maxShed, hi * wl) * 100) / 100);
+  // An overheating level never cuts more than FAIR.hotCap, even if that leaves the total a little short: its cooling
+  // runs on this power, and in a hot section that is life support.
+  const amount = w.map((wl, l) => Math.round(Math.min(hot[l] ? FAIR.hotCap : EASE.maxShed, hi * wl) * 100) / 100);
 
   // One alert per run of levels with the same request.
   const outputs: Output[] = [];
@@ -51,10 +58,10 @@ export function fairShare(m: ProductMemory, day: number, shed: Shed | null):
     let e = l;
     while (e + 1 < LEVELS && amount[e + 1] === amount[l]) e++;
     const a = amount[l];
-    const relieved = darkShare[l] > 0;
+    const relieved = darkShare[l] > 0 || hot[l];
     outputs.push({
       kind: 'alert', id: `fs-${day}-${l + 1}`, module: 'fairShare', action: 'shed', from: l + 1, to: e + 1, hours: 24, amount: a,
-      text: `Fair share for levels ${l + 1 === e + 1 ? l + 1 : `${l + 1}–${e + 1}`} today: switch off ${Math.round(a * 100)}% of non-essential load (the Hollow-wide request is ${Math.round(shed.amount * 100)}%). ${relieved ? 'You lost power yesterday, so you are asked for less.' : 'Levels that lost power yesterday are asked for less, so you are asked for a little more.'}`,
+      text: `Fair share for levels ${l + 1 === e + 1 ? l + 1 : `${l + 1}–${e + 1}`} today: switch off ${Math.round(a * 100)}% of non-essential load (the Hollow-wide request is ${Math.round(shed.amount * 100)}%). ${hot[l] ? 'Your level is overheating, and its cooling runs on this power, so you are asked for much less.' : relieved ? 'You lost power yesterday, so you are asked for less.' : 'Levels that are overheating or lost power yesterday are asked for less, so you are asked for a little more.'}`,
       evidence: [
         `The total saving is the same as Blackout Warning's request: ${Math.round(shed.amount * 100)}% of all non-essential load`,
         `From yesterday's outage reports, these levels were dark for about ${Math.round(darkShare[l] * 24)} h`,
