@@ -101,4 +101,4 @@ The check-first model: `uv run python models/train_dark_residents.py`, then `uv 
 
 ## Team
 
-Neil, Adarsh, Anish and Darryl. Built during the event, Nov 14–20, 2026, with help from AI tools as the rules allow.
+Neil (Codexee), Adarsh (air842) and Richard (rphan09). Built during the event, Nov 14–20, 2026, with help from AI tools as the rules allow.
